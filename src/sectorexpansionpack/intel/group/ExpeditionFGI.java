@@ -236,6 +236,17 @@ public class ExpeditionFGI extends FleetGroupIntel {
     }
 
     @Override
+    protected void addBasicDescription(TooltipMakerAPI info, float width, float height, float oPad) {
+        info.addImage(getFaction().getLogo(), width, 128, oPad);
+        StarSystemAPI system = this.params.target;
+        String noun = this.params.noun;
+
+        info.addPara(Misc.ucFirst(this.faction.getPersonNamePrefixAOrAn()) + " %s " + noun + " is going to explore "
+                        + "the " + system.getNameWithLowercaseTypeShort() + ".", oPad,
+                this.faction.getBaseUIColor(), this.faction.getPersonNamePrefix());
+    }
+
+    @Override
     protected void addAssessmentSection(TooltipMakerAPI info, float width, float height, float oPad) {
         FactionAPI faction = getFaction();
         String forces = this.params.forcesNoun;
