@@ -2,6 +2,7 @@ package sectorexpansionpack.intel.group;
 
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.campaign.*;
+import com.fs.starfarer.api.campaign.econ.Industry;
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
 import com.fs.starfarer.api.impl.campaign.ids.*;
 import com.fs.starfarer.api.impl.campaign.intel.group.FGAction;
@@ -13,6 +14,7 @@ import com.fs.starfarer.api.impl.campaign.missions.hub.BaseHubMission;
 import com.fs.starfarer.api.impl.campaign.missions.hub.HubMissionWithSearch;
 import com.fs.starfarer.api.impl.campaign.missions.hub.HubMissionWithTriggers;
 import com.fs.starfarer.api.impl.campaign.missions.hub.ReqMode;
+import com.fs.starfarer.api.impl.campaign.rulecmd.salvage.special.BaseSalvageSpecial;
 import com.fs.starfarer.api.ui.Alignment;
 import com.fs.starfarer.api.ui.LabelAPI;
 import com.fs.starfarer.api.ui.TooltipMakerAPI;
@@ -579,10 +581,48 @@ public class ExpeditionFGI extends FleetGroupIntel {
             this.travelAction.setActionFinished(true);
         } else if (Objects.equals(PAYLOAD_ACTION, action.getId())) {
             this.payloadAction.setActionFinished(true);
+            List<Float> probabilities = new ArrayList<>();
+            float totalLootMult = this.lootMult;
+            for (float i = totalLootMult; i >= 0f; i--) {
+                probabilities.add(Math.min(i, 1f));
+            }
+
+            CargoAPI loot = Global.getFactory().createCargo(true);
+            for (float probability : probabilities) {
+                if (getRandom().nextFloat() < probability) {
+                    String id = pickSpecialItem();
+                    loot.addSpecial(new SpecialItemData(id, null), 1);
+                }
+            }
+
+            BaseSalvageSpecial.addExtraSalvage(getMainFleet(), loot);
         } else if (Objects.equals(RETURN_ACTION, action.getId())) {
             this.returnAction.setActionFinished(true);
         }
     }
+
+    protected String pickSpecialItem() {
+        WeightedRandomPicker<SpecialItemSpecAPI> specialItemPicker = new WeightedRandomPicker<>(getRandom());
+        for (SpecialItemSpecAPI spec : Global.getSettings().getAllSpecialItemSpecs()) {
+            if (!spec.hasTag("hist3t") || Objects.equals(spec.getId(), Items.CORONAL_PORTAL) || Objects.equals(spec.getId(), Items.ORBITAL_FUSION_LAMP)) {
+                continue;
+            }
+            float weight = 10f;
+            for (Industry i : getSource().getMarket().getIndustries()) {
+                if (i.wantsToUseSpecialItem(new SpecialItemData(spec.getId(), null))) {
+                    weight += 3f; // Increase weight if source market can use special item
+                }
+            }
+            if (Objects.equals(spec.getId(), Items.PRISTINE_NANOFORGE)) {
+                weight = 3f;
+            } else if (Objects.equals(spec.getId(), Items.CORRUPTED_NANOFORGE)) {
+                weight = 7f;
+            }
+            specialItemPicker.add(spec, weight);
+        }
+        return specialItemPicker.pick().getId();
+    }
+
 
     public CampaignFleetAPI getMainFleet() {
         return getFleets().stream()
