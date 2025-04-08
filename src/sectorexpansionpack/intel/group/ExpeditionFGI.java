@@ -230,7 +230,11 @@ public class ExpeditionFGI extends FleetGroupIntel {
             m.triggerMakeAlwaysSpreadTOffHostility();
         }
 
-        return m.createFleet();
+        CampaignFleetAPI fleet = m.createFleet();
+        if (fleet != null) {
+            configureFleet(size, fleet);
+        }
+        return fleet;
     }
 
     public void setFleetCreatorQualityFromRoute(FleetCreatorMission m) {
@@ -239,6 +243,25 @@ public class ExpeditionFGI extends FleetGroupIntel {
         }
         m.getPreviousCreateFleetAction().qualityOverride = this.route.getExtra().quality;
     }
+
+    public void configureFleet(int size, CampaignFleetAPI fleet) {
+        fleet.setNoFactionInName(false);
+        if (this.params.fleetSizes.size() == 1) {
+            fleet.setName("Expedition Fleet");
+            fleet.getMemoryWithoutUpdate().set("$sep_expeditionFleet", true);
+            setPostingLocation(fleet);
+        } else {
+            Integer maxSize = this.params.fleetSizes.stream().reduce(Integer.MIN_VALUE, Integer::max);
+            if (size == maxSize) {
+                fleet.setName("Expedition Fleet");
+                fleet.getMemoryWithoutUpdate().set("$sep_expeditionFleet", true);
+                setPostingLocation(fleet);
+            } else {
+                fleet.setName("Supply Fleet");
+            }
+        }
+    }
+
 
     @Override
     protected SectorEntityToken getSource() {
