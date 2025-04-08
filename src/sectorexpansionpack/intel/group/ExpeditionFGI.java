@@ -331,13 +331,8 @@ public class ExpeditionFGI extends FleetGroupIntel {
         String forces = this.params.forcesNoun;
         String noun = this.params.noun;
 
-        boolean prepareFailed = this.waitAction.isActionFinished() && isAborted();
-        boolean travelFailed = this.travelAction.isActionFinished() && isAborted() && prepareFailed;
-        boolean payloadFailed = this.payloadAction.isActionFinished() && isAborted() && travelFailed;
-        boolean returnFailed = this.returnAction.isActionFinished() && isAborted() && payloadFailed;
-
         info.addSectionHeading("Status", this.faction.getBaseUIColor(), this.faction.getDarkUIColor(), Alignment.MID, oPad);
-        if (currentAction != null) {
+        if (currentAction != null && !isFailed()) {
             if (isInPreLaunchDelay()) {
                 if (getSource().getMarket() != null) {
                     BaseHubMission.addStandardMarketDesc("The " + noun + " is in the planning stages on",
@@ -349,57 +344,53 @@ public class ExpeditionFGI extends FleetGroupIntel {
                     }
                 }
             } else if (Objects.equals(PREPARE_ACTION, currentAction.getId())) {
-                if (!prepareFailed) {
-                    if (getSource().getMarket() != null) {
-                        BaseHubMission.addStandardMarketDesc("Making preparations in orbit around", getSource().getMarket(), info, oPad);
-                    } else {
-                        info.addPara("Making preparations in orbit around " + getSource().getName() + ".", oPad);
-                    }
+                if (getSource().getMarket() != null) {
+                    BaseHubMission.addStandardMarketDesc("Making preparations in orbit around", getSource().getMarket(), info, oPad);
                 } else {
-                    info.addPara("The " + forces + " failed to depart from the " + source.getNameWithLowercaseTypeShort(), oPad);
+                    info.addPara("Making preparations in orbit around " + getSource().getName() + ".", oPad);
                 }
             } else if (Objects.equals(TRAVEL_ACTION, currentAction.getId())) {
-                if (!travelFailed) {
-                    if (getSource().getMarket() == null) {
-                        info.addPara("Traveling to the " + target.getNameWithLowercaseTypeShort() + ".", oPad);
-                    } else {
-                        info.addPara("Traveling from " + getSource().getMarket().getName() + " to the " +
-                                target.getNameWithLowercaseTypeShort() + ".", oPad);
-                    }
+                if (getSource().getMarket() == null) {
+                    info.addPara("Traveling to the " + target.getNameWithLowercaseTypeShort() + ".", oPad);
                 } else {
-                    info.addPara("The " + forces + " failed to reach the " + target.getNameWithLowercaseTypeShort(), oPad);
+                    info.addPara("Traveling from " + getSource().getMarket().getName() + " to the " +
+                            target.getNameWithLowercaseTypeShort() + ".", oPad);
                 }
             } else if (Objects.equals(PAYLOAD_ACTION, currentAction.getId())) {
-                if (!payloadFailed) {
-                    info.addPara("Exploring the " + target.getNameWithLowercaseTypeShort(), oPad);
-                } else {
-                    info.addPara("The " + forces + " failed to explore the " + target.getNameWithLowercaseTypeShort(), oPad);
-                }
+                info.addPara("Exploring the " + target.getNameWithLowercaseTypeShort(), oPad);
             } else if (Objects.equals(RETURN_ACTION, currentAction.getId())) {
-                if (!returnFailed) {
-                    if (getSource().getMarket() == null) {
-                        info.addPara("Returning to their port of origin.", oPad);
-                    } else {
-                        String lootDesc = getLootDescription(this.lootMult, true);
-                        String lootHighlight = getLootDescription(this.lootMult, false);
-                        Color lootColor = getLootDescColor(this.lootMult);
-
-                        LabelAPI label = info.addPara("Returning to " + getSource().getMarket().getName() + " in the "
-                                + source.getNameWithLowercaseTypeShort() + ". Has " + lootDesc
-                                + " of carrying valuable salvage.", oPad);
-                        label.setHighlightColors(getFaction().getBaseUIColor(), Misc.getTextColor(), lootColor);
-                        label.setHighlight(getSource().getMarket().getName(), getNameWithNoType(source.getNameWithLowercaseTypeShort()), lootHighlight);
-                    }
+                if (getSource().getMarket() == null) {
+                    info.addPara("Returning to their port of origin.", oPad);
                 } else {
-                    info.addPara("The " + forces + " failed to return to the " + source.getNameWithLowercaseTypeShort(), oPad);
+                    String lootDesc = getLootDescription(this.lootMult, true);
+                    String lootHighlight = getLootDescription(this.lootMult, false);
+                    Color lootColor = getLootDescColor(this.lootMult);
+
+                    LabelAPI label = info.addPara("Returning to " + getSource().getMarket().getName() + " in the "
+                            + source.getNameWithLowercaseTypeShort() + ". Has " + lootDesc
+                            + " of carrying valuable salvage.", oPad);
+                    label.setHighlightColors(getFaction().getBaseUIColor(), Misc.getTextColor(), lootColor);
+                    label.setHighlight(getSource().getMarket().getName(), getNameWithNoType(source.getNameWithLowercaseTypeShort()), lootHighlight);
                 }
             }
-        } else {
-            if (isSucceeded()) {
+        } else if (isSucceeded()){
                 info.addPara("The " + forces + " have returned from the " + target.getNameWithLowercaseTypeShort()
                         + ". Any valuable salvage they recovered will most likely be used and distributed.", oPad);
-            }
-            if (isFailed()) {
+        } else if (isFailed()) {
+            boolean prepareFailed = this.waitAction.isActionFinished() && isAborted();
+            boolean travelFailed = this.travelAction.isActionFinished() && isAborted() && prepareFailed;
+            boolean payloadFailed = this.payloadAction.isActionFinished() && isAborted() && travelFailed;
+            boolean returnFailed = this.returnAction.isActionFinished() && isAborted() && payloadFailed;
+
+            if (returnFailed) {
+                info.addPara("The " + forces + " failed to return to the " + source.getNameWithLowercaseTypeShort(), oPad);
+            } else if (payloadFailed) {
+                info.addPara("The " + forces + " failed to explore the " + target.getNameWithLowercaseTypeShort(), oPad);
+            } else if (travelFailed) {
+                info.addPara("The " + forces + " failed to reach the " + target.getNameWithLowercaseTypeShort(), oPad);
+            } else if (prepareFailed) {
+                info.addPara("The " + forces + " failed to depart from the " + source.getNameWithLowercaseTypeShort(), oPad);
+            } else {
                 info.addPara("The " + forces + " failed to complete their objectives", oPad);
             }
         }
