@@ -8,6 +8,7 @@ import com.fs.starfarer.api.campaign.StarSystemAPI;
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
 import com.fs.starfarer.api.impl.campaign.ids.Factions;
 import com.fs.starfarer.api.impl.campaign.ids.Industries;
+import com.fs.starfarer.api.impl.campaign.ids.Stats;
 import com.fs.starfarer.api.impl.campaign.intel.group.FGAction;
 import com.fs.starfarer.api.impl.campaign.intel.group.FGTravelAction;
 import com.fs.starfarer.api.impl.campaign.intel.group.FGWaitAction;
@@ -56,8 +57,27 @@ public class ExpeditionFGI extends FleetGroupIntel {
             return;
         }
 
-        float maxTotalDifficulty = 10f;
-        this.params.fleetSizes.add(Math.round(maxTotalDifficulty));
+        float fleetSizeMult = this.params.source.getStats().getDynamic().getMod(Stats.COMBAT_FLEET_SIZE_MULT).computeEffective(0f);
+        float maxTotalDifficulty = fleetSizeMult * 5f;
+        float totalDifficulty = maxTotalDifficulty;
+        if (totalDifficulty > 100f) {
+            totalDifficulty = 100f;
+        }
+        if (totalDifficulty >= 10f) {
+            this.params.fleetSizes.add(10);
+            totalDifficulty -= 10f;
+        } else {
+            this.params.fleetSizes.add(Math.round(totalDifficulty));
+            totalDifficulty = 0f;
+        }
+        while (totalDifficulty > 0f) {
+            int min = 4;
+            int max = 8;
+            int diff = min + this.random.nextInt(max - min + 1);
+
+            this.params.fleetSizes.add(diff);
+            totalDifficulty -= diff;
+        }
 
         setRandom(this.params.random);
         setPostingLocation(getSource());
