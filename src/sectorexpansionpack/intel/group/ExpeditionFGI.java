@@ -289,40 +289,43 @@ public class ExpeditionFGI extends FleetGroupIntel {
 
     @Override
     protected void addAssessmentSection(TooltipMakerAPI info, float width, float height, float oPad) {
+        FGAction currentAction = getCurrentAction();
         FactionAPI faction = getFaction();
         String forces = this.params.forcesNoun;
         String systemName = this.params.target.getNameWithLowercaseTypeShort();
         String systemHighlight = getNameWithNoType(systemName);
         Color h = Misc.getHighlightColor();
 
-        if (!isEnding() && !isSucceeded() && !isFailed() && getCurrentAction() != null && !RETURN_ACTION.equals(getCurrentAction().getId())) {
-            info.addSectionHeading("Assessment", faction.getBaseUIColor(), faction.getDarkUIColor(), Alignment.MID, oPad);
+        if (currentAction != null) {
+            if (!isEnding() && !isSucceeded() && !isFailed() && !RETURN_ACTION.equals(getCurrentAction().getId())) {
+                info.addSectionHeading("Assessment", faction.getBaseUIColor(), faction.getDarkUIColor(), Alignment.MID, oPad);
 
-            float raidStr = getRoute().getExtra().getStrengthModifiedByDamage();
-            String strDesc = Misc.getStrengthDesc(raidStr);
-            int numFleets = getApproximateNumberOfFleets();
-            String fleets = "fleets";
-            if (numFleets == 1) {
-                fleets = "fleet";
+                float raidStr = getRoute().getExtra().getStrengthModifiedByDamage();
+                String strDesc = Misc.getStrengthDesc(raidStr);
+                int numFleets = getApproximateNumberOfFleets();
+                String fleets = "fleets";
+                if (numFleets == 1) {
+                    fleets = "fleet";
+                }
+
+                info.addPara("The " + forces + " are projected to be %s and likely comprised of %s " + fleets + ".",
+                        oPad, h, strDesc, "" + numFleets);
+
+                String lootDesc = getLootDescription(this.lootMult, true);
+                String lootHighlight = getLootDescription(this.lootMult, false);
+                Color lootColor = getLootDescColor(this.lootMult);
+
+                LabelAPI label = info.addPara("Preliminary info on the " + systemName +
+                        " suggests " + lootDesc + " of yielding valuable salvage.", oPad);
+                label.setHighlightColors(h, lootColor);
+                label.setHighlight(systemHighlight, lootHighlight);
             }
-
-            info.addPara("The " + forces + " are projected to be %s and likely comprised of %s " + fleets + ".",
-                    oPad, h, strDesc, "" + numFleets);
-
-            String lootDesc = getLootDescription(this.lootMult, true);
-            String lootHighlight = getLootDescription(this.lootMult, false);
-            Color lootColor = getLootDescColor(this.lootMult);
-
-            LabelAPI label = info.addPara("Preliminary info on the " + systemName +
-                    " suggests " + lootDesc + " of yielding valuable salvage.", oPad);
-            label.setHighlightColors(h, lootColor);
-            label.setHighlight(systemHighlight, lootHighlight);
         }
     }
 
     @Override
     protected void addStatusSection(TooltipMakerAPI info, float width, float height, float oPad) {
-        FGAction curr = getCurrentAction();
+        FGAction currentAction = getCurrentAction();
         StarSystemAPI target = this.params.target;
         StarSystemAPI source = this.params.source.getStarSystem();
         String forces = this.params.forcesNoun;
@@ -334,60 +337,62 @@ public class ExpeditionFGI extends FleetGroupIntel {
         boolean returnFailed = this.returnAction.isActionFinished() && isAborted() && payloadFailed;
 
         info.addSectionHeading("Status", this.faction.getBaseUIColor(), this.faction.getDarkUIColor(), Alignment.MID, oPad);
-        if (isInPreLaunchDelay()) {
-            if (getSource().getMarket() != null) {
-                BaseHubMission.addStandardMarketDesc("The " + noun + " is in the planning stages on",
-                        getSource().getMarket(), info, oPad);
-                boolean mil = isSourceFunctionalMilitaryMarket();
-                if (mil) {
-                    info.addPara("Disrupting the military facilities " + getSource().getMarket().getOnOrAt() +
-                            " " + getSource().getMarket().getName() + " will abort the " + noun + ".", oPad);
-                }
-            }
-        } else if (Objects.equals(PREPARE_ACTION, curr.getId())) {
-            if (!prepareFailed) {
+        if (currentAction != null) {
+            if (isInPreLaunchDelay()) {
                 if (getSource().getMarket() != null) {
-                    BaseHubMission.addStandardMarketDesc("Making preparations in orbit around", getSource().getMarket(), info, oPad);
-                } else {
-                    info.addPara("Making preparations in orbit around " + getSource().getName() + ".", oPad);
+                    BaseHubMission.addStandardMarketDesc("The " + noun + " is in the planning stages on",
+                            getSource().getMarket(), info, oPad);
+                    boolean mil = isSourceFunctionalMilitaryMarket();
+                    if (mil) {
+                        info.addPara("Disrupting the military facilities " + getSource().getMarket().getOnOrAt() +
+                                " " + getSource().getMarket().getName() + " will abort the " + noun + ".", oPad);
+                    }
                 }
-            } else {
-                info.addPara("The " + forces + " failed to depart from the " + source.getNameWithLowercaseTypeShort(), oPad);
-            }
-        } else if (Objects.equals(TRAVEL_ACTION, curr.getId())) {
-            if (!travelFailed) {
-                if (getSource().getMarket() == null) {
-                    info.addPara("Traveling to the " + target.getNameWithLowercaseTypeShort() + ".", oPad);
+            } else if (Objects.equals(PREPARE_ACTION, currentAction.getId())) {
+                if (!prepareFailed) {
+                    if (getSource().getMarket() != null) {
+                        BaseHubMission.addStandardMarketDesc("Making preparations in orbit around", getSource().getMarket(), info, oPad);
+                    } else {
+                        info.addPara("Making preparations in orbit around " + getSource().getName() + ".", oPad);
+                    }
                 } else {
-                    info.addPara("Traveling from " + getSource().getMarket().getName() + " to the " +
-                            target.getNameWithLowercaseTypeShort() + ".", oPad);
+                    info.addPara("The " + forces + " failed to depart from the " + source.getNameWithLowercaseTypeShort(), oPad);
                 }
-            } else {
-                info.addPara("The " + forces + " failed to reach the " + target.getNameWithLowercaseTypeShort(), oPad);
-            }
-        } else if (Objects.equals(PAYLOAD_ACTION, curr.getId())) {
-            if (!payloadFailed) {
-                info.addPara("Exploring the " + target.getNameWithLowercaseTypeShort(), oPad);
-            } else {
-                info.addPara("The " + forces + " failed to explore the " + target.getNameWithLowercaseTypeShort(), oPad);
-            }
-        } else if (Objects.equals(RETURN_ACTION, curr.getId())) {
-            if (!returnFailed) {
-                if (getSource().getMarket() == null) {
-                    info.addPara("Returning to their port of origin.", oPad);
+            } else if (Objects.equals(TRAVEL_ACTION, currentAction.getId())) {
+                if (!travelFailed) {
+                    if (getSource().getMarket() == null) {
+                        info.addPara("Traveling to the " + target.getNameWithLowercaseTypeShort() + ".", oPad);
+                    } else {
+                        info.addPara("Traveling from " + getSource().getMarket().getName() + " to the " +
+                                target.getNameWithLowercaseTypeShort() + ".", oPad);
+                    }
                 } else {
-                    String lootDesc = getLootDescription(this.lootMult, true);
-                    String lootHighlight = getLootDescription(this.lootMult, false);
-                    Color lootColor = getLootDescColor(this.lootMult);
+                    info.addPara("The " + forces + " failed to reach the " + target.getNameWithLowercaseTypeShort(), oPad);
+                }
+            } else if (Objects.equals(PAYLOAD_ACTION, currentAction.getId())) {
+                if (!payloadFailed) {
+                    info.addPara("Exploring the " + target.getNameWithLowercaseTypeShort(), oPad);
+                } else {
+                    info.addPara("The " + forces + " failed to explore the " + target.getNameWithLowercaseTypeShort(), oPad);
+                }
+            } else if (Objects.equals(RETURN_ACTION, currentAction.getId())) {
+                if (!returnFailed) {
+                    if (getSource().getMarket() == null) {
+                        info.addPara("Returning to their port of origin.", oPad);
+                    } else {
+                        String lootDesc = getLootDescription(this.lootMult, true);
+                        String lootHighlight = getLootDescription(this.lootMult, false);
+                        Color lootColor = getLootDescColor(this.lootMult);
 
-                    LabelAPI label = info.addPara("Returning to " + getSource().getMarket().getName() + " in the "
-                            + source.getNameWithLowercaseTypeShort() + ". Has " + lootDesc
-                            + " of carrying valuable salvage.", oPad);
-                    label.setHighlightColors(getFaction().getBaseUIColor(), Misc.getTextColor(), lootColor);
-                    label.setHighlight(getSource().getMarket().getName(), getNameWithNoType(source.getNameWithLowercaseTypeShort()), lootHighlight);
+                        LabelAPI label = info.addPara("Returning to " + getSource().getMarket().getName() + " in the "
+                                + source.getNameWithLowercaseTypeShort() + ". Has " + lootDesc
+                                + " of carrying valuable salvage.", oPad);
+                        label.setHighlightColors(getFaction().getBaseUIColor(), Misc.getTextColor(), lootColor);
+                        label.setHighlight(getSource().getMarket().getName(), getNameWithNoType(source.getNameWithLowercaseTypeShort()), lootHighlight);
+                    }
+                } else {
+                    info.addPara("The " + forces + " failed to return to the " + source.getNameWithLowercaseTypeShort(), oPad);
                 }
-            } else {
-                info.addPara("The " + forces + " failed to return to the " + source.getNameWithLowercaseTypeShort(), oPad);
             }
         } else {
             if (isSucceeded()) {
@@ -434,8 +439,8 @@ public class ExpeditionFGI extends FleetGroupIntel {
 
     @Override
     protected void addNonUpdateBulletPoints(TooltipMakerAPI info, Color tc, Object param, ListInfoMode mode, float initPad) {
+        FGAction currentAction = getCurrentAction();
         Color s = Misc.getHighlightColor();
-        FGAction curr = getCurrentAction();
         StarSystemAPI target = this.params.target;
         StarSystemAPI source = this.params.source.getStarSystem();
 
@@ -444,48 +449,50 @@ public class ExpeditionFGI extends FleetGroupIntel {
         float untilArrival = getETAUntil(PAYLOAD_ACTION);
         float untilReturn = getETAUntil(RETURN_ACTION, true);
 
-        if (Objects.equals(PREPARE_ACTION, curr.getId())) {
-            if (!isEnding()) {
-                if (untilDeployment > 0) {
+        if (currentAction != null) {
+            if (Objects.equals(PREPARE_ACTION, currentAction.getId())) {
+                if (!isEnding()) {
+                    if (untilDeployment > 0) {
+                        if (mode == ListInfoMode.INTEL || mode == ListInfoMode.MESSAGES) {
+                            info.addPara("Deploying in the %s", initPad, tc, s, source.getNameWithLowercaseTypeShort());
+                            initPad = 0f;
+                        }
+                        addETABulletPoints(null, null, false, untilDeployment, ETAType.DEPLOYMENT, info, tc, initPad);
+                    } else if (untilDeparture > 0) {
+                        if (mode == ListInfoMode.INTEL || mode == ListInfoMode.MESSAGES) {
+                            info.addPara("Preparing in the %s", initPad, tc, s, source.getNameWithLowercaseTypeShort());
+                            initPad = 0f;
+                        }
+                        addETABulletPoints(null, null, false, untilDeparture, ETAType.DEPARTURE, info, tc, initPad);
+                    }
+                }
+            } else if (Objects.equals(TRAVEL_ACTION, currentAction.getId())) {
+                if (!isEnding()) {
                     if (mode == ListInfoMode.INTEL || mode == ListInfoMode.MESSAGES) {
-                        info.addPara("Deploying in the %s", initPad, tc, s, source.getNameWithLowercaseTypeShort());
+                        info.addPara("Traveling to the %s", initPad, tc, s, target.getNameWithLowercaseTypeShort());
                         initPad = 0f;
                     }
-                    addETABulletPoints(null, null, false, untilDeployment, ETAType.DEPLOYMENT, info, tc, initPad);
-                } else if (untilDeparture > 0) {
+                    addETABulletPoints(target.getNameWithLowercaseTypeShort(), s, true, untilArrival, ETAType.ARRIVING, info, tc, initPad);
+                }
+            } else if (Objects.equals(PAYLOAD_ACTION, currentAction.getId())) {
+                if (!isEnding()) {
                     if (mode == ListInfoMode.INTEL || mode == ListInfoMode.MESSAGES) {
-                        info.addPara("Preparing in the %s", initPad, tc, s, source.getNameWithLowercaseTypeShort());
+                        LabelAPI label = info.addPara("Exploring the " + target.getNameWithLowercaseTypeShort(), initPad, tc, s, target.getNameWithNoType());
+                        label.setHighlightColors(s);
+                        label.setHighlight(target.getNameWithNoType());
                         initPad = 0f;
                     }
-                    addETABulletPoints(null, null, false, untilDeparture, ETAType.DEPARTURE, info, tc, initPad);
                 }
-            }
-        } else if (Objects.equals(TRAVEL_ACTION, curr.getId())) {
-            if (!isEnding()) {
-                if (mode == ListInfoMode.INTEL || mode == ListInfoMode.MESSAGES) {
-                    info.addPara("Traveling to the %s", initPad, tc, s, target.getNameWithLowercaseTypeShort());
-                    initPad = 0f;
+            } else if (Objects.equals(RETURN_ACTION, currentAction.getId())) {
+                if (!isEnding()) {
+                    if (mode == ListInfoMode.INTEL || mode == ListInfoMode.MESSAGES) {
+                        LabelAPI label = info.addPara("Returning to the " + getSource().getStarSystem().getNameWithLowercaseTypeShort(), tc, initPad);
+                        label.setHighlightColors(s);
+                        label.setHighlight(getSource().getStarSystem().getNameWithNoType());
+                        initPad = 0f;
+                    }
+                    addETABulletPoints(source.getNameWithLowercaseTypeShort(), s, false, untilReturn, ETAType.RETURNING, info, tc, initPad);
                 }
-                addETABulletPoints(target.getNameWithLowercaseTypeShort(), s, true, untilArrival, ETAType.ARRIVING, info, tc, initPad);
-            }
-        } else if (Objects.equals(PAYLOAD_ACTION, curr.getId())) {
-            if (!isEnding()) {
-                if (mode == ListInfoMode.INTEL || mode == ListInfoMode.MESSAGES) {
-                    LabelAPI label = info.addPara("Exploring the " + target.getNameWithLowercaseTypeShort(), initPad, tc, s, target.getNameWithNoType());
-                    label.setHighlightColors(s);
-                    label.setHighlight(target.getNameWithNoType());
-                    initPad = 0f;
-                }
-            }
-        } else if (Objects.equals(RETURN_ACTION, curr.getId())) {
-            if (!isEnding()) {
-                if (mode == ListInfoMode.INTEL || mode == ListInfoMode.MESSAGES) {
-                    LabelAPI label = info.addPara("Returning to the " + getSource().getStarSystem().getNameWithLowercaseTypeShort(), tc, initPad);
-                    label.setHighlightColors(s);
-                    label.setHighlight(getSource().getStarSystem().getNameWithNoType());
-                    initPad = 0f;
-                }
-                addETABulletPoints(source.getNameWithLowercaseTypeShort(), s, false, untilReturn, ETAType.RETURNING, info, tc, initPad);
             }
         }
     }
