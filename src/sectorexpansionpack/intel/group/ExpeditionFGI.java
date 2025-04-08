@@ -126,7 +126,51 @@ public class ExpeditionFGI extends FleetGroupIntel {
         }
 
         this.params.target = picked;
-        this.lootMult = 5f;
+        this.lootMult = getLootMultiplier(picked);
+    }
+
+    protected float getLootMultiplier(StarSystemAPI system) {
+        float mult = 0f;
+
+        for (PlanetAPI p : system.getPlanets()) {
+            if (p.hasCondition(Conditions.RUINS_SCATTERED)) {
+                mult += 0.10f;
+            } else if (p.hasCondition(Conditions.RUINS_WIDESPREAD)) {
+                mult += 0.20f;
+            } else if (p.hasCondition(Conditions.RUINS_EXTENSIVE)) {
+                mult += 0.30f;
+            } else if (p.hasCondition(Conditions.RUINS_VAST)) {
+                mult += 0.50f;
+            }
+        }
+
+        for (SectorEntityToken e : system.getEntitiesWithTag(Tags.SALVAGEABLE)) {
+            String type = e.getCustomEntityType();
+            switch (type) {
+                case Entities.DERELICT_MOTHERSHIP:
+                case Entities.STATION_RESEARCH:
+                    mult += 0.50f;
+                    break;
+                case Entities.DERELICT_SURVEY_SHIP:
+                    mult += 0.30f;
+                    break;
+                case Entities.STATION_MINING:
+                case Entities.ORBITAL_HABITAT:
+                    mult += 0.20f;
+                    break;
+                case Entities.EQUIPMENT_CACHE:
+                    mult += 0.10f;
+                    break;
+                case Entities.EQUIPMENT_CACHE_SMALL:
+                    mult += 0.05f;
+                    break;
+                default:
+                    mult += 0.025f;
+                    break;
+            }
+        }
+
+        return mult;
     }
 
     public void initAction() {
