@@ -1,14 +1,9 @@
 package sectorexpansionpack.intel.group;
 
 import com.fs.starfarer.api.Global;
-import com.fs.starfarer.api.campaign.CampaignFleetAPI;
-import com.fs.starfarer.api.campaign.FactionAPI;
-import com.fs.starfarer.api.campaign.SectorEntityToken;
-import com.fs.starfarer.api.campaign.StarSystemAPI;
+import com.fs.starfarer.api.campaign.*;
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
-import com.fs.starfarer.api.impl.campaign.ids.Factions;
-import com.fs.starfarer.api.impl.campaign.ids.Industries;
-import com.fs.starfarer.api.impl.campaign.ids.Stats;
+import com.fs.starfarer.api.impl.campaign.ids.*;
 import com.fs.starfarer.api.impl.campaign.intel.group.FGAction;
 import com.fs.starfarer.api.impl.campaign.intel.group.FGTravelAction;
 import com.fs.starfarer.api.impl.campaign.intel.group.FGWaitAction;
@@ -40,6 +35,7 @@ public class ExpeditionFGI extends FleetGroupIntel {
     public static String PAYLOAD_ACTION = "payload_action";
     public static String RETURN_ACTION = "return_action";
 
+    protected float lootMult = 0f;
     protected ExpeditionParams params;
     protected FGWaitAction waitAction;
     protected FGTravelAction travelAction;
@@ -128,6 +124,7 @@ public class ExpeditionFGI extends FleetGroupIntel {
         }
 
         this.params.target = picked;
+        this.lootMult = 5f;
     }
 
     public void initAction() {
