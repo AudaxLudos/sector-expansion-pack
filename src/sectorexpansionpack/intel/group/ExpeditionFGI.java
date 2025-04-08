@@ -332,12 +332,65 @@ public class ExpeditionFGI extends FleetGroupIntel {
 
     @Override
     protected void addNonUpdateBulletPoints(TooltipMakerAPI info, Color tc, Object param, ListInfoMode mode, float initPad) {
+        Color s = Misc.getHighlightColor();
+        FGAction curr = getCurrentAction();
+        StarSystemAPI target = this.params.target;
+        StarSystemAPI source = this.params.source.getStarSystem();
 
+        float untilDeployment = getETAUntil(PREPARE_ACTION);
+        float untilDeparture = getETAUntil(TRAVEL_ACTION);
+        float untilArrival = getETAUntil(PAYLOAD_ACTION);
+        float untilReturn = getETAUntil(RETURN_ACTION, true);
+
+        if (Objects.equals(PREPARE_ACTION, curr.getId())) {
+            if (!isEnding()) {
+                if (untilDeployment > 0) {
+                    if (mode == ListInfoMode.INTEL || mode == ListInfoMode.MESSAGES) {
+                        info.addPara("Deploying in the %s", initPad, tc, s, source.getNameWithLowercaseTypeShort());
+                        initPad = 0f;
+                    }
+                    addETABulletPoints(null, null, false, untilDeployment, ETAType.DEPLOYMENT, info, tc, initPad);
+                } else if (untilDeparture > 0) {
+                    if (mode == ListInfoMode.INTEL || mode == ListInfoMode.MESSAGES) {
+                        info.addPara("Preparing in the %s", initPad, tc, s, source.getNameWithLowercaseTypeShort());
+                        initPad = 0f;
+                    }
+                    addETABulletPoints(null, null, false, untilDeparture, ETAType.DEPARTURE, info, tc, initPad);
+                }
+            }
+        } else if (Objects.equals(TRAVEL_ACTION, curr.getId())) {
+            if (!isEnding()) {
+                if (mode == ListInfoMode.INTEL || mode == ListInfoMode.MESSAGES) {
+                    info.addPara("Traveling to the %s", initPad, tc, s, target.getNameWithLowercaseTypeShort());
+                    initPad = 0f;
+                }
+                addETABulletPoints(target.getNameWithLowercaseTypeShort(), s, true, untilArrival, ETAType.ARRIVING, info, tc, initPad);
+            }
+        } else if (Objects.equals(PAYLOAD_ACTION, curr.getId())) {
+            if (!isEnding()) {
+                if (mode == ListInfoMode.INTEL || mode == ListInfoMode.MESSAGES) {
+                    LabelAPI label = info.addPara("Exploring the " + target.getNameWithLowercaseTypeShort(), initPad, tc, s, target.getNameWithNoType());
+                    label.setHighlightColors(s);
+                    label.setHighlight(target.getNameWithNoType());
+                    initPad = 0f;
+                }
+            }
+        } else if (Objects.equals(RETURN_ACTION, curr.getId())) {
+            if (!isEnding()) {
+                if (mode == ListInfoMode.INTEL || mode == ListInfoMode.MESSAGES) {
+                    LabelAPI label = info.addPara("Returning to the " + getSource().getStarSystem().getNameWithLowercaseTypeShort(), tc, initPad);
+                    label.setHighlightColors(s);
+                    label.setHighlight(getSource().getStarSystem().getNameWithNoType());
+                    initPad = 0f;
+                }
+                addETABulletPoints(source.getNameWithLowercaseTypeShort(), s, false, untilReturn, ETAType.RETURNING, info, tc, initPad);
+            }
+        }
     }
 
     @Override
     protected void addUpdateBulletPoints(TooltipMakerAPI info, Color tc, Object param, ListInfoMode mode, float initPad) {
-
+        addNonUpdateBulletPoints(info, tc, param, mode, initPad);
     }
 
     public static class ExpeditionParams {
