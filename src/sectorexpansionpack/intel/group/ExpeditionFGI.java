@@ -512,6 +512,23 @@ public class ExpeditionFGI extends FleetGroupIntel {
         return this.returnAction.isActionFinished() && !isAborted();
     }
 
+    @Override
+    public boolean isFailed() {
+        return isAborted() && shouldAbort();
+    }
+
+    @Override
+    protected boolean shouldAbort() {
+        return isSpawnedFleets() && !isSpawning() && getMainFleet() == null;
+    }
+
+    public CampaignFleetAPI getMainFleet() {
+        return getFleets().stream()
+                .filter(fleet -> fleet.getMemoryWithoutUpdate().getBoolean("$sep_expeditionFleet"))
+                .findFirst()
+                .orElse(null);
+    }
+
     public static class ExpeditionParams {
         public Random random;
         public MarketAPI source;
