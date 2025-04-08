@@ -289,6 +289,8 @@ public class ExpeditionFGI extends FleetGroupIntel {
     protected void addAssessmentSection(TooltipMakerAPI info, float width, float height, float oPad) {
         FactionAPI faction = getFaction();
         String forces = this.params.forcesNoun;
+        String systemName = this.params.target.getNameWithLowercaseTypeShort();
+        String systemHighlight = getNameWithNoType(systemName);
         Color h = Misc.getHighlightColor();
 
         if (!isEnding() && !isSucceeded() && !isFailed() && getCurrentAction() != null && !RETURN_ACTION.equals(getCurrentAction().getId())) {
@@ -304,6 +306,15 @@ public class ExpeditionFGI extends FleetGroupIntel {
 
             info.addPara("The " + forces + " are projected to be %s and likely comprised of %s " + fleets + ".",
                     oPad, h, strDesc, "" + numFleets);
+
+            String lootDesc = getLootDescription(this.lootMult, true);
+            String lootHighlight = getLootDescription(this.lootMult, false);
+            Color lootColor = getLootDescColor(this.lootMult);
+
+            LabelAPI label = info.addPara("Preliminary info on the " + systemName +
+                    " suggests " + lootDesc + " of yielding valuable salvage.", oPad);
+            label.setHighlightColors(h, lootColor);
+            label.setHighlight(systemHighlight, lootHighlight);
         }
     }
 
@@ -363,8 +374,15 @@ public class ExpeditionFGI extends FleetGroupIntel {
                 if (getSource().getMarket() == null) {
                     info.addPara("Returning to their port of origin.", oPad);
                 } else {
-                    info.addPara("Returning to " + getSource().getMarket().getName() + " in the " +
-                            source.getNameWithLowercaseTypeShort() + ".", oPad);
+                    String lootDesc = getLootDescription(this.lootMult, true);
+                    String lootHighlight = getLootDescription(this.lootMult, false);
+                    Color lootColor = getLootDescColor(this.lootMult);
+
+                    LabelAPI label = info.addPara("Returning to " + getSource().getMarket().getName() + " in the "
+                            + source.getNameWithLowercaseTypeShort() + ". Has " + lootDesc
+                            + " of carrying valuable salvage.", oPad);
+                    label.setHighlightColors(getFaction().getBaseUIColor(), Misc.getTextColor(), lootColor);
+                    label.setHighlight(getSource().getMarket().getName(), getNameWithNoType(source.getNameWithLowercaseTypeShort()), lootHighlight);
                 }
             } else {
                 info.addPara("The " + forces + " failed to return to the " + source.getNameWithLowercaseTypeShort(), oPad);
@@ -378,6 +396,38 @@ public class ExpeditionFGI extends FleetGroupIntel {
                 info.addPara("The " + forces + " failed to complete their objectives", oPad);
             }
         }
+    }
+
+    protected String getLootDescription(float lootMult, boolean hasAOrAn) {
+        String result = "a very low chance";
+        if (lootMult >= 1f) {
+            result = "a guaranteed chance";
+        } else if (lootMult >= 0.75f) {
+            result = "a very high chance";
+        } else if (lootMult >= 0.50f) {
+            result = "a high chance";
+        } else if (lootMult >= 0.25f) {
+            result = "a low chance";
+        } else if (lootMult >= 0.05f) {
+            result = "a very low chance";
+        }
+
+        if (!hasAOrAn) {
+            result = result.replace("a ", "");
+            result = result.replace("an ", "");
+        }
+
+        return result;
+    }
+
+    protected Color getLootDescColor(float lootMult) {
+        if (lootMult >= 0.75f) {
+            return Misc.getStoryOptionColor();
+        } else if (lootMult >= 0.50f) {
+            return Misc.getHighlightColor();
+        }
+
+        return Misc.getGrayColor();
     }
 
     @Override
