@@ -8,14 +8,17 @@ import com.fs.starfarer.api.campaign.StarSystemAPI;
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
 import com.fs.starfarer.api.impl.campaign.ids.Factions;
 import com.fs.starfarer.api.impl.campaign.ids.Industries;
+import com.fs.starfarer.api.impl.campaign.intel.group.FGAction;
 import com.fs.starfarer.api.impl.campaign.intel.group.FGTravelAction;
 import com.fs.starfarer.api.impl.campaign.intel.group.FGWaitAction;
 import com.fs.starfarer.api.impl.campaign.intel.group.FleetGroupIntel;
 import com.fs.starfarer.api.impl.campaign.missions.FleetCreatorMission;
+import com.fs.starfarer.api.impl.campaign.missions.hub.BaseHubMission;
 import com.fs.starfarer.api.impl.campaign.missions.hub.HubMissionWithSearch;
 import com.fs.starfarer.api.impl.campaign.missions.hub.HubMissionWithTriggers;
 import com.fs.starfarer.api.impl.campaign.missions.hub.ReqMode;
 import com.fs.starfarer.api.ui.Alignment;
+import com.fs.starfarer.api.ui.LabelAPI;
 import com.fs.starfarer.api.ui.TooltipMakerAPI;
 import com.fs.starfarer.api.util.Misc;
 import com.fs.starfarer.api.util.WeightedRandomPicker;
@@ -25,6 +28,7 @@ import org.lwjgl.util.vector.Vector2f;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Random;
 
 public class ExpeditionFGI extends FleetGroupIntel {
@@ -250,6 +254,79 @@ public class ExpeditionFGI extends FleetGroupIntel {
 
             info.addPara("The " + forces + " are projected to be %s and likely comprised of %s " + fleets + ".",
                     oPad, h, strDesc, "" + numFleets);
+        }
+    }
+
+    @Override
+    protected void addStatusSection(TooltipMakerAPI info, float width, float height, float oPad) {
+        FGAction curr = getCurrentAction();
+        StarSystemAPI target = this.params.target;
+        StarSystemAPI source = this.params.source.getStarSystem();
+        String forces = this.params.forcesNoun;
+        String noun = this.params.noun;
+
+        boolean prepareFailed = this.waitAction.isActionFinished() && isAborted();
+        boolean travelFailed = this.travelAction.isActionFinished() && isAborted() && prepareFailed;
+        boolean payloadFailed = this.payloadAction.isActionFinished() && isAborted() && travelFailed;
+        boolean returnFailed = this.returnAction.isActionFinished() && isAborted() && payloadFailed;
+
+        info.addSectionHeading("Status", this.faction.getBaseUIColor(), this.faction.getDarkUIColor(), Alignment.MID, oPad);
+        if (isInPreLaunchDelay()) {
+            if (getSource().getMarket() != null) {
+                BaseHubMission.addStandardMarketDesc("The " + noun + " is in the planning stages on",
+                        getSource().getMarket(), info, oPad);
+                boolean mil = isSourceFunctionalMilitaryMarket();
+                if (mil) {
+                    info.addPara("Disrupting the military facilities " + getSource().getMarket().getOnOrAt() +
+                            " " + getSource().getMarket().getName() + " will abort the " + noun + ".", oPad);
+                }
+            }
+        } else if (Objects.equals(PREPARE_ACTION, curr.getId())) {
+            if (!prepareFailed) {
+                if (getSource().getMarket() != null) {
+                    BaseHubMission.addStandardMarketDesc("Making preparations in orbit around", getSource().getMarket(), info, oPad);
+                } else {
+                    info.addPara("Making preparations in orbit around " + getSource().getName() + ".", oPad);
+                }
+            } else {
+                info.addPara("The " + forces + " failed to depart from the " + source.getNameWithLowercaseTypeShort(), oPad);
+            }
+        } else if (Objects.equals(TRAVEL_ACTION, curr.getId())) {
+            if (!travelFailed) {
+                if (getSource().getMarket() == null) {
+                    info.addPara("Traveling to the " + target.getNameWithLowercaseTypeShort() + ".", oPad);
+                } else {
+                    info.addPara("Traveling from " + getSource().getMarket().getName() + " to the " +
+                            target.getNameWithLowercaseTypeShort() + ".", oPad);
+                }
+            } else {
+                info.addPara("The " + forces + " failed to reach the " + target.getNameWithLowercaseTypeShort(), oPad);
+            }
+        } else if (Objects.equals(PAYLOAD_ACTION, curr.getId())) {
+            if (!payloadFailed) {
+                info.addPara("Exploring the " + target.getNameWithLowercaseTypeShort(), oPad);
+            } else {
+                info.addPara("The " + forces + " failed to explore the " + target.getNameWithLowercaseTypeShort(), oPad);
+            }
+        } else if (Objects.equals(RETURN_ACTION, curr.getId())) {
+            if (!returnFailed) {
+                if (getSource().getMarket() == null) {
+                    info.addPara("Returning to their port of origin.", oPad);
+                } else {
+                    info.addPara("Returning to " + getSource().getMarket().getName() + " in the " +
+                            source.getNameWithLowercaseTypeShort() + ".", oPad);
+                }
+            } else {
+                info.addPara("The " + forces + " failed to return to the " + source.getNameWithLowercaseTypeShort(), oPad);
+            }
+        } else {
+            if (isSucceeded()) {
+                info.addPara("The " + forces + " have returned from the " + target.getNameWithLowercaseTypeShort()
+                        + ". Any valuable salvage they recovered will most likely be used and distributed.", oPad);
+            }
+            if (isFailed()) {
+                info.addPara("The " + forces + " failed to complete their objectives", oPad);
+            }
         }
     }
 
