@@ -2,6 +2,7 @@ package sectorexpansionpack.intel.group;
 
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.campaign.CampaignFleetAPI;
+import com.fs.starfarer.api.campaign.FactionAPI;
 import com.fs.starfarer.api.campaign.SectorEntityToken;
 import com.fs.starfarer.api.campaign.StarSystemAPI;
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
@@ -14,6 +15,7 @@ import com.fs.starfarer.api.impl.campaign.missions.FleetCreatorMission;
 import com.fs.starfarer.api.impl.campaign.missions.hub.HubMissionWithSearch;
 import com.fs.starfarer.api.impl.campaign.missions.hub.HubMissionWithTriggers;
 import com.fs.starfarer.api.impl.campaign.missions.hub.ReqMode;
+import com.fs.starfarer.api.ui.Alignment;
 import com.fs.starfarer.api.ui.TooltipMakerAPI;
 import com.fs.starfarer.api.util.Misc;
 import com.fs.starfarer.api.util.WeightedRandomPicker;
@@ -227,6 +229,28 @@ public class ExpeditionFGI extends FleetGroupIntel {
     @Override
     protected String getBaseName() {
         return Misc.ucFirst(getFaction().getPersonNamePrefix()) + " " + Misc.ucFirst(this.params.noun);
+    }
+
+    @Override
+    protected void addAssessmentSection(TooltipMakerAPI info, float width, float height, float oPad) {
+        FactionAPI faction = getFaction();
+        String forces = this.params.forcesNoun;
+        Color h = Misc.getHighlightColor();
+
+        if (!isEnding() && !isSucceeded() && !isFailed() && getCurrentAction() != null && !RETURN_ACTION.equals(getCurrentAction().getId())) {
+            info.addSectionHeading("Assessment", faction.getBaseUIColor(), faction.getDarkUIColor(), Alignment.MID, oPad);
+
+            float raidStr = getRoute().getExtra().getStrengthModifiedByDamage();
+            String strDesc = Misc.getStrengthDesc(raidStr);
+            int numFleets = getApproximateNumberOfFleets();
+            String fleets = "fleets";
+            if (numFleets == 1) {
+                fleets = "fleet";
+            }
+
+            info.addPara("The " + forces + " are projected to be %s and likely comprised of %s " + fleets + ".",
+                    oPad, h, strDesc, "" + numFleets);
+        }
     }
 
     @Override
