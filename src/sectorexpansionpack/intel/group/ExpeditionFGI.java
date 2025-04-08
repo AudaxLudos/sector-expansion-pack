@@ -569,6 +569,21 @@ public class ExpeditionFGI extends FleetGroupIntel {
         return isSpawnedFleets() && !isSpawning() && getMainFleet() == null;
     }
 
+    @Override
+    protected void notifyActionFinished(FGAction action) {
+        super.notifyActionFinished(action);
+
+        if (Objects.equals(PREPARE_ACTION, action.getId())) {
+            this.waitAction.setActionFinished(true);
+        } else if (Objects.equals(TRAVEL_ACTION, action.getId())) {
+            this.travelAction.setActionFinished(true);
+        } else if (Objects.equals(PAYLOAD_ACTION, action.getId())) {
+            this.payloadAction.setActionFinished(true);
+        } else if (Objects.equals(RETURN_ACTION, action.getId())) {
+            this.returnAction.setActionFinished(true);
+        }
+    }
+
     public CampaignFleetAPI getMainFleet() {
         return getFleets().stream()
                 .filter(fleet -> fleet.getMemoryWithoutUpdate().getBoolean("$sep_expeditionFleet"))
