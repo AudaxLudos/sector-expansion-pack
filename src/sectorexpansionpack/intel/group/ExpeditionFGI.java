@@ -262,7 +262,6 @@ public class ExpeditionFGI extends FleetGroupIntel {
         }
     }
 
-
     @Override
     protected SectorEntityToken getSource() {
         return this.params.source.getPrimaryEntity();
@@ -506,6 +505,11 @@ public class ExpeditionFGI extends FleetGroupIntel {
                 label.highlightLast(hl);
             }
         }
+    }
+
+    @Override
+    public boolean isSucceeded() {
+        return this.returnAction.isActionFinished() && !isAborted();
     }
 
     public static class ExpeditionParams {
