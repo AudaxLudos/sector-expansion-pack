@@ -13,12 +13,12 @@ public class ExpeditionManager extends BaseEventManager {
 
     @Override
     protected int getMinConcurrent() {
-        return 1;
+        return 0;
     }
 
     @Override
     protected int getMaxConcurrent() {
-        return 1;
+        return 3;
     }
 
     @Override
