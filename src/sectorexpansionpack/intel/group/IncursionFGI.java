@@ -7,8 +7,10 @@ import com.fs.starfarer.api.campaign.econ.MarketAPI;
 import com.fs.starfarer.api.impl.campaign.command.WarSimScript;
 import com.fs.starfarer.api.impl.campaign.ids.Industries;
 import com.fs.starfarer.api.impl.campaign.ids.Stats;
+import com.fs.starfarer.api.impl.campaign.intel.group.BlockadeFGI;
 import com.fs.starfarer.api.impl.campaign.intel.group.FGAction;
 import com.fs.starfarer.api.impl.campaign.intel.group.GenericRaidFGI;
+import com.fs.starfarer.api.impl.campaign.intel.group.PerseanLeagueBlockade;
 import com.fs.starfarer.api.impl.campaign.missions.hub.BaseHubMission;
 import com.fs.starfarer.api.impl.campaign.missions.hub.HubMissionWithTriggers;
 import com.fs.starfarer.api.impl.campaign.missions.hub.ReqMode;
@@ -76,6 +78,7 @@ public class IncursionFGI extends GenericRaidFGI {
             totalDifficulty -= diff;
         }
 
+        this.params.prepDays = 14f + 14f * this.params.random.nextFloat();
         this.params.makeFleetsHostile = false;
         this.params.repImpact = HubMissionWithTriggers.ComplicationRepImpact.FULL;
         this.params.noun = "incursion";
