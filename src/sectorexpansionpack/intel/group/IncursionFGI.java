@@ -8,11 +8,14 @@ import com.fs.starfarer.api.campaign.econ.Industry;
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
 import com.fs.starfarer.api.impl.campaign.command.WarSimScript;
 import com.fs.starfarer.api.impl.campaign.ids.Industries;
+import com.fs.starfarer.api.impl.campaign.intel.group.FGAction;
 import com.fs.starfarer.api.impl.campaign.intel.group.GenericRaidFGI;
+import com.fs.starfarer.api.impl.campaign.missions.hub.BaseHubMission;
 import com.fs.starfarer.api.impl.campaign.missions.hub.HubMissionWithTriggers;
 import com.fs.starfarer.api.impl.campaign.missions.hub.ReqMode;
 import com.fs.starfarer.api.impl.campaign.rulecmd.salvage.MarketCMD;
 import com.fs.starfarer.api.ui.Alignment;
+import com.fs.starfarer.api.ui.LabelAPI;
 import com.fs.starfarer.api.ui.TooltipMakerAPI;
 import com.fs.starfarer.api.util.Misc;
 import com.fs.starfarer.api.util.WeightedRandomPicker;
@@ -21,6 +24,7 @@ import sectorexpansionpack.missions.hub.SEPHubMission;
 
 import java.awt.*;
 import java.util.List;
+import java.util.Objects;
 
 public class IncursionFGI extends GenericRaidFGI {
     public static Logger log = Global.getLogger(IncursionFGI.class);
@@ -193,6 +197,70 @@ public class IncursionFGI extends GenericRaidFGI {
                         info.addPara("A colony " + risk, opad, Misc.getNegativeHighlightColor(), highlight);
                     }
                 }
+            }
+        }
+    }
+
+    @Override
+    protected void addStatusSection(TooltipMakerAPI info, float width, float height, float oPad) {
+        FGAction currentAction = getCurrentAction();
+        StarSystemAPI target = this.raidAction.getWhere();
+        StarSystemAPI source = this.params.source.getStarSystem();
+        String noun = this.params.noun;
+
+        info.addSectionHeading("Status", this.faction.getBaseUIColor(), this.faction.getDarkUIColor(), Alignment.MID, oPad);
+        if (currentAction != null && !isFailed()) {
+            if (isInPreLaunchDelay()) {
+                if (getSource().getMarket() != null) {
+                    BaseHubMission.addStandardMarketDesc("The " + noun + " is in the planning stages on",
+                            getSource().getMarket(), info, oPad);
+                    boolean mil = isSourceFunctionalMilitaryMarket();
+                    if (mil) {
+                        info.addPara("Disrupting the military facilities " + getSource().getMarket().getOnOrAt() +
+                                " " + getSource().getMarket().getName() + " will abort the " + noun + ".", oPad);
+                    }
+                }
+            } else if (Objects.equals(PREPARE_ACTION, currentAction.getId())) {
+                if (getSource().getMarket() != null) {
+                    BaseHubMission.addStandardMarketDesc("Making preparations in orbit around", getSource().getMarket(), info, oPad);
+                } else {
+                    info.addPara("Making preparations in orbit around " + getSource().getName() + ".", oPad);
+                }
+            } else if (Objects.equals(TRAVEL_ACTION, currentAction.getId())) {
+                if (getSource().getMarket() == null) {
+                    info.addPara("Traveling to the " + target.getNameWithLowercaseTypeShort() + ".", oPad);
+                } else {
+                    info.addPara("Traveling from " + getSource().getMarket().getName() + " to the " + target.getNameWithLowercaseTypeShort() + ".", oPad);
+                }
+            } else if (Objects.equals(PAYLOAD_ACTION, currentAction.getId())) {
+                addPayloadActionStatus(info, width, height, oPad);
+            } else if (Objects.equals(RETURN_ACTION, currentAction.getId())) {
+                if (getSource().getMarket() == null) {
+                    info.addPara("Returning to their port of origin.", oPad);
+                } else {
+                    info.addPara("Returning to " + getSource().getMarket().getName() + " in the " +
+                            this.origin.getContainingLocation().getNameWithLowercaseTypeShort() + ".", oPad);
+                }
+            }
+        } else if (isSucceeded()){
+            info.addPara("Successfully completed there objective and have returned to " + getSource().getMarket().getName()
+                    + ". Any valuable item taken will most likely be used and distributed.", oPad);
+        } else if (isFailed()) {
+            boolean prepareFailed = this.waitAction.isActionFinished() && isAborted();
+            boolean travelFailed = this.travelAction.isActionFinished() && isAborted() && prepareFailed;
+            boolean payloadFailed = this.raidAction.isActionFinished() && isAborted() && travelFailed;
+            boolean returnFailed = this.returnAction.isActionFinished() && isAborted() && payloadFailed;
+
+            if (returnFailed) {
+                info.addPara("Failed to return to the " + source.getNameWithLowercaseTypeShort(), oPad);
+            } else if (payloadFailed) {
+                info.addPara("Failed to attack the target colony", oPad);
+            } else if (travelFailed) {
+                info.addPara("Failed to reach the target colony", oPad);
+            } else if (prepareFailed) {
+                info.addPara("Failed to depart from the " + source.getNameWithLowercaseTypeShort(), oPad);
+            } else {
+                info.addPara("Failed to complete their objectives", oPad);
             }
         }
     }
