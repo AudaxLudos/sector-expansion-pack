@@ -2,6 +2,7 @@ package sectorexpansionpack;
 
 import com.fs.starfarer.api.BaseModPlugin;
 import sectorexpansionpack.intel.group.ExpeditionManager;
+import sectorexpansionpack.intel.group.IncursionManager;
 
 public class ModPlugin extends BaseModPlugin {
     @Override
@@ -12,5 +13,6 @@ public class ModPlugin extends BaseModPlugin {
     @Override
     public void onGameLoad(boolean newGame) {
         ExpeditionManager.register();
+        IncursionManager.register();
     }
 }
