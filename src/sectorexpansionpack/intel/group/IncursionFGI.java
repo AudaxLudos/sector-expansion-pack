@@ -434,4 +434,21 @@ public class IncursionFGI extends GenericRaidFGI {
     public boolean isSucceeded() {
         return this.returnAction.isActionFinished() && !this.isAborted();
     }
+
+    @Override
+    public boolean isFailed() {
+        return isAborted() && shouldAbort();
+    }
+
+    @Override
+    protected boolean shouldAbort() {
+        return isSpawnedFleets() && !isSpawning() && getMainFleet() == null;
+    }
+
+    public CampaignFleetAPI getMainFleet() {
+        return getFleets().stream()
+                .filter(fleet -> fleet.getMemoryWithoutUpdate().getBoolean("$sep_incursionFleet"))
+                .findFirst()
+                .orElse(null);
+    }
 }
