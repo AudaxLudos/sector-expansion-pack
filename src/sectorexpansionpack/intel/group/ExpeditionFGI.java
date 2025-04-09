@@ -78,11 +78,10 @@ public class ExpeditionFGI extends FleetGroupIntel {
             totalDifficulty -= diff;
         }
 
-        // TODO: Update preparation days based on loot mult
         float daysLootMult = Math.max(0.2f, Math.min(2f, this.lootMult));
         this.params.prepDays = 14f + 14f * daysLootMult;
-        // TODO: Update exploration days based on loot mult
-
+        daysLootMult = Math.max(0.5f, Math.min(2f, this.lootMult));
+        this.params.payloadDays = 28f + 14f * daysLootMult;
         setRandom(this.params.random);
         setPostingLocation(getSource());
         initAction();
