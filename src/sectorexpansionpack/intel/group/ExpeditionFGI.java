@@ -420,9 +420,9 @@ public class ExpeditionFGI extends FleetGroupIntel {
                     label.setHighlight(getSource().getMarket().getName(), getNameWithNoType(source.getNameWithLowercaseTypeShort()), lootHighlight);
                 }
             }
-        } else if (isSucceeded()){
-                info.addPara("The " + forces + " have returned from the " + target.getNameWithLowercaseTypeShort()
-                        + ". Any valuable salvage they recovered will most likely be used and distributed.", oPad);
+        } else if (isSucceeded()) {
+            info.addPara("The " + forces + " have returned from the " + target.getNameWithLowercaseTypeShort()
+                    + ". Any valuable salvage they recovered will most likely be used and distributed.", oPad);
         } else if (isFailed()) {
             boolean prepareFailed = this.waitAction.isActionFinished() && isAborted();
             boolean travelFailed = this.travelAction.isActionFinished() && isAborted() && prepareFailed;
