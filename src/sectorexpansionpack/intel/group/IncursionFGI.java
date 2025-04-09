@@ -331,6 +331,68 @@ public class IncursionFGI extends GenericRaidFGI {
     }
 
     @Override
+    protected void addETABulletPoints(String destName, Color destHL, boolean withDepartedText, float eta, ETAType type, TooltipMakerAPI info, Color tc, float initPad) {
+        Color h = Misc.getHighlightColor();
+        String hl = getNameWithNoType(destName);
+        LabelAPI label;
+
+        if (type == ETAType.DEPLOYMENT) {
+            if ((int) eta <= 0) {
+                info.addPara("Fleet deployment imminent", tc, initPad);
+            } else {
+                String days = (int) eta == 1 ? "day" : "days";
+                info.addPara("Estimated %s " + days + " until fleet deployment",
+                        initPad, tc, h, "" + (int) eta);
+            }
+            return;
+        }
+
+        if (type == ETAType.DEPARTURE) {
+            if ((int) eta <= 0) {
+                info.addPara("Departure imminent", tc, initPad);
+            } else {
+                String days = (int) eta == 1 ? "day" : "days";
+                info.addPara("Estimated %s " + days + " until departure",
+                        initPad, tc, h, "" + (int) eta);
+            }
+            return;
+        }
+
+        if ((int) eta > 0) {
+            String days = (int) eta == 1 ? "day" : "days";
+            String post = " until arrival";
+            if (type == ETAType.RETURNING) {
+                post = " until return";
+            }
+            if (!withDepartedText) {
+                if (type == ETAType.RETURNING) {
+                    post += " to " + destName;
+                } else if (type == ETAType.ARRIVING) {
+                    post += " at " + destName;
+                }
+            }
+            label = info.addPara("Estimated %s " + days + post, initPad, tc, h, "" + (int) eta);
+
+            if (!withDepartedText && destHL != null && label != null) {
+                label.setHighlightColors(h, destHL);
+                label.setHighlight("" + (int) eta, hl);
+            }
+        } else {
+            String pre = "Arrival ";
+            if (type == ETAType.RETURNING) {
+                pre = "Return ";
+            }
+
+            label = info.addPara(pre + " imminent", tc, initPad);
+
+            if (destHL != null && label != null) {
+                label.setHighlightColor(destHL);
+                label.highlightLast(hl);
+            }
+        }
+    }
+
+    @Override
     public boolean isSucceeded() {
         return this.returnAction.isActionFinished() && !this.isAborted();
     }
