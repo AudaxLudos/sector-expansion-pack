@@ -22,8 +22,6 @@ import org.apache.log4j.Logger;
 import sectorexpansionpack.missions.hub.SEPHubMission;
 
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
 public class IncursionFGI extends GenericRaidFGI {
@@ -82,7 +80,7 @@ public class IncursionFGI extends GenericRaidFGI {
         this.params.repImpact = HubMissionWithTriggers.ComplicationRepImpact.FULL;
         this.params.noun = "incursion";
         this.params.forcesNoun = "incursion forces";
-        setRandom(this.random);
+        setRandom(this.params.random);
         setPostingLocation(this.params.source.getPrimaryEntity());
         initActions();
         Global.getSector().getIntelManager().queueIntel(this);
@@ -460,6 +458,8 @@ public class IncursionFGI extends GenericRaidFGI {
             BaseSalvageSpecial.addExtraSalvage(getMainFleet(), loot);
         } else if (Objects.equals(RETURN_ACTION, action.getId())) {
             this.returnAction.setActionFinished(true);
+            // TODO: Upon completion install any special items usable by the market
+            // TODO: Any unused special items will be sent to other same faction markets that can use them
         }
     }
 
