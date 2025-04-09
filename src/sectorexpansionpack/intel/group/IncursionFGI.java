@@ -1,6 +1,7 @@
 package sectorexpansionpack.intel.group;
 
 import com.fs.starfarer.api.Global;
+import com.fs.starfarer.api.campaign.CampaignFleetAPI;
 import com.fs.starfarer.api.campaign.FactionAPI;
 import com.fs.starfarer.api.campaign.SpecialItemData;
 import com.fs.starfarer.api.campaign.StarSystemAPI;
@@ -164,6 +165,25 @@ public class IncursionFGI extends GenericRaidFGI {
             return null;
         }
         return this.params.raidParams.allowedTargets.get(0);
+    }
+
+    @Override
+    protected void configureFleet(int size, CampaignFleetAPI fleet) {
+        fleet.setNoFactionInName(false);
+        if (this.params.fleetSizes.size() == 1) {
+            fleet.setName("Incursion Fleet");
+            fleet.getMemoryWithoutUpdate().set("$sep_incursionFleet", true);
+            setPostingLocation(fleet);
+        } else {
+            Integer maxSize = this.params.fleetSizes.stream().reduce(Integer.MIN_VALUE, Integer::max);
+            if (size == maxSize) {
+                fleet.setName("Incursion Fleet");
+                fleet.getMemoryWithoutUpdate().set("$sep_incursionFleet", true);
+                setPostingLocation(fleet);
+            } else {
+                fleet.setName("Support Fleet");
+            }
+        }
     }
 
     @Override
