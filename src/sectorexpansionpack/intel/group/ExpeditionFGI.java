@@ -77,6 +77,9 @@ public class ExpeditionFGI extends FleetGroupIntel {
             totalDifficulty -= diff;
         }
 
+        // TODO: Update preparation days based on loot mult
+        // TODO: Update exploration days based on loot mult
+
         setRandom(this.params.random);
         setPostingLocation(getSource());
         initAction();
@@ -589,6 +592,8 @@ public class ExpeditionFGI extends FleetGroupIntel {
             if (type == ETAType.RETURNING) {
                 pre = "Return to ";
             }
+
+            // REVIEW: Remove destination name as its already mentioned in the intel
             label = info.addPara(pre + destName + " is imminent", tc, initPad);
 
             if (destHL != null && label != null) {
@@ -640,6 +645,8 @@ public class ExpeditionFGI extends FleetGroupIntel {
             BaseSalvageSpecial.addExtraSalvage(getMainFleet(), loot);
         } else if (Objects.equals(RETURN_ACTION, action.getId())) {
             this.returnAction.setActionFinished(true);
+            // TODO: Upon completion install any special items usable by the market
+            // TODO: Any unused special items will be sent to other same faction markets that can use them
         }
     }
 

@@ -6,15 +6,21 @@ import com.fs.starfarer.api.campaign.SpecialItemData;
 import com.fs.starfarer.api.campaign.StarSystemAPI;
 import com.fs.starfarer.api.campaign.econ.Industry;
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
+import com.fs.starfarer.api.impl.campaign.command.WarSimScript;
 import com.fs.starfarer.api.impl.campaign.ids.Industries;
 import com.fs.starfarer.api.impl.campaign.intel.group.GenericRaidFGI;
 import com.fs.starfarer.api.impl.campaign.missions.hub.HubMissionWithTriggers;
 import com.fs.starfarer.api.impl.campaign.missions.hub.ReqMode;
+import com.fs.starfarer.api.impl.campaign.rulecmd.salvage.MarketCMD;
+import com.fs.starfarer.api.ui.Alignment;
 import com.fs.starfarer.api.ui.TooltipMakerAPI;
 import com.fs.starfarer.api.util.Misc;
 import com.fs.starfarer.api.util.WeightedRandomPicker;
 import org.apache.log4j.Logger;
 import sectorexpansionpack.missions.hub.SEPHubMission;
+
+import java.awt.*;
+import java.util.List;
 
 public class IncursionFGI extends GenericRaidFGI {
     public static Logger log = Global.getLogger(IncursionFGI.class);
@@ -150,5 +156,44 @@ public class IncursionFGI extends GenericRaidFGI {
         info.addPara(Misc.ucFirst(faction.getPersonNamePrefixAOrAn()) + " %s " + noun + " is targeting a colony in the "
                         + system.getNameWithLowercaseTypeShort() + ".", oPad,
                 faction.getBaseUIColor(), faction.getPersonNamePrefix());
+    }
+
+    @Override
+    protected void addAssessmentSection(TooltipMakerAPI info, float width, float height, float opad) {
+        FactionAPI faction = getFaction();
+        MarketAPI targetMarket = getTargetMarket();
+        String noun = getNoun();
+
+        if (!isEnding() && !isSucceeded() && !isFailed()) {
+            info.addSectionHeading("Assessment", faction.getBaseUIColor(), faction.getDarkUIColor(), Alignment.MID, opad);
+            if (targetMarket == null) {
+                info.addPara("There are no colonies for the " + noun + " to target in the system.", opad);
+            } else {
+                StarSystemAPI system = this.raidAction.getWhere();
+                String forces = getForcesNoun();
+
+                boolean potentialDanger = addStrengthDesc(info, opad, system, forces,
+                        "the " + noun + " is unlikely to find success",
+                        "the outcome of the " + noun + " is uncertain",
+                        "the " + noun + " is likely to find success");
+
+                if (potentialDanger) {
+                    String safe = "should be safe from the " + noun;
+                    String risk = "is at risk of losing special items installed on its structures.";
+                    String highlight = "losing special items";
+
+                    float raidStr  = getRoute().getExtra().getStrengthModifiedByDamage();
+                    float defenderStr = WarSimScript.getEnemyStrength(getFaction(), system, isPlayerTargeted());
+                    float defensiveStr = defenderStr + WarSimScript.getStationStrength(targetMarket.getFaction(), system, targetMarket.getPrimaryEntity());
+                    boolean isSafe = defensiveStr > raidStr * 1.25f;
+
+                    if (isSafe) {
+                        info.addPara("However, all colonies " + safe + ", owing to their orbital defenses.", opad);
+                    } else {
+                        info.addPara("A colony " + risk, opad, Misc.getNegativeHighlightColor(), highlight);
+                    }
+                }
+            }
+        }
     }
 }
