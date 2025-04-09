@@ -196,4 +196,9 @@ public class IncursionFGI extends GenericRaidFGI {
             }
         }
     }
+
+    @Override
+    public boolean isSucceeded() {
+        return this.returnAction.isActionFinished() && !this.isAborted();
+    }
 }
