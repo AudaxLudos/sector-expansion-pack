@@ -8,6 +8,7 @@ import com.fs.starfarer.api.campaign.econ.Industry;
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
 import com.fs.starfarer.api.impl.campaign.command.WarSimScript;
 import com.fs.starfarer.api.impl.campaign.ids.Industries;
+import com.fs.starfarer.api.impl.campaign.ids.Stats;
 import com.fs.starfarer.api.impl.campaign.intel.group.FGAction;
 import com.fs.starfarer.api.impl.campaign.intel.group.GenericRaidFGI;
 import com.fs.starfarer.api.impl.campaign.missions.hub.BaseHubMission;
@@ -54,10 +55,27 @@ public class IncursionFGI extends GenericRaidFGI {
             return;
         }
 
-        float totalDifficulty = 26f;
-        this.params.fleetSizes.add(10);
-        this.params.fleetSizes.add(8);
-        this.params.fleetSizes.add(8);
+        float fleetSizeMult = this.params.source.getStats().getDynamic().getMod(Stats.COMBAT_FLEET_SIZE_MULT).computeEffective(0f);
+        float maxTotalDifficulty = fleetSizeMult * 5f;
+        float totalDifficulty = maxTotalDifficulty;
+        if (totalDifficulty > 100f) {
+            totalDifficulty = 100f;
+        }
+        if (totalDifficulty >= 10f) {
+            this.params.fleetSizes.add(10);
+            totalDifficulty -= 10f;
+        } else {
+            this.params.fleetSizes.add(Math.round(totalDifficulty));
+            totalDifficulty = 0f;
+        }
+        while (totalDifficulty > 0f) {
+            int min = 4;
+            int max = 8;
+            int diff = min + this.random.nextInt(max - min + 1);
+
+            this.params.fleetSizes.add(diff);
+            totalDifficulty -= diff;
+        }
 
         this.params.makeFleetsHostile = false;
         this.params.repImpact = HubMissionWithTriggers.ComplicationRepImpact.FULL;
@@ -69,7 +87,7 @@ public class IncursionFGI extends GenericRaidFGI {
         Global.getSector().getIntelManager().queueIntel(this);
         log.info(String.format("Starting incursion by %s at %s in the %s with a total difficulty value of %s",
                 getFaction().getDisplayName(), getSource().getMarket().getName(),
-                getSource().getStarSystem().getNameWithLowercaseTypeShort(), totalDifficulty));
+                getSource().getStarSystem().getNameWithLowercaseTypeShort(), maxTotalDifficulty));
     }
 
     protected void pickSource() {
