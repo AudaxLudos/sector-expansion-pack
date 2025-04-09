@@ -15,7 +15,7 @@ public class ExpeditionManager extends BaseEventManager {
 
     @Override
     protected int getMinConcurrent() {
-        return 0;
+        return Global.getSettings().isDevMode() ? 1 : 0;
     }
 
     @Override
@@ -26,6 +26,11 @@ public class ExpeditionManager extends BaseEventManager {
     @Override
     protected float getBaseInterval() {
         return EVENT_INTERVAL;
+    }
+
+    @Override
+    protected float getIntervalRateMult() {
+        return Global.getSettings().isDevMode() ? 1000000f : 1f;
     }
 
     @Override
