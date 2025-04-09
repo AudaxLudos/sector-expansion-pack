@@ -5,6 +5,8 @@ import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.impl.campaign.intel.BaseEventManager;
 
 public class IncursionManager extends BaseEventManager {
+    public static float EVENT_INTERVAL = 60f; // In days
+
     public static void register() {
         if (!Global.getSector().hasScript(IncursionManager.class)) {
             Global.getSector().addTransientScript(new IncursionManager());
@@ -19,6 +21,11 @@ public class IncursionManager extends BaseEventManager {
     @Override
     protected int getMaxConcurrent() {
         return 1;
+    }
+
+    @Override
+    protected float getBaseInterval() {
+        return EVENT_INTERVAL;
     }
 
     @Override
