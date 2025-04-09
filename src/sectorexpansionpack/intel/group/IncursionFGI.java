@@ -79,6 +79,7 @@ public class IncursionFGI extends GenericRaidFGI {
         }
 
         this.params.prepDays = 14f + 14f * this.params.random.nextFloat();
+        this.params.payloadDays = 21f + 14f * this.params.random.nextFloat();
         this.params.makeFleetsHostile = false;
         this.params.repImpact = HubMissionWithTriggers.ComplicationRepImpact.FULL;
         this.params.noun = "incursion";
