@@ -22,6 +22,7 @@ import com.fs.starfarer.api.util.Misc;
 import com.fs.starfarer.api.util.WeightedRandomPicker;
 import org.apache.log4j.Logger;
 import org.lwjgl.util.vector.Vector2f;
+import sectorexpansionpack.missions.hub.SEPHubMission;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -90,12 +91,8 @@ public class ExpeditionFGI extends FleetGroupIntel {
     }
 
     protected void pickSource() {
-        HubMissionWithSearch picker = new HubMissionWithSearch() {
-            @Override
-            protected boolean create(MarketAPI createdAt, boolean barEvent) {
-                return false;
-            }
-        };
+        SEPHubMission picker = new SEPHubMission();
+        picker.setGenRandom(this.params.random);
         picker.requireMarketNotHidden();
         picker.requireMarketHasSpaceport();
         picker.requireMarketFactionNotPlayer();
@@ -112,12 +109,8 @@ public class ExpeditionFGI extends FleetGroupIntel {
     }
 
     protected void pickTarget() {
-        HubMissionWithSearch picker = new HubMissionWithSearch() {
-            @Override
-            protected boolean create(MarketAPI createdAt, boolean barEvent) {
-                return false;
-            }
-        };
+        SEPHubMission picker = new SEPHubMission();
+        picker.setGenRandom(this.params.random);
         picker.requireSystemInterestingAndNotCore();
         picker.preferSystemInInnerSector();
         picker.preferSystemUnexplored();
