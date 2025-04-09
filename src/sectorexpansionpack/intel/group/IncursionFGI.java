@@ -1,13 +1,16 @@
 package sectorexpansionpack.intel.group;
 
 import com.fs.starfarer.api.Global;
+import com.fs.starfarer.api.campaign.FactionAPI;
 import com.fs.starfarer.api.campaign.SpecialItemData;
+import com.fs.starfarer.api.campaign.StarSystemAPI;
 import com.fs.starfarer.api.campaign.econ.Industry;
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
 import com.fs.starfarer.api.impl.campaign.ids.Industries;
 import com.fs.starfarer.api.impl.campaign.intel.group.GenericRaidFGI;
 import com.fs.starfarer.api.impl.campaign.missions.hub.HubMissionWithTriggers;
 import com.fs.starfarer.api.impl.campaign.missions.hub.ReqMode;
+import com.fs.starfarer.api.ui.TooltipMakerAPI;
 import com.fs.starfarer.api.util.Misc;
 import com.fs.starfarer.api.util.WeightedRandomPicker;
 import org.apache.log4j.Logger;
@@ -135,5 +138,17 @@ public class IncursionFGI extends GenericRaidFGI {
             return null;
         }
         return this.params.raidParams.allowedTargets.get(0);
+    }
+
+    @Override
+    protected void addBasicDescription(TooltipMakerAPI info, float width, float height, float oPad) {
+        FactionAPI faction = getFaction();
+        StarSystemAPI system = this.raidAction.getWhere();
+        String noun = getNoun();
+
+        info.addImage(faction.getLogo(), width, 128, oPad);
+        info.addPara(Misc.ucFirst(faction.getPersonNamePrefixAOrAn()) + " %s " + noun + " is targeting a colony in the "
+                        + system.getNameWithLowercaseTypeShort() + ".", oPad,
+                faction.getBaseUIColor(), faction.getPersonNamePrefix());
     }
 }
