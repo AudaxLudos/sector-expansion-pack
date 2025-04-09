@@ -13,7 +13,6 @@ import com.fs.starfarer.api.impl.campaign.intel.group.GenericRaidFGI;
 import com.fs.starfarer.api.impl.campaign.missions.hub.BaseHubMission;
 import com.fs.starfarer.api.impl.campaign.missions.hub.HubMissionWithTriggers;
 import com.fs.starfarer.api.impl.campaign.missions.hub.ReqMode;
-import com.fs.starfarer.api.impl.campaign.rulecmd.salvage.MarketCMD;
 import com.fs.starfarer.api.ui.Alignment;
 import com.fs.starfarer.api.ui.LabelAPI;
 import com.fs.starfarer.api.ui.TooltipMakerAPI;
@@ -23,7 +22,6 @@ import org.apache.log4j.Logger;
 import sectorexpansionpack.missions.hub.SEPHubMission;
 
 import java.awt.*;
-import java.util.List;
 import java.util.Objects;
 
 public class IncursionFGI extends GenericRaidFGI {
@@ -186,7 +184,7 @@ public class IncursionFGI extends GenericRaidFGI {
                     String risk = "is at risk of losing special items installed on its structures.";
                     String highlight = "losing special items";
 
-                    float raidStr  = getRoute().getExtra().getStrengthModifiedByDamage();
+                    float raidStr = getRoute().getExtra().getStrengthModifiedByDamage();
                     float defenderStr = WarSimScript.getEnemyStrength(getFaction(), system, isPlayerTargeted());
                     float defensiveStr = defenderStr + WarSimScript.getStationStrength(targetMarket.getFaction(), system, targetMarket.getPrimaryEntity());
                     boolean isSafe = defensiveStr > raidStr * 1.25f;
@@ -242,7 +240,7 @@ public class IncursionFGI extends GenericRaidFGI {
                             this.origin.getContainingLocation().getNameWithLowercaseTypeShort() + ".", oPad);
                 }
             }
-        } else if (isSucceeded()){
+        } else if (isSucceeded()) {
             info.addPara("Successfully completed there objective and have returned to " + getSource().getMarket().getName()
                     + ". Any valuable item taken will most likely be used and distributed.", oPad);
         } else if (isFailed()) {
@@ -263,6 +261,73 @@ public class IncursionFGI extends GenericRaidFGI {
                 info.addPara("Failed to complete their objectives", oPad);
             }
         }
+    }
+
+    @Override
+    protected void addNonUpdateBulletPoints(TooltipMakerAPI info, Color tc, Object param, ListInfoMode mode, float initPad) {
+        FGAction currentAction = getCurrentAction();
+        Color s = Misc.getHighlightColor();
+        StarSystemAPI target = getTargetSystem();
+        StarSystemAPI source = getSource().getStarSystem();
+        MarketAPI targetMarket = getTargetMarket();
+
+        float untilDeployment = getETAUntil(PREPARE_ACTION);
+        float untilDeparture = getETAUntil(TRAVEL_ACTION);
+        float untilArrival = getETAUntil(PAYLOAD_ACTION);
+        float untilReturn = getETAUntil(RETURN_ACTION, true);
+
+        if (currentAction != null) {
+            if (Objects.equals(PREPARE_ACTION, currentAction.getId())) {
+                if (!isEnding()) {
+                    if (untilDeployment > 0) {
+                        if (mode == ListInfoMode.INTEL || mode == ListInfoMode.MESSAGES) {
+                            info.addPara("Deploying in the %s", initPad, tc, s, source.getNameWithLowercaseTypeShort());
+                            initPad = 0f;
+                        }
+                        addETABulletPoints(null, null, false, untilDeployment, ETAType.DEPLOYMENT, info, tc, initPad);
+                    } else if (untilDeparture > 0) {
+                        if (mode == ListInfoMode.INTEL || mode == ListInfoMode.MESSAGES) {
+                            info.addPara("Preparing in the %s", initPad, tc, s, source.getNameWithLowercaseTypeShort());
+                            initPad = 0f;
+                        }
+                        addETABulletPoints(null, null, false, untilDeparture, ETAType.DEPARTURE, info, tc, initPad);
+                    }
+                }
+            } else if (Objects.equals(TRAVEL_ACTION, currentAction.getId())) {
+                if (!isEnding()) {
+                    if (mode == ListInfoMode.INTEL || mode == ListInfoMode.MESSAGES) {
+                        info.addPara("Traveling to the %s", initPad, tc, s, target.getNameWithLowercaseTypeShort());
+                        initPad = 0f;
+                    }
+                    addETABulletPoints(target.getNameWithLowercaseTypeShort(), s, false, untilArrival, ETAType.ARRIVING, info, tc, initPad);
+                }
+            } else if (Objects.equals(PAYLOAD_ACTION, currentAction.getId())) {
+                if (!isEnding()) {
+                    if (mode == ListInfoMode.INTEL || mode == ListInfoMode.MESSAGES) {
+                        LabelAPI label = info.addPara("Targeting " + targetMarket.getName() + " in the "
+                                + target.getNameWithLowercaseTypeShort(), initPad, tc, s, target.getNameWithNoType());
+                        label.setHighlightColors(s);
+                        label.setHighlight(target.getNameWithNoType());
+                        initPad = 0f;
+                    }
+                }
+            } else if (Objects.equals(RETURN_ACTION, currentAction.getId())) {
+                if (!isEnding()) {
+                    if (mode == ListInfoMode.INTEL || mode == ListInfoMode.MESSAGES) {
+                        LabelAPI label = info.addPara("Returning to the " + getSource().getStarSystem().getNameWithLowercaseTypeShort(), tc, initPad);
+                        label.setHighlightColors(s);
+                        label.setHighlight(getSource().getStarSystem().getNameWithNoType());
+                        initPad = 0f;
+                    }
+                    addETABulletPoints(source.getNameWithLowercaseTypeShort(), s, false, untilReturn, ETAType.RETURNING, info, tc, initPad);
+                }
+            }
+        }
+    }
+
+    @Override
+    protected void addUpdateBulletPoints(TooltipMakerAPI info, Color tc, Object param, ListInfoMode mode, float initPad) {
+        addNonUpdateBulletPoints(info, tc, param, mode, initPad);
     }
 
     @Override
