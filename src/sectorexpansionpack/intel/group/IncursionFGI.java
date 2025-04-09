@@ -1,10 +1,7 @@
 package sectorexpansionpack.intel.group;
 
 import com.fs.starfarer.api.Global;
-import com.fs.starfarer.api.campaign.CampaignFleetAPI;
-import com.fs.starfarer.api.campaign.FactionAPI;
-import com.fs.starfarer.api.campaign.SpecialItemData;
-import com.fs.starfarer.api.campaign.StarSystemAPI;
+import com.fs.starfarer.api.campaign.*;
 import com.fs.starfarer.api.campaign.econ.Industry;
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
 import com.fs.starfarer.api.impl.campaign.command.WarSimScript;
@@ -15,6 +12,7 @@ import com.fs.starfarer.api.impl.campaign.intel.group.GenericRaidFGI;
 import com.fs.starfarer.api.impl.campaign.missions.hub.BaseHubMission;
 import com.fs.starfarer.api.impl.campaign.missions.hub.HubMissionWithTriggers;
 import com.fs.starfarer.api.impl.campaign.missions.hub.ReqMode;
+import com.fs.starfarer.api.impl.campaign.rulecmd.salvage.special.BaseSalvageSpecial;
 import com.fs.starfarer.api.ui.Alignment;
 import com.fs.starfarer.api.ui.LabelAPI;
 import com.fs.starfarer.api.ui.TooltipMakerAPI;
@@ -24,6 +22,8 @@ import org.apache.log4j.Logger;
 import sectorexpansionpack.missions.hub.SEPHubMission;
 
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 public class IncursionFGI extends GenericRaidFGI {
@@ -443,6 +443,21 @@ public class IncursionFGI extends GenericRaidFGI {
     @Override
     protected boolean shouldAbort() {
         return isSpawnedFleets() && !isSpawning() && getMainFleet() == null;
+    }
+
+    @Override
+    protected void notifyActionFinished(FGAction action) {
+        super.notifyActionFinished(action);
+
+        if (Objects.equals(PREPARE_ACTION, action.getId())) {
+            this.waitAction.setActionFinished(true);
+        } else if (Objects.equals(TRAVEL_ACTION, action.getId())) {
+            this.travelAction.setActionFinished(true);
+        } else if (Objects.equals(PAYLOAD_ACTION, action.getId())) {
+            this.raidAction.setActionFinished(true);
+        } else if (Objects.equals(RETURN_ACTION, action.getId())) {
+            this.returnAction.setActionFinished(true);
+        }
     }
 
     public CampaignFleetAPI getMainFleet() {
