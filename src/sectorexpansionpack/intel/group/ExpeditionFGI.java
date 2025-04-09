@@ -427,15 +427,15 @@ public class ExpeditionFGI extends FleetGroupIntel {
             boolean returnFailed = this.returnAction.isActionFinished() && isAborted() && payloadFailed;
 
             if (returnFailed) {
-                info.addPara("The " + forces + " failed to return to the " + source.getNameWithLowercaseTypeShort(), oPad);
+                info.addPara("Failed to return to the " + source.getNameWithLowercaseTypeShort(), oPad);
             } else if (payloadFailed) {
-                info.addPara("The " + forces + " failed to explore the " + target.getNameWithLowercaseTypeShort(), oPad);
+                info.addPara("Failed to explore the " + target.getNameWithLowercaseTypeShort(), oPad);
             } else if (travelFailed) {
-                info.addPara("The " + forces + " failed to reach the " + target.getNameWithLowercaseTypeShort(), oPad);
+                info.addPara("Failed to reach the " + target.getNameWithLowercaseTypeShort(), oPad);
             } else if (prepareFailed) {
-                info.addPara("The " + forces + " failed to depart from the " + source.getNameWithLowercaseTypeShort(), oPad);
+                info.addPara("Failed to depart from the " + source.getNameWithLowercaseTypeShort(), oPad);
             } else {
-                info.addPara("The " + forces + " failed to complete their objectives", oPad);
+                info.addPara("Failed to complete their objectives", oPad);
             }
         }
     }
