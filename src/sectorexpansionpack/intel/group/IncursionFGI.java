@@ -455,6 +455,9 @@ public class IncursionFGI extends GenericRaidFGI {
             this.travelAction.setActionFinished(true);
         } else if (Objects.equals(PAYLOAD_ACTION, action.getId())) {
             this.raidAction.setActionFinished(true);
+            CargoAPI loot = Global.getFactory().createCargo(true);
+            loot.addSpecial(this.specialItem, 1);
+            BaseSalvageSpecial.addExtraSalvage(getMainFleet(), loot);
         } else if (Objects.equals(RETURN_ACTION, action.getId())) {
             this.returnAction.setActionFinished(true);
         }
