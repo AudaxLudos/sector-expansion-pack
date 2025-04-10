@@ -66,7 +66,7 @@ public class IncursionFGI extends GenericRaidFGI {
             totalDifficulty -= 10f;
         } else {
             this.params.fleetSizes.add(Math.round(totalDifficulty));
-            totalDifficulty = 0f;
+            totalDifficulty = -1f;
         }
         while (totalDifficulty > 0f) {
             int min = 4;

@@ -13,7 +13,6 @@ import com.fs.starfarer.api.impl.campaign.intel.group.FGWaitAction;
 import com.fs.starfarer.api.impl.campaign.intel.group.FleetGroupIntel;
 import com.fs.starfarer.api.impl.campaign.missions.FleetCreatorMission;
 import com.fs.starfarer.api.impl.campaign.missions.hub.BaseHubMission;
-import com.fs.starfarer.api.impl.campaign.missions.hub.HubMissionWithSearch;
 import com.fs.starfarer.api.impl.campaign.missions.hub.HubMissionWithTriggers;
 import com.fs.starfarer.api.impl.campaign.missions.hub.ReqMode;
 import com.fs.starfarer.api.impl.campaign.rulecmd.salvage.special.BaseSalvageSpecial;
@@ -70,7 +69,7 @@ public class ExpeditionFGI extends FleetGroupIntel {
             totalDifficulty -= 10f;
         } else {
             this.params.fleetSizes.add(Math.round(totalDifficulty));
-            totalDifficulty = 0f;
+            totalDifficulty = -1f;
         }
         while (totalDifficulty > 0f) {
             int min = 4;
