@@ -27,6 +27,7 @@ import java.util.Objects;
 public class IncursionFGI extends GenericRaidFGI {
     public static Logger log = Global.getLogger(IncursionFGI.class);
 
+    protected CampaignFleetAPI mainFleet;
     protected Industry industry;
     protected SpecialItemData specialItem;
 
@@ -173,12 +174,14 @@ public class IncursionFGI extends GenericRaidFGI {
         if (this.params.fleetSizes.size() == 1) {
             fleet.setName("Incursion Fleet");
             fleet.getMemoryWithoutUpdate().set("$sep_incursionFleet", true);
+            this.mainFleet = fleet;
             setPostingLocation(fleet);
         } else {
             Integer maxSize = this.params.fleetSizes.stream().reduce(Integer.MIN_VALUE, Integer::max);
             if (size == maxSize) {
                 fleet.setName("Incursion Fleet");
                 fleet.getMemoryWithoutUpdate().set("$sep_incursionFleet", true);
+                this.mainFleet = fleet;
                 setPostingLocation(fleet);
             } else {
                 fleet.setName("Support Fleet");
@@ -442,7 +445,7 @@ public class IncursionFGI extends GenericRaidFGI {
 
     @Override
     protected boolean shouldAbort() {
-        return isSpawnedFleets() && !isSpawning() && getMainFleet() == null;
+        return isSpawnedFleets() && !isSpawning() && (getMainFleet() == null || (getMainFleet() != null && !getMainFleet().isAlive())) ;
     }
 
     @Override
@@ -466,9 +469,6 @@ public class IncursionFGI extends GenericRaidFGI {
     }
 
     public CampaignFleetAPI getMainFleet() {
-        return getFleets().stream()
-                .filter(fleet -> fleet.getMemoryWithoutUpdate().getBoolean("$sep_incursionFleet"))
-                .findFirst()
-                .orElse(null);
+        return this.mainFleet;
     }
 }

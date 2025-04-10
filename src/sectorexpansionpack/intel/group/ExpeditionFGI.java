@@ -40,6 +40,7 @@ public class ExpeditionFGI extends FleetGroupIntel {
     public static String PAYLOAD_ACTION = "payload_action";
     public static String RETURN_ACTION = "return_action";
 
+    protected CampaignFleetAPI mainFleet;
     protected float lootMult = 0f;
     protected ExpeditionParams params;
     protected FGWaitAction waitAction;
@@ -291,12 +292,14 @@ public class ExpeditionFGI extends FleetGroupIntel {
         if (this.params.fleetSizes.size() == 1) {
             fleet.setName("Expedition Fleet");
             fleet.getMemoryWithoutUpdate().set("$sep_expeditionFleet", true);
+            this.mainFleet = fleet;
             setPostingLocation(fleet);
         } else {
             Integer maxSize = this.params.fleetSizes.stream().reduce(Integer.MIN_VALUE, Integer::max);
             if (size == maxSize) {
                 fleet.setName("Expedition Fleet");
                 fleet.getMemoryWithoutUpdate().set("$sep_expeditionFleet", true);
+                this.mainFleet = fleet;
                 setPostingLocation(fleet);
             } else {
                 fleet.setName("Supply Fleet");
@@ -610,7 +613,7 @@ public class ExpeditionFGI extends FleetGroupIntel {
 
     @Override
     protected boolean shouldAbort() {
-        return isSpawnedFleets() && !isSpawning() && getMainFleet() == null;
+        return isSpawnedFleets() && !isSpawning() && (getMainFleet() == null || (getMainFleet() != null && !getMainFleet().isAlive())) ;
     }
 
     @Override
@@ -690,12 +693,8 @@ public class ExpeditionFGI extends FleetGroupIntel {
         return specialItemPicker.pick().getId();
     }
 
-
     public CampaignFleetAPI getMainFleet() {
-        return getFleets().stream()
-                .filter(fleet -> fleet.getMemoryWithoutUpdate().getBoolean("$sep_expeditionFleet"))
-                .findFirst()
-                .orElse(null);
+        return this.mainFleet;
     }
 
     public static class ExpeditionParams {
