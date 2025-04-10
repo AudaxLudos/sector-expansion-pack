@@ -4,6 +4,8 @@ import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.campaign.*;
 import com.fs.starfarer.api.campaign.econ.Industry;
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
+import com.fs.starfarer.api.impl.campaign.econ.impl.InstallableItemEffect;
+import com.fs.starfarer.api.impl.campaign.econ.impl.ItemEffectsRepo;
 import com.fs.starfarer.api.impl.campaign.ids.*;
 import com.fs.starfarer.api.impl.campaign.intel.group.FGAction;
 import com.fs.starfarer.api.impl.campaign.intel.group.FGTravelAction;
@@ -639,8 +641,31 @@ public class ExpeditionFGI extends FleetGroupIntel {
             BaseSalvageSpecial.addExtraSalvage(getMainFleet(), loot);
         } else if (Objects.equals(RETURN_ACTION, action.getId())) {
             this.returnAction.setActionFinished(true);
-            // TODO: Upon completion install any special items usable by the market
-            // TODO: Any unused special items will be sent to other same faction markets that can use them
+            BaseSalvageSpecial.ExtraSalvage extraSalvage = BaseSalvageSpecial.getExtraSalvage(getMainFleet());
+            CargoAPI cargo = extraSalvage.cargo;
+            for (CargoStackAPI stack : cargo.getStacksCopy()) {
+                SpecialItemData data = stack.getSpecialDataIfSpecial();
+                if (data != null) {
+                    InstallableItemEffect effect = ItemEffectsRepo.ITEM_EFFECTS.get(data.getId());
+                    MarketAPI market = this.params.source;
+                    for (Industry industry : market.getIndustries()) {
+                        if (!industry.wantsToUseSpecialItem(data) || effect == null || stack.getSize() <= 0f) {
+                            continue;
+                        }
+                        List<String> unmet = effect.getUnmetRequirements(industry);
+                        if (unmet != null && !unmet.isEmpty()) {
+                            continue;
+                        }
+
+                        // REVIEW: Send intel message about special item use on source market
+                        industry.setSpecialItem(data);
+                        cargo.removeItems(stack.getType(), data, 1f);
+                        break;
+                    }
+
+                    // TODO: Any unused special items will be sent to other same faction markets that can use them
+                }
+            }
         }
     }
 
