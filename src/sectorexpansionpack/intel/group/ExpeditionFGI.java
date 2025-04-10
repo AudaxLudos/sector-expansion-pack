@@ -643,6 +643,10 @@ public class ExpeditionFGI extends FleetGroupIntel {
         } else if (Objects.equals(RETURN_ACTION, action.getId())) {
             this.returnAction.setActionFinished(true);
             BaseSalvageSpecial.ExtraSalvage extraSalvage = BaseSalvageSpecial.getExtraSalvage(getMainFleet());
+            if (extraSalvage == null) {
+                return;
+            }
+
             CargoAPI cargo = extraSalvage.cargo;
             for (CargoStackAPI stack : cargo.getStacksCopy()) {
                 SpecialItemData data = stack.getSpecialDataIfSpecial();
