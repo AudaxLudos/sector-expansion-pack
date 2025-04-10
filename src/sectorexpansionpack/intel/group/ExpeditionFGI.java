@@ -612,7 +612,7 @@ public class ExpeditionFGI extends FleetGroupIntel {
 
     @Override
     protected boolean shouldAbort() {
-        return isSpawnedFleets() && !isSpawning() && (getMainFleet() == null || (getMainFleet() != null && !getMainFleet().isAlive())) ;
+        return isSpawnedFleets() && !isSpawning() && (getMainFleet() == null || (getMainFleet() != null && !getMainFleet().isAlive()));
     }
 
     @Override

@@ -5,6 +5,8 @@ import com.fs.starfarer.api.campaign.*;
 import com.fs.starfarer.api.campaign.econ.Industry;
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
 import com.fs.starfarer.api.impl.campaign.command.WarSimScript;
+import com.fs.starfarer.api.impl.campaign.econ.impl.InstallableItemEffect;
+import com.fs.starfarer.api.impl.campaign.econ.impl.ItemEffectsRepo;
 import com.fs.starfarer.api.impl.campaign.ids.Industries;
 import com.fs.starfarer.api.impl.campaign.ids.Stats;
 import com.fs.starfarer.api.impl.campaign.intel.group.FGAction;
@@ -22,6 +24,7 @@ import org.apache.log4j.Logger;
 import sectorexpansionpack.missions.hub.SEPHubMission;
 
 import java.awt.*;
+import java.util.List;
 import java.util.Objects;
 
 public class IncursionFGI extends GenericRaidFGI {
@@ -445,7 +448,7 @@ public class IncursionFGI extends GenericRaidFGI {
 
     @Override
     protected boolean shouldAbort() {
-        return isSpawnedFleets() && !isSpawning() && (getMainFleet() == null || (getMainFleet() != null && !getMainFleet().isAlive())) ;
+        return isSpawnedFleets() && !isSpawning() && (getMainFleet() == null || (getMainFleet() != null && !getMainFleet().isAlive()));
     }
 
     @Override
@@ -463,7 +466,25 @@ public class IncursionFGI extends GenericRaidFGI {
             BaseSalvageSpecial.addExtraSalvage(getMainFleet(), loot);
         } else if (Objects.equals(RETURN_ACTION, action.getId())) {
             this.returnAction.setActionFinished(true);
-            // TODO: Upon completion install any special items usable by the market
+            BaseSalvageSpecial.ExtraSalvage extraSalvage = BaseSalvageSpecial.getExtraSalvage(getMainFleet());
+            CargoAPI cargo = extraSalvage.cargo;
+            InstallableItemEffect effect = ItemEffectsRepo.ITEM_EFFECTS.get(this.specialItem.getId());
+            MarketAPI market = this.params.source;
+            for (Industry industry : market.getIndustries()) {
+                if (!industry.wantsToUseSpecialItem(this.specialItem) || effect == null) {
+                    continue;
+                }
+                List<String> unmet = effect.getUnmetRequirements(industry);
+                if (unmet != null && !unmet.isEmpty()) {
+                    continue;
+                }
+
+                // REVIEW: Send intel message about special item use on source market
+                industry.setSpecialItem(this.specialItem);
+                cargo.removeItems(CargoAPI.CargoItemType.SPECIAL, this.specialItem, 1f);
+                break;
+            }
+
             // TODO: Any unused special items will be sent to other same faction markets that can use them
         }
     }
