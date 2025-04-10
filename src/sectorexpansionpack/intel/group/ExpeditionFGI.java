@@ -525,7 +525,7 @@ public class ExpeditionFGI extends FleetGroupIntel {
                         label.setHighlight(getSource().getStarSystem().getNameWithNoType());
                         initPad = 0f;
                     }
-                    addETABulletPoints(source.getNameWithLowercaseTypeShort(), s, false, untilReturn, ETAType.RETURNING, info, tc, initPad);
+                    addETABulletPoints(source.getNameWithLowercaseTypeShort(), s, true, untilReturn, ETAType.RETURNING, info, tc, initPad);
                 }
             }
         }
@@ -584,13 +584,12 @@ public class ExpeditionFGI extends FleetGroupIntel {
                 label.setHighlight("" + (int) eta, hl);
             }
         } else {
-            String pre = "Arrival at ";
+            String pre = "Arrival";
             if (type == ETAType.RETURNING) {
-                pre = "Return to ";
+                pre = "Return";
             }
 
-            // REVIEW: Remove destination name as its already mentioned in the intel
-            label = info.addPara(pre + destName + " is imminent", tc, initPad);
+            label = info.addPara(pre + " imminent", tc, initPad);
 
             if (destHL != null && label != null) {
                 label.setHighlightColor(destHL);
