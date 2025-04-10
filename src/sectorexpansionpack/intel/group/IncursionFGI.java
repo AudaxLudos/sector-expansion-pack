@@ -248,7 +248,7 @@ public class IncursionFGI extends GenericRaidFGI {
         String noun = this.params.noun;
 
         info.addSectionHeading("Status", this.faction.getBaseUIColor(), this.faction.getDarkUIColor(), Alignment.MID, oPad);
-        if (currentAction != null && !isFailed()) {
+        if (currentAction != null && !isEnding() && !isFailed() && !isSucceeded()) {
             if (isInPreLaunchDelay()) {
                 if (getSource().getMarket() != null) {
                     BaseHubMission.addStandardMarketDesc("The " + noun + " is in the planning stages on",
@@ -281,10 +281,10 @@ public class IncursionFGI extends GenericRaidFGI {
                             this.origin.getContainingLocation().getNameWithLowercaseTypeShort() + ".", oPad);
                 }
             }
-        } else if (isSucceeded()) {
+        } else if (isSucceeded() && !isFailed()) {
             info.addPara("Successfully completed there objective and have returned to " + getSource().getMarket().getName()
                     + ". Any valuable item taken will most likely be used and distributed.", oPad);
-        } else if (isFailed()) {
+        } else if (isEnding() && isFailed()) {
             boolean prepareFailed = this.waitAction.isActionFinished() && isAborted();
             boolean travelFailed = this.travelAction.isActionFinished() && isAborted() && prepareFailed;
             boolean payloadFailed = this.raidAction.isActionFinished() && isAborted() && travelFailed;
