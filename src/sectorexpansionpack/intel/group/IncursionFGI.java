@@ -499,4 +499,13 @@ public class IncursionFGI extends GenericRaidFGI {
     public CampaignFleetAPI getMainFleet() {
         return this.mainFleet;
     }
+
+    @Override
+    protected void notifyEnding() {
+        unsetMemoryFlags();
+    }
+
+    protected void unsetMemoryFlags() {
+        getTargetMarket().getMemoryWithoutUpdate().unset("$sep_isIncursionTarget");
+    }
 }
