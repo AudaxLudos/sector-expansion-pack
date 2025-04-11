@@ -89,10 +89,12 @@ public class IncursionFGI extends GenericRaidFGI {
         setRandom(this.params.random);
         setPostingLocation(this.params.source.getPrimaryEntity());
         initActions();
+        setMemoryFlags();
         Global.getSector().getIntelManager().queueIntel(this);
-        log.info(String.format("Starting incursion by %s at %s in the %s with a total difficulty value of %s",
+        log.info(String.format("Starting incursion by %s at %s in the %s with a total difficulty value of %s targeting %s in the %s",
                 getFaction().getDisplayName(), getSource().getMarket().getName(),
-                getSource().getStarSystem().getNameWithLowercaseTypeShort(), maxTotalDifficulty));
+                getSource().getStarSystem().getNameWithLowercaseTypeShort(), maxTotalDifficulty,
+                getTargetMarket().getName(), getTargetSystem().getNameWithLowercaseTypeShort()));
     }
 
     protected void pickSource() {
@@ -119,6 +121,7 @@ public class IncursionFGI extends GenericRaidFGI {
         picker.requireMarketNotHidden();
         picker.requireMarketFactionNotPlayer();
         picker.requireMarketHasInstalledItems();
+        picker.requireMarketMemoryFlagMissingOrFalse("$sep_isIncursionTarget");
 
         MarketAPI picked = picker.pickMarket();
         if (picked == null) {
@@ -169,6 +172,10 @@ public class IncursionFGI extends GenericRaidFGI {
             return null;
         }
         return this.params.raidParams.allowedTargets.get(0);
+    }
+
+    protected void setMemoryFlags() {
+        getTargetMarket().getMemoryWithoutUpdate().set("$sep_isIncursionTarget", true);
     }
 
     @Override

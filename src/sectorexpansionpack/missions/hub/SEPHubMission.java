@@ -23,4 +23,14 @@ public class SEPHubMission extends HubMissionWithBarEvent {
             }
         });
     }
+
+    public void requireMarketMemoryFlagMissingOrFalse(String key) {
+        this.search.marketReqs.add(new MarketRequirement() {
+            @Override
+            public boolean marketMatchesRequirement(MarketAPI market) {
+                boolean val = market.getMemoryWithoutUpdate().getBoolean(key);
+                return !val;
+            }
+        });
+    }
 }
