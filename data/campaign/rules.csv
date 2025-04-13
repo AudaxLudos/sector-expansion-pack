@@ -1,0 +1,26 @@
+id,trigger,conditions,script,text,options,notes
+"# artifact incursion mission
+# initial dialogs",,,,,,
+sep_aim_blurb,sep_aim_blurb,,,OFFER BLURB,,
+sep_aim_blurbOfferOption,sep_aim_option,,,,sep_aim_start:OFFER OPTION,
+sep_aim_offerTextContact,DialogOptionSelected,$option == sep_aim_start,$missionId = sep_aim,OFFER TEXT,"contact_accept:ACCEPT
+contact_decline:DECLINE",
+"# artifact incursion mission
+# raid dialogs",,,,,,
+sep_aim_raidFinished,SEPAIMRaidFinished,"$market.sep_aim_raidHere
+Call $market.sep_aim_ref updateData","$market.sep_aim_deliverArtifact = true
+Call $market.sep_aim_ref updateStage",RAID COMPLETED,,
+"# artifact incursion mission
+# return dialogs",,,,,,
+sep_aim_returnOption,PopulateOptions,"$sep_aim_deliverHere
+Call $sep_aim_ref updateData",SetOptionColor sep_aim_returnText hColor,,sep_aim_askToReturn:GIVE DIALOG,
+sep_aim_returnText,DialogOptionSelected,$option == sep_aim_askToReturn,"SetTooltip sep_aim_giveArtifact ""Requires 1 $sep_aim_artifactName""
+SetTooltipHighlights sep_aim_giveArtifact $sep_aim_artifactName
+SetEnabled sep_aim_giveArtifact false
+FireAll SEPAIMCheckCargo",GIVE OR KEEP TEXT,"sep_aim_giveArtifact:GIVE
+100:cutCommLink:LEAVE",
+sep_aim_returnCheckCargo,SEPAIMCheckCargo,PlayerHasCargo $sep_aim_artifactId score:1000,SetEnabled sep_aim_giveArtifact true,,,
+sep_aim_returnGiveText,DialogOptionSelected,$option == sep_aim_giveArtifact,"AddRemoveAnyItem SPECIAL $sep_aim_artifactId -1
+$sep_aim_completed = true
+Call $sep_aim_ref updateStage",GIVEN,contact_pickAnotherGreeting:END,
+,,,,,,
