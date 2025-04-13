@@ -1,0 +1,3 @@
+Wispborne: For the Starsector IntelliJ mod template and the GitHub action release script.
+Starsector Community: For resources about modding.
+Alex and Company: For making a great game and community.

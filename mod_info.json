@@ -1,0 +1,12 @@
+{
+    "id": "sectorexpansionpack",
+    "name": "Sector Expansion Pack",
+    "author": "Audax",
+    "version": "0.0.1",
+    "description": "A mod for Starsector that adds new ships, weapons, quests, exploration content, and more.",
+    "gameVersion": "0.98a",
+    "jars": [
+        "SectorExpansionPack.jar"
+    ],
+    "modPlugin": "sectorexpansionpack.ModPlugin"
+}
