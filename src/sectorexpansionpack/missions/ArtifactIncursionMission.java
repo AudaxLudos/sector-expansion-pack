@@ -90,6 +90,7 @@ public class ArtifactIncursionMission extends HubMissionWithBarEvent implements 
         int bonus = getRewardBonusForMarines(getMarinesRequiredForCustomObjective(this.market, getDangerLevel()));
         bonus += Math.round(this.specialItemSpec.getBasePrice() * 0.5f);
         setCreditRewardWithBonus(CreditReward.VERY_HIGH, bonus);
+        setRepChanges(0.1f, 0.2f, 0.1f, 0.2f);
 
         return true;
     }
