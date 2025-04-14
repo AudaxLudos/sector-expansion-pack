@@ -57,6 +57,7 @@ public class ArtifactIncursionMission extends HubMissionWithBarEvent implements 
         requireMarketFactionNotPlayer();
         requireMarketHasItemsInstalled();
         preferMarketAnyItemCompatibleWithOtherMarket(this.person.getMarket());
+        preferMarketFactionHostileTo(this.person.getFaction().getId());
         this.market = pickMarket();
 
         if (!setMarketMissionRef(this.market, "$sep_aim_ref")) {
