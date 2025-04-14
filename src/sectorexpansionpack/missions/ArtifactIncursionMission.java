@@ -1,10 +1,7 @@
 package sectorexpansionpack.missions;
 
 import com.fs.starfarer.api.Global;
-import com.fs.starfarer.api.campaign.InteractionDialogAPI;
-import com.fs.starfarer.api.campaign.SectorEntityToken;
-import com.fs.starfarer.api.campaign.SpecialItemData;
-import com.fs.starfarer.api.campaign.SpecialItemSpecAPI;
+import com.fs.starfarer.api.campaign.*;
 import com.fs.starfarer.api.campaign.econ.Industry;
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
 import com.fs.starfarer.api.campaign.listeners.GroundRaidObjectivesListener;
@@ -24,6 +21,7 @@ import com.fs.starfarer.api.util.WeightedRandomPicker;
 import java.awt.*;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 public class ArtifactIncursionMission extends HubMissionWithBarEvent implements GroundRaidObjectivesListener {
     public static float MISSION_DURATION = 120f;
@@ -220,18 +218,20 @@ public class ArtifactIncursionMission extends HubMissionWithBarEvent implements 
         if (this.creditReward > 0) {
             InstallableItemEffect effect = ItemEffectsRepo.ITEM_EFFECTS.get(this.specialItemData.getId());
             MarketAPI market = this.person.getMarket();
-            for (Industry industry : market.getIndustries()) {
-                if (!industry.wantsToUseSpecialItem(this.specialItemData) || effect == null) {
-                    continue;
-                }
-                List<String> unmet = effect.getUnmetRequirements(industry);
-                if (unmet != null && !unmet.isEmpty()) {
-                    continue;
-                }
+            if (Objects.equals(market.getFactionId(), this.person.getFaction().getId())) {
+                for (Industry industry : market.getIndustries()) {
+                    if (!industry.wantsToUseSpecialItem(this.specialItemData) || effect == null) {
+                        continue;
+                    }
+                    List<String> unmet = effect.getUnmetRequirements(industry);
+                    if (unmet != null && !unmet.isEmpty()) {
+                        continue;
+                    }
 
-                // OPTION: Send intel message when special item is installed
-                industry.setSpecialItem(this.specialItemData);
-                break;
+                    // OPTION: Send intel message when special item is installed
+                    industry.setSpecialItem(this.specialItemData);
+                    break;
+                }
             }
         }
     }
