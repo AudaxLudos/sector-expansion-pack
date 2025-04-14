@@ -1,19 +1,27 @@
 id,trigger,conditions,script,text,options,notes
 "# artifact incursion mission
 # initial dialogs",,,,,,
-sep_aim_blurb,sep_aim_blurb,,,OFFER BLURB,,
-sep_aim_blurbOfferOption,sep_aim_option,,,,sep_aim_start:OFFER OPTION,
-sep_aim_offerTextContact,DialogOptionSelected,$option == sep_aim_start,$missionId = sep_aim,OFFER TEXT,"contact_accept:ACCEPT
-contact_decline:DECLINE",
+sep_aim_blurb,sep_aim_blurb,,,"""An opposing faction is exploiting a valuable artifact to boost their industry; I need a trusted individual to put a stop to that and ensure my faction reaps the benefits of the artifact instead.""",,
+sep_aim_blurbOfferOption,sep_aim_option,,,,sep_aim_start:Ask about taking an artifact from an opposing faction,
+sep_aim_offerTextContact,DialogOptionSelected,$option == sep_aim_start,"$missionId = sep_aim
+Highlight ""$sep_aim_distance"" ""$sep_aim_reward"" ""$sep_aim_marines""
+Call $sep_aim_ref showMap ""Target: $sep_aim_marketName""","""An artifact called '$sep_aim_artifactName' is being use on $sep_aim_marketName, a colony $sep_aim_distance light years away from here. Your mission is to infiltrate the facility housing the artifact, secure it, and bring it back to me. Once the artifact is in my hands you'll be paid $sep_aim_reward."" 
+
+$HeOrShe continues, ""The market is well defended, so I had insiders gather some intel."" $HeOrShe hands over a tri-pad containing detailed reports on troop deployments and security measures on $sep_aim_marketName. A quick scan suggests you'd need around $sep_aim_marines marines to conduct the operation.
+
+$HeOrShe continues, ""Now then, do we have a deal?""","contact_accept:Accept
+contact_decline:Decline",
 "# artifact incursion mission
 # raid dialogs",,,,,,
 sep_aim_raidFinished,SEPAIMRaidFinished,"$market.sep_aim_raidHere
 Call $market.sep_aim_ref updateData","$market.sep_aim_deliverArtifact = true
-Call $market.sep_aim_ref updateStage",RAID COMPLETED,,
+Call $market.sep_aim_ref updateStage","After some time, your marine commander leading the strike team contacts you.
+
+""Command, we’ve breached the facility. Resistance was within expectations. The artifact is secure. I repeat, the artifact is secure. Prepping for extraction now. We should be clear in a few minutes.""",,
 "# artifact incursion mission
 # return dialogs",,,,,,
 sep_aim_returnOption,PopulateOptions,"$sep_aim_deliverHere
-Call $sep_aim_ref updateData",SetOptionColor sep_aim_returnText hColor,,sep_aim_askToReturn:GIVE OR KEEP DIALOG,
+Call $sep_aim_ref updateData",SetOptionColor sep_aim_returnText hColor,,"sep_aim_askToReturn:""I’d like to talk about the artifact incursion mission.""",
 sep_aim_returnText,DialogOptionSelected,$option == sep_aim_askToReturn,"SetTooltip sep_aim_giveArtifact ""Requires 1 $sep_aim_artifactName""
 SetTooltipHighlights sep_aim_giveArtifact $sep_aim_artifactName
 SetEnabled sep_aim_giveArtifact true
@@ -21,15 +29,15 @@ SetTooltip sep_aim_keepArtifact ""Requires 1 $sep_aim_artifactName""
 SetTooltipHighlights sep_aim_keepArtifact $sep_aim_artifactName
 SetEnabled sep_aim_keepArtifact true
 SetStoryOption sep_aim_keepArtifact general ""Convinced to keep the artifact""
-FireAll SEPAIMCheckCargo",GIVE OR KEEP TEXT,"sep_aim_giveArtifact:GIVE
-sep_aim_keepArtifact:KEEP
-100:cutCommLink:LEAVE",
+FireAll SEPAIMCheckCargo","""You've completed the raid? Well then, hand the artifact over, and I'll pay you the agreed-upon credits.""","sep_aim_giveArtifact:Give the artifact
+sep_aim_keepArtifact:Keep the artifact
+100:cutCommLink:Deny and leave",
 sep_aim_returnCheckCargo,SEPAIMCheckCargo,!PlayerHasCargo $sep_aim_artifactId score:1000,"SetEnabled sep_aim_giveArtifact false
 SetEnabled sep_aim_keepArtifact false",,,
 sep_aim_returnGiveText,DialogOptionSelected,$option == sep_aim_giveArtifact,"AddRemoveAnyItem SPECIAL $sep_aim_artifactId -1
 $sep_aim_completed = true
-Call $sep_aim_ref updateStage",GIVEN,contact_pickAnotherGreeting:END,
+Call $sep_aim_ref updateStage","""You made the right choice. This artifact will greatly benefit the $Faction. As promised, here's your payment.""",contact_pickAnotherGreeting:continue,
 sep_aim_returnKeepText,DialogOptionSelected,$option == sep_aim_keepArtifact,"Call $spe_aim_ref noCreditReward
 $sep_aim_completed = true
-Call $sep_aim_ref updateStage",KEPT,contact_pickAnotherGreeting:END,
+Call $sep_aim_ref updateStage","""You present a compelling case. If leaving the artifact in your possession ultimately serves our interests, then so be it. However, the agreed-upon payment stays with me. Consider it a fair exchange.""",contact_pickAnotherGreeting:continue,
 ,,,,,,

@@ -201,6 +201,11 @@ public class ArtifactIncursionMission extends HubMissionWithBarEvent implements 
 
     @Override
     protected void updateInteractionDataImpl() {
+        set("$sep_aim_missionDuration", Misc.getWithDGS(MISSION_DURATION) + " days");
+        set("$sep_aim_reward", Misc.getDGSCredits(getCreditsReward()));
+        set("$sep_aim_marketName", this.market.getName());
+        set("$sep_aim_marines", getMarinesRequiredForCustomObjective(this.market, this.danger));
+        set("$sep_aim_distance", getDistanceLY(this.market));
         set("$sep_aim_artifactId", this.specialItemSpec.getId());
         set("$sep_aim_artifactName", this.specialItemSpec.getName());
     }
