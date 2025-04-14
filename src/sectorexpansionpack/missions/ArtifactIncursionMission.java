@@ -21,6 +21,8 @@ import java.util.List;
 import java.util.Map;
 
 public class ArtifactIncursionMission extends HubMissionWithBarEvent implements GroundRaidObjectivesListener {
+    public static float MISSION_DURATION = 120f;
+
     public enum Stage {
         RAID_ARTIFACT,
         DELIVER_ARTIFACT,
@@ -80,6 +82,8 @@ public class ArtifactIncursionMission extends HubMissionWithBarEvent implements 
         connectWithMarketDecivilized(Stage.DELIVER_ARTIFACT, Stage.FAILED_DECIV, this.person.getMarket());
         setStageOnMarketDecivilized(Stage.FAILED_DECIV, this.market);
         setStageOnMarketDecivilized(Stage.FAILED_DECIV, createdAt);
+
+        setTimeLimit(Stage.FAILED, MISSION_DURATION, null);
 
         return true;
     }
