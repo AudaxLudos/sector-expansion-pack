@@ -26,6 +26,7 @@ public class ArtifactIncursionMission extends HubMissionWithBarEvent implements 
         DELIVER_ARTIFACT,
         COMPLETED,
         FAILED,
+        FAILED_DECIV
     }
 
     protected PersonAPI person;
@@ -73,6 +74,12 @@ public class ArtifactIncursionMission extends HubMissionWithBarEvent implements 
 
         connectWithMemoryFlag(Stage.RAID_ARTIFACT, Stage.DELIVER_ARTIFACT, this.market, "$sep_aim_deliverArtifact");
         setStageOnMemoryFlag(Stage.COMPLETED, this.person, "$sep_aim_completed");
+
+        addNoPenaltyFailureStages(Stage.FAILED_DECIV);
+        connectWithMarketDecivilized(Stage.RAID_ARTIFACT, Stage.FAILED_DECIV, this.market);
+        connectWithMarketDecivilized(Stage.DELIVER_ARTIFACT, Stage.FAILED_DECIV, this.person.getMarket());
+        setStageOnMarketDecivilized(Stage.FAILED_DECIV, this.market);
+        setStageOnMarketDecivilized(Stage.FAILED_DECIV, createdAt);
 
         return true;
     }
