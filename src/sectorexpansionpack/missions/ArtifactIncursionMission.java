@@ -251,6 +251,11 @@ public class ArtifactIncursionMission extends HubMissionWithBarEvent implements 
     }
 
     @Override
+    protected void notifyEnding() {
+        Global.getSector().getListenerManager().removeListener(this);
+    }
+
+    @Override
     public void modifyRaidObjectives(MarketAPI market, SectorEntityToken entity, List<GroundRaidObjectivePlugin> objectives, MarketCMD.RaidType type, int marineTokens, int priority) {
         if (priority != 1) {
             return;
