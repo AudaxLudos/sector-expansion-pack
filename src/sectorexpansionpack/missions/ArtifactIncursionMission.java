@@ -15,8 +15,11 @@ import com.fs.starfarer.api.impl.campaign.graid.SpecialItemRaidObjectivePluginIm
 import com.fs.starfarer.api.impl.campaign.missions.hub.HubMissionWithBarEvent;
 import com.fs.starfarer.api.impl.campaign.rulecmd.FireAll;
 import com.fs.starfarer.api.impl.campaign.rulecmd.salvage.MarketCMD;
+import com.fs.starfarer.api.ui.TooltipMakerAPI;
+import com.fs.starfarer.api.util.Misc;
 import com.fs.starfarer.api.util.WeightedRandomPicker;
 
+import java.awt.*;
 import java.util.List;
 import java.util.Map;
 
@@ -133,6 +136,65 @@ public class ArtifactIncursionMission extends HubMissionWithBarEvent implements 
     @Override
     public String getBaseName() {
         return "Artifact Incursion";
+    }
+
+    @Override
+    public boolean addNextStepText(TooltipMakerAPI info, Color tc, float pad) {
+        if (this.currentStage == Stage.RAID_ARTIFACT) {
+            info.addPara("Take the %s being used on %s in the %s", pad, tc, tc,
+                    this.specialItemSpec.getName(), this.market.getName(), this.market.getStarSystem().getNameWithLowercaseTypeShort());
+        } else if (this.currentStage == Stage.DELIVER_ARTIFACT) {
+            info.addPara("Deliver the %s to %s at %s in the %s", pad, tc, tc,
+                    this.specialItemSpec.getName(), this.person.getName().getFullName(), this.person.getMarket().getName(),
+                    this.person.getMarket().getStarSystem().getNameWithLowercaseTypeShort());
+        }
+        return false;
+    }
+
+    @Override
+    public void addDescriptionForNonEndStage(TooltipMakerAPI info, float width, float height) {
+        float oPad = 10f;
+        Color textColor = Misc.getTextColor();
+        Color boldColor = Misc.getHighlightColor();
+        Color giverColor = this.person.getFaction().getBaseUIColor();
+        Color targetColor = this.market.getFaction().getBaseUIColor();
+        Color marketColor = this.person.getMarket().getTextColorForFactionOrPlanet();
+        if (this.currentStage == Stage.RAID_ARTIFACT) {
+            info.addPara("Take the %s being used on %s a size %s colony, in the %s controlled by the %s.", oPad,
+                    new Color[]{boldColor, targetColor, boldColor, textColor, targetColor},
+                    this.specialItemSpec.getName(), this.market.getName(), this.market.getSize() + "",
+                    this.market.getStarSystem().getNameWithLowercaseTypeShort(), this.market.getFaction().getDisplayName());
+            addCustomRaidInfo(this.market, this.danger, info, oPad);
+        } else if (this.currentStage == Stage.DELIVER_ARTIFACT) {
+            info.addPara("Deliver the %s to %s at %s a size %s colony, in the %s controlled by the %s.", oPad,
+                    new Color[]{boldColor, giverColor, marketColor, boldColor, textColor, marketColor},
+                    this.specialItemSpec.getName(), this.person.getName().getFullName(), this.person.getMarket().getName(),
+                    this.person.getMarket().getSize() + "", this.person.getMarket().getStarSystem().getNameWithLowercaseTypeShort(),
+                    this.person.getMarket().getFaction().getDisplayName());
+        }
+    }
+
+    @Override
+    public String getStageDescriptionText() {
+        if (this.currentStage == Stage.FAILED_DECIV) {
+            if (this.person.getMarket().isPlanetConditionMarketOnly()) {
+                return "The " + getMissionTypeNoun() + " has failed due to " + this.person.getMarket().getName() + " becoming decivilized. No reputation penalty will be applied for this outcome.";
+            } else if (this.market.isPlanetConditionMarketOnly()) {
+                return "The " + getMissionTypeNoun() + " has failed due to " + this.market.getName() + " becoming decivilized. No reputation penalty will be applied for this outcome.";
+            }
+        }
+
+        return null;
+    }
+
+    @Override
+    protected void addBulletPointsPost(TooltipMakerAPI info, Color tc, float initPad, ListInfoMode mode) {
+        Color boldColor = Misc.getHighlightColor();
+        if (mode == ListInfoMode.IN_DESC && isSucceeded()) {
+            if (isSucceeded() && this.creditReward <= 0) {
+                info.addPara("%s artifact", initPad, tc, boldColor, this.specialItemSpec.getName());
+            }
+        }
     }
 
     @Override
