@@ -10,6 +10,8 @@ import com.fs.starfarer.api.campaign.econ.MarketAPI;
 import com.fs.starfarer.api.campaign.listeners.GroundRaidObjectivesListener;
 import com.fs.starfarer.api.campaign.rules.MemoryAPI;
 import com.fs.starfarer.api.characters.PersonAPI;
+import com.fs.starfarer.api.impl.campaign.econ.impl.InstallableItemEffect;
+import com.fs.starfarer.api.impl.campaign.econ.impl.ItemEffectsRepo;
 import com.fs.starfarer.api.impl.campaign.graid.GroundRaidObjectivePlugin;
 import com.fs.starfarer.api.impl.campaign.graid.SpecialItemRaidObjectivePluginImpl;
 import com.fs.starfarer.api.impl.campaign.missions.hub.HubMissionWithBarEvent;
@@ -206,6 +208,27 @@ public class ArtifactIncursionMission extends HubMissionWithBarEvent implements 
     @Override
     public void acceptImpl(InteractionDialogAPI dialog, Map<String, MemoryAPI> memoryMap) {
         Global.getSector().getListenerManager().addListener(this);
+    }
+
+    @Override
+    protected void endSuccessImpl(InteractionDialogAPI dialog, Map<String, MemoryAPI> memoryMap) {
+        if (this.creditReward > 0) {
+            InstallableItemEffect effect = ItemEffectsRepo.ITEM_EFFECTS.get(this.specialItemData.getId());
+            MarketAPI market = this.person.getMarket();
+            for (Industry industry : market.getIndustries()) {
+                if (!industry.wantsToUseSpecialItem(this.specialItemData) || effect == null) {
+                    continue;
+                }
+                List<String> unmet = effect.getUnmetRequirements(industry);
+                if (unmet != null && !unmet.isEmpty()) {
+                    continue;
+                }
+
+                // OPTION: Send intel message when special item is installed
+                industry.setSpecialItem(this.specialItemData);
+                break;
+            }
+        }
     }
 
     @Override
