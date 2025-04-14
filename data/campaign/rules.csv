@@ -29,6 +29,7 @@ SetStoryOption sep_aim_keepArtifact general ""Convinced to keep the artifact""",
 sep_aim_returnGiveText,DialogOptionSelected,$option == sep_aim_giveArtifact,"AddRemoveAnyItem SPECIAL $sep_aim_artifactId -1
 $sep_aim_completed = true
 Call $sep_aim_ref updateStage",GIVEN,contact_pickAnotherGreeting:END,
-sep_aim_returnKeepText,DialogOptionSelected,$option == sep_aim_keepArtifact,"$sep_aim_completed = true
+sep_aim_returnKeepText,DialogOptionSelected,$option == sep_aim_keepArtifact,"Call $spe_aim_ref noCreditReward
+$sep_aim_completed = true
 Call $sep_aim_ref updateStage",KEPT,contact_pickAnotherGreeting:END,
 ,,,,,,

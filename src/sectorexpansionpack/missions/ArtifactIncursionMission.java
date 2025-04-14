@@ -209,6 +209,18 @@ public class ArtifactIncursionMission extends HubMissionWithBarEvent implements 
     }
 
     @Override
+    public boolean callEvent(String ruleId, InteractionDialogAPI dialog, List<Misc.Token> params, Map<String, MemoryAPI> memoryMap) {
+        String action = params.get(0).getString(memoryMap);
+
+        if (action.equals("noCreditReward")) {
+            setCreditReward(0);
+            return true;
+        }
+
+        return super.callEvent(ruleId, dialog, params, memoryMap);
+    }
+
+    @Override
     public void modifyRaidObjectives(MarketAPI market, SectorEntityToken entity, List<GroundRaidObjectivePlugin> objectives, MarketCMD.RaidType type, int marineTokens, int priority) {
         if (priority != 1) {
             return;
