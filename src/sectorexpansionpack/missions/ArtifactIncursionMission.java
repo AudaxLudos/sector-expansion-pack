@@ -36,6 +36,7 @@ public class ArtifactIncursionMission extends HubMissionWithBarEvent implements 
     protected Industry industry;
     protected SpecialItemSpecAPI specialItemSpec;
     protected SpecialItemData specialItemData;
+    protected MarketCMD.RaidDangerLevel danger;
     protected SpecialItemRaidObjectivePluginImpl objectivePlugin;
 
     @Override
@@ -85,6 +86,11 @@ public class ArtifactIncursionMission extends HubMissionWithBarEvent implements 
 
         setTimeLimit(Stage.FAILED, MISSION_DURATION, null);
 
+        this.danger = getDangerLevel();
+        int bonus = getRewardBonusForMarines(getMarinesRequiredForCustomObjective(this.market, getDangerLevel()));
+        bonus += Math.round(this.specialItemSpec.getBasePrice() * 0.5f);
+        setCreditRewardWithBonus(CreditReward.VERY_HIGH, bonus);
+
         return true;
     }
 
@@ -113,6 +119,14 @@ public class ArtifactIncursionMission extends HubMissionWithBarEvent implements 
         }
         this.specialItemData = picked;
         this.specialItemSpec = Global.getSettings().getSpecialItemSpec(picked.getId());
+    }
+
+    public MarketCMD.RaidDangerLevel getDangerLevel() {
+        MarketCMD.RaidDangerLevel level = this.specialItemSpec.getBaseDanger();
+        if (this.industry != null) {
+            level = this.industry.adjustItemDangerLevel(this.specialItemData.getId(), this.specialItemData.getData(), level);
+        }
+        return level;
     }
 
     @Override
