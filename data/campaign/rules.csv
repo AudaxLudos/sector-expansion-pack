@@ -16,16 +16,16 @@ sep_aim_returnOption,PopulateOptions,"$sep_aim_deliverHere
 Call $sep_aim_ref updateData",SetOptionColor sep_aim_returnText hColor,,sep_aim_askToReturn:GIVE OR KEEP DIALOG,
 sep_aim_returnText,DialogOptionSelected,$option == sep_aim_askToReturn,"SetTooltip sep_aim_giveArtifact ""Requires 1 $sep_aim_artifactName""
 SetTooltipHighlights sep_aim_giveArtifact $sep_aim_artifactName
-SetEnabled sep_aim_giveArtifact false
+SetEnabled sep_aim_giveArtifact true
 SetTooltip sep_aim_keepArtifact ""Requires 1 $sep_aim_artifactName""
 SetTooltipHighlights sep_aim_keepArtifact $sep_aim_artifactName
-SetEnabled sep_aim_keepArtifact false
+SetEnabled sep_aim_keepArtifact true
+SetStoryOption sep_aim_keepArtifact general ""Convinced to keep the artifact""
 FireAll SEPAIMCheckCargo",GIVE OR KEEP TEXT,"sep_aim_giveArtifact:GIVE
 sep_aim_keepArtifact:KEEP
 100:cutCommLink:LEAVE",
-sep_aim_returnCheckCargo,SEPAIMCheckCargo,PlayerHasCargo $sep_aim_artifactId score:1000,"SetEnabled sep_aim_giveArtifact true
-SetEnabled sep_aim_keepArtifact true
-SetStoryOption sep_aim_keepArtifact general ""Convinced to keep the artifact""",,,
+sep_aim_returnCheckCargo,SEPAIMCheckCargo,!PlayerHasCargo $sep_aim_artifactId score:1000,"SetEnabled sep_aim_giveArtifact false
+SetEnabled sep_aim_keepArtifact false",,,
 sep_aim_returnGiveText,DialogOptionSelected,$option == sep_aim_giveArtifact,"AddRemoveAnyItem SPECIAL $sep_aim_artifactId -1
 $sep_aim_completed = true
 Call $sep_aim_ref updateStage",GIVEN,contact_pickAnotherGreeting:END,
