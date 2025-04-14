@@ -19,6 +19,7 @@ import com.fs.starfarer.api.util.Misc;
 import com.fs.starfarer.api.util.WeightedRandomPicker;
 
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -55,6 +56,7 @@ public class ArtifactIncursionMission extends HubMissionWithBarEvent implements 
         requireMarketNotInHyperspace();
         requireMarketFactionNotPlayer();
         requireMarketHasItemsInstalled();
+        preferMarketAnyItemCompatibleWithOtherMarket(this.person.getMarket());
         this.market = pickMarket();
 
         if (!setMarketMissionRef(this.market, "$sep_aim_ref")) {
@@ -284,6 +286,43 @@ public class ArtifactIncursionMission extends HubMissionWithBarEvent implements 
             dialog.getInteractionTarget().getMemoryWithoutUpdate().set("$raidMarinesLost", data.marinesLost, 0);
             FireAll.fire(null, dialog, memoryMap, "SEPAIMRaidFinished");
             Global.getSector().getListenerManager().removeListener(this);
+        }
+    }
+
+    public void preferMarketAnyItemCompatibleWithOtherMarket(MarketAPI other) {
+        this.search.marketPrefs.add(new MarketAnyItemCompatibleWithOtherMarketReq(other));
+    }
+
+    public static class MarketAnyItemCompatibleWithOtherMarketReq implements MarketRequirement {
+        MarketAPI other;
+
+        public MarketAnyItemCompatibleWithOtherMarketReq(MarketAPI other) {
+            this.other = other;
+        }
+
+        @Override
+        public boolean marketMatchesRequirement(MarketAPI market) {
+            List<SpecialItemData> installedItems = new ArrayList<>();
+            for (Industry ind : market.getIndustries()) {
+                installedItems.addAll(ind.getVisibleInstalledItems());
+            }
+
+            for (Industry ind : this.other.getIndustries()) {
+                for (SpecialItemData data : installedItems) {
+                    InstallableItemEffect effect = ItemEffectsRepo.ITEM_EFFECTS.get(data.getId());
+                    if (!ind.wantsToUseSpecialItem(data) || effect == null) {
+                        continue;
+                    }
+                    List<String> unmet = effect.getUnmetRequirements(ind);
+                    if (unmet != null && !unmet.isEmpty()) {
+                        continue;
+                    }
+
+                    return true;
+                }
+            }
+
+            return false;
         }
     }
 
