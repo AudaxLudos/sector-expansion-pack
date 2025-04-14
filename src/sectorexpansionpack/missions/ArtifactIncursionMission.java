@@ -86,8 +86,6 @@ public class ArtifactIncursionMission extends HubMissionWithBarEvent implements 
 
         addNoPenaltyFailureStages(Stage.FAILED_DECIV);
         connectWithMarketDecivilized(Stage.RAID_ARTIFACT, Stage.FAILED_DECIV, this.market);
-        connectWithMarketDecivilized(Stage.DELIVER_ARTIFACT, Stage.FAILED_DECIV, this.person.getMarket());
-        setStageOnMarketDecivilized(Stage.FAILED_DECIV, this.market);
         setStageOnMarketDecivilized(Stage.FAILED_DECIV, createdAt);
 
         setTimeLimit(Stage.FAILED, MISSION_DURATION, null);
@@ -180,10 +178,11 @@ public class ArtifactIncursionMission extends HubMissionWithBarEvent implements 
     @Override
     public String getStageDescriptionText() {
         if (this.currentStage == Stage.FAILED_DECIV) {
-            if (this.person.getMarket().isPlanetConditionMarketOnly()) {
-                return "The " + getMissionTypeNoun() + " has failed due to " + this.person.getMarket().getName() + " becoming decivilized. No reputation penalty will be applied for this outcome.";
+            System.out.println(this.market.isPlanetConditionMarketOnly());
+            if (this.person.getMarket() == null) {
+                return "The " + getMissionTypeNoun() + " has failed because the colony where your contact resided has decivilized. No reputation penalty will be applied for this outcome.";
             } else if (this.market.isPlanetConditionMarketOnly()) {
-                return "The " + getMissionTypeNoun() + " has failed due to " + this.market.getName() + " becoming decivilized. No reputation penalty will be applied for this outcome.";
+                return "The " + getMissionTypeNoun() + " has failed because the target colony has decivilized. No reputation penalty will be applied for this outcome.";
             }
         }
 
