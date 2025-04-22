@@ -19,6 +19,21 @@ Call $market.sep_aim_ref updateStage","After some time, your marine commander le
 
 ""Command, we’ve breached the facility. Resistance was within expectations. The artifact is secure. I repeat, the artifact is secure. Prepping for extraction now. We should be clear in a few minutes.""",,
 "# artifact incursion mission
+# quick reaction fleet dialogs",,,,,,
+sep_aim_qrfStart,BeginFleetEncounter,"$sep_aim_qrf score:1000
+!$sep_aim_encounteredAlready
+Call $sep_aim_ref updateData","$sep_aim_encounteredAlready = true
+FleetDesc
+HailPlayer",,,
+sep_aim_qrfKnows,OpenCommLink,"$entity.sep_aim_qrf score:1000
+!$entity.ignorePlayerCommRequests",$entity.ignorePlayerCommRequests = true,KNOWS YOU HAVE THE ARTIFACT,"sep_aim_surrender:SURRENDER
+100:cutCommLink:RETALIATE",
+sep_aim_qrfSurrender,DialogOptionSelected,$option == sep_aim_surrender,"AddRemoveAnyItem SPECIAL $entity.sep_aim_artifactId -1
+MakeOtherFleetAllowDisengage true
+MakeOtherFleetNonAggressive true
+MakeOtherFleetNonHostile true
+Call $entity.sep_aim_ref endFailure",SURRENDER TEXT,100:cutCommLink:LEAVE,
+"# artifact incursion mission
 # return dialogs",,,,,,
 sep_aim_returnOption,PopulateOptions,"$sep_aim_deliverHere
 Call $sep_aim_ref updateData",SetOptionColor sep_aim_returnText hColor,,"sep_aim_askToReturn:""I’d like to talk about the artifact incursion mission.""",
