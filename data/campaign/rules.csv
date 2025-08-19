@@ -15,6 +15,7 @@ contact_decline:Decline",
 # raid dialogs",,,,,,
 sep_aim_raidFinished,SEPAIMRaidFinished,"$market.sep_aim_raidHere
 Call $market.sep_aim_ref updateData","$market.sep_aim_deliverArtifact = true
+Call $market.sep_aim_ref triggerComplications
 Call $market.sep_aim_ref updateStage","After some time, your marine commander leading the strike team contacts you.
 
 ""Command, we’ve breached the facility. Resistance was within expectations. The artifact is secure. I repeat, the artifact is secure. Prepping for extraction now. We should be clear in a few minutes.""",,
@@ -25,8 +26,20 @@ sep_aim_qrfStart,BeginFleetEncounter,"$sep_aim_qrf score:1000
 Call $sep_aim_ref updateData","$sep_aim_encounteredAlready = true
 FleetDesc
 HailPlayer",,,
-sep_aim_qrfKnows,OpenCommLink,"$entity.sep_aim_qrf score:1000
-!$entity.ignorePlayerCommRequests",$entity.ignorePlayerCommRequests = true,KNOWS YOU HAVE THE ARTIFACT,"sep_aim_surrender:SURRENDER
+sep_aim_qrfUnawarePlayerHasArtifact,OpenCommLink,"$entity.sep_aim_qrf score:1000
+!$entity.ignorePlayerCommRequests
+!Call $sep_aim_ref isRaidSilent",$entity.ignorePlayerCommRequests = true,UNAWARE YOU HAVE THE ARTIFACT,"sep_aim_allowScan:ALLOW SCAN
+100:cutCommLink:REFUSE",
+sep_aim_qrfScanArtifactFound,DialogOptionSelected,"$option == sep_aim_allowScan
+PlayerHasCargo $sep_aim_artifactId",,DEMAND THE ARTIFACT FROM YOU,"sep_aim_surrender:SURRENDER
+100:cutCommLink:RETALIATE",
+sep_aim_qrfScanArtifactMissing,DialogOptionSelected,"$option == sep_aim_allowScan
+!PlayerHasCargo $sep_aim_artifactId","MakeOtherFleetAllowDisengage true
+MakeOtherFleetNonAggressive true
+MakeOtherFleetNonHostile true",DID NOT FIND THE ARTIFACT,100:cutCommLink:CONTINUE,
+sep_aim_qrfAwarePlayerHasArtifact,OpenCommLink,"$entity.sep_aim_qrf score:1000
+!$entity.ignorePlayerCommRequests
+Call $sep_aim_ref isRaidSilent",$entity.ignorePlayerCommRequests = true,AWARE YOU HAVE THE ARTIFACT,"sep_aim_surrender:SURRENDER
 100:cutCommLink:RETALIATE",
 sep_aim_qrfSurrender,DialogOptionSelected,$option == sep_aim_surrender,"AddRemoveAnyItem SPECIAL $entity.sep_aim_artifactId -1
 MakeOtherFleetAllowDisengage true
