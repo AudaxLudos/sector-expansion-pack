@@ -13,6 +13,7 @@ import com.fs.starfarer.api.impl.campaign.graid.GroundRaidObjectivePlugin;
 import com.fs.starfarer.api.impl.campaign.graid.SpecialItemRaidObjectivePluginImpl;
 import com.fs.starfarer.api.impl.campaign.ids.Factions;
 import com.fs.starfarer.api.impl.campaign.ids.FleetTypes;
+import com.fs.starfarer.api.impl.campaign.ids.MemFlags;
 import com.fs.starfarer.api.impl.campaign.missions.hub.HubMissionWithBarEvent;
 import com.fs.starfarer.api.impl.campaign.rulecmd.FireAll;
 import com.fs.starfarer.api.impl.campaign.rulecmd.salvage.MarketCMD;
@@ -41,6 +42,8 @@ public class ArtifactIncursionMission extends HubMissionWithBarEvent implements 
     protected PersonAPI person;
     protected MarketAPI market;
     protected Industry industry;
+    protected boolean isRaidSilent = false;
+    protected boolean isTradeModeSneak = false;
     protected SpecialItemSpecAPI specialItemSpec;
     protected SpecialItemData specialItemData;
     protected MarketCMD.RaidDangerLevel danger;
@@ -98,32 +101,6 @@ public class ArtifactIncursionMission extends HubMissionWithBarEvent implements 
         bonus += Math.round(this.specialItemSpec.getBasePrice() * 0.5f);
         setCreditRewardWithBonus(CreditReward.VERY_HIGH, bonus);
         setRepChanges(0.1f, 0.2f, 0.1f, 0.2f);
-
-        if (rollProbability(AFTER_RAID_COMPLICATIONS_CHANCE)) {
-            FactionAPI faction = Global.getSector().getFaction(this.market.getFactionId());
-            beginWithinHyperspaceRangeTrigger(this.market.getStarSystem().getCenter(), 3f, true, Stage.DELIVER_ARTIFACT);
-            triggerCreateFleet(FleetSize.LARGE, FleetQuality.SMOD_3, faction.getId(), FleetTypes.TASK_FORCE, this.market.getStarSystem());
-            triggerMakeLowRepImpact();
-
-            triggerSetFleetFlag("$sep_aim_qrf", Stage.DELIVER_ARTIFACT);
-            triggerSetFleetMemoryValue("$sep_aim_ref", this);
-            if (faction.getCustomBoolean(Factions.CUSTOM_SPAWNS_AS_INDEPENDENT)) {
-                triggerSetFleetFaction(Factions.INDEPENDENT);
-                triggerSetFleetMemoryValue("$sep_aim_originalFaction", faction);
-            }
-            triggerSetFleetAlwaysPursue();
-            triggerFleetStopPursuingPlayerUnlessInStage(Stage.DELIVER_ARTIFACT);
-            triggerFleetAllowLongPursuit();
-            triggerMakeHostileAndAggressive();
-            triggerOrderFleetInterceptPlayer();
-            triggerOrderFleetEBurn(1f);
-
-            triggerFleetSetName("Quick Reaction Force");
-
-            triggerPickLocationAroundPlayer(2000);
-            triggerSpawnFleetAtPickedLocation();
-            endTrigger();
-        }
 
         return true;
     }
@@ -274,6 +251,53 @@ public class ArtifactIncursionMission extends HubMissionWithBarEvent implements 
         if (action.equals("noCreditReward")) {
             setCreditReward(0);
             return true;
+        } else if (action.equals("triggerComplications")) {
+            SectorEntityToken marketEntity = dialog.getInteractionTarget();
+            this.isTradeModeSneak = Objects.equals(marketEntity.getMemoryWithoutUpdate().get("$tradeMode"), "SNEAK");
+
+            MarketAPI market = marketEntity.getMarket();
+            MarketCMD.TempData marketTempData = (MarketCMD.TempData) market.getMemoryWithoutUpdate().get("$MarketCMD_temp");
+            this.isRaidSilent = marketTempData.secret;
+
+            float complicationChance = 0f;
+            if (!this.isRaidSilent) {
+                complicationChance += 0.5f;
+            }
+            if (!this.isTradeModeSneak) {
+                complicationChance += 0.5f;
+            }
+
+            if (rollProbability(complicationChance)) {
+                FactionAPI faction = Global.getSector().getFaction(this.market.getFactionId());
+                beginWithinHyperspaceRangeTrigger(this.market.getStarSystem().getCenter(), 3f, true, Stage.DELIVER_ARTIFACT);
+                triggerCreateFleet(FleetSize.LARGE, FleetQuality.SMOD_3, faction.getId(), FleetTypes.TASK_FORCE, this.market.getStarSystem());
+                triggerMakeLowRepImpact();
+
+                triggerSetFleetFlag("$sep_aim_qrf", Stage.DELIVER_ARTIFACT);
+                triggerSetFleetMemoryValue("$sep_aim_ref", this);
+                if (faction.getCustomBoolean(Factions.CUSTOM_SPAWNS_AS_INDEPENDENT)) {
+                    triggerSetFleetFaction(Factions.INDEPENDENT);
+                    triggerSetFleetMemoryValue("$sep_aim_originalFaction", faction);
+                }
+                triggerSetFleetAlwaysPursue();
+                triggerFleetStopPursuingPlayerUnlessInStage(Stage.DELIVER_ARTIFACT);
+                triggerFleetAllowLongPursuit();
+                triggerMakeHostileAndAggressive();
+                triggerOrderFleetInterceptPlayer();
+                triggerOrderFleetEBurn(1f);
+
+                triggerFleetSetName("Quick Reaction Force");
+
+                triggerPickLocationAroundPlayer(2000);
+                triggerSpawnFleetAtPickedLocation();
+                endTrigger();
+            }
+
+            return true;
+        } else if (action.equals("isRaidSilent")) {
+            return this.isRaidSilent;
+        } else if (action.equals("isTradeModeSneak")) {
+            return this.isTradeModeSneak;
         }
 
         return super.callEvent(ruleId, dialog, params, memoryMap);
