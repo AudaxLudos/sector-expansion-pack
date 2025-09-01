@@ -1,0 +1,23 @@
+{
+    "displayName": "Attack",
+    "fluxCapacitors": 10,
+    "fluxVents": 2,
+    "goalVariant": false,
+    "hullId": "sep_hornet",
+    "hullMods": [
+        "hardenedshieldemitter",
+        "frontemitter"
+    ],
+    "quality": 0.0,
+    "variantId": "sep_hornet_Attack",
+    "weaponGroups": [
+        {
+            "autofire": true,
+            "mode": "LINKED",
+            "weapons": {
+                "WS 000": "pulselaser",
+                "WS 001": "pulselaser"
+            }
+        }
+    ]
+}
