@@ -1,0 +1,189 @@
+{
+    "hullName": "Hornet",
+    "hullId": "sep_hornet",
+    "hullSize": "FRIGATE",
+    "style": "HIGH_TECH",
+    "spriteName": "graphics/sectorexpansionpack/hulls/hornet.png",
+    "height": 129,
+    "width": 109,
+    "center": [
+        54, 64
+    ],
+    "collisionRadius": 70,
+    "coversColor": "",
+    "shieldCenter": [
+        -12.5, 0
+    ],
+    "shieldRadius": 85,
+    "viewOffset": 0,
+    "builtInMods": [
+        "delicate"
+    ],
+    "builtInWings": [],
+    "builtInModules": null,
+    "weaponSlots": [
+        {
+            "id": "WS 000",
+            "size": "MEDIUM",
+            "type": "ENERGY",
+            "mount": "HARDPOINT",
+            "arc": 15,
+            "angle": 0,
+            "locations": [
+                    29.5,        9
+            ]
+        },
+        {
+            "id": "WS 001",
+            "size": "MEDIUM",
+            "type": "ENERGY",
+            "mount": "HARDPOINT",
+            "arc": 15,
+            "angle": 0,
+            "locations": [
+                    29.5,       -9
+            ]
+        }
+    ],
+    "engineSlots": [
+        {
+            "location": [
+                -56.5, 33
+            ],
+            "length": 32,
+            "width": 12,
+            "angle": 180,
+            "contrailSize": 12,
+            "style": "HIGH_TECH"
+        },
+        {
+            "location": [
+                -56.5, -33
+            ],
+            "length": 32,
+            "width": 12,
+            "angle": 180,
+            "contrailSize": 12,
+            "style": "HIGH_TECH"
+        },
+        {
+            "location": [
+                -44.5, 43
+            ],
+            "length": 12,
+            "width": 4,
+            "angle": 180,
+            "contrailSize": 12,
+            "style": "HIGH_TECH"
+        },
+        {
+            "location": [
+                -44.5, -43
+            ],
+            "length": 12,
+            "width": 4,
+            "angle": 180,
+            "contrailSize": 12,
+            "style": "HIGH_TECH"
+        },
+        {
+            "location": [
+                -31.5, 51
+            ],
+            "length": 12,
+            "width": 4,
+            "angle": 180,
+            "contrailSize": 12,
+            "style": "HIGH_TECH"
+        },
+        {
+            "location": [
+                -31.5, -51
+            ],
+            "length": 12,
+            "width": 4,
+            "angle": 180,
+            "contrailSize": 12,
+            "style": "HIGH_TECH"
+        },
+        {
+            "location": [
+                -56.5, 25
+            ],
+            "length": 24,
+            "width": 6,
+            "angle": 180,
+            "contrailSize": 12,
+            "style": "HIGH_TECH"
+        },
+        {
+            "location": [
+                -56.5, -25
+            ],
+            "length": 24,
+            "width": 6,
+            "angle": 180,
+            "contrailSize": 12,
+            "style": "HIGH_TECH"
+        },
+        {
+            "location": [
+                -56.5, 20
+            ],
+            "length": 24,
+            "width": 6,
+            "angle": 180,
+            "contrailSize": 12,
+            "style": "HIGH_TECH"
+        },
+        {
+            "location": [
+                -56.5, -20
+            ],
+            "length": 24,
+            "width": 6,
+            "angle": 180,
+            "contrailSize": 12,
+            "style": "HIGH_TECH"
+        },
+        {
+            "location": [
+                -56.5, 15
+            ],
+            "length": 24,
+            "width": 6,
+            "angle": 180,
+            "contrailSize": 12,
+            "style": "HIGH_TECH"
+        },
+        {
+            "location": [
+                -56.5, -15
+            ],
+            "length": 24,
+            "width": 6,
+            "angle": 180,
+            "contrailSize": 12,
+            "style": "HIGH_TECH"
+        }
+    ],
+    "bounds": [
+             -64,     -4.5,
+           -56.5,      -12,
+           -56.5,      -37,
+           -20.5,    -54.5,
+            27.5,    -35.5,
+        
+              62,    -23.5,
+              35,      -19,
+              35,       19,
+              62,     23.5,
+            27.5,     35.5,
+        
+           -20.5,     54.5,
+           -56.5,       37,
+           -56.5,       12,
+             -64,      4.5
+    # 14 points total.
+    ]
+}
