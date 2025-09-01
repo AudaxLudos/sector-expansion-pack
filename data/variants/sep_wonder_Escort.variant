@@ -1,0 +1,46 @@
+{
+    "displayName": "Escort",
+    "fluxCapacitors": 7,
+    "fluxVents": 12,
+    "goalVariant": true,
+    "hullId": "sep_wonder",
+    "hullMods": [
+        "escort_package",
+        "hardenedshieldemitter",
+        "targetingunit"
+    ],
+    "quality": 0.0,
+    "variantId": "sep_wonder_Escort",
+    "weaponGroups": [
+        {
+            "autofire": true,
+            "mode": "LINKED",
+            "weapons": {
+                "WS 003": "ionbeam"
+            }
+        },
+        {
+            "autofire": true,
+            "mode": "LINKED",
+            "weapons": {
+                "WS 001": "hveldriver"
+            }
+        },
+        {
+            "autofire": true,
+            "mode": "LINKED",
+            "weapons": {
+                "WS 002": "gravitonbeam"
+            }
+        },
+        {
+            "autofire": true,
+            "mode": "LINKED",
+            "weapons": {
+                "WS 005": "pdlaser",
+                "WS 004": "pdlaser",
+                "WS 000": "pdburst"
+            }
+        }
+    ]
+}
