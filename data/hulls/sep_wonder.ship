@@ -1,0 +1,169 @@
+{
+    "hullName": "Wonder",
+    "hullId": "sep_wonder",
+    "hullSize": "DESTROYER",
+    "style": "HIGH_TECH",
+    "spriteName": "graphics/sectorexpansionpack/hulls/wonder.png",
+    "height": 161,
+    "width": 150,
+    "center": [
+        75, 75.5
+    ],
+    "collisionRadius": 105,
+    "coversColor": "",
+    "shieldCenter": [
+        0, 0
+    ],
+    "shieldRadius": 105,
+    "viewOffset": 0,
+    "builtInMods": [
+        "hiressensors",
+        "surveying_equipment"
+    ],
+    "builtInWings": [],
+    "builtInModules": null,
+    "weaponSlots": [
+        {
+            "id": "WS 000",
+            "size": "SMALL",
+            "type": "ENERGY",
+            "mount": "TURRET",
+            "arc": 260,
+            "angle": 0,
+            "locations": [
+                    63.5,        0
+            ]
+        },
+        {
+            "id": "WS 001",
+            "size": "MEDIUM",
+            "type": "BALLISTIC",
+            "mount": "TURRET",
+            "arc": 150,
+            "angle": 0,
+            "locations": [
+                    37.5,        0
+            ]
+        },
+        {
+            "id": "WS 002",
+            "size": "MEDIUM",
+            "type": "ENERGY",
+            "mount": "TURRET",
+            "arc": 160,
+            "angle": 60,
+            "locations": [
+                     1.5,       25
+            ]
+        },
+        {
+            "id": "WS 003",
+            "size": "MEDIUM",
+            "type": "ENERGY",
+            "mount": "TURRET",
+            "arc": 160,
+            "angle": 300,
+            "locations": [
+                     1.5,      -25
+            ]
+        },
+        {
+            "id": "WS 004",
+            "size": "SMALL",
+            "type": "ENERGY",
+            "mount": "TURRET",
+            "arc": 180,
+            "angle": 135,
+            "locations": [
+                   -22.5,       35
+            ]
+        },
+        {
+            "id": "WS 005",
+            "size": "SMALL",
+            "type": "ENERGY",
+            "mount": "TURRET",
+            "arc": 180,
+            "angle": 225,
+            "locations": [
+                   -22.5,      -35
+            ]
+        }
+    ],
+    "engineSlots": [
+        {
+            "location": [
+                -72.5, 0
+            ],
+            "length": 32,
+            "width": 8,
+            "angle": 180,
+            "contrailSize": 12,
+            "style": "HIGH_TECH"
+        },
+        {
+            "location": [
+                -72.5, 11
+            ],
+            "length": 32,
+            "width": 8,
+            "angle": 180,
+            "contrailSize": 12,
+            "style": "HIGH_TECH"
+        },
+        {
+            "location": [
+                -72.5, -11
+            ],
+            "length": 32,
+            "width": 8,
+            "angle": 180,
+            "contrailSize": 12,
+            "style": "HIGH_TECH"
+        },
+        {
+            "location": [
+                -72.5, 22.5
+            ],
+            "length": 32,
+            "width": 8,
+            "angle": 180,
+            "contrailSize": 12,
+            "style": "HIGH_TECH"
+        },
+        {
+            "location": [
+                -72.5, -22.5
+            ],
+            "length": 32,
+            "width": 8,
+            "angle": 180,
+            "contrailSize": 12,
+            "style": "HIGH_TECH"
+        }
+    ],
+    "bounds": [
+            84.5,     -5.5,
+              46,      -23,
+               9,    -52.5,
+           -12.5,      -53,
+             -23,      -72,
+        
+             -48,      -72,
+             -75,    -54.5,
+           -60.5,      -34,
+             -71,      -28,
+             -71,       28,
+        
+           -60.5,       34,
+             -75,     54.5,
+             -48,       72,
+             -23,       72,
+           -12.5,       53,
+        
+               9,     52.5,
+              46,       23,
+            84.5,      5.5
+    # 18 points total.
+    ]
+}
