@@ -31,9 +31,11 @@ public class MissionDefinition implements MissionDefinitionPlugin {
         // Set up the player's fleet.  Variant names come from the
         // files in data/variants and data/variants/fighters
         api.addToFleet(FleetSide.PLAYER, "sep_hornet_Attack", FleetMemberType.SHIP, "MMAS Hornet", true);
+        api.addToFleet(FleetSide.PLAYER, "sep_wonder_Escort", FleetMemberType.SHIP, "MMAS Hornet", false);
 
         // Set up the enemy fleet.
         api.addToFleet(FleetSide.ENEMY, "sep_hornet_Attack", FleetMemberType.SHIP, "MMAS Hornet", true);
+        api.addToFleet(FleetSide.ENEMY, "sep_wonder_Escort", FleetMemberType.SHIP, "MMAS Wonder", false);
 
         // Set up the map.
         float width = 18000f;
