@@ -13,8 +13,13 @@ sep_sar_offerTextBar1,DialogOptionSelected,$option == sep_sar_startBar,$missionI
 contact_declineBarNoContinue:DECLINE",
 # Rescue survivor in entity,,,,,,
 sep_sar_entityRescueText,OpenInteractionDialog,"$sep_sar_survivorEntity score:1000
-Call $sep_sar_ref updateData","$sep_sar_returnToContact = true
-Call $sep_sar_ref updateStage",RESCUE SURVIVOR TEXT,defaultLeave:LEAVE,
+Call $sep_sar_ref updateData",Call $sep_sar_ref checkSurvivorStatus,RESCUE SURVIVOR TEXT,sep_sar_checkSurvivorStatus:CONTINUE,
+sep_sar_entitySurvivorDead,DialogOptionSelected,"$sep_sar_survivorAlive score:1000
+$option == sep_sar_checkSurvivorStatus","$sep_sar_returnToContact = true
+Call $sep_sar_ref updateStage",SURVIVOR ALIVE TEXT,defaultLeave:END INTERACTION,
+sep_sar_entitySurvivorAlive,DialogOptionSelected,"!$sep_sar_survivorAlive score:1000
+$option == sep_sar_checkSurvivorStatus","$sep_sar_returnToContact = true
+Call $sep_sar_ref updateStage",SURVIVOR DEAD TEXT,defaultLeave:END INTERACTION,
 # Return survivor to contact,,,,,,
 sep_sar_returnSurvivorText,PickGreeting,"$sep_sar_contactPerson score:1000
 Call $sep_sar_ref updateData

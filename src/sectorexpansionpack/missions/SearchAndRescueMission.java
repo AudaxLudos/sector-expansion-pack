@@ -33,6 +33,7 @@ public class SearchAndRescueMission extends HubMissionWithBarEvent {
     protected PersonPostType survivorPostType;
     protected PersonAPI survivor;
     protected SectorEntityToken survivorEntity;
+    protected boolean survivorAlive = true;
 
     @Override
     protected boolean create(MarketAPI createdAt, boolean barEvent) {
@@ -117,18 +118,8 @@ public class SearchAndRescueMission extends HubMissionWithBarEvent {
     }
 
     @Override
-    public void addDescriptionForNonEndStage(TooltipMakerAPI info, float width, float height) {
-        if (this.currentStage == Stage.FIND) {
-            String loc = BreadcrumbSpecial.getLocatedString(this.survivorEntity);
-            loc = loc.replaceAll("orbiting", "in");
-            loc = loc.replaceAll("located in", "in");
-            info.addPara("Search for %s " + loc, 10f, Misc.getHighlightColor(), this.survivor.getNameString());
-        } else if (this.currentStage == Stage.RETURN) {
-            info.addPara("Return with %s to " + getPerson().getMarket().getName() + " in the "
-                            + getPerson().getMarket().getStarSystem().getNameWithLowercaseTypeShort()
-                            + " and talk to " + getPerson().getNameString() + ".",
-                    10f, Misc.getHighlightColor(), this.survivor.getNameString());
-        }
+    protected void updateInteractionDataImpl() {
+        set("$sep_sar_survivorAlive", this.survivorAlive);
     }
 
     @Override
@@ -148,8 +139,39 @@ public class SearchAndRescueMission extends HubMissionWithBarEvent {
     }
 
     @Override
+    public void addDescriptionForNonEndStage(TooltipMakerAPI info, float width, float height) {
+        if (this.currentStage == Stage.FIND) {
+            String loc = BreadcrumbSpecial.getLocatedString(this.survivorEntity);
+            loc = loc.replaceAll("orbiting", "in");
+            loc = loc.replaceAll("located in", "in");
+            info.addPara("Search for %s " + loc, 10f, Misc.getHighlightColor(), this.survivor.getNameString());
+        } else if (this.currentStage == Stage.RETURN) {
+            info.addPara("Return with %s to " + getPerson().getMarket().getName() + " in the "
+                            + getPerson().getMarket().getStarSystem().getNameWithLowercaseTypeShort()
+                            + " and talk to " + getPerson().getNameString() + ".",
+                    10f, Misc.getHighlightColor(), this.survivor.getNameString());
+        }
+    }
+
+    @Override
+    public boolean callEvent(String ruleId, InteractionDialogAPI dialog, List<Misc.Token> params, Map<String, MemoryAPI> memoryMap) {
+        String action = params.get(0).getString(memoryMap);
+
+        if (action.equals("checkSurvivorStatus")) {
+            if (this.timeLimit.days - this.elapsed < 60f) {
+                this.survivorAlive = false;
+            }
+            updateInteractionData(dialog, memoryMap);
+            return this.survivorAlive;
+        }
+
+        return super.callEvent(ruleId, dialog, params, memoryMap);
+    }
+
+
+    @Override
     protected void endSuccessImpl(InteractionDialogAPI dialog, Map<String, MemoryAPI> memoryMap) {
-        if (this.survivorPostType != PersonPostType.CIVILIAN) {
+        if (this.survivorAlive && this.survivorPostType != PersonPostType.CIVILIAN) {
             for (EveryFrameScript script : Global.getSector().getScripts()) {
                 if (script instanceof OfficerManagerEvent manager) {
                     float salary = (this.survivorPostType == PersonPostType.OFFICER ?
@@ -162,6 +184,7 @@ public class SearchAndRescueMission extends HubMissionWithBarEvent {
                     } else if (this.survivorPostType == PersonPostType.ADMINISTRATOR) {
                         manager.addAvailableAdmin(officer);
                     }
+
                     break;
                 }
             }
