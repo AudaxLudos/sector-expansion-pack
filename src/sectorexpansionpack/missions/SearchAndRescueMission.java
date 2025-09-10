@@ -3,6 +3,7 @@ package sectorexpansionpack.missions;
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.campaign.SectorEntityToken;
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
+import com.fs.starfarer.api.characters.PersonAPI;
 import com.fs.starfarer.api.impl.campaign.ids.Entities;
 import com.fs.starfarer.api.impl.campaign.ids.Factions;
 import com.fs.starfarer.api.impl.campaign.ids.Ranks;
@@ -10,9 +11,13 @@ import com.fs.starfarer.api.impl.campaign.ids.Tags;
 import com.fs.starfarer.api.impl.campaign.missions.hub.HubMissionWithBarEvent;
 import com.fs.starfarer.api.impl.campaign.missions.hub.ReqMode;
 import com.fs.starfarer.api.impl.campaign.procgen.Constellation;
+import com.fs.starfarer.api.impl.campaign.rulecmd.salvage.special.BreadcrumbSpecial;
 import com.fs.starfarer.api.ui.SectorMapAPI;
+import com.fs.starfarer.api.ui.TooltipMakerAPI;
+import com.fs.starfarer.api.util.Misc;
 import org.apache.log4j.Logger;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,6 +25,7 @@ public class SearchAndRescueMission extends HubMissionWithBarEvent {
     public static Logger log = Global.getLogger(SearchAndRescueMission.class);
     public static float MISSION_DAYS = 120f;
     protected SectorEntityToken survivorEntity;
+    protected PersonAPI survivor;
 
     @Override
     protected boolean create(MarketAPI createdAt, boolean barEvent) {
@@ -39,6 +45,12 @@ public class SearchAndRescueMission extends HubMissionWithBarEvent {
 
         if (barEvent) {
             setGiverIsPotentialContactOnSuccess();
+        }
+
+        this.survivor = createdAt.getFaction().createRandomPerson(this.genRandom);
+        if (this.survivor == null) {
+            log.info("Failed to create survivor to rescue");
+            return false;
         }
 
         preferSystemInInnerSector();
@@ -75,7 +87,38 @@ public class SearchAndRescueMission extends HubMissionWithBarEvent {
 
     @Override
     public String getBaseName() {
-        return "Search and Rescue";
+        return "Search and Rescue: " + this.survivor.getNameString();
+    }
+
+    @Override
+    public void addDescriptionForNonEndStage(TooltipMakerAPI info, float width, float height) {
+        if (this.currentStage == Stage.FIND) {
+            String loc = BreadcrumbSpecial.getLocatedString(this.survivorEntity);
+            loc = loc.replaceAll("orbiting", "in");
+            loc = loc.replaceAll("located in", "in");
+            info.addPara("Search for %s " + loc, 10f, Misc.getHighlightColor(), this.survivor.getNameString());
+        } else if (this.currentStage == Stage.RETURN) {
+            info.addPara("Return with %s to " + getPerson().getMarket().getName() + " in the "
+                            + getPerson().getMarket().getStarSystem().getNameWithLowercaseTypeShort()
+                            + " and talk to " + getPerson().getNameString() + ".",
+                    10f, Misc.getHighlightColor(), this.survivor.getNameString());
+        }
+    }
+
+    @Override
+    public boolean addNextStepText(TooltipMakerAPI info, Color tc, float pad) {
+        if (this.currentStage == Stage.FIND) {
+            String loc = BreadcrumbSpecial.getLocationDescription(this.survivorEntity, false);
+            info.addPara("Search for %s in " + loc, 3f, tc, Misc.getHighlightColor(), this.survivor.getNameString());
+            return true;
+        } else if (this.currentStage == Stage.RETURN) {
+            info.addPara("Return to " + getPerson().getMarket().getName() + " in the "
+                            + getPerson().getMarket().getStarSystem().getNameWithLowercaseTypeShort()
+                            + " and talk to " + getPerson().getNameString() + ".",
+                    3f, tc, Misc.getHighlightColor(), this.survivor.getNameString());
+            return true;
+        }
+        return false;
     }
 
     @Override
