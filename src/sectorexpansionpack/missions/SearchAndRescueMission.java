@@ -1,9 +1,13 @@
 package sectorexpansionpack.missions;
 
+import com.fs.starfarer.api.EveryFrameScript;
 import com.fs.starfarer.api.Global;
+import com.fs.starfarer.api.campaign.InteractionDialogAPI;
 import com.fs.starfarer.api.campaign.SectorEntityToken;
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
+import com.fs.starfarer.api.campaign.rules.MemoryAPI;
 import com.fs.starfarer.api.characters.PersonAPI;
+import com.fs.starfarer.api.impl.campaign.events.OfficerManagerEvent;
 import com.fs.starfarer.api.impl.campaign.ids.Entities;
 import com.fs.starfarer.api.impl.campaign.ids.Factions;
 import com.fs.starfarer.api.impl.campaign.ids.Ranks;
@@ -19,13 +23,16 @@ import org.apache.log4j.Logger;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 public class SearchAndRescueMission extends HubMissionWithBarEvent {
     public static Logger log = Global.getLogger(SearchAndRescueMission.class);
     public static float MISSION_DAYS = 120f;
-    protected SectorEntityToken survivorEntity;
+    protected PersonPostType survivorPostType;
     protected PersonAPI survivor;
+    protected SectorEntityToken survivorEntity;
 
     @Override
     protected boolean create(MarketAPI createdAt, boolean barEvent) {
@@ -57,6 +64,25 @@ public class SearchAndRescueMission extends HubMissionWithBarEvent {
         preferSystemInDirectionOfOtherMissions();
         requireEntityTags(ReqMode.ALL, Tags.SALVAGEABLE);
         requireEntityType(Entities.WRECK);
+
+        this.survivorPostType = (PersonPostType) pickOneObject(Arrays.asList(PersonPostType.OFFICER, PersonPostType.ADMINISTRATOR, PersonPostType.CIVILIAN));
+        switch (this.survivorPostType) {
+            case OFFICER -> {
+                this.survivor = OfficerManagerEvent.createOfficer(createdAt.getFaction(), 1, OfficerManagerEvent.SkillPickPreference.ANY, this.genRandom);
+                this.survivor.setPostId(Ranks.POST_OFFICER_FOR_HIRE);
+            }
+            case ADMINISTRATOR -> {
+                this.survivor = OfficerManagerEvent.createAdmin(createdAt.getFaction(), 1, this.genRandom);
+            }
+            default -> {
+                this.survivor = createdAt.getFaction().createRandomPerson(this.genRandom);
+            }
+        }
+
+        if (this.survivor == null) {
+            log.info("Failed to create survivor");
+            return false;
+        }
 
         this.survivorEntity = pickEntity();
         if (!setEntityMissionRef(this.survivorEntity, "$sep_sar_ref")) {
@@ -122,6 +148,27 @@ public class SearchAndRescueMission extends HubMissionWithBarEvent {
     }
 
     @Override
+    protected void endSuccessImpl(InteractionDialogAPI dialog, Map<String, MemoryAPI> memoryMap) {
+        if (this.survivorPostType != PersonPostType.CIVILIAN) {
+            for (EveryFrameScript script : Global.getSector().getScripts()) {
+                if (script instanceof OfficerManagerEvent manager) {
+                    float salary = (this.survivorPostType == PersonPostType.OFFICER ?
+                            Misc.getOfficerSalary(this.survivor) : Misc.getAdminSalary(this.survivor)) * 0.5f;
+                    OfficerManagerEvent.AvailableOfficer officer = new OfficerManagerEvent.AvailableOfficer(
+                            this.survivor, getPerson().getMarket().getId(), 0, Math.round(salary));
+
+                    if (this.survivorPostType == PersonPostType.OFFICER) {
+                        manager.addAvailable(officer);
+                    } else if (this.survivorPostType == PersonPostType.ADMINISTRATOR) {
+                        manager.addAvailableAdmin(officer);
+                    }
+                    break;
+                }
+            }
+        }
+    }
+
+    @Override
     public SectorEntityToken getMapLocation(SectorMapAPI map) {
         if (this.currentStage == Stage.FIND) {
             Constellation constellation = this.survivorEntity.getConstellation();
@@ -152,5 +199,11 @@ public class SearchAndRescueMission extends HubMissionWithBarEvent {
         COMPLETED,
         FAILED,
         FAILED_DECIV
+    }
+
+    public enum PersonPostType {
+        OFFICER,
+        ADMINISTRATOR,
+        CIVILIAN
     }
 }
