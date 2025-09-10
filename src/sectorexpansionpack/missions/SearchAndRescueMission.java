@@ -7,26 +7,18 @@ import com.fs.starfarer.api.impl.campaign.ids.Entities;
 import com.fs.starfarer.api.impl.campaign.ids.Factions;
 import com.fs.starfarer.api.impl.campaign.ids.Ranks;
 import com.fs.starfarer.api.impl.campaign.ids.Tags;
-import com.fs.starfarer.api.impl.campaign.missions.JailbreakMission;
 import com.fs.starfarer.api.impl.campaign.missions.hub.HubMissionWithBarEvent;
 import com.fs.starfarer.api.impl.campaign.missions.hub.ReqMode;
-import com.fs.starfarer.api.ui.TooltipMakerAPI;
+import com.fs.starfarer.api.impl.campaign.procgen.Constellation;
+import com.fs.starfarer.api.ui.SectorMapAPI;
 import org.apache.log4j.Logger;
 
-import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class SearchAndRescueMission extends HubMissionWithBarEvent {
     public static Logger log = Global.getLogger(SearchAndRescueMission.class);
     public static float MISSION_DAYS = 120f;
-
-    public enum Stage {
-        FIND,
-        RETURN,
-        COMPLETED,
-        FAILED,
-        FAILED_DECIV
-    }
-
     protected SectorEntityToken survivorEntity;
 
     @Override
@@ -84,5 +76,38 @@ public class SearchAndRescueMission extends HubMissionWithBarEvent {
     @Override
     public String getBaseName() {
         return "Search and Rescue";
+    }
+
+    @Override
+    public SectorEntityToken getMapLocation(SectorMapAPI map) {
+        if (this.currentStage == Stage.FIND) {
+            Constellation constellation = this.survivorEntity.getConstellation();
+            SectorEntityToken entity = null;
+            if (constellation != null && map != null) {
+                entity = map.getConstellationLabelEntity(constellation);
+            }
+            if (entity == null) entity = this.survivorEntity;
+            return entity;
+        }
+        return super.getMapLocation(map);
+    }
+
+    @Override
+    public List<ArrowData> getArrowData(SectorMapAPI map) {
+        List<ArrowData> result = new ArrayList<>();
+
+        ArrowData arrow = new ArrowData(Global.getSector().getPlayerFleet(), getMapLocation(map));
+        arrow.width = 14f;
+        result.add(arrow);
+
+        return result;
+    }
+
+    public enum Stage {
+        FIND,
+        RETURN,
+        COMPLETED,
+        FAILED,
+        FAILED_DECIV
     }
 }
