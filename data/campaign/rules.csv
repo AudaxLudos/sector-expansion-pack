@@ -1,0 +1,26 @@
+id,trigger,conditions,script,text,options,notes
+"# Search and rescue mission
+# START",,,,,,
+# Offered by contact,,,,,,
+sep_sar_blurb,sep_sar_blurb,,,CONTACT MISSION BLURB,,
+sep_sar_offerOption,sep_sar_option,,,,sep_sar_start:CONTACT ASK OPTION,
+sep_sar_offerTextContact1,DialogOptionSelected,$option == sep_sar_start,$missionId = sep_sar,CONTACT MISSION OFFER TEXT,"contact_accept:ACCEPT
+contact_decline:DECLINE",
+# Offered in bar,,,,,,
+sep_sar_blurbBar,sep_sar_blurbBar,,,BAR MISSION BLURB,,
+sep_sar_offerOptionBar,sep_sar_optionBar,,,,sep_sar_startBar:BAR ASK OPTION,
+sep_sar_offerTextBar1,DialogOptionSelected,$option == sep_sar_startBar,$missionId = sep_sar,BAR MISSION OFFER TEXT,"contact_acceptBar:ACCEPT
+contact_declineBarNoContinue:DECLINE",
+# Rescue survivor in entity,,,,,,
+sep_sar_entityRescueText,OpenInteractionDialog,"$sep_sar_survivorEntity score:1000
+Call $sep_sar_ref updateData","$sep_sar_returnToContact = true
+Call $sep_sar_ref updateStage",RESCUE SURVIVOR TEXT,defaultLeave:LEAVE,
+# Return survivor to contact,,,,,,
+sep_sar_returnSurvivorText,PickGreeting,"$sep_sar_contactPerson score:1000
+Call $sep_sar_ref updateData
+FireBest GenericMissionReturn","ShowPersonVisual
+$sep_sar_completed = true
+Call $sep_sar_ref updateStage",RETURN SURVIVOR TEXT,contact_pickAnotherGreeting:END MISSION,
+"# Search and rescue mission
+# END",,,,,,
+,,,,,,
