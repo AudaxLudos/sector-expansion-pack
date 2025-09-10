@@ -120,6 +120,7 @@ public class SearchAndRescueMission extends HubMissionWithBarEvent {
     @Override
     protected void updateInteractionDataImpl() {
         set("$sep_sar_survivorAlive", this.survivorAlive);
+        set("$sep_sar_survivorPostType", this.survivorPostType);
     }
 
     @Override
@@ -142,8 +143,8 @@ public class SearchAndRescueMission extends HubMissionWithBarEvent {
     public void addDescriptionForNonEndStage(TooltipMakerAPI info, float width, float height) {
         if (this.currentStage == Stage.FIND) {
             String loc = BreadcrumbSpecial.getLocatedString(this.survivorEntity);
-            loc = loc.replaceAll("orbiting", "in");
-            loc = loc.replaceAll("located in", "in");
+            loc = loc.replaceAll("orbiting", "near");
+            loc = loc.replaceAll("located in ", "near ");
             info.addPara("Search for %s " + loc, 10f, Misc.getHighlightColor(), this.survivor.getNameString());
         } else if (this.currentStage == Stage.RETURN) {
             info.addPara("Return with %s to " + getPerson().getMarket().getName() + " in the "
@@ -163,11 +164,13 @@ public class SearchAndRescueMission extends HubMissionWithBarEvent {
             }
             updateInteractionData(dialog, memoryMap);
             return this.survivorAlive;
+        } else if (action.equals("showSurvivorVisual")) {
+            dialog.getVisualPanel().showPersonInfo(this.survivor);
+            return true;
         }
 
         return super.callEvent(ruleId, dialog, params, memoryMap);
     }
-
 
     @Override
     protected void endSuccessImpl(InteractionDialogAPI dialog, Map<String, MemoryAPI> memoryMap) {
@@ -184,6 +187,8 @@ public class SearchAndRescueMission extends HubMissionWithBarEvent {
                     } else if (this.survivorPostType == PersonPostType.ADMINISTRATOR) {
                         manager.addAvailableAdmin(officer);
                     }
+
+                    officer.person.getMemoryWithoutUpdate().set("$sep_survivor", true);
 
                     break;
                 }
