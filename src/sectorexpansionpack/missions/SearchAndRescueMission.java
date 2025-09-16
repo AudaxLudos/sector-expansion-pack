@@ -20,96 +20,119 @@ import com.fs.starfarer.api.ui.SectorMapAPI;
 import com.fs.starfarer.api.ui.TooltipMakerAPI;
 import com.fs.starfarer.api.util.Misc;
 import org.apache.log4j.Logger;
+import org.json.JSONException;
+import org.json.JSONObject;
+import sectorexpansionpack.ModPlugin;
 
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
 public class SearchAndRescueMission extends HubMissionWithBarEvent {
     public static Logger log = Global.getLogger(SearchAndRescueMission.class);
     public static float MISSION_DAYS = 120f;
+    protected JSONObject scenarioData;
     protected PersonPostType survivorPostType;
     protected PersonAPI survivor;
-    protected SectorEntityToken survivorEntity;
     protected boolean survivorAlive = true;
+    protected EntityType entityType;
+    protected SectorEntityToken entity;
 
     @Override
     protected boolean create(MarketAPI createdAt, boolean barEvent) {
-        if (barEvent) {
-            setGiverRank(Ranks.CITIZEN);
-            setGiverPost(pickOne(Ranks.POST_AGENT, Ranks.POST_SMUGGLER, Ranks.POST_GANGSTER, Ranks.POST_FENCE, Ranks.POST_CRIMINAL));
-            setGiverImportance(pickImportance());
-            setGiverFaction(Factions.PIRATES);
-            setGiverTags(Tags.CONTACT_TRADE);
-            findOrCreateGiver(createdAt, true, false);
-        }
-
-        if (!setPersonMissionRef(getPerson(), "$sep_sar_ref")) {
-            log.info("Failed to find or create contact");
-            return false;
-        }
-
-        if (barEvent) {
-            setGiverIsPotentialContactOnSuccess();
-        }
-
-        this.survivor = createdAt.getFaction().createRandomPerson(this.genRandom);
-        if (this.survivor == null) {
-            log.info("Failed to create survivor to rescue");
-            return false;
-        }
-
-        preferSystemInInnerSector();
-        preferSystemInDirectionOfOtherMissions();
-        requireEntityTags(ReqMode.ALL, Tags.SALVAGEABLE);
-        requireEntityType(Entities.WRECK);
-
-        this.survivorPostType = (PersonPostType) pickOneObject(Arrays.asList(PersonPostType.OFFICER, PersonPostType.ADMINISTRATOR, PersonPostType.CIVILIAN));
-        switch (this.survivorPostType) {
-            case OFFICER -> {
-                this.survivor = OfficerManagerEvent.createOfficer(createdAt.getFaction(), 1, OfficerManagerEvent.SkillPickPreference.ANY, this.genRandom);
-                this.survivor.setPostId(Ranks.POST_OFFICER_FOR_HIRE);
+        try {
+            this.scenarioData = ModPlugin.SEP_SAR_SCENARIOS.pick();
+            if (this.scenarioData == null) {
+                log.info("No scenario data found");
+                return false;
             }
-            case ADMINISTRATOR -> {
-                this.survivor = OfficerManagerEvent.createAdmin(createdAt.getFaction(), 1, this.genRandom);
-            }
-            default -> {
-                this.survivor = createdAt.getFaction().createRandomPerson(this.genRandom);
-            }
-        }
 
-        if (this.survivor == null) {
-            log.info("Failed to create survivor");
+            if (barEvent) {
+                setGiverRank(Ranks.CITIZEN);
+                setGiverPost(pickOne(Ranks.POST_AGENT, Ranks.POST_SMUGGLER, Ranks.POST_GANGSTER, Ranks.POST_FENCE, Ranks.POST_CRIMINAL));
+                setGiverImportance(pickImportance());
+                setGiverFaction(Factions.PIRATES);
+                setGiverTags(Tags.CONTACT_TRADE);
+                findOrCreateGiver(createdAt, true, false);
+            }
+
+            if (!setPersonMissionRef(getPerson(), "$sep_sar_ref")) {
+                log.info("Failed to find or create contact");
+                return false;
+            }
+
+            if (barEvent) {
+                setGiverIsPotentialContactOnSuccess();
+            }
+
+            this.survivor = createdAt.getFaction().createRandomPerson(this.genRandom);
+            if (this.survivor == null) {
+                log.info("Failed to create survivor to rescue");
+                return false;
+            }
+
+            this.survivorPostType = PersonPostType.valueOf(this.scenarioData.getString("survivorType"));
+            switch (this.survivorPostType) {
+                case OFFICER -> {
+                    this.survivor = OfficerManagerEvent.createOfficer(createdAt.getFaction(), 1, OfficerManagerEvent.SkillPickPreference.ANY, this.genRandom);
+                    this.survivor.setPostId(Ranks.POST_OFFICER_FOR_HIRE);
+                }
+                case ADMINISTRATOR -> {
+                    this.survivor = OfficerManagerEvent.createAdmin(createdAt.getFaction(), 1, this.genRandom);
+                }
+                default -> {
+                    this.survivor = createdAt.getFaction().createRandomPerson(this.genRandom);
+                }
+            }
+
+            if (this.survivor == null) {
+                log.info("Failed to create survivor");
+                return false;
+            }
+
+            this.entityType = EntityType.valueOf(this.scenarioData.getString("entityType"));
+            switch (this.entityType) {
+                case WRECK -> {
+                    preferSystemInInnerSector();
+                    preferSystemInDirectionOfOtherMissions();
+                    requireEntityTags(ReqMode.ALL, Tags.SALVAGEABLE);
+                    requireEntityType(Entities.WRECK);
+                    this.entity = pickEntity();
+                }
+                default -> {
+                    this.entity = null;
+                }
+            }
+
+            if (!setEntityMissionRef(this.entity, "$sep_sar_ref")) {
+                log.info("Failed to find entity containing survivor");
+                return false;
+            }
+
+            makeImportant(this.entity, "$sep_sar_survivorEntity", Stage.FIND);
+            makeImportant(getPerson(), "$sep_sar_contactPerson", Stage.RETURN);
+
+            setStartingStage(Stage.FIND);
+            setSuccessStage(Stage.COMPLETED);
+            addFailureStages(Stage.FAILED);
+
+            connectWithMemoryFlag(Stage.FIND, Stage.RETURN, this.entity, "$sep_sar_returnToContact");
+            setStageOnMemoryFlag(Stage.COMPLETED, getPerson(), "$sep_sar_completed");
+
+            addNoPenaltyFailureStages(Stage.FAILED_DECIV);
+            connectWithMarketDecivilized(Stage.RETURN, Stage.FAILED_DECIV, createdAt);
+            setStageOnMarketDecivilized(Stage.FAILED_DECIV, createdAt);
+
+            setTimeLimit(Stage.FAILED, MISSION_DAYS, null, Stage.RETURN);
+
+            setCreditReward(CreditReward.HIGH);
+
+            return true;
+        } catch (JSONException e) {
+            log.error(e);
             return false;
         }
-
-        this.survivorEntity = pickEntity();
-        if (!setEntityMissionRef(this.survivorEntity, "$sep_sar_ref")) {
-            log.info("Failed to find entity containing survivor");
-            return false;
-        }
-
-        makeImportant(this.survivorEntity, "$sep_sar_survivorEntity", Stage.FIND);
-        makeImportant(getPerson(), "$sep_sar_contactPerson", Stage.RETURN);
-
-        setStartingStage(Stage.FIND);
-        setSuccessStage(Stage.COMPLETED);
-        addFailureStages(Stage.FAILED);
-
-        connectWithMemoryFlag(Stage.FIND, Stage.RETURN, this.survivorEntity, "$sep_sar_returnToContact");
-        setStageOnMemoryFlag(Stage.COMPLETED, getPerson(), "$sep_sar_completed");
-
-        addNoPenaltyFailureStages(Stage.FAILED_DECIV);
-        connectWithMarketDecivilized(Stage.RETURN, Stage.FAILED_DECIV, createdAt);
-        setStageOnMarketDecivilized(Stage.FAILED_DECIV, createdAt);
-
-        setTimeLimit(Stage.FAILED, MISSION_DAYS, null, Stage.RETURN);
-
-        setCreditReward(CreditReward.HIGH);
-
-        return true;
     }
 
     @Override
@@ -121,12 +144,36 @@ public class SearchAndRescueMission extends HubMissionWithBarEvent {
     protected void updateInteractionDataImpl() {
         set("$sep_sar_survivorAlive", this.survivorAlive);
         set("$sep_sar_survivorPostType", this.survivorPostType);
+
+        set("$sep_sar_survivorName", this.survivor.getNameString());
+
+        set("$sep_sar_contactMissionOfferText", getDialogText("contactMissionOfferText"));
+        set("$sep_sar_wreckInteractionText", getDialogText("wreckInteractionText"));
+        set("$sep_sar_survivorAliveText", getDialogText("survivorAliveText"));
+        set("$sep_sar_survivorDeadText", getDialogText("survivorDeadText"));
+        set("$sep_sar_returnSurvivorAliveText", getDialogText("returnSurvivorAliveText"));
+        set("$sep_sar_survivorDialogText", getDialogText("survivorDialogText"));
+        set("$sep_sar_returnSurvivorDeadText", getDialogText("returnSurvivorDeadText"));
+    }
+
+    public String getDialogText(String id) {
+        String result = "";
+        try {
+            if (this.scenarioData.has(id)) {
+                result = this.scenarioData.getString(id);
+            }
+        } catch (JSONException e) {
+            log.error(e);
+            result = e.getMessage();
+        }
+
+        return result;
     }
 
     @Override
     public boolean addNextStepText(TooltipMakerAPI info, Color tc, float pad) {
         if (this.currentStage == Stage.FIND) {
-            String loc = BreadcrumbSpecial.getLocationDescription(this.survivorEntity, false);
+            String loc = BreadcrumbSpecial.getLocationDescription(this.entity, false);
             info.addPara("Search for %s in " + loc, 3f, tc, Misc.getHighlightColor(), this.survivor.getNameString());
             return true;
         } else if (this.currentStage == Stage.RETURN) {
@@ -142,7 +189,7 @@ public class SearchAndRescueMission extends HubMissionWithBarEvent {
     @Override
     public void addDescriptionForNonEndStage(TooltipMakerAPI info, float width, float height) {
         if (this.currentStage == Stage.FIND) {
-            String loc = BreadcrumbSpecial.getLocatedString(this.survivorEntity);
+            String loc = BreadcrumbSpecial.getLocatedString(this.entity);
             loc = loc.replaceAll("orbiting", "near");
             loc = loc.replaceAll("located in ", "near ");
             info.addPara("Search for %s " + loc, 10f, Misc.getHighlightColor(), this.survivor.getNameString());
@@ -199,12 +246,12 @@ public class SearchAndRescueMission extends HubMissionWithBarEvent {
     @Override
     public SectorEntityToken getMapLocation(SectorMapAPI map) {
         if (this.currentStage == Stage.FIND) {
-            Constellation constellation = this.survivorEntity.getConstellation();
+            Constellation constellation = this.entity.getConstellation();
             SectorEntityToken entity = null;
             if (constellation != null && map != null) {
                 entity = map.getConstellationLabelEntity(constellation);
             }
-            if (entity == null) entity = this.survivorEntity;
+            if (entity == null) entity = this.entity;
             return entity;
         }
         return super.getMapLocation(map);
@@ -233,5 +280,11 @@ public class SearchAndRescueMission extends HubMissionWithBarEvent {
         OFFICER,
         ADMINISTRATOR,
         CIVILIAN
+    }
+
+    public enum EntityType {
+        WRECK,
+        FLEET,
+        PLANET
     }
 }

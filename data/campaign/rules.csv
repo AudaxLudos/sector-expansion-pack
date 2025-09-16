@@ -26,7 +26,8 @@ FireBest HireOptionSet",,,
 # Offered by contact,,,,,,
 sep_sar_blurb,sep_sar_blurb,,,CONTACT MISSION BLURB,,
 sep_sar_offerOption,sep_sar_option,,,,sep_sar_start:CONTACT ASK OPTION,
-sep_sar_offerTextContact1,DialogOptionSelected,$option == sep_sar_start,$missionId = sep_sar,CONTACT MISSION OFFER TEXT,"contact_accept:ACCEPT
+sep_sar_offerTextContact1,DialogOptionSelected,$option == sep_sar_start,"$missionId = sep_sar
+AddText $sep_sar_contactMissionOfferText",,"contact_accept:ACCEPT
 contact_decline:DECLINE",
 # Offered in bar,,,,,,
 sep_sar_blurbBar,sep_sar_blurbBar,,,BAR MISSION BLURB,,
@@ -35,35 +36,42 @@ sep_sar_offerTextBar1,DialogOptionSelected,$option == sep_sar_startBar,$missionI
 contact_declineBarNoContinue:DECLINE",
 # Rescue survivor in entity,,,,,,
 sep_sar_entityRescueText,OpenInteractionDialog,"$sep_sar_survivorEntity score:1000
-Call $sep_sar_ref updateData",Call $sep_sar_ref checkSurvivorStatus,RESCUE SURVIVOR TEXT,sep_sar_checkSurvivorStatus:CONTINUE,
+Call $sep_sar_ref updateData","AddText $sep_sar_wreckInteractionText
+Call $sep_sar_ref checkSurvivorStatus",,sep_sar_checkSurvivorStatus:CONTINUE,
 sep_sar_entitySurvivorDead,DialogOptionSelected,"$sep_sar_survivorAlive score:1000
-$option == sep_sar_checkSurvivorStatus","$sep_sar_returnToContact = true
-Call $sep_sar_ref updateStage",SURVIVOR ALIVE TEXT,defaultLeave:END INTERACTION,
+$option == sep_sar_checkSurvivorStatus","AddText $sep_sar_survivorAliveText
+$sep_sar_returnToContact = true
+Call $sep_sar_ref updateStage",,defaultLeave:END INTERACTION,
 sep_sar_entitySurvivorAlive,DialogOptionSelected,"!$sep_sar_survivorAlive score:1000
-$option == sep_sar_checkSurvivorStatus","$sep_sar_returnToContact = true
-Call $sep_sar_ref updateStage",SURVIVOR DEAD TEXT,defaultLeave:END INTERACTION,
+$option == sep_sar_checkSurvivorStatus","AddText $sep_sar_survivorDeadText
+$sep_sar_returnToContact = true
+Call $sep_sar_ref updateStage",,defaultLeave:END INTERACTION,
 # Return survivor to contact,,,,,,
 sep_sar_returnSurvivorAliveA,PickGreeting,"$sep_sar_contactPerson score:1000
 Call $sep_sar_ref updateData
 $sep_sar_survivorAlive score: 1000
 $sep_sar_survivorPostType == CIVILIAN score:1000
-FireBest GenericMissionReturn","ShowPersonVisual
+FireBest GenericMissionReturn","AddText $sep_sar_returnSurvivorAliveText
+ShowPersonVisual
 $sep_sar_completed = true
-Call $sep_sar_ref updateStage",RETURN SURVIVOR ALIVE CANNOT BE HIRED TEXT,contact_pickAnotherGreeting:END MISSION,
+Call $sep_sar_ref updateStage",,contact_pickAnotherGreeting:END MISSION,
 sep_sar_returnSurvivorAliveB,PickGreeting,"$sep_sar_contactPerson score:1000
 Call $sep_sar_ref updateData
 $sep_sar_survivorAlive score: 1000
 $sep_sar_survivorPostType != CIVILIAN score:1000
-FireBest GenericMissionReturn",ShowPersonVisual,RETURN SURVIVOR ALIVE TEXT,sep_sar_talkToSurvivor:CONTINUE,
-sep_sar_returnSurvivorAliveB1,DialogOptionSelected,$option == sep_sar_talkToSurvivor,"Call $sep_sar_ref showSurvivorVisual
+FireBest GenericMissionReturn","AddText $sep_sar_returnSurvivorAliveText
+ShowPersonVisual",,sep_sar_talkToSurvivor:CONTINUE,
+sep_sar_returnSurvivorAliveB1,DialogOptionSelected,$option == sep_sar_talkToSurvivor,"AddText $sep_sar_survivorDialogText
+Call $sep_sar_ref showSurvivorVisual
 $sep_sar_completed = true
-Call $sep_sar_ref updateStage",SURVIVOR CAN BE HIRED TEXT,contact_pickAnotherGreeting:END MISSION,
+Call $sep_sar_ref updateStage",,contact_pickAnotherGreeting:END MISSION,
 sep_sar_returnSurvivorDead,PickGreeting,"$sep_sar_contactPerson score:1000
 Call $sep_sar_ref updateData
 !$sep_sar_survivorAlive score: 1000
-FireBest GenericMissionReturn","ShowPersonVisual
+FireBest GenericMissionReturn","AddText $sep_sar_returnSurvivorDeadText
+ShowPersonVisual
 $sep_sar_completed = true
-Call $sep_sar_ref updateStage",RETURN SURVIVOR DEAD TEXT,contact_pickAnotherGreeting:END MISSION,
+Call $sep_sar_ref updateStage",,contact_pickAnotherGreeting:END MISSION,
 "# Search and rescue mission
 # END",,,,,,
 ,,,,,,

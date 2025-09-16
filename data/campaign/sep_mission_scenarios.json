@@ -1,0 +1,24 @@
+{
+  "sep_sar": [
+    {
+      "survivorType": "OFFICER", # OFFICER, ADMINISTRATOR, CIVILIAN 
+      "entityType": "WRECK", # WRECK, FLEET, PLANET
+
+      # Start dialog texts
+      "contactMissionOfferText": "SAMPLE: CONTACT MISSION OFFER TEXT",
+      "barMissionOfferText": "SAMPLE: BAR MISSION OFFER TEXT",
+
+      # WRECK entity interaction texts
+      "wreckInteractionText": "SAMPLE: RESCUE SURVIVOR TEXT",
+
+      # After entity interaction texsts
+      "survivorAliveText": "SAMPLE: SURVIVOR ALIVE TEXT",
+      "survivorDeadText": "SAMPLE: SURVIVOR DEAD TEXT",
+
+      # Ending dialog texts
+      "returnSurvivorAliveText": "SAMPLE: RETURN SURVIVOR ALIVE TEXT",
+      "survivorDialogText": "SAMPLE: SURVIVOR CAN BE HIRED TEXT",
+      "returnSurvivorDeadText": "SAMPLE: RETURN SURVIVOR DEAD TEXT"
+    }
+  ]
+}
