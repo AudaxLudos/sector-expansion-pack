@@ -179,8 +179,10 @@ public class SearchAndRescueMission extends HubMissionWithBarEvent {
 
     @Override
     protected void updateInteractionDataImpl() {
+        set("$sep_sar_scenarioType", this.scenarioType);
         set("$sep_sar_survivorAlive", this.survivorAlive);
         set("$sep_sar_survivorPostType", this.survivorPostType);
+        set("$sep_sar_entityType", this.entityType);
 
         set("$sep_sar_survivorFullName", this.survivor.getNameString());
         set("$sep_sar_survivorFirstName", this.survivor.getName().getFirst());
@@ -190,6 +192,7 @@ public class SearchAndRescueMission extends HubMissionWithBarEvent {
         set("$sep_sar_survivorHimOrHer", this.survivor.getHimOrHer());
         set("$sep_sar_survivorManOrWoman", this.survivor.getManOrWoman());
 
+        set("$sep_sar_barMissionOfferText", getDialogText("barMissionOfferText"));
         set("$sep_sar_contactMissionOfferText", getDialogText("contactMissionOfferText"));
         set("$sep_sar_entityDialogText", getDialogText("entityDialogText"));
         set("$sep_sar_entityPayRansomText", getDialogText("entityPayRansomText"));
