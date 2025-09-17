@@ -2,16 +2,12 @@ package sectorexpansionpack.missions;
 
 import com.fs.starfarer.api.EveryFrameScript;
 import com.fs.starfarer.api.Global;
-import com.fs.starfarer.api.campaign.InteractionDialogAPI;
-import com.fs.starfarer.api.campaign.SectorEntityToken;
+import com.fs.starfarer.api.campaign.*;
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
 import com.fs.starfarer.api.campaign.rules.MemoryAPI;
 import com.fs.starfarer.api.characters.PersonAPI;
 import com.fs.starfarer.api.impl.campaign.events.OfficerManagerEvent;
-import com.fs.starfarer.api.impl.campaign.ids.Entities;
-import com.fs.starfarer.api.impl.campaign.ids.Factions;
-import com.fs.starfarer.api.impl.campaign.ids.Ranks;
-import com.fs.starfarer.api.impl.campaign.ids.Tags;
+import com.fs.starfarer.api.impl.campaign.ids.*;
 import com.fs.starfarer.api.impl.campaign.missions.hub.HubMissionWithBarEvent;
 import com.fs.starfarer.api.impl.campaign.missions.hub.ReqMode;
 import com.fs.starfarer.api.impl.campaign.procgen.Constellation;
@@ -91,14 +87,42 @@ public class SearchAndRescueMission extends HubMissionWithBarEvent {
                 return false;
             }
 
+            preferSystemInInnerSector();
+            preferSystemInDirectionOfOtherMissions();
+
             this.entityType = EntityType.valueOf(this.scenarioData.getString("entityType"));
             switch (this.entityType) {
                 case WRECK -> {
-                    preferSystemInInnerSector();
-                    preferSystemInDirectionOfOtherMissions();
                     requireEntityTags(ReqMode.ALL, Tags.SALVAGEABLE);
                     requireEntityType(Entities.WRECK);
                     this.entity = pickEntity();
+                }
+                case FLEET -> {
+                    requireSystemHasSafeStars();
+                    requireSystemTags(ReqMode.NOT_ALL, Tags.THEME_UNSAFE);
+                    preferPlanetNotFullySurveyed();
+                    preferPlanetUnpopulated();
+                    preferPlanetWithRuins();
+                    PlanetAPI planet = pickPlanet();
+
+                    beginStageTrigger(Stage.FIND);
+                    triggerCreateFleet(FleetSize.MEDIUM, FleetQuality.DEFAULT, Factions.PIRATES, FleetTypes.PATROL_MEDIUM, planet.getStarSystem());
+                    triggerAutoAdjustFleetStrengthModerate();
+
+                    triggerPickLocationAroundEntity(planet, 1000f);
+                    triggerSpawnFleetAtPickedLocation();
+
+                    triggerMakeLowRepImpact();
+                    triggerMakeFleetIgnoreOtherFleets();
+                    triggerMakeFleetIgnoredByOtherFleets();
+                    triggerMakeFleetNotIgnorePlayer();
+                    triggerOrderFleetPatrol(planet);
+                    triggerFleetAddDefeatTrigger("SEPSARFleetDefeated");
+
+                    endTrigger();
+
+                    List<CampaignFleetAPI> fleets = runStageTriggersReturnFleets(Stage.FIND);
+                    this.entity = fleets.get(0);
                 }
                 default -> {
                     this.entity = null;
@@ -148,7 +172,7 @@ public class SearchAndRescueMission extends HubMissionWithBarEvent {
         set("$sep_sar_survivorName", this.survivor.getNameString());
 
         set("$sep_sar_contactMissionOfferText", getDialogText("contactMissionOfferText"));
-        set("$sep_sar_wreckInteractionText", getDialogText("wreckInteractionText"));
+        set("$sep_sar_entityDialogText", getDialogText("entityDialogText"));
         set("$sep_sar_survivorAliveText", getDialogText("survivorAliveText"));
         set("$sep_sar_survivorDeadText", getDialogText("survivorDeadText"));
         set("$sep_sar_returnSurvivorAliveText", getDialogText("returnSurvivorAliveText"));

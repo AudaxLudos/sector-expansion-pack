@@ -34,10 +34,31 @@ sep_sar_blurbBar,sep_sar_blurbBar,,,BAR MISSION BLURB,,
 sep_sar_offerOptionBar,sep_sar_optionBar,,,,sep_sar_startBar:BAR ASK OPTION,
 sep_sar_offerTextBar1,DialogOptionSelected,$option == sep_sar_startBar,$missionId = sep_sar,BAR MISSION OFFER TEXT,"contact_acceptBar:ACCEPT
 contact_declineBarNoContinue:DECLINE",
-# Rescue survivor in entity,,,,,,
-sep_sar_entityRescueText,OpenInteractionDialog,"$sep_sar_survivorEntity score:1000
-Call $sep_sar_ref updateData","AddText $sep_sar_wreckInteractionText
+# Rescue survivor in wreck,,,,,,
+sep_sar_wreckRescueText,OpenInteractionDialog,"$sep_sar_survivorEntity score:1000
+Call $sep_sar_ref updateData","AddText $sep_sar_entityDialogText
 Call $sep_sar_ref checkSurvivorStatus",,sep_sar_checkSurvivorStatus:CONTINUE,
+sep_sar_fleetRescueText,OpenCommLink,"$entity.sep_sar_survivorEntity score:1000
+Call $entity.sep_sar_ref updateData",AddText $sep_sar_entityDialogText,,"sep_sar_payRansom:PAY RANSOM
+sep_sar_beginFight:FIGHT
+sep_sar_declineRansom:DECLINE",
+sep_sar_fleetAcceptRansom,DialogOptionSelected,$option == sep_sar_payRansom,"AddText $sep_sar_entityPayRansomText
+$entity.sep_sar_returnToContact = true
+Call $entity.sep_sar_ref updateStage
+MakeOtherFleetAllowDisengage sep_sar true
+MakeOtherFleetNonHostile sep_sar true",,cutCommLinkNoText:END INTERACTION,
+sep_sar_fleetBeginFight,DialogOptionSelected,$option == sep_sar_beginFight,"AddText $sep_sar_entityFightText
+MakeOtherFleetHostile sep_sar true
+MakeOtherFleetAggressive sep_sar true
+MakeOtherFleetPreventDisengage sep_sar true
+$entity.ignorePlayerCommRequests = true
+",,cutCommLinkNoText:END INTERACTION,
+sep_sar_fleetDeclineRansom,DialogOptionSelected,$option == sep_sar_declineRansom,"AddText $sep_sar_entityDeclineText
+MakeOtherFleetAllowDisengage sep_sar true
+MakeOtherFleetNonHostile sep_sar true
+MakeOtherFleetPreventDisengage sep_sar true",,cutCommLinkNoText:END INTERACTION,
+sep_sar_fleetDefeated,SEPSARFleetDefeated,$someShipsDestroyed,"$sep_sar_returnToContact = true
+Call $sep_sar_ref updateStage",,,
 sep_sar_entitySurvivorDead,DialogOptionSelected,"$sep_sar_survivorAlive score:1000
 $option == sep_sar_checkSurvivorStatus","AddText $sep_sar_survivorAliveText
 $sep_sar_returnToContact = true
