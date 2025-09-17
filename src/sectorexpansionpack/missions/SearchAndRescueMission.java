@@ -25,10 +25,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+// TODO: Add bonus reward for returning survivor alive
 public class SearchAndRescueMission extends HubMissionWithBarEvent {
     public static Logger log = Global.getLogger(SearchAndRescueMission.class);
-    public static float MISSION_DAYS = 120f;
+    // TODO: Make mission days modifiable using the scenario settings
+    protected float missionDays = 120f;
     protected JSONObject scenarioData;
+    protected ScenarioType scenarioType;
     protected PersonPostType survivorPostType;
     protected PersonAPI survivor;
     protected boolean survivorAlive = true;
@@ -45,6 +48,7 @@ public class SearchAndRescueMission extends HubMissionWithBarEvent {
             }
 
             if (barEvent) {
+                // TODO: Make this bar contact modifiable using the scenario settings
                 setGiverRank(Ranks.CITIZEN);
                 setGiverPost(pickOne(Ranks.POST_AGENT, Ranks.POST_SMUGGLER, Ranks.POST_GANGSTER, Ranks.POST_FENCE, Ranks.POST_CRIMINAL));
                 setGiverImportance(pickImportance());
@@ -105,6 +109,7 @@ public class SearchAndRescueMission extends HubMissionWithBarEvent {
                     preferPlanetWithRuins();
                     PlanetAPI planet = pickPlanet();
 
+                    // TODO: Make this fleet modifiable using the scenario settings
                     beginStageTrigger(Stage.FIND);
                     triggerCreateFleet(FleetSize.MEDIUM, FleetQuality.DEFAULT, Factions.PIRATES, FleetTypes.PATROL_MEDIUM, planet.getStarSystem());
                     triggerAutoAdjustFleetStrengthModerate();
@@ -155,8 +160,9 @@ public class SearchAndRescueMission extends HubMissionWithBarEvent {
             connectWithMarketDecivilized(Stage.RETURN, Stage.FAILED_DECIV, createdAt);
             setStageOnMarketDecivilized(Stage.FAILED_DECIV, createdAt);
 
-            setTimeLimit(Stage.FAILED, MISSION_DAYS, null, Stage.RETURN);
+            setTimeLimit(Stage.FAILED, this.missionDays, null, Stage.RETURN);
 
+            // TODO: Make this reward modifiable using the scenario settings
             setCreditReward(CreditReward.HIGH);
 
             return true;
@@ -176,7 +182,13 @@ public class SearchAndRescueMission extends HubMissionWithBarEvent {
         set("$sep_sar_survivorAlive", this.survivorAlive);
         set("$sep_sar_survivorPostType", this.survivorPostType);
 
-        set("$sep_sar_survivorName", this.survivor.getNameString());
+        set("$sep_sar_survivorFullName", this.survivor.getNameString());
+        set("$sep_sar_survivorFirstName", this.survivor.getName().getFirst());
+        set("$sep_sar_survivorLastName", this.survivor.getName().getLast());
+        set("$sep_sar_survivorHeOrShe", this.survivor.getHeOrShe());
+        set("$sep_sar_survivorHisOrHer", this.survivor.getHisOrHer());
+        set("$sep_sar_survivorHimOrHer", this.survivor.getHimOrHer());
+        set("$sep_sar_survivorManOrWoman", this.survivor.getManOrWoman());
 
         set("$sep_sar_contactMissionOfferText", getDialogText("contactMissionOfferText"));
         set("$sep_sar_entityDialogText", getDialogText("entityDialogText"));
@@ -319,6 +331,12 @@ public class SearchAndRescueMission extends HubMissionWithBarEvent {
     public enum EntityType {
         WRECK,
         FLEET,
-        PLANET
+        PLANET,
+        MARKET
+    }
+
+    public enum ScenarioType {
+        KIDNAPPING,
+        STRANDED
     }
 }

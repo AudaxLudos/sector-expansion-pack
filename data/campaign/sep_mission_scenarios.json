@@ -1,7 +1,7 @@
 {
   "sep_sar": [
     {
-      "weight": 100,
+      "weight": -1,
       "survivorType": "OFFICER", # OFFICER, ADMINISTRATOR, CIVILIAN 
       "entityType": "WRECK", # WRECK, FLEET, PLANET
 
@@ -22,7 +22,7 @@
       "returnSurvivorDeadText": "SAMPLE: RETURN SURVIVOR DEAD TEXT"
     },
     {
-      "weight": 0,
+      "weight": -1,
       "survivorType": "OFFICER", # OFFICER, ADMINISTRATOR, CIVILIAN 
       "entityType": "FLEET", # WRECK, FLEET, PLANET
 
@@ -46,7 +46,7 @@
       "returnSurvivorDeadText": "SAMPLE: RETURN SURVIVOR DEAD TEXT"
     },
     {
-      "weight": 0,
+      "weight": -1,
       "survivorType": "CIVILIAN", # OFFICER, ADMINISTRATOR, CIVILIAN 
       "entityType": "PLANET", # WRECK, FLEET, PLANET
 
