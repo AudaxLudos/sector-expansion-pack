@@ -124,6 +124,13 @@ public class SearchAndRescueMission extends HubMissionWithBarEvent {
                     List<CampaignFleetAPI> fleets = runStageTriggersReturnFleets(Stage.FIND);
                     this.entity = fleets.get(0);
                 }
+                case PLANET -> {
+                    requireSystemInterestingAndNotCore();
+                    preferPlanetNotFullySurveyed();
+                    preferPlanetUnpopulated();
+                    preferPlanetWithRuins();
+                    this.entity = pickPlanet();
+                }
                 default -> {
                     this.entity = null;
                 }
@@ -173,6 +180,9 @@ public class SearchAndRescueMission extends HubMissionWithBarEvent {
 
         set("$sep_sar_contactMissionOfferText", getDialogText("contactMissionOfferText"));
         set("$sep_sar_entityDialogText", getDialogText("entityDialogText"));
+        set("$sep_sar_entityPayRansomText", getDialogText("entityPayRansomText"));
+        set("$sep_sar_entityFightText", getDialogText("entityFightText"));
+        set("$sep_sar_entityDeclineText", getDialogText("entityDeclineText"));
         set("$sep_sar_survivorAliveText", getDialogText("survivorAliveText"));
         set("$sep_sar_survivorDeadText", getDialogText("survivorDeadText"));
         set("$sep_sar_returnSurvivorAliveText", getDialogText("returnSurvivorAliveText"));

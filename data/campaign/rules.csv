@@ -36,7 +36,8 @@ sep_sar_offerTextBar1,DialogOptionSelected,$option == sep_sar_startBar,$missionI
 contact_declineBarNoContinue:DECLINE",
 # Rescue survivor in wreck,,,,,,
 sep_sar_wreckRescueText,OpenInteractionDialog,"$sep_sar_survivorEntity score:1000
-Call $sep_sar_ref updateData","AddText $sep_sar_entityDialogText
+Call $sep_sar_ref updateData","ShowDefaultVisual
+AddText $sep_sar_entityDialogText
 Call $sep_sar_ref checkSurvivorStatus",,sep_sar_checkSurvivorStatus:CONTINUE,
 sep_sar_fleetRescueText,OpenCommLink,"$entity.sep_sar_survivorEntity score:1000
 Call $entity.sep_sar_ref updateData",AddText $sep_sar_entityDialogText,,"sep_sar_payRansom:PAY RANSOM

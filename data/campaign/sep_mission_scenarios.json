@@ -1,7 +1,7 @@
 {
   "sep_sar": [
     {
-      "weight": 0,
+      "weight": 100,
       "survivorType": "OFFICER", # OFFICER, ADMINISTRATOR, CIVILIAN 
       "entityType": "WRECK", # WRECK, FLEET, PLANET
 
@@ -22,7 +22,7 @@
       "returnSurvivorDeadText": "SAMPLE: RETURN SURVIVOR DEAD TEXT"
     },
     {
-      "weight": 100,
+      "weight": 0,
       "survivorType": "OFFICER", # OFFICER, ADMINISTRATOR, CIVILIAN 
       "entityType": "FLEET", # WRECK, FLEET, PLANET
 
@@ -35,6 +35,27 @@
       "entityPayRansomText": "FLEET SAMPLE: SAVE SURVIVOR BY PAYING RANSOM",
       "entityFightText": "FLEET SAMPLE: SAVE SURVIVOR BY FIGHTING FLEET",
       "entityDeclineText": "FLEET SAMPLE: GO BACK",
+
+      # After entity interaction texsts
+      "survivorAliveText": "SAMPLE: SURVIVOR ALIVE TEXT",
+      "survivorDeadText": "SAMPLE: SURVIVOR DEAD TEXT",
+
+      # Ending dialog texts
+      "returnSurvivorAliveText": "SAMPLE: RETURN SURVIVOR ALIVE TEXT",
+      "survivorDialogText": "SAMPLE: SURVIVOR CAN BE HIRED TEXT",
+      "returnSurvivorDeadText": "SAMPLE: RETURN SURVIVOR DEAD TEXT"
+    },
+    {
+      "weight": 0,
+      "survivorType": "CIVILIAN", # OFFICER, ADMINISTRATOR, CIVILIAN 
+      "entityType": "PLANET", # WRECK, FLEET, PLANET
+
+      # Start dialog texts
+      "contactMissionOfferText": "SAMPLE: CONTACT MISSION OFFER TEXT",
+      "barMissionOfferText": "SAMPLE: BAR MISSION OFFER TEXT",
+
+      # FLEET entity interaction texts
+      "entityDialogText": "PLANET SAMPLE: PLANET INTERACTION TEXT",
 
       # After entity interaction texsts
       "survivorAliveText": "SAMPLE: SURVIVOR ALIVE TEXT",
