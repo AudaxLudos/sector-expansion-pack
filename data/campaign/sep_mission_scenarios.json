@@ -1,73 +1,70 @@
 {
-  "sep_sar": [
-    {
-      "weight": -1,
-      "survivorType": "OFFICER", # OFFICER, ADMINISTRATOR, CIVILIAN 
+  "sep_sar": {
+    "defaults": {
+      "weight": 10,
+      "survivorType": "OFFICER", # OFFICER, ADMINISTRATOR, CIVILIAN, RANDOM
       "entityType": "WRECK", # WRECK, FLEET, PLANET
 
-      # Start dialog texts
-      "contactMissionOfferText": "SAMPLE: CONTACT MISSION OFFER TEXT",
-      "barMissionOfferText": "SAMPLE: BAR MISSION OFFER TEXT",
-
-      # WRECK entity interaction texts
-      "entityDialogText": "WRECK SAMPLE: RESCUE SURVIVOR TEXT",
-
-      # After entity interaction texsts
-      "survivorAliveText": "SAMPLE: SURVIVOR ALIVE TEXT",
-      "survivorDeadText": "SAMPLE: SURVIVOR DEAD TEXT",
-
       # Ending dialog texts
-      "returnSurvivorAliveText": "SAMPLE: RETURN SURVIVOR ALIVE TEXT",
-      "survivorDialogText": "SAMPLE: SURVIVOR CAN BE HIRED TEXT",
-      "returnSurvivorDeadText": "SAMPLE: RETURN SURVIVOR DEAD TEXT"
+      "returnSurvivorAliveText": "You report to $PersonPost $personName about the success of your mission, bringing the good news that $sep_sar_survivorFullName was found alive and safely recovered.\n\nAfterward, you order your chief security officer to escort $sep_sar_survivorFullName to a safe location, while you provide a full report detailing the mission and the circumstances of the rescue before receiving your reward.\n\nBut before you could continue speaking with $personName, $sep_sar_survivorFullName contacts you.",
+      "survivorDialogText": "\"Captain,\" $sep_sar_survivorHeOrShe says, \"thank you for saving me. I spoke with my fa... superior, and he wants to give you a greater reward for bringing me back home.\" \n\n$sep_sar_survivorHeOrShe pauses for a moment. \"Also, if you're hiring, it would be an honor to work with you. I've mostly recovered and convinced my superior to let me go. Now I just need to file a bit of paperwork, so if you ever get the chance, my contact information will be in your directory.\"\n\nHe thanks you once more before ending the connection.",
+      "returnSurvivorDeadText": "You report to $PersonPost $personName about the success of your mission, bringing the grim news that $sep_sar_survivorFullName had already passed away by the time you reached $sep_sar_survivorHimOrHer.\n\nAfterward, you order your chief security officer to escort the body of $sep_sar_survivorFullName to a safe location, while you provide a full report detailing the mission and the circumstances of $sep_sar_survivorFullName's death before receiving your reward."
     },
-    {
-      "weight": 100,
-      "survivorType": "OFFICER", # OFFICER, ADMINISTRATOR, CIVILIAN 
-      "entityType": "FLEET", # WRECK, FLEET, PLANET
+    "scenarios": [
+      {
+        "weight": -1,
+        "survivorType": "OFFICER", # OFFICER, ADMINISTRATOR, CIVILIAN 
+        "entityType": "WRECK", # WRECK, FLEET, PLANET
 
-      # Start dialog texts
-      "contactMissionBlurb": "SAMPLE: CONTACT MISSION BLURB",
-      "contactMissionOfferText": "SAMPLE: CONTACT MISSION OFFER TEXT",
-      "barMissionBlurb": "SAMPLE: BAR MISSION OFFER BLURB",
-      "barMissionOfferText": "SAMPLE: BAR MISSION OFFER TEXT",
+        # Start dialog texts
+        "contactMissionOfferText": "SAMPLE: CONTACT MISSION OFFER TEXT", 
+        "barMissionOfferText": "SAMPLE: BAR MISSION OFFER TEXT",
 
-      # FLEET entity interaction texts
-      "entityDialogText": "FLEET SAMPLE: FLEET INTERACTION TEXT",
-      "entityPayRansomText": "FLEET SAMPLE: SAVE SURVIVOR BY PAYING RANSOM",
-      "entityFightText": "FLEET SAMPLE: SAVE SURVIVOR BY FIGHTING FLEET",
-      "entityDeclineText": "FLEET SAMPLE: GO BACK",
-      "entityDefeatedText": "FLEET SAMPLE: SAVE SURVIVOR TEXT",
+        # WRECK entity interaction texts
+        "entityDialogText": "WRECK SAMPLE: RESCUE SURVIVOR TEXT",
 
-      # After entity interaction texsts
-      "survivorAliveText": "SAMPLE: SURVIVOR ALIVE TEXT",
-      "survivorDeadText": "SAMPLE: SURVIVOR DEAD TEXT",
+        # After entity interaction texsts
+        "survivorAliveText": "SAMPLE: SURVIVOR ALIVE TEXT",
+        "survivorDeadText": "SAMPLE: SURVIVOR DEAD TEXT",
+      },
+      {
+        "weight": 100,
+        "survivorType": "OFFICER", # OFFICER, ADMINISTRATOR, CIVILIAN 
+        "entityType": "FLEET", # WRECK, FLEET, PLANET
 
-      # Ending dialog texts
-      "returnSurvivorAliveText": "SAMPLE: RETURN SURVIVOR ALIVE TEXT",
-      "survivorDialogText": "SAMPLE: SURVIVOR CAN BE HIRED TEXT",
-      "returnSurvivorDeadText": "SAMPLE: RETURN SURVIVOR DEAD TEXT"
-    },
-    {
-      "weight": -1,
-      "survivorType": "CIVILIAN", # OFFICER, ADMINISTRATOR, CIVILIAN 
-      "entityType": "PLANET", # WRECK, FLEET, PLANET
+        # Start dialog texts
+        "contactMissionBlurb": "SAMPLE: CONTACT MISSION BLURB",
+        "contactMissionOfferText": "SAMPLE: CONTACT MISSION OFFER TEXT",
+        "barMissionBlurb": "SAMPLE: BAR MISSION OFFER BLURB",
+        "barMissionOfferText": "SAMPLE: BAR MISSION OFFER TEXT",
 
-      # Start dialog texts
-      "contactMissionOfferText": "SAMPLE: CONTACT MISSION OFFER TEXT",
-      "barMissionOfferText": "SAMPLE: BAR MISSION OFFER TEXT",
+        # FLEET entity interaction texts
+        "entityDialogText": "FLEET SAMPLE: FLEET INTERACTION TEXT",
+        "entityPayRansomText": "FLEET SAMPLE: SAVE SURVIVOR BY PAYING RANSOM",
+        "entityFightText": "FLEET SAMPLE: SAVE SURVIVOR BY FIGHTING FLEET",
+        "entityDeclineText": "FLEET SAMPLE: GO BACK",
+        "entityDefeatedText": "FLEET SAMPLE: SAVE SURVIVOR TEXT",
 
-      # FLEET entity interaction texts
-      "entityDialogText": "PLANET SAMPLE: PLANET INTERACTION TEXT",
+        # After entity interaction texsts
+        "survivorAliveText": "SAMPLE: SURVIVOR ALIVE TEXT",
+        "survivorDeadText": "SAMPLE: SURVIVOR DEAD TEXT",
+      },
+      {
+        "weight": -1,
+        "survivorType": "CIVILIAN", # OFFICER, ADMINISTRATOR, CIVILIAN 
+        "entityType": "PLANET", # WRECK, FLEET, PLANET
 
-      # After entity interaction texsts
-      "survivorAliveText": "SAMPLE: SURVIVOR ALIVE TEXT",
-      "survivorDeadText": "SAMPLE: SURVIVOR DEAD TEXT",
+        # Start dialog texts
+        "contactMissionOfferText": "SAMPLE: CONTACT MISSION OFFER TEXT",
+        "barMissionOfferText": "SAMPLE: BAR MISSION OFFER TEXT",
 
-      # Ending dialog texts
-      "returnSurvivorAliveText": "SAMPLE: RETURN SURVIVOR ALIVE TEXT",
-      "survivorDialogText": "SAMPLE: SURVIVOR CAN BE HIRED TEXT",
-      "returnSurvivorDeadText": "SAMPLE: RETURN SURVIVOR DEAD TEXT"
-    }
-  ]
+        # FLEET entity interaction texts
+        "entityDialogText": "PLANET SAMPLE: PLANET INTERACTION TEXT",
+
+        # After entity interaction texsts
+        "survivorAliveText": "SAMPLE: SURVIVOR ALIVE TEXT",
+        "survivorDeadText": "SAMPLE: SURVIVOR DEAD TEXT",
+      }
+    ]
+  }
 }

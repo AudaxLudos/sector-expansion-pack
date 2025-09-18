@@ -3,7 +3,11 @@ id,trigger,conditions,script,text,options,notes
 # START",,,,,,
 sep_survivorGreeting,PickGreeting,"$sep_survivor score:1000
 $ome_hireable score:100","ShowPersonVisual
-FireAll PopulateOptionsHire",RESCUED/SURVIVOR GREETING,,
+FireAll PopulateOptionsHire","After a short wait, your connection request is accepted.
+
+$personName looks at you eagerly.
+
+""Captain, thank you again for saving me. I knew you would see the value in giving me a chance. You will not regret it. I am more capable than most you will find out here.""",,
 sep_survivorAskHireOfficer,DialogOptionSelected,"$sep_survivor score:1000
 $option == ome_askHire","AddText ""\""You saved my life, and I’ll never forget that. Serving under you would mean a great deal, so I won’t ask for a hiring bonus and am willing to start at a reduced salary of $ome_salary credits per month, half the standard rate. If you accept, I’ll be ready to board within the hour.\""""
 SetTextHighlightColors hColor hColor

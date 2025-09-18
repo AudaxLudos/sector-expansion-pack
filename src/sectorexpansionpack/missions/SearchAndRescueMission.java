@@ -2,7 +2,10 @@ package sectorexpansionpack.missions;
 
 import com.fs.starfarer.api.EveryFrameScript;
 import com.fs.starfarer.api.Global;
-import com.fs.starfarer.api.campaign.*;
+import com.fs.starfarer.api.campaign.CampaignFleetAPI;
+import com.fs.starfarer.api.campaign.InteractionDialogAPI;
+import com.fs.starfarer.api.campaign.PlanetAPI;
+import com.fs.starfarer.api.campaign.SectorEntityToken;
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
 import com.fs.starfarer.api.campaign.rules.MemoryAPI;
 import com.fs.starfarer.api.characters.PersonAPI;
@@ -43,11 +46,7 @@ public class SearchAndRescueMission extends HubMissionWithBarEvent {
     protected boolean create(MarketAPI createdAt, boolean barEvent) {
         try {
             this.genRandom = new Random(Long.parseLong(Global.getSector().getSeedString().replaceAll("\\D", "")));
-            this.scenarioData = ModPlugin.SEP_SAR_SCENARIOS.pick(this.genRandom);
-            if (this.scenarioData == null) {
-                log.info("No scenario data found");
-                return false;
-            }
+            this.scenarioData = ModPlugin.getRandomMissionScenario(getMissionId(), this.genRandom);
 
             if (barEvent) {
                 // TODO: Make this bar contact modifiable using the scenario settings
@@ -219,10 +218,11 @@ public class SearchAndRescueMission extends HubMissionWithBarEvent {
         try {
             if (this.scenarioData.has(id)) {
                 result = this.scenarioData.getString(id);
+            } else {
+                result = ModPlugin.getMissionScenarioDefaults(getMissionId()).getString(id);
             }
         } catch (JSONException e) {
-            log.error(e);
-            result = e.getMessage();
+            throw new RuntimeException(e);
         }
 
         return result;
@@ -337,7 +337,8 @@ public class SearchAndRescueMission extends HubMissionWithBarEvent {
     public enum PersonPostType {
         OFFICER,
         ADMINISTRATOR,
-        CIVILIAN
+        CIVILIAN,
+        RANDOM
     }
 
     public enum EntityType {
