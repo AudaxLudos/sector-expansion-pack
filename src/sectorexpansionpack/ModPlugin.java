@@ -22,6 +22,8 @@ public class ModPlugin extends BaseModPlugin {
             float weight = 10f;
             if (scenario.has("weight")) {
                 weight = (float) scenario.getDouble("weight");
+            } else {
+                weight = (float) getMissionScenarioDefaults(missionId).getDouble("weight");
             }
             scenarioPicker.add(scenario, weight);
         }

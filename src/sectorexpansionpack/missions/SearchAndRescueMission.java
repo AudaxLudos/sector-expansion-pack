@@ -186,6 +186,10 @@ public class SearchAndRescueMission extends HubMissionWithBarEvent {
         set("$sep_sar_survivorAlive", this.survivorAlive);
         set("$sep_sar_survivorPostType", this.survivorPostType);
         set("$sep_sar_entityType", this.entityType);
+        set("$sep_sar_creditReward", Misc.getDGSCredits(getCreditsReward()));
+
+        String loc = BreadcrumbSpecial.getLocationDescription(this.entity, false);
+        set("$sep_sar_possibleLoc", loc);
 
         set("$sep_sar_survivorFullName", this.survivor.getNameString());
         set("$sep_sar_survivorFirstName", this.survivor.getName().getFirst());
@@ -247,10 +251,8 @@ public class SearchAndRescueMission extends HubMissionWithBarEvent {
     @Override
     public void addDescriptionForNonEndStage(TooltipMakerAPI info, float width, float height) {
         if (this.currentStage == Stage.FIND) {
-            String loc = BreadcrumbSpecial.getLocatedString(this.entity);
-            loc = loc.replaceAll("orbiting", "near");
-            loc = loc.replaceAll("located in ", "near ");
-            info.addPara("Search for %s " + loc, 10f, Misc.getHighlightColor(), this.survivor.getNameString());
+            String loc = BreadcrumbSpecial.getLocationDescription(this.entity, false);
+            info.addPara("Search for %s in " + loc, 10f, Misc.getHighlightColor(), this.survivor.getNameString());
         } else if (this.currentStage == Stage.RETURN) {
             info.addPara("Return with %s to " + getPerson().getMarket().getName() + " in the "
                             + getPerson().getMarket().getStarSystem().getNameWithLowercaseTypeShort()

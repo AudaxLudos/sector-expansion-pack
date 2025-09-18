@@ -5,6 +5,24 @@
       "survivorType": "OFFICER", # OFFICER, ADMINISTRATOR, CIVILIAN, RANDOM
       "entityType": "WRECK", # WRECK, FLEET, PLANET
 
+      # Start dialog texts
+      "contactMissionBlurb": "Add the following to your custom scenario object within sep_mission_scenarios.json file:\n\n\"contactMissionBlurb\":\"SAMPLE TEXT\"",
+      "contactMissionOfferText": "Add the following to your custom scenario object within sep_mission_scenarios.json file:\n\n\"contactMissionOfferText\":\"SAMPLE TEXT\"",
+      "barMissionBlurb": "Add the following to your custom scenario object within sep_mission_scenarios.json file:\n\n\"barMissionBlurb\":\"SAMPLE TEXT\"",
+      "barMissionOfferText": "Add the following to your custom scenario object within sep_mission_scenarios.json file:\n\n\"barMissionOfferText\":\"SAMPLE TEXT\"",
+
+      # WRECK or PLANET or FLEET entity interaction texts
+      "entityDialogText": "Add the following to your custom scenario object within sep_mission_scenarios.json file:\n\n\"entityDialogText\":\"SAMPLE TEXT\"",
+      # After WRECK or PLANET entity interaction texts
+      "survivorAliveText": "Add the following to your custom scenario object within sep_mission_scenarios.json file:\n\n\"survivorAliveText\":\"SAMPLE TEXT\"",
+      "survivorDeadText": "Add the following to your custom scenario object within sep_mission_scenarios.json file:\n\n\"survivorDeadText\":\"SAMPLE TEXT\"",
+
+      # FLEET entity interaction texts
+      "entityPayRansomText": "Add the following to your custom scenario object within sep_mission_scenarios.json file:\n\n\"entityPayRansomText\":\"SAMPLE TEXT\"",
+      "entityFightText": "Add the following to your custom scenario object within sep_mission_scenarios.json file:\n\n\"entityFightText\":\"SAMPLE TEXT\"",
+      "entityDeclineText": "Add the following to your custom scenario object within sep_mission_scenarios.json file:\n\n\"entityDeclineText\":\"SAMPLE TEXT\"",
+      "entityDefeatedText": "Add the following to your custom scenario object within sep_mission_scenarios.json file:\n\n\"entityDefeatedText\":\"SAMPLE TEXT\"",
+
       # Ending dialog texts
       "returnSurvivorAliveText": "You report to $PersonPost $personName about the success of your mission, bringing the good news that $sep_sar_survivorFullName was found alive and safely recovered.\n\nAfterward, you order your chief security officer to escort $sep_sar_survivorFullName to a safe location, while you provide a full report detailing the mission and the circumstances of the rescue before receiving your reward.\n\nBut before you could continue speaking with $personName, $sep_sar_survivorFullName contacts you.",
       "survivorDialogText": "\"Captain,\" $sep_sar_survivorHeOrShe says, \"thank you for saving me. I spoke with my fa... superior, and he wants to give you a greater reward for bringing me back home.\" \n\n$sep_sar_survivorHeOrShe pauses for a moment. \"Also, if you're hiring, it would be an honor to work with you. I've mostly recovered and convinced my superior to let me go. Now I just need to file a bit of paperwork, so if you ever get the chance, my contact information will be in your directory.\"\n\nHe thanks you once more before ending the connection.",
@@ -12,23 +30,22 @@
     },
     "scenarios": [
       {
-        "weight": -1,
         "survivorType": "OFFICER", # OFFICER, ADMINISTRATOR, CIVILIAN 
         "entityType": "WRECK", # WRECK, FLEET, PLANET
 
         # Start dialog texts
-        "contactMissionOfferText": "SAMPLE: CONTACT MISSION OFFER TEXT", 
+        "contactMissionOfferText": "\"$sep_sar_survivorFullName, a relative of a ranking official, was sent on a mission by the $Faction and was due to return over a week ago, but $sep_sar_survivorHeOrShe never arrived,\" $PersonPost $personName says as $heOrShe sends a shared intel briefing to your tripad.\n\n\"Data from the fleet's last transmission places them in $sep_sar_possibleLoc, but reports indicate that the fleet was attacked by an unknown force. Still, the official refuses to believe $sep_sar_survivorFirstName is gone and is offering $sep_sar_creditReward for $sep_sar_survivorHisOrHer safe return, if possible.\"\n\nGeneral Kyugu leans back slightly before adding, \"A fool's errand, perhaps, but if luck is on your side, the pay will be good. Are you interested?\"", 
         "barMissionOfferText": "SAMPLE: BAR MISSION OFFER TEXT",
 
         # WRECK entity interaction texts
-        "entityDialogText": "WRECK SAMPLE: RESCUE SURVIVOR TEXT",
+        "entityDialogText": "While searching empty space and drifting wreckage, your sensor officer detects a weak life signature aboard a derelict ship and promptly sends a rescue signal across all frequencies but receives no response.\n\nWithout hesitation, you direct your chief salvage operator and chief medical officer to plan and conduct a rescue mission.",
 
         # After entity interaction texsts
-        "survivorAliveText": "SAMPLE: SURVIVOR ALIVE TEXT",
-        "survivorDeadText": "SAMPLE: SURVIVOR DEAD TEXT",
+        "survivorAliveText": "A short time later, your officers find the survivor and recognize him as our rescue target, $sep_sar_survivorFullName. Luckily $sep_sar_survivorHeOrShe is alive, and according to your chief medical officer, $sep_sar_survivorHeOrShe is comatose and exhibits obvious symptoms of malnutrition, but he will survive.",
+        "survivorDeadText": "A short time later, your officers find the survivor and recognize him as our rescue target, $sep_sar_survivorFullName. Unfortunately, $sep_sar_survivorHeOrShe is dead, and according to your chief medical officer, $sep_sar_survivorHeOrShe died of extreme malnutrition and oxygen deprivation.",
       },
       {
-        "weight": 100,
+        "weight": -1,
         "survivorType": "OFFICER", # OFFICER, ADMINISTRATOR, CIVILIAN 
         "entityType": "FLEET", # WRECK, FLEET, PLANET
 
