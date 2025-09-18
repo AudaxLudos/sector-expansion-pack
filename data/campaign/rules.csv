@@ -4,14 +4,16 @@ id,trigger,conditions,script,text,options,notes
 sep_survivorGreeting,PickGreeting,"$sep_survivor score:1000
 $ome_hireable score:100","ShowPersonVisual
 FireAll PopulateOptionsHire",RESCUED/SURVIVOR GREETING,,
-sep_survivorAskHireOfficer,DialogOptionSelected,$option == ome_askHire,"AddText ""\""You saved my life, and I’ll never forget that. Serving under you would mean a great deal, so I won’t ask for a hiring bonus and am willing to start at a reduced salary of $ome_salary credits per month, half the standard rate. If you accept, I’ll be ready to board within the hour.\""""
+sep_survivorAskHireOfficer,DialogOptionSelected,"$sep_survivor score:1000
+$option == ome_askHire","AddText ""\""You saved my life, and I’ll never forget that. Serving under you would mean a great deal, so I won’t ask for a hiring bonus and am willing to start at a reduced salary of $ome_salary credits per month, half the standard rate. If you accept, I’ll be ready to board within the hour.\""""
 SetTextHighlightColors hColor hColor
 SetTextHighlights $ome_hiringBonus $ome_salary
 AddText ""You have $player.creditsStr credits available.""
 SetTextHighlightColors hColor
 SetTextHighlights $player.creditsStr
 FireBest HireOptionSet",,,
-sep_survivorAskHireAdmin,DialogOptionSelected,"$option == ome_askHire
+sep_survivorAskHireAdmin,DialogOptionSelected,"$sep_survivor score:1000
+$option == ome_askHire
 $ome_isAdmin","AddText ""\""You saved my life, and I’ll never forget that. Serving under you would mean a great deal, so I won’t ask for a hiring bonus and am willing to start at a reduced salary of $ome_salary credits per month, half the standard rate. If you accept, I’ll await my assignment at your pleasure.\""""
 SetTextHighlightColors hColor hColor
 SetTextHighlights $ome_hiringBonus $ome_salary
@@ -24,23 +26,36 @@ FireBest HireOptionSet",,,
 "# Search and rescue mission
 # START",,,,,,
 # Offered by contact,,,,,,
-sep_sar_blurb,sep_sar_blurb,,,CONTACT MISSION BLURB,,
+sep_sar_blurb,sep_sar_blurb,,AddText $sep_sar_contactMissionBlurb,,,
 sep_sar_offerOption,sep_sar_option,,,,sep_sar_start:CONTACT ASK OPTION,
 sep_sar_offerTextContact1,DialogOptionSelected,$option == sep_sar_start,"$missionId = sep_sar
 AddText $sep_sar_contactMissionOfferText",,"contact_accept:ACCEPT
 contact_decline:DECLINE",
 # Offered in bar,,,,,,
-sep_sar_blurbBar,sep_sar_blurbBar,,,BAR MISSION BLURB,,
+sep_sar_blurbBar,sep_sar_blurbBar,,AddText $sep_sar_barMissionBlurb,,,
 sep_sar_offerOptionBar,sep_sar_optionBar,,,,sep_sar_startBar:BAR ASK OPTION,
-sep_sar_offerTextBar1,DialogOptionSelected,$option == sep_sar_startBar,$missionId = sep_sar,BAR MISSION OFFER TEXT,"contact_acceptBar:ACCEPT
+sep_sar_offerTextBar1,DialogOptionSelected,$option == sep_sar_startBar,"$missionId = sep_sar
+AddText $sep_sar_barMissionOfferText",,"contact_acceptBar:ACCEPT
 contact_declineBarNoContinue:DECLINE",
 # Rescue survivor in wreck,,,,,,
 sep_sar_wreckRescueText,OpenInteractionDialog,"$sep_sar_survivorEntity score:1000
 Call $sep_sar_ref updateData","ShowDefaultVisual
-AddText $sep_sar_entityDialogText
-Call $sep_sar_ref checkSurvivorStatus",,sep_sar_checkSurvivorStatus:CONTINUE,
+FireAll SEPSAREntityOptions",,,
 sep_sar_fleetRescueText,OpenCommLink,"$entity.sep_sar_survivorEntity score:1000
-Call $entity.sep_sar_ref updateData",AddText $sep_sar_entityDialogText,,"sep_sar_payRansom:PAY RANSOM
+Call $entity.sep_sar_ref updateData","ShowDefaultVisual
+FireAll SEPSAREntityOptions", ,,
+sep_sar_entityInitialDialog,SEPSAREntityOptions,,AddText $sep_sar_entityDialogText,,,
+sep_sar_entityWreckOpt,SEPSAREntityOptions,$sep_sar_entityType == WRECK score:1000,Call $sep_sar_ref checkSurvivorStatus,,sep_sar_checkSurvivorStatus:CONTINUE,
+sep_sar_entityPlanetOpt,SEPSAREntityOptions,$sep_sar_entityType == PLANET score:1000,Call $sep_sar_ref checkSurvivorStatus,,sep_sar_checkSurvivorStatus:CONTINUE,
+sep_sar_entitySurvivorDead,DialogOptionSelected,"$sep_sar_survivorAlive score:1000
+$option == sep_sar_checkSurvivorStatus","AddText $sep_sar_survivorAliveText
+$sep_sar_returnToContact = true
+Call $sep_sar_ref updateStage",,defaultLeave:END INTERACTION,
+sep_sar_entitySurvivorAlive,DialogOptionSelected,"!$sep_sar_survivorAlive score:1000
+$option == sep_sar_checkSurvivorStatus","AddText $sep_sar_survivorDeadText
+$sep_sar_returnToContact = true
+Call $sep_sar_ref updateStage",,defaultLeave:END INTERACTION,
+sep_sar_entityFleetOpt,SEPSAREntityOptions,$sep_sar_entityType == FLEET score:1000,,,"sep_sar_payRansom:PAY RANSOM
 sep_sar_beginFight:FIGHT
 sep_sar_declineRansom:DECLINE",
 sep_sar_fleetAcceptRansom,DialogOptionSelected,$option == sep_sar_payRansom,"AddText $sep_sar_entityPayRansomText
@@ -58,42 +73,24 @@ sep_sar_fleetDeclineRansom,DialogOptionSelected,$option == sep_sar_declineRansom
 MakeOtherFleetAllowDisengage sep_sar true
 MakeOtherFleetNonHostile sep_sar true
 MakeOtherFleetPreventDisengage sep_sar true",,cutCommLinkNoText:END INTERACTION,
-sep_sar_fleetDefeated,SEPSARFleetDefeated,$someShipsDestroyed,"$sep_sar_returnToContact = true
+sep_sar_fleetDefeated,SEPSARFleetDefeated,"$someShipsDestroyed
+Call $sep_sar_ref updateData","AddText $sep_sar_entityDefeatedText
+$sep_sar_returnToContact = true
 Call $sep_sar_ref updateStage",,,
-sep_sar_entitySurvivorDead,DialogOptionSelected,"$sep_sar_survivorAlive score:1000
-$option == sep_sar_checkSurvivorStatus","AddText $sep_sar_survivorAliveText
-$sep_sar_returnToContact = true
-Call $sep_sar_ref updateStage",,defaultLeave:END INTERACTION,
-sep_sar_entitySurvivorAlive,DialogOptionSelected,"!$sep_sar_survivorAlive score:1000
-$option == sep_sar_checkSurvivorStatus","AddText $sep_sar_survivorDeadText
-$sep_sar_returnToContact = true
-Call $sep_sar_ref updateStage",,defaultLeave:END INTERACTION,
 # Return survivor to contact,,,,,,
-sep_sar_returnSurvivorAliveA,PickGreeting,"$sep_sar_contactPerson score:1000
+sep_sar_returnGreeting,PickGreeting,"$sep_sar_contactPerson score:1000
 Call $sep_sar_ref updateData
-$sep_sar_survivorAlive score: 1000
-$sep_sar_survivorPostType == CIVILIAN score:1000
-FireBest GenericMissionReturn","AddText $sep_sar_returnSurvivorAliveText
-ShowPersonVisual
-$sep_sar_completed = true
+FireBest GenericMissionReturn","ShowPersonVisual
+FireAll SEPSARContactOptions",,,
+sep_sar_returnSurvivorAlive,SEPSARContactOptions,$sep_sar_survivorAlive score:1000,AddText $sep_sar_returnSurvivorAliveText,,,
+sep_sar_returnSurvivorAliveA,SEPSARContactOptions,$sep_sar_survivorPostType == CIVILIAN score:1000,"$sep_sar_completed = true
 Call $sep_sar_ref updateStage",,contact_pickAnotherGreeting:END MISSION,
-sep_sar_returnSurvivorAliveB,PickGreeting,"$sep_sar_contactPerson score:1000
-Call $sep_sar_ref updateData
-$sep_sar_survivorAlive score: 1000
-$sep_sar_survivorPostType != CIVILIAN score:1000
-FireBest GenericMissionReturn","AddText $sep_sar_returnSurvivorAliveText
-ShowPersonVisual",,sep_sar_talkToSurvivor:CONTINUE,
+sep_sar_returnSurvivorAliveB,SEPSARContactOptions,$sep_sar_survivorPostType != CIVILIAN score:1000,,,sep_sar_talkToSurvivor:CONTINUE,
 sep_sar_returnSurvivorAliveB1,DialogOptionSelected,$option == sep_sar_talkToSurvivor,"AddText $sep_sar_survivorDialogText
 Call $sep_sar_ref showSurvivorVisual
 $sep_sar_completed = true
 Call $sep_sar_ref updateStage",,contact_pickAnotherGreeting:END MISSION,
-sep_sar_returnSurvivorDead,PickGreeting,"$sep_sar_contactPerson score:1000
-Call $sep_sar_ref updateData
-!$sep_sar_survivorAlive score: 1000
-FireBest GenericMissionReturn","AddText $sep_sar_returnSurvivorDeadText
-ShowPersonVisual
-$sep_sar_completed = true
-Call $sep_sar_ref updateStage",,contact_pickAnotherGreeting:END MISSION,
+sep_sar_returnSurvivorDead,SEPSARContactOptions,!$sep_sar_survivorAlive score:1000,AddText $sep_sar_returnSurvivorDeadText,,contact_pickAnotherGreeting:END MISSION,
 "# Search and rescue mission
 # END",,,,,,
 ,,,,,,

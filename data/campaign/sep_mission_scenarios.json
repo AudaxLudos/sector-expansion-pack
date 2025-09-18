@@ -22,12 +22,14 @@
       "returnSurvivorDeadText": "SAMPLE: RETURN SURVIVOR DEAD TEXT"
     },
     {
-      "weight": -1,
+      "weight": 100,
       "survivorType": "OFFICER", # OFFICER, ADMINISTRATOR, CIVILIAN 
       "entityType": "FLEET", # WRECK, FLEET, PLANET
 
       # Start dialog texts
+      "contactMissionBlurb": "SAMPLE: CONTACT MISSION BLURB",
       "contactMissionOfferText": "SAMPLE: CONTACT MISSION OFFER TEXT",
+      "barMissionBlurb": "SAMPLE: BAR MISSION OFFER BLURB",
       "barMissionOfferText": "SAMPLE: BAR MISSION OFFER TEXT",
 
       # FLEET entity interaction texts
@@ -35,6 +37,7 @@
       "entityPayRansomText": "FLEET SAMPLE: SAVE SURVIVOR BY PAYING RANSOM",
       "entityFightText": "FLEET SAMPLE: SAVE SURVIVOR BY FIGHTING FLEET",
       "entityDeclineText": "FLEET SAMPLE: GO BACK",
+      "entityDefeatedText": "FLEET SAMPLE: SAVE SURVIVOR TEXT",
 
       # After entity interaction texsts
       "survivorAliveText": "SAMPLE: SURVIVOR ALIVE TEXT",

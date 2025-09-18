@@ -15,8 +15,7 @@ public class ModPlugin extends BaseModPlugin {
     @Override
     public void onGameLoad(boolean newGame) {
         try {
-            JSONObject data = null;
-            data = Global.getSettings().loadJSON("data/campaign/sep_mission_scenarios.json");
+            JSONObject data = Global.getSettings().loadJSON("data/campaign/sep_mission_scenarios.json");
             JSONArray scenarios = data.getJSONArray("sep_sar");
             for (int i = 0; i < scenarios.length(); i++) {
                 JSONObject scenario = scenarios.getJSONObject(i);

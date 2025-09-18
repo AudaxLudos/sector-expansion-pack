@@ -24,6 +24,7 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 // TODO: Add bonus reward for returning survivor alive
 public class SearchAndRescueMission extends HubMissionWithBarEvent {
@@ -41,7 +42,8 @@ public class SearchAndRescueMission extends HubMissionWithBarEvent {
     @Override
     protected boolean create(MarketAPI createdAt, boolean barEvent) {
         try {
-            this.scenarioData = ModPlugin.SEP_SAR_SCENARIOS.pick();
+            this.genRandom = new Random(Long.parseLong(Global.getSector().getSeedString().replaceAll("\\D", "")));
+            this.scenarioData = ModPlugin.SEP_SAR_SCENARIOS.pick(this.genRandom);
             if (this.scenarioData == null) {
                 log.info("No scenario data found");
                 return false;
@@ -165,6 +167,8 @@ public class SearchAndRescueMission extends HubMissionWithBarEvent {
             // TODO: Make this reward modifiable using the scenario settings
             setCreditReward(CreditReward.HIGH);
 
+            // TODO: Add mission complications
+
             return true;
         } catch (JSONException e) {
             log.error(e);
@@ -192,14 +196,19 @@ public class SearchAndRescueMission extends HubMissionWithBarEvent {
         set("$sep_sar_survivorHimOrHer", this.survivor.getHimOrHer());
         set("$sep_sar_survivorManOrWoman", this.survivor.getManOrWoman());
 
-        set("$sep_sar_barMissionOfferText", getDialogText("barMissionOfferText"));
+        set("$sep_sar_contactMissionBlurb", getDialogText("contactMissionBlurb"));
         set("$sep_sar_contactMissionOfferText", getDialogText("contactMissionOfferText"));
+        set("$sep_sar_barMissionBlurb", getDialogText("barMissionBlurb"));
+        set("$sep_sar_barMissionOfferText", getDialogText("barMissionOfferText"));
+
         set("$sep_sar_entityDialogText", getDialogText("entityDialogText"));
         set("$sep_sar_entityPayRansomText", getDialogText("entityPayRansomText"));
         set("$sep_sar_entityFightText", getDialogText("entityFightText"));
         set("$sep_sar_entityDeclineText", getDialogText("entityDeclineText"));
+        set("$sep_sar_entityDefeatedText", getDialogText("entityDefeatedText"));
         set("$sep_sar_survivorAliveText", getDialogText("survivorAliveText"));
         set("$sep_sar_survivorDeadText", getDialogText("survivorDeadText"));
+
         set("$sep_sar_returnSurvivorAliveText", getDialogText("returnSurvivorAliveText"));
         set("$sep_sar_survivorDialogText", getDialogText("survivorDialogText"));
         set("$sep_sar_returnSurvivorDeadText", getDialogText("returnSurvivorDeadText"));
