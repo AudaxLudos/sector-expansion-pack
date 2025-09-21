@@ -197,8 +197,11 @@ public class SearchAndRescueMission extends HubMissionWithBarEvent {
         set("$sep_sar_survivorManOrWoman", this.survivor.getManOrWoman());
 
         set("$sep_sar_contactMissionBlurb", getDialogText("contactMissionBlurb"));
+        set("$sep_sar_contactMissionOption", getDialogText("contactMissionOption"));
         set("$sep_sar_contactMissionOfferText", getDialogText("contactMissionOfferText"));
+
         set("$sep_sar_barMissionBlurb", getDialogText("barMissionBlurb"));
+        set("$sep_sar_barMissionOption", getDialogText("barMissionOption"));
         set("$sep_sar_barMissionOfferText", getDialogText("barMissionOfferText"));
 
         set("$sep_sar_entityDialogText", getDialogText("entityDialogText"));
