@@ -94,7 +94,7 @@
         "survivorDeadText": "SAMPLE: SURVIVOR DEAD TEXT",
       },
       {
-        "weight": 100,
+        "weight": -1,
         "survivorType": "ADMINISTRATOR", # OFFICER, ADMINISTRATOR, CIVILIAN 
         "entityType": "PLANET_RAID", # WRECK, FLEET, PLANET
 
@@ -111,6 +111,25 @@
         # FLEET entity interaction texts
         "entityDialogText": "PLANET RAID SAMPLE: PLANET INTERACTION TEXT",
         "entityRaidFinishedText": "PLANET RAID SAMPLE: RAID FINISHED TEXT"
+      },
+      {
+        "weight": 100,
+        "survivorType": "RANDOM", # OFFICER, ADMINISTRATOR, CIVILIAN 
+        "entityType": "MARKET", # WRECK, FLEET, PLANET, MARKET
+
+        # Start contact dialog texts
+        "contactMissionBlurb": "MARKET RAID SAMPLE: MISSION BLURB",
+        "contactMissionOption": "MARKET RAID SAMPLE: MISSION OPTION",
+        "contactMissionOfferText": "MARKET RAID SAMPLE: MISSION OFFER TEXT", 
+
+        # Start bar dialog texts
+        "barMissionBlurb": "MARKET RAID SAMPLE: BAR BLURB",
+        "barMissionOption": "MARKET RAID SAMPLE: BAR OPTION",
+        "barMissionOfferText": "MARKET RAID SAMPLE: BAR OFFER TEXT",
+
+        # FLEET entity interaction texts
+        "entityDialogText": "MARKET RAID SAMPLE: MARKET INTERACTION TEXT",
+        "entityRaidFinishedText": "MARKET RAID SAMPLE: RAID FINISHED TEXT"
       }
     ]
   }

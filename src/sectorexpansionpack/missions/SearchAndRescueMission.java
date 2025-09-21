@@ -133,6 +133,11 @@ public class SearchAndRescueMission extends HubMissionWithBarEvent {
                     preferPlanetUnpopulated();
                     this.entity = pickPlanet();
                     break;
+                case MARKET:
+                    requireMarketNotHidden();
+                    preferMarketFactionHostileTo(getPerson().getFaction().getId());
+                    this.entity = pickMarket().getPrimaryEntity();
+                    break;
                 default:
                     this.entity = null;
                     break;

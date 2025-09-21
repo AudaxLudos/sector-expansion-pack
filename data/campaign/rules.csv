@@ -48,7 +48,8 @@ SetTextHighlights $sep_sar_survivorFullName $sep_sar_possibleLoc $sep_sar_credit
 contact_declineBarNoContinue:Decline",
 # Rescue survivor in wreck,,,,,,
 sep_sar_wreckRescueText,OpenInteractionDialog,"$sep_sar_survivorEntity score:1000
-Call $sep_sar_ref updateData","ShowDefaultVisual
+Call $sep_sar_ref updateData
+!$sep_sar_addedRaidObjective","ShowDefaultVisual
 FireAll SEPSAREntityOptions",,,
 sep_sar_fleetRescueText,OpenCommLink,"$entity.sep_sar_survivorEntity score:1000
 Call $entity.sep_sar_ref updateData","ShowDefaultVisual
@@ -68,6 +69,11 @@ SetTextHighlightColors h
 SetTextHighlights $sep_sar_survivorFullName
 $sep_sar_returnToContact = true
 Call $sep_sar_ref updateStage",,defaultLeave:Leave,
+sep_sar_entityMarketRaidBegin,SEPSAREntityOptions,"$sep_sar_entityType == MARKET score:1000
+!$sep_sar_addedRaidObjective","AddRaidObjective genericIcon ""Rescue $sep_sar_survivorFullName"" LOW 5000 SEPSARRaidFinished
+$sep_sar_addedRaidObjective = true
+FireBest OpenInteractionDialog",,"mktRaidNonMarket:Consider a ground operation to retrieve the data
+defaultLeave:Leave",
 sep_sar_entityPlanetRaidBegin,SEPSAREntityOptions,$sep_sar_entityType == PLANET_RAID score:1000,FireBest SEPSARRaidBegin,,"mktRaidNonMarket:Consider a ground operation to retrieve the data
 defaultLeave:Leave",
 sep_sar_entityPlanetRaidAdd,SEPSARRaidBegin,,"$raidDifficulty = 100
