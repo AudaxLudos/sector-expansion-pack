@@ -72,17 +72,16 @@ public class SearchAndRescueMission extends HubMissionWithBarEvent {
             }
 
             this.survivorPostType = PersonPostType.valueOf(this.scenarioData.getString("survivorType"));
-            switch (this.survivorPostType) {
-                case OFFICER -> {
-                    this.survivor = OfficerManagerEvent.createOfficer(createdAt.getFaction(), 1, OfficerManagerEvent.SkillPickPreference.ANY, this.genRandom);
-                    this.survivor.setPostId(Ranks.POST_OFFICER_FOR_HIRE);
-                }
-                case ADMINISTRATOR -> {
-                    this.survivor = OfficerManagerEvent.createAdmin(createdAt.getFaction(), 1, this.genRandom);
-                }
-                default -> {
-                    this.survivor = createdAt.getFaction().createRandomPerson(this.genRandom);
-                }
+            if (this.survivorPostType == PersonPostType.RANDOM) {
+                this.survivorPostType = (PersonPostType) pickOneObject(Arrays.asList(PersonPostType.OFFICER, PersonPostType.ADMINISTRATOR, PersonPostType.CIVILIAN));
+            }
+            if (this.survivorPostType == PersonPostType.OFFICER) {
+                this.survivor = OfficerManagerEvent.createOfficer(createdAt.getFaction(), 1, OfficerManagerEvent.SkillPickPreference.ANY, this.genRandom);
+                this.survivor.setPostId(Ranks.POST_OFFICER_FOR_HIRE);
+            } else if (this.survivorPostType == PersonPostType.ADMINISTRATOR) {
+                this.survivor = OfficerManagerEvent.createAdmin(createdAt.getFaction(), 1, this.genRandom);
+            } else {
+                this.survivor = createdAt.getFaction().createRandomPerson(this.genRandom);
             }
 
             if (this.survivor == null) {
