@@ -68,6 +68,16 @@ SetTextHighlightColors h
 SetTextHighlights $sep_sar_survivorFullName
 $sep_sar_returnToContact = true
 Call $sep_sar_ref updateStage",,defaultLeave:Leave,
+sep_sar_entityPlanetRaidBegin,SEPSAREntityOptions,$sep_sar_entityType == PLANET_RAID score:1000,FireBest SEPSARRaidBegin,,"mktRaidNonMarket:Consider a ground operation to retrieve the data
+defaultLeave:Leave",
+sep_sar_entityPlanetRaidAdd,SEPSARRaidBegin,,"$raidDifficulty = 100
+$raidGoBackTrigger = SEPSARRaidBegin
+$raidRestrictToTrigger = SEPSARRaidFinished
+AddRaidObjective genericIcon ""Rescue $sep_sar_survivorFullName"" LOW 5000 SEPSARRaidFinished true",,"mktRaidNonMarket:Rescue $sep_sar_survivorFullName
+defaultLeave:Leave",
+sep_sar_entityPlanetRaidFinished,SEPSARRaidFinished,Call $sep_sar_ref updateData,"AddText $sep_sar_entityRaidFinishedText
+$sep_sar_returnToContact = true
+Call $sep_sar_ref updateStage",,,
 sep_sar_entityFleetOpt,SEPSAREntityOptions,$sep_sar_entityType == FLEET score:1000,,,"sep_sar_payRansom:PAY RANSOM
 sep_sar_beginFight:FIGHT
 sep_sar_declineRansom:DECLINE",

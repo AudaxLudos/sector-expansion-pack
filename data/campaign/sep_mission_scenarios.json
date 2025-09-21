@@ -91,6 +91,25 @@
         # After entity interaction texsts
         "survivorAliveText": "SAMPLE: SURVIVOR ALIVE TEXT",
         "survivorDeadText": "SAMPLE: SURVIVOR DEAD TEXT",
+      },
+      {
+        "weight": 100,
+        "survivorType": "ADMINISTRATOR", # OFFICER, ADMINISTRATOR, CIVILIAN 
+        "entityType": "PLANET_RAID", # WRECK, FLEET, PLANET
+
+        # Start contact dialog texts
+        "contactMissionBlurb": "PLANET RAID SAMPLE: MISSION BLURB",
+        "contactMissionOption": "PLANET RAID SAMPLE: MISSION OPTION",
+        "contactMissionOfferText": "PLANET RAID SAMPLE: MISSION OFFER TEXT", 
+
+        # Start bar dialog texts
+        "barMissionBlurb": "PLANET RAID SAMPLE: BAR BLURB",
+        "barMissionOption": "PLANET RAID SAMPLE: BAR OPTION",
+        "barMissionOfferText": "PLANET RAID SAMPLE: BAR OFFER TEXT",
+
+        # FLEET entity interaction texts
+        "entityDialogText": "PLANET RAID SAMPLE: PLANET INTERACTION TEXT",
+        "entityRaidFinishedText": "PLANET RAID SAMPLE: RAID FINISHED TEXT"
       }
     ]
   }

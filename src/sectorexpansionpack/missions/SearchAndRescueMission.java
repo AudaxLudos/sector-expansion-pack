@@ -14,6 +14,7 @@ import com.fs.starfarer.api.impl.campaign.ids.*;
 import com.fs.starfarer.api.impl.campaign.missions.hub.HubMissionWithBarEvent;
 import com.fs.starfarer.api.impl.campaign.missions.hub.ReqMode;
 import com.fs.starfarer.api.impl.campaign.procgen.Constellation;
+import com.fs.starfarer.api.impl.campaign.rulecmd.salvage.MarketCMD;
 import com.fs.starfarer.api.impl.campaign.rulecmd.salvage.special.BreadcrumbSpecial;
 import com.fs.starfarer.api.ui.SectorMapAPI;
 import com.fs.starfarer.api.ui.TooltipMakerAPI;
@@ -33,7 +34,6 @@ public class SearchAndRescueMission extends HubMissionWithBarEvent {
     // TODO: Make mission days modifiable using the scenario settings
     protected float missionDays = 120f;
     protected JSONObject scenarioData;
-    protected ScenarioType scenarioType;
     protected PersonPostType survivorPostType;
     protected PersonAPI survivor;
     protected boolean survivorAlive = true;
@@ -94,12 +94,12 @@ public class SearchAndRescueMission extends HubMissionWithBarEvent {
 
             this.entityType = EntityType.valueOf(this.scenarioData.getString("entityType"));
             switch (this.entityType) {
-                case WRECK -> {
+                case WRECK:
                     requireEntityTags(ReqMode.ALL, Tags.SALVAGEABLE);
                     requireEntityType(Entities.WRECK);
                     this.entity = pickEntity();
-                }
-                case FLEET -> {
+                    break;
+                case FLEET:
                     requireSystemHasSafeStars();
                     requireSystemTags(ReqMode.NOT_ALL, Tags.THEME_UNSAFE);
                     preferPlanetNotFullySurveyed();
@@ -126,17 +126,18 @@ public class SearchAndRescueMission extends HubMissionWithBarEvent {
 
                     List<CampaignFleetAPI> fleets = runStageTriggersReturnFleets(Stage.FIND);
                     this.entity = fleets.get(0);
-                }
-                case PLANET -> {
+                    break;
+                case PLANET_RAID:
+                case PLANET:
                     requireSystemInterestingAndNotCore();
                     preferPlanetNotFullySurveyed();
                     preferPlanetUnpopulated();
                     preferPlanetWithRuins();
                     this.entity = pickPlanet();
-                }
-                default -> {
+                    break;
+                default:
                     this.entity = null;
-                }
+                    break;
             }
 
             if (!setEntityMissionRef(this.entity, "$sep_sar_ref")) {
@@ -179,14 +180,12 @@ public class SearchAndRescueMission extends HubMissionWithBarEvent {
 
     @Override
     protected void updateInteractionDataImpl() {
-        set("$sep_sar_scenarioType", this.scenarioType);
         set("$sep_sar_survivorAlive", this.survivorAlive);
         set("$sep_sar_survivorPostType", this.survivorPostType);
         set("$sep_sar_entityType", this.entityType);
         set("$sep_sar_creditReward", Misc.getDGSCredits(getCreditsReward()));
-
-        String loc = BreadcrumbSpecial.getLocationDescription(this.entity, false);
-        set("$sep_sar_possibleLoc", loc);
+        set("$sep_sar_danger", MarketCMD.RaidDangerLevel.MEDIUM);
+        set("$sep_sar_possibleLoc", BreadcrumbSpecial.getLocationDescription(this.entity, false));
 
         set("$sep_sar_survivorFullName", this.survivor.getNameString());
         set("$sep_sar_survivorFirstName", this.survivor.getName().getFirst());
@@ -347,11 +346,7 @@ public class SearchAndRescueMission extends HubMissionWithBarEvent {
         WRECK,
         FLEET,
         PLANET,
-        MARKET
-    }
-
-    public enum ScenarioType {
-        KIDNAPPING,
-        STRANDED
+        MARKET,
+        PLANET_RAID
     }
 }
