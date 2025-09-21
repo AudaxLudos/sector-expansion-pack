@@ -107,7 +107,8 @@ FireBest GenericMissionReturn","ShowPersonVisual
 FireAll SEPSARContactOptions",,,
 sep_sar_returnSurvivorAlive,SEPSARContactOptions,$sep_sar_survivorAlive score:1000,"AddText $sep_sar_returnSurvivorAliveText
 SetTextHighlightColors h
-SetTextHighlights $sep_sar_survivorFullName",,,
+SetTextHighlights $sep_sar_survivorFullName
+Call $sep_sar_ref addBonusCreditReward",,,
 sep_sar_returnSurvivorAliveA,SEPSARContactOptions,$sep_sar_survivorPostType == CIVILIAN score:1000,"$sep_sar_completed = true
 Call $sep_sar_ref updateStage",,contact_pickAnotherGreeting:Continue,
 sep_sar_returnSurvivorAliveB,SEPSARContactOptions,$sep_sar_survivorPostType != CIVILIAN score:1000,,,sep_sar_talkToSurvivor:Continue,

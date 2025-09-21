@@ -1,5 +1,6 @@
 {
   "sep_sar": {
+    # TODO: Add at least 10 different scenarios
     "defaults": {
       "weight": 10, # Probabilty that this scenario will be selected -1 value wont be selected
       "survivorType": "RANDOM", # OFFICER, ADMINISTRATOR, CIVILIAN, RANDOM

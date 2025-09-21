@@ -28,7 +28,6 @@ import java.awt.*;
 import java.util.*;
 import java.util.List;
 
-// TODO: Add bonus reward for returning survivor alive
 public class SearchAndRescueMission extends HubMissionWithBarEvent {
     public static Logger log = Global.getLogger(SearchAndRescueMission.class);
     // TODO: Make mission days modifiable using the scenario settings
@@ -132,7 +131,6 @@ public class SearchAndRescueMission extends HubMissionWithBarEvent {
                     requireSystemInterestingAndNotCore();
                     preferPlanetNotFullySurveyed();
                     preferPlanetUnpopulated();
-                    preferPlanetWithRuins();
                     this.entity = pickPlanet();
                     break;
                 default:
@@ -210,6 +208,7 @@ public class SearchAndRescueMission extends HubMissionWithBarEvent {
         set("$sep_sar_entityDefeatedText", getDialogText("entityDefeatedText"));
         set("$sep_sar_survivorAliveText", getDialogText("survivorAliveText"));
         set("$sep_sar_survivorDeadText", getDialogText("survivorDeadText"));
+        set("$sep_sar_entityRaidFinishedText", getDialogText("entityRaidFinishedText"));
 
         set("$sep_sar_returnSurvivorAliveText", getDialogText("returnSurvivorAliveText"));
         set("$sep_sar_survivorDialogText", getDialogText("survivorDialogText"));
@@ -272,6 +271,9 @@ public class SearchAndRescueMission extends HubMissionWithBarEvent {
             return this.survivorAlive;
         } else if (action.equals("showSurvivorVisual")) {
             dialog.getVisualPanel().showPersonInfo(this.survivor);
+            return true;
+        } else if (action.equals("addBonusCreditReward")) {
+            setCreditReward(getCreditsReward() + CreditReward.VERY_LOW.min);
             return true;
         }
 
@@ -338,6 +340,7 @@ public class SearchAndRescueMission extends HubMissionWithBarEvent {
     public enum PersonPostType {
         OFFICER,
         ADMINISTRATOR,
+        CONTACT,
         CIVILIAN,
         RANDOM
     }
