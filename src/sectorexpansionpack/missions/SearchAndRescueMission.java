@@ -24,10 +24,8 @@ import org.json.JSONObject;
 import sectorexpansionpack.ModPlugin;
 
 import java.awt.*;
-import java.util.ArrayList;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
-import java.util.Random;
 
 // TODO: Add bonus reward for returning survivor alive
 public class SearchAndRescueMission extends HubMissionWithBarEvent {

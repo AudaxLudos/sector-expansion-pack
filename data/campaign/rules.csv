@@ -42,6 +42,8 @@ sep_sar_blurbBar,sep_sar_blurbBar,,AddText $sep_sar_barMissionBlurb,,,
 sep_sar_offerOptionBar,sep_sar_optionBar,,,,sep_sar_startBar:BAR ASK OPTION,
 sep_sar_offerTextBar1,DialogOptionSelected,$option == sep_sar_startBar,"$missionId = sep_sar
 AddText $sep_sar_barMissionOfferText
+SetTextHighlightColors h h h
+SetTextHighlights $sep_sar_survivorFullName $sep_sar_possibleLoc $sep_sar_creditReward
 ",,"contact_acceptBar:Accept
 contact_declineBarNoContinue:Decline",
 # Rescue survivor in wreck,,,,,,
