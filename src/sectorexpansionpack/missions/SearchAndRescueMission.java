@@ -20,6 +20,7 @@ import com.fs.starfarer.api.ui.SectorMapAPI;
 import com.fs.starfarer.api.ui.TooltipMakerAPI;
 import com.fs.starfarer.api.util.Misc;
 import org.apache.log4j.Logger;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import sectorexpansionpack.ModPlugin;
@@ -129,6 +130,8 @@ public class SearchAndRescueMission extends HubMissionWithBarEvent {
                 case PLANET_RAID:
                 case PLANET:
                     requireSystemInterestingAndNotCore();
+                    requirePlanetNotGasGiant();
+                    requirePlanetNotStar();
                     preferPlanetNotFullySurveyed();
                     preferPlanetUnpopulated();
                     this.entity = pickPlanet();
@@ -164,8 +167,7 @@ public class SearchAndRescueMission extends HubMissionWithBarEvent {
 
             setTimeLimit(Stage.FAILED, this.missionDays, null, Stage.RETURN);
 
-            // TODO: Make this reward modifiable using the scenario settings
-            setCreditReward(CreditReward.HIGH);
+            setCreditReward(getScenarioCreditReward(false));
 
             // TODO: Add mission complications
 
@@ -278,7 +280,14 @@ public class SearchAndRescueMission extends HubMissionWithBarEvent {
             dialog.getVisualPanel().showPersonInfo(this.survivor);
             return true;
         } else if (action.equals("addBonusCreditReward")) {
-            setCreditReward(getCreditsReward() + CreditReward.VERY_LOW.min);
+            int creditRewardBonus;
+            try {
+                creditRewardBonus = getScenarioCreditReward(true);
+            } catch (JSONException e) {
+                log.error(e);
+                creditRewardBonus = getCreditRewardValue(CreditReward.LOW.min, CreditReward.LOW.max);
+            }
+            setCreditReward(getCreditsReward() + creditRewardBonus);
             return true;
         }
 
@@ -317,7 +326,9 @@ public class SearchAndRescueMission extends HubMissionWithBarEvent {
             if (constellation != null && map != null) {
                 entity = map.getConstellationLabelEntity(constellation);
             }
-            if (entity == null) entity = this.entity;
+            if (entity == null) {
+                entity = this.entity;
+            }
             return entity;
         }
         return super.getMapLocation(map);
@@ -332,6 +343,37 @@ public class SearchAndRescueMission extends HubMissionWithBarEvent {
         result.add(arrow);
 
         return result;
+    }
+
+    public Object getScenarioData(String id) throws JSONException {
+        Object result;
+        if (this.scenarioData.has(id)) {
+            result = this.scenarioData.get(id);
+        } else {
+            result = ModPlugin.getMissionScenarioDefaults(getMissionId()).getString(id);
+        }
+        return result;
+    }
+
+    public int getScenarioCreditReward(boolean isBonus) throws JSONException {
+        Object data = getScenarioData(!isBonus ? "creditReward" : "creditRewardBonus");
+        int result = 0;
+        if (data instanceof String value) {
+            CreditReward creditRewardType = CreditReward.valueOf(value);
+            result = getCreditRewardValue(creditRewardType.min, creditRewardType.max);
+        } else if (data instanceof Integer value) {
+            result = value;
+        }
+        return result;
+    }
+
+    public int getCreditRewardValue(int min, int max) {
+        int reward = min + this.genRandom.nextInt(max - min + 1);
+        reward = reward / 1000 * 1000;
+        if (reward > 100000) {
+            reward = reward / 10000 * 10000;
+        }
+        return reward;
     }
 
     public enum Stage {

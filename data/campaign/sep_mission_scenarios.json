@@ -3,6 +3,8 @@
     # TODO: Add at least 10 different scenarios
     "defaults": {
       "weight": 10, # Probabilty that this scenario will be selected -1 value wont be selected
+      "creditReward": "HIGH", # Can be number or one of the following: VERY_LOW, LOW, AVERAGE, HIGH, VERY_HIGH
+      "creditRewardBonus": "LOW", # Can be number or one of the following: VERY_LOW, LOW, AVERAGE, HIGH, VERY_HIGH
       "survivorType": "RANDOM", # OFFICER, ADMINISTRATOR, CIVILIAN, RANDOM
       "entityType": "WRECK", # WRECK, FLEET, PLANET
 
@@ -28,6 +30,9 @@
       "entityDeclineText": "In your custom scenario add this:\n\"entityDeclineText\":\"SAMPLE TEXT\"",
       "entityDefeatedText": "In your custom scenario add this:\n\"entityDefeatedText\":\"SAMPLE TEXT\"",
 
+      # MARKET or PLANET_RAID
+      "entityRaidFinishedText": "In your custom scenario add this:\n\"entityDefeatedText\":\"SAMPLE TEXT\"",
+
       # Ending dialog texts
       "returnSurvivorAliveText": "You report to $PersonPost $personName about the success of your mission, bringing the good news that $sep_sar_survivorFullName was found alive and safely recovered.\n\nAfterward, you order your chief security officer to escort $sep_sar_survivorFullName to a safe location, while you provide a full report detailing the mission and the circumstances of the rescue before receiving your reward.\n\nBut before you could continue speaking with $personName, $sep_sar_survivorFullName contacts you.",
       "survivorDialogText": "\"Captain,\" $sep_sar_survivorHeOrShe says, \"thank you for saving me. I spoke with my fa... superior, and he wants to give you a greater reward for bringing me back home.\" \n\n$sep_sar_survivorHeOrShe pauses for a moment. \"Also, if you're hiring, it would be an honor to work with you. I've mostly recovered and convinced my superior to let me go. Now I just need to file a bit of paperwork, so if you ever get the chance, my contact information will be in your directory.\"\n\nHe thanks you once more before ending the connection.",
@@ -41,7 +46,7 @@
         # Start contact dialog texts
         "contactMissionBlurb": "\"A ranking official has filed a search-and-rescue mission. It's a top priority, and they're offering a substantial credit reward.\"",
         "contactMissionOption": "Ask about the search and rescue mission",
-        "contactMissionOfferText": "\"$sep_sar_survivorFullName, a close relative of a ranking official, was part of a fleet that was due to return over a week ago, but the fleet never arrived. Fleet intel has marked the fleet as 'lost,' but the official refuses to accept that and insists $sep_sar_survivorLastName is still alive.\"\n\n$HeOrShe swipes upward on $hisOrHer tripad, sending a shared intel briefing to you. \"The fleet's last known heading was toward $sep_sar_possibleLoc, after which all contact was lost.\"\n\n$HeOrShe leans back slightly. \"Your task is to search the area and recover $sep_sar_survivorFullName, alive or dead. If successful, the official is offering $sep_sar_creditReward.\"\n\nAfter a pause, $heOrShe adds, \"A fool's errand, perhaps, but the pay is good. Are you interested?\"", 
+        "contactMissionOfferText": "\"$sep_sar_survivorFullName, a close relative of a ranking official, was part of a fleet that was due to return over a week ago, but the fleet never arrived. Fleet intel has marked the fleet as 'lost,' but the official refuses to accept that and insists $sep_sar_survivorLastName is still alive.\"\n\n$HeOrShe swipes upward on $hisOrHer tripad, sending a shared intel briefing to you. \"The fleet's last known heading was toward $sep_sar_possibleLoc, after which all contact was lost.\"\n\n$HeOrShe leans back slightly. \"Your task is to search the area and recover $sep_sar_survivorFullName, alive or dead. If successful, the official is offering $sep_sar_creditReward. Interested?\"", 
 
         # Start bar dialog texts
         "barMissionBlurb": "A gloomy $manOrWoman sits hunched over the bar, clutching a faded photo in $hisOrHer hands. $HisOrHer expression heavy with grief and stubborn hope.",
@@ -78,13 +83,19 @@
         "survivorDeadText": "SAMPLE: SURVIVOR DEAD TEXT",
       },
       {
-        "weight": -1,
-        "survivorType": "CIVILIAN", # OFFICER, ADMINISTRATOR, CIVILIAN 
+        "weight": 100,
+        "survivorType": "ADMINISTRATOR", # OFFICER, ADMINISTRATOR, CIVILIAN 
         "entityType": "PLANET", # WRECK, FLEET, PLANET
 
-        # Start dialog texts
-        "contactMissionOfferText": "SAMPLE: CONTACT MISSION OFFER TEXT",
-        "barMissionOfferText": "SAMPLE: BAR MISSION OFFER TEXT",
+        # Start contact dialog texts
+        "contactMissionBlurb": "\"Fleet Intel has filed a search-and-rescue mission for a survey fleet that failed to report back, with orders to recover survivors and secure their data.\"",
+        "contactMissionOption": "Ask about the missing survey fleet",
+        "contactMissionOfferText": "\"The fleet was sent out on a routine survey mission to chart resources and assess colonization prospects. Their course took them toward $sep_sar_possibleLoc, but all contact was lost en route.\"\n\n$HeOrShe looks through $hisOrHer tripad and continues, \"Fleet intel primarily suspects interference from hostile elements, while others cite navigation failures caused by hyperspace anomalies.\"\n\n$HeOrShe concludes, \"Either way, Fleet intel has authorized a reward of $sep_sar_creditReward to confirm the fleet's fate and recover any surviving crew or data.\"", 
+
+        # Start bar dialog texts
+        "barMissionBlurb": "In your custom scenario add this:\n\"barMissionBlurb\":\"SAMPLE TEXT\"",
+        "barMissionOption": "In your custom scenario add this:\n\"barMissionOption\":\"SAMPLE TEXT\"",
+        "barMissionOfferText": "In your custom scenario add this:\n\"barMissionOfferText\":\"SAMPLE TEXT\"",
 
         # FLEET entity interaction texts
         "entityDialogText": "PLANET SAMPLE: PLANET INTERACTION TEXT",
@@ -113,7 +124,7 @@
         "entityRaidFinishedText": "PLANET RAID SAMPLE: RAID FINISHED TEXT"
       },
       {
-        "weight": 100,
+        "weight": -1,
         "survivorType": "RANDOM", # OFFICER, ADMINISTRATOR, CIVILIAN 
         "entityType": "MARKET", # WRECK, FLEET, PLANET, MARKET
 

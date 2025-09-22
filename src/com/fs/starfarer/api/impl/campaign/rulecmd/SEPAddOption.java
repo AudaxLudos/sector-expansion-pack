@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 // SEPAddOption text id order(optional)
-public class SEPAddOption extends BaseCommandPlugin{
+public class SEPAddOption extends BaseCommandPlugin {
     @Override
     public boolean execute(String ruleId, InteractionDialogAPI dialog, List<Misc.Token> params, Map<String, MemoryAPI> memoryMap) {
         if (dialog == null) {
