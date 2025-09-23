@@ -44,7 +44,12 @@ public class SearchAndRescueMission extends HubMissionWithBarEvent {
     protected boolean create(MarketAPI createdAt, boolean barEvent) {
         try {
             this.genRandom = new Random(Long.parseLong(Global.getSector().getSeedString().replaceAll("\\D", "")));
-            this.scenarioData = ModPlugin.getRandomMissionScenario(getMissionId(), this.genRandom);
+            this.scenarioData = ModPlugin.getRandomMissionScenario(getMissionId(), this.genRandom, barEvent);
+
+            if (this.scenarioData == null) {
+                log.info("Failed to choose a mission scenario");
+                return false;
+            }
 
             if (barEvent) {
                 // TODO: Make this bar contact modifiable using the scenario settings
@@ -169,7 +174,62 @@ public class SearchAndRescueMission extends HubMissionWithBarEvent {
 
             setCreditReward(getScenarioCreditReward(false));
 
-            // TODO: Add mission complications
+            JSONArray complications = this.scenarioData.getJSONArray("complications");
+            for (int i = 0; i < complications.length(); i++) {
+                JSONObject complication = complications.getJSONObject(i);
+                if (complication.has("probability") && rollProbability((float) complication.getDouble("probability"))) {
+                    continue;
+                }
+
+                beginWithinHyperspaceRangeTrigger(
+                        this.entity.getStarSystem(),
+                        2000f,
+                        false,
+                        Stage.valueOf(complication.getString("stageTrigger")));
+
+                triggerCreateFleet(
+                        FleetSize.valueOf(complication.getString("fleetSize")),
+                        FleetQuality.valueOf(complication.getString("fleetQuality")),
+                        complication.getString("factionId"),
+                        complication.getString("fleetTypes"),
+                        this.entity.getStarSystem());
+
+                if (complication.has("autoAdjust")) {
+                    switch (complication.getString("autoAdjust")) {
+                        case "MODERATE" -> triggerAutoAdjustFleetStrengthModerate();
+                        case "MAJOR" -> triggerAutoAdjustFleetStrengthMajor();
+                        case "EXTREME" -> triggerAutoAdjustFleetStrengthExtreme();
+                    }
+                }
+
+                triggerPickLocationAroundEntity(this.entity, 1000f);
+                triggerSpawnFleetAtPickedLocation();
+
+                if (complication.has("lowRepImpact") && complication.getBoolean("lowRepImpact")) {
+                    triggerMakeLowRepImpact();
+                }
+                if (complication.has("hostileAndAggressive") && complication.getBoolean("hostileAndAggressive")) {
+                    triggerMakeHostileAndAggressive();
+                }
+                if (complication.has("ignoreOtherFleets") && complication.getBoolean("ignoreOtherFleets")) {
+                    triggerMakeFleetIgnoreOtherFleets();
+                }
+                if (complication.has("ignoredByOtherFleets") && complication.getBoolean("ignoredByOtherFleets")) {
+                    triggerMakeFleetIgnoredByOtherFleets();
+                }
+                if (complication.has("notIgnorePlayer") && complication.getBoolean("notIgnorePlayer")) {
+                    triggerMakeFleetNotIgnorePlayer();
+                }
+                if (complication.has("noFactionInName") && complication.getBoolean("noFactionInName")) {
+                    triggerFleetSetNoFactionInName();
+                }
+                if (complication.has("fleetName") && !complication.getString("fleetName").isEmpty()) {
+                    triggerFleetSetName(complication.getString("fleetName"));
+                }
+
+                triggerOrderFleetPatrol(this.entity);
+                endTrigger();
+            }
 
             return true;
         } catch (JSONException e) {

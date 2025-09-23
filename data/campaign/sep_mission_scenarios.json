@@ -2,7 +2,9 @@
   "sep_sar": {
     # TODO: Add at least 10 different scenarios
     "defaults": {
-      "weight": 10, # Probabilty that this scenario will be selected -1 value wont be selected
+      "weight": 10, # Probabilty that this scenario will be selected, -1 value wont be selected
+      "hasContactEvent": true,
+      "hasBarEvent": true,
       "creditReward": "HIGH", # Can be number or one of the following: VERY_LOW, LOW, AVERAGE, HIGH, VERY_HIGH
       "creditRewardBonus": "LOW", # Can be number or one of the following: VERY_LOW, LOW, AVERAGE, HIGH, VERY_HIGH
       "survivorType": "RANDOM", # OFFICER, ADMINISTRATOR, CIVILIAN, RANDOM
@@ -36,7 +38,26 @@
       # Ending dialog texts
       "returnSurvivorAliveText": "You report to $PersonPost $personName about the success of your mission, bringing the good news that $sep_sar_survivorFullName was found alive and safely recovered.\n\nAfterward, you order your chief security officer to escort $sep_sar_survivorFullName to a safe location, while you provide a full report detailing the mission and the circumstances of the rescue before receiving your reward.\n\nBut before you could continue speaking with $personName, $sep_sar_survivorFullName contacts you.",
       "survivorDialogText": "\"Captain,\" $sep_sar_survivorHeOrShe says, \"thank you for saving me. I spoke with my fa... superior, and he wants to give you a greater reward for bringing me back home.\" \n\n$sep_sar_survivorHeOrShe pauses for a moment. \"Also, if you're hiring, it would be an honor to work with you. I've mostly recovered and convinced my superior to let me go. Now I just need to file a bit of paperwork, so if you ever get the chance, my contact information will be in your directory.\"\n\nHe thanks you once more before ending the connection.",
-      "returnSurvivorDeadText": "You report to $PersonPost $personName about the success of your mission, bringing the grim news that $sep_sar_survivorFullName had already passed away by the time you reached $sep_sar_survivorHimOrHer.\n\nAfterward, you order your chief security officer to escort the body of $sep_sar_survivorFullName to a safe location, while you provide a full report detailing the mission and the circumstances of $sep_sar_survivorFullName's death before receiving your reward."
+      "returnSurvivorDeadText": "You report to $PersonPost $personName about the success of your mission, bringing the grim news that $sep_sar_survivorFullName had already passed away by the time you reached $sep_sar_survivorHimOrHer.\n\nAfterward, you order your chief security officer to escort the body of $sep_sar_survivorFullName to a safe location, while you provide a full report detailing the mission and the circumstances of $sep_sar_survivorFullName's death before receiving your reward.",
+
+      "complications": []
+      #"complications": [
+      #  {
+      #    "probability": 0.5, # chance to spawn fleet, spawns if not written
+      #    "stageTrigger": "FIND", # Accepts FIND, RETURN - required
+      #    "factionId": "pirates", # Faction id - required
+      #    "fleetName": "",
+      #    "fleetSize": "MEDIUM", # TINY, VERY_SMALL, SMALL, MEDIUM, LARGE, LARGER, VERY_LARGE, HUGE, MAXIMUM - required
+      #    "fleetQuality": "DEFAULT", # VERY_LOW, LOWER, DEFAULT, HIGHER, VERY_HIGH, SMOD_1, SMOD_2, SMOD_3 - required
+      #    "fleetTypes": "patrolMedium", # required
+      #    "autoAdjust": "MODERATE", # MODERATE, MAJOR, EXTREME
+      #    "lowRepImpact": true,
+      #    "ignoreOtherFleets": false,
+      #    "ignoredByOtherFleets": false,
+      #    "notIgnorePlayer": true,
+      #    "noFactionInName": true
+      #  }
+      #]
     },
     "scenarios": [
       {
@@ -98,11 +119,16 @@
         "barMissionOfferText": "In your custom scenario add this:\n\"barMissionOfferText\":\"SAMPLE TEXT\"",
 
         # FLEET entity interaction texts
-        "entityDialogText": "PLANET SAMPLE: PLANET INTERACTION TEXT",
+        "entityDialogText": "Upon arriving in orbit of Grama, your sensors officer reports multiple distress signals emanating from the surface. Visual sweeps confirm the wreckage of several ships scattered across the terrain, with emergency shuttles grounded nearby and intense thermal signatures detected across the site.\n\nYou immediately order the comms officer to broadcast emergency hails and stand by for any response.",
 
         # After entity interaction texsts
-        "survivorAliveText": "SAMPLE: SURVIVOR ALIVE TEXT",
-        "survivorDeadText": "SAMPLE: SURVIVOR DEAD TEXT",
+        "survivorAliveText": "Soon after, multiple responses are received from the surface. You immediately begin coordinating a recovery operation to rescue survivors while your comms officer searches through the signals and identifies a reply from a ranking officer, $sep_sar_survivorFullName.\n\nAccording to $sep_sar_survivorLastName, the fleet was struck by an unknown hyperspace anomaly that caused its drive bubble to collapse, exposing it to hyperstorms. A few ships managed to reach the system, but damage from the storms rendered them inoperable, forcing the crews to scuttle the remaining vessels for emergency supplies.\n\nYou await the completion of the recovery operation and order your crews to accommodate the arriving survivors.",
+        "survivorDeadText": "After a period of waiting, no responses are received from the surface. With no other option, you dispatch medical and security teams to inspect the grounded emergency shuttles.\n\nThe teams report back with grim findings. The shuttles are filled with bodies, most malnourished or dead from oxygen depletion after their life support failed. No survivors remain.\n\nFurther investigation reveals that the fleet was struck by an unknown hyperspace anomaly that caused its drive bubble to collapse, exposing it to hyperstorms. A few ships managed to reach the system, but damage from the storms rendered them inoperable, forcing the crews to scuttle the remaining vessels for emergency supplies.\n\nYou order the recovery of the remains to ensure they are properly accounted for and given due respect.",
+
+        # Ending dialog texts
+        "returnSurvivorAliveText": "You report to $PersonPost $personName about the success of your mission, bringing the good news that a few survivors were found alive and safely recovered.\n\nAfterward, you order your chief security officer to escort the survivors to a safe location while you provide a full report detailing the mission and the circumstances of the rescue before receiving your reward.\n\nBefore you can continue speaking with $personName, $sep_sar_survivorFullName contacts you.",
+        "survivorDialogText": "\"Captain,\" $sep_sar_survivorHeOrShe says, \"On behalf of the fleet, thank you for saving us. We spoke with our superiors, and we requested to give you a greater reward for bringing us home.\"\n\n$sep_sar_survivorHeOrShe pauses for a moment. \"Some of the crew wish to join you and so do I. I've mostly recovered and convinced my superior to let me go. I just need to file some paperwork, so if you ever get the chance, the crew are available for hire while my contact information will be in your directory.\"\n\nHe thanks you once more before ending the connection.",
+        "returnSurvivorDeadText": "You report to $PersonPost $personName about the success of your mission, bringing the grim news that no survivors remained by the time you arrived.\n\nAfterward, you order your chief security officer to escort the recovered remains to a secure location while you provide a full report detailing the mission and the circumstances of the fleet's destruction before receiving your reward."
       },
       {
         "weight": -1,

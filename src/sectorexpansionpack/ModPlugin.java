@@ -13,13 +13,24 @@ import java.util.Random;
 public class ModPlugin extends BaseModPlugin {
     public static JSONObject MISSION_SCENARIOS;
 
-    public static JSONObject getRandomMissionScenario(String missionId, Random random) throws JSONException {
+    public static JSONObject getRandomMissionScenario(String missionId, Random random, boolean barEvent) throws JSONException {
         WeightedRandomPicker<JSONObject> scenarioPicker = new WeightedRandomPicker<>();
         JSONObject mission = MISSION_SCENARIOS.getJSONObject(missionId);
         JSONArray scenarios = mission.getJSONArray("scenarios");
         for (int i = 0; i < scenarios.length(); i++) {
             JSONObject scenario = scenarios.getJSONObject(i);
-            float weight = 10f;
+            boolean hasBarEvent;
+            if (scenario.has("hasBarEvent")) {
+                hasBarEvent = scenario.getBoolean("hasBarEvent");
+            } else {
+                hasBarEvent = getMissionScenarioDefaults(missionId).getBoolean("hasBarEvent");
+            }
+            if (!hasBarEvent && barEvent) {
+                continue;
+            }
+
+
+            float weight;
             if (scenario.has("weight")) {
                 weight = (float) scenario.getDouble("weight");
             } else {
