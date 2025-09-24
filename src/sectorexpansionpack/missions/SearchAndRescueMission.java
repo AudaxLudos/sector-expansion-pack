@@ -70,13 +70,8 @@ public class SearchAndRescueMission extends HubMissionWithBarEvent {
                 setGiverIsPotentialContactOnSuccess();
             }
 
-            this.survivor = createdAt.getFaction().createRandomPerson(this.genRandom);
-            if (this.survivor == null) {
-                log.info("Failed to create survivor to rescue");
-                return false;
-            }
-
-            this.survivorPostType = PersonPostType.valueOf(this.scenarioData.getString("survivorType"));
+            // TODO: Make survivor modifiable using the scenario settings
+            this.survivorPostType = PersonPostType.valueOf((String) getScenarioData("survivorType"));
             if (this.survivorPostType == PersonPostType.RANDOM) {
                 this.survivorPostType = (PersonPostType) pickOneObject(Arrays.asList(PersonPostType.OFFICER, PersonPostType.ADMINISTRATOR, PersonPostType.CIVILIAN));
             }
@@ -97,7 +92,7 @@ public class SearchAndRescueMission extends HubMissionWithBarEvent {
             preferSystemInInnerSector();
             preferSystemInDirectionOfOtherMissions();
 
-            this.entityType = EntityType.valueOf(this.scenarioData.getString("entityType"));
+            this.entityType = EntityType.valueOf((String) getScenarioData("entityType"));
             switch (this.entityType) {
                 case WRECK:
                     requireEntityTags(ReqMode.ALL, Tags.SALVAGEABLE);
@@ -174,7 +169,7 @@ public class SearchAndRescueMission extends HubMissionWithBarEvent {
 
             setCreditReward(getScenarioCreditReward(false));
 
-            JSONArray complications = this.scenarioData.getJSONArray("complications");
+            JSONArray complications = (JSONArray) getScenarioData("complications");
             for (int i = 0; i < complications.length(); i++) {
                 JSONObject complication = complications.getJSONObject(i);
                 if (complication.has("probability") && rollProbability((float) complication.getDouble("probability"))) {
@@ -260,30 +255,41 @@ public class SearchAndRescueMission extends HubMissionWithBarEvent {
         set("$sep_sar_survivorHimOrHer", this.survivor.getHimOrHer());
         set("$sep_sar_survivorManOrWoman", this.survivor.getManOrWoman());
 
-        set("$sep_sar_contactMissionBlurb", getDialogText("contactMissionBlurb"));
-        set("$sep_sar_contactMissionOption", getDialogText("contactMissionOption"));
-        set("$sep_sar_contactMissionOfferText", getDialogText("contactMissionOfferText"));
+        if (this.currentStage == null) {
+            if (!isBarEvent()) {
+                set("$sep_sar_contactMissionBlurb", getDialogText("contactMissionBlurb"));
+                set("$sep_sar_contactMissionOption", getDialogText("contactMissionOption"));
+                set("$sep_sar_contactMissionOfferText", getDialogText("contactMissionOfferText"));
+            } else {
+                set("$sep_sar_barMissionBlurb", getDialogText("barMissionBlurb"));
+                set("$sep_sar_barMissionOption", getDialogText("barMissionOption"));
+                set("$sep_sar_barMissionOfferText", getDialogText("barMissionOfferText"));
+            }
+        }
 
-        set("$sep_sar_barMissionBlurb", getDialogText("barMissionBlurb"));
-        set("$sep_sar_barMissionOption", getDialogText("barMissionOption"));
-        set("$sep_sar_barMissionOfferText", getDialogText("barMissionOfferText"));
+        if (this.currentStage == Stage.FIND) {
+            set("$sep_sar_entityDialogText", getDialogText("entityDialogText"));
+            if (this.entityType == EntityType.FLEET) {
+                set("$sep_sar_entityPayRansomText", getDialogText("entityPayRansomText"));
+                set("$sep_sar_entityFightText", getDialogText("entityFightText"));
+                set("$sep_sar_entityDeclineText", getDialogText("entityDeclineText"));
+                set("$sep_sar_entityDefeatedText", getDialogText("entityDefeatedText"));
+            } else if (this.entityType == EntityType.PLANET_RAID) {
+                set("$sep_sar_entityRaidFinishedText", getDialogText("entityRaidFinishedText"));
+            }
+            set("$sep_sar_survivorAliveText", getDialogText("survivorAliveText"));
+            set("$sep_sar_survivorDeadText", getDialogText("survivorDeadText"));
+        }
 
-        set("$sep_sar_entityDialogText", getDialogText("entityDialogText"));
-        set("$sep_sar_entityPayRansomText", getDialogText("entityPayRansomText"));
-        set("$sep_sar_entityFightText", getDialogText("entityFightText"));
-        set("$sep_sar_entityDeclineText", getDialogText("entityDeclineText"));
-        set("$sep_sar_entityDefeatedText", getDialogText("entityDefeatedText"));
-        set("$sep_sar_survivorAliveText", getDialogText("survivorAliveText"));
-        set("$sep_sar_survivorDeadText", getDialogText("survivorDeadText"));
-        set("$sep_sar_entityRaidFinishedText", getDialogText("entityRaidFinishedText"));
-
-        set("$sep_sar_returnSurvivorAliveText", getDialogText("returnSurvivorAliveText"));
-        set("$sep_sar_survivorDialogText", getDialogText("survivorDialogText"));
-        set("$sep_sar_returnSurvivorDeadText", getDialogText("returnSurvivorDeadText"));
+        if (this.currentStage == Stage.RETURN) {
+            set("$sep_sar_returnSurvivorAliveText", getDialogText("returnSurvivorAliveText"));
+            set("$sep_sar_survivorDialogText", getDialogText("survivorDialogText"));
+            set("$sep_sar_returnSurvivorDeadText", getDialogText("returnSurvivorDeadText"));
+        }
     }
 
     public String getDialogText(String id) {
-        String result = "";
+        String result;
         try {
             if (this.scenarioData.has(id)) {
                 result = this.scenarioData.getString(id);
@@ -330,25 +336,29 @@ public class SearchAndRescueMission extends HubMissionWithBarEvent {
     public boolean callEvent(String ruleId, InteractionDialogAPI dialog, List<Misc.Token> params, Map<String, MemoryAPI> memoryMap) {
         String action = params.get(0).getString(memoryMap);
 
-        if (action.equals("checkSurvivorStatus")) {
-            if (this.timeLimit.days - this.elapsed < 60f) {
-                this.survivorAlive = false;
+        switch (action) {
+            case "checkSurvivorStatus" -> {
+                if (this.timeLimit.days - this.elapsed < 60f) {
+                    this.survivorAlive = false;
+                }
+                updateInteractionData(dialog, memoryMap);
+                return this.survivorAlive;
             }
-            updateInteractionData(dialog, memoryMap);
-            return this.survivorAlive;
-        } else if (action.equals("showSurvivorVisual")) {
-            dialog.getVisualPanel().showPersonInfo(this.survivor);
-            return true;
-        } else if (action.equals("addBonusCreditReward")) {
-            int creditRewardBonus;
-            try {
-                creditRewardBonus = getScenarioCreditReward(true);
-            } catch (JSONException e) {
-                log.error(e);
-                creditRewardBonus = getCreditRewardValue(CreditReward.LOW.min, CreditReward.LOW.max);
+            case "showSurvivorVisual" -> {
+                dialog.getVisualPanel().showPersonInfo(this.survivor);
+                return true;
             }
-            setCreditReward(getCreditsReward() + creditRewardBonus);
-            return true;
+            case "addBonusCreditReward" -> {
+                int creditRewardBonus;
+                try {
+                    creditRewardBonus = getScenarioCreditReward(true);
+                } catch (JSONException e) {
+                    log.error(e);
+                    creditRewardBonus = getCreditRewardValue(CreditReward.LOW.min, CreditReward.LOW.max);
+                }
+                setCreditReward(getCreditsReward() + creditRewardBonus);
+                return true;
+            }
         }
 
         return super.callEvent(ruleId, dialog, params, memoryMap);
@@ -410,7 +420,7 @@ public class SearchAndRescueMission extends HubMissionWithBarEvent {
         if (this.scenarioData.has(id)) {
             result = this.scenarioData.get(id);
         } else {
-            result = ModPlugin.getMissionScenarioDefaults(getMissionId()).getString(id);
+            result = ModPlugin.getMissionScenarioDefaults(getMissionId()).get(id);
         }
         return result;
     }

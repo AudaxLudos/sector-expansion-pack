@@ -107,22 +107,18 @@
         "weight": 100,
         "survivorType": "ADMINISTRATOR", # OFFICER, ADMINISTRATOR, CIVILIAN 
         "entityType": "PLANET", # WRECK, FLEET, PLANET
+        "hasBarEvent": false,
 
         # Start contact dialog texts
         "contactMissionBlurb": "\"Fleet Intel has filed a search-and-rescue mission for a survey fleet that failed to report back, with orders to recover survivors and secure their data.\"",
         "contactMissionOption": "Ask about the missing survey fleet",
         "contactMissionOfferText": "\"The fleet was sent out on a routine survey mission to chart resources and assess colonization prospects. Their course took them toward $sep_sar_possibleLoc, but all contact was lost en route.\"\n\n$HeOrShe looks through $hisOrHer tripad and continues, \"Fleet intel primarily suspects interference from hostile elements, while others cite navigation failures caused by hyperspace anomalies.\"\n\n$HeOrShe concludes, \"Either way, Fleet intel has authorized a reward of $sep_sar_creditReward to confirm the fleet's fate and recover any surviving crew or data.\"", 
 
-        # Start bar dialog texts
-        "barMissionBlurb": "In your custom scenario add this:\n\"barMissionBlurb\":\"SAMPLE TEXT\"",
-        "barMissionOption": "In your custom scenario add this:\n\"barMissionOption\":\"SAMPLE TEXT\"",
-        "barMissionOfferText": "In your custom scenario add this:\n\"barMissionOfferText\":\"SAMPLE TEXT\"",
-
         # FLEET entity interaction texts
-        "entityDialogText": "Upon arriving in orbit of Grama, your sensors officer reports multiple distress signals emanating from the surface. Visual sweeps confirm the wreckage of several ships scattered across the terrain, with emergency shuttles grounded nearby and intense thermal signatures detected across the site.\n\nYou immediately order the comms officer to broadcast emergency hails and stand by for any response.",
+        "entityDialogText": "Upon arriving in orbit of $entityName, your sensors officer reports multiple distress signals coming from the surface. Visual sweeps confirm wreckage scattered across a valley, with grounded shuttles nearby and intense thermal signatures still active throughout the area.\n\nYou order your comms officer to broadcast emergency hails and stand by for any response.",
 
         # After entity interaction texsts
-        "survivorAliveText": "Soon after, multiple responses are received from the surface. You immediately begin coordinating a recovery operation to rescue survivors while your comms officer searches through the signals and identifies a reply from a ranking officer, $sep_sar_survivorFullName.\n\nAccording to $sep_sar_survivorLastName, the fleet was struck by an unknown hyperspace anomaly that caused its drive bubble to collapse, exposing it to hyperstorms. A few ships managed to reach the system, but damage from the storms rendered them inoperable, forcing the crews to scuttle the remaining vessels for emergency supplies.\n\nYou await the completion of the recovery operation and order your crews to accommodate the arriving survivors.",
+        "survivorAliveText": "Soon after, multiple responses are received around the wreckage. You immediately begin coordinating a recovery operation to rescue survivors while your comms officer works to determine the cause of the fleet's crash. One transmission is identified as coming from a ranking officer, $sep_sar_survivorFullName.\n\nAccording to $sep_sar_survivorLastName, the fleet was struck by an unknown hyperspace anomaly that caused its drive bubble to collapse, exposing it to hyperstorms. A few ships managed to reach the system, but damage from the storms rendered them inoperable, forcing the crews to scuttle the remaining vessels for emergency supplies.\n\nYou await the completion of the recovery operation and order your crews to accommodate the arriving survivors.",
         "survivorDeadText": "After a period of waiting, no responses are received from the surface. With no other option, you dispatch medical and security teams to inspect the grounded emergency shuttles.\n\nThe teams report back with grim findings. The shuttles are filled with bodies, most malnourished or dead from oxygen depletion after their life support failed. No survivors remain.\n\nFurther investigation reveals that the fleet was struck by an unknown hyperspace anomaly that caused its drive bubble to collapse, exposing it to hyperstorms. A few ships managed to reach the system, but damage from the storms rendered them inoperable, forcing the crews to scuttle the remaining vessels for emergency supplies.\n\nYou order the recovery of the remains to ensure they are properly accounted for and given due respect.",
 
         # Ending dialog texts

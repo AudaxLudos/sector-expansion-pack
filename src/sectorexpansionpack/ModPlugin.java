@@ -13,21 +13,34 @@ import java.util.Random;
 public class ModPlugin extends BaseModPlugin {
     public static JSONObject MISSION_SCENARIOS;
 
-    public static JSONObject getRandomMissionScenario(String missionId, Random random, boolean barEvent) throws JSONException {
-        WeightedRandomPicker<JSONObject> scenarioPicker = new WeightedRandomPicker<>();
+    public static JSONObject getRandomMissionScenario(String missionId, Random random, boolean barEventsOnly) throws JSONException {
+        WeightedRandomPicker<JSONObject> scenarioPicker = new WeightedRandomPicker<>(random);
         JSONObject mission = MISSION_SCENARIOS.getJSONObject(missionId);
         JSONArray scenarios = mission.getJSONArray("scenarios");
         for (int i = 0; i < scenarios.length(); i++) {
             JSONObject scenario = scenarios.getJSONObject(i);
             boolean hasBarEvent;
+            boolean hasContactEvent;
             if (scenario.has("hasBarEvent")) {
                 hasBarEvent = scenario.getBoolean("hasBarEvent");
             } else {
                 hasBarEvent = getMissionScenarioDefaults(missionId).getBoolean("hasBarEvent");
             }
-            if (!hasBarEvent && barEvent) {
-                continue;
+            if (scenario.has("hasContactEvent")) {
+                hasContactEvent = scenario.getBoolean("hasContactEvent");
+            } else {
+                hasContactEvent = getMissionScenarioDefaults(missionId).getBoolean("hasContactEvent");
             }
+            if (barEventsOnly) {
+                if (!hasBarEvent) {
+                    continue;
+                }
+            } else {
+                if (!hasContactEvent) {
+                    continue;
+                }
+            }
+
 
 
             float weight;
@@ -38,7 +51,7 @@ public class ModPlugin extends BaseModPlugin {
             }
             scenarioPicker.add(scenario, weight);
         }
-        return scenarioPicker.pick(random);
+        return scenarioPicker.pick();
     }
 
     public static JSONObject getMissionScenarioDefaults(String missionId) throws JSONException {
