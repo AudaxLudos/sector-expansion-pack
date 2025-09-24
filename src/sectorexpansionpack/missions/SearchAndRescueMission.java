@@ -31,8 +31,6 @@ import java.util.List;
 
 public class SearchAndRescueMission extends HubMissionWithBarEvent {
     public static Logger log = Global.getLogger(SearchAndRescueMission.class);
-    // TODO: Make mission days modifiable using the scenario settings
-    protected float missionDays = 120f;
     protected JSONObject scenarioData;
     protected PersonPostType survivorPostType;
     protected PersonAPI survivor;
@@ -165,7 +163,7 @@ public class SearchAndRescueMission extends HubMissionWithBarEvent {
             connectWithMarketDecivilized(Stage.RETURN, Stage.FAILED_DECIV, createdAt);
             setStageOnMarketDecivilized(Stage.FAILED_DECIV, createdAt);
 
-            setTimeLimit(Stage.FAILED, this.missionDays, null, Stage.RETURN);
+            setTimeLimit(Stage.FAILED, (float) getScenarioData("missionDuration"), null, Stage.RETURN);
 
             setCreditReward(getScenarioCreditReward(false));
 

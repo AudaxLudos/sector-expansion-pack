@@ -5,6 +5,7 @@
       "weight": 10, # Probabilty that this scenario will be selected, -1 value wont be selected
       "hasContactEvent": true,
       "hasBarEvent": true,
+      "missionDuration": 120,
       "creditReward": "HIGH", # Can be number or one of the following: VERY_LOW, LOW, AVERAGE, HIGH, VERY_HIGH
       "creditRewardBonus": "LOW", # Can be number or one of the following: VERY_LOW, LOW, AVERAGE, HIGH, VERY_HIGH
       "survivorType": "RANDOM", # OFFICER, ADMINISTRATOR, CIVILIAN, RANDOM

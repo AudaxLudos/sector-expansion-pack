@@ -41,8 +41,6 @@ public class ModPlugin extends BaseModPlugin {
                 }
             }
 
-
-
             float weight;
             if (scenario.has("weight")) {
                 weight = (float) scenario.getDouble("weight");
