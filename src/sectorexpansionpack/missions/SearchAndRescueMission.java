@@ -2,10 +2,7 @@ package sectorexpansionpack.missions;
 
 import com.fs.starfarer.api.EveryFrameScript;
 import com.fs.starfarer.api.Global;
-import com.fs.starfarer.api.campaign.CampaignFleetAPI;
-import com.fs.starfarer.api.campaign.InteractionDialogAPI;
-import com.fs.starfarer.api.campaign.PlanetAPI;
-import com.fs.starfarer.api.campaign.SectorEntityToken;
+import com.fs.starfarer.api.campaign.*;
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
 import com.fs.starfarer.api.campaign.rules.MemoryAPI;
 import com.fs.starfarer.api.characters.PersonAPI;
@@ -163,7 +160,7 @@ public class SearchAndRescueMission extends HubMissionWithBarEvent {
             connectWithMarketDecivilized(Stage.RETURN, Stage.FAILED_DECIV, createdAt);
             setStageOnMarketDecivilized(Stage.FAILED_DECIV, createdAt);
 
-            setTimeLimit(Stage.FAILED, (float) getScenarioData("missionDuration"), null, Stage.RETURN);
+            setTimeLimit(Stage.FAILED, ((Number) getScenarioData("missionDuration")).floatValue(), null, Stage.RETURN);
 
             setCreditReward(getScenarioCreditReward(false));
 
@@ -242,6 +239,7 @@ public class SearchAndRescueMission extends HubMissionWithBarEvent {
         set("$sep_sar_survivorPostType", this.survivorPostType);
         set("$sep_sar_entityType", this.entityType);
         set("$sep_sar_creditReward", Misc.getDGSCredits(getCreditsReward()));
+        set("$sep_sar_creditRansom", Misc.getDGSCredits(getCreditsReward() * 0.75f));
         set("$sep_sar_danger", MarketCMD.RaidDangerLevel.MEDIUM);
         set("$sep_sar_possibleLoc", BreadcrumbSpecial.getLocationDescription(this.entity, false));
 

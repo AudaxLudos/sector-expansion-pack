@@ -10,6 +10,12 @@
       "creditRewardBonus": "LOW", # Can be number or one of the following: VERY_LOW, LOW, AVERAGE, HIGH, VERY_HIGH
       "survivorType": "RANDOM", # OFFICER, ADMINISTRATOR, CIVILIAN, RANDOM
       "entityType": "WRECK", # WRECK, FLEET, PLANET
+      "needsCommission": false, # not in use
+      "minRepNeeded": "NEUTRAL", # not in use
+
+      entityFleet: {
+
+      },
 
       # Start contact dialog texts
       "contactMissionBlurb": "In your custom scenario add this:\n\n\"contactMissionBlurb\":\"SAMPLE TEXT\"",
@@ -83,15 +89,19 @@
         "survivorDeadText": "A short time later, your officers find the survivor and recognize him as our rescue target, $sep_sar_survivorFullName. Unfortunately, $sep_sar_survivorHeOrShe is dead, and according to your chief medical officer, $sep_sar_survivorHeOrShe died of extreme malnutrition and oxygen deprivation.",
       },
       {
-        "weight": -1,
+        "weight": 100,
         "survivorType": "OFFICER", # OFFICER, ADMINISTRATOR, CIVILIAN 
         "entityType": "FLEET", # WRECK, FLEET, PLANET
 
-        # Start dialog texts
-        "contactMissionBlurb": "SAMPLE: CONTACT MISSION BLURB",
-        "contactMissionOfferText": "SAMPLE: CONTACT MISSION OFFER TEXT",
-        "barMissionBlurb": "SAMPLE: BAR MISSION OFFER BLURB",
-        "barMissionOfferText": "SAMPLE: BAR MISSION OFFER TEXT",
+        # Start contact dialog texts
+        "contactMissionBlurb": "\"A ranking official has been kidnapped. I can't spare the resources to mount a rescue, but I trust you enough to offer this mission to you if you're willing.\"",
+        "contactMissionOption": "Ask about the kidnapped ranking offical",
+        "contactMissionOfferText": "\"$sep_sar_survivorFullName was abducted shortly after leaving a bar. Soon after, the kidnappers contacted $sep_sar_survivorHisOrHer family, demanding a ransom of $sep_sar_creditRansom in exchange for $sep_sar_survivorLastName's release.\" $heOrShe pauses, transmitting a shared intel briefing from $hisOrHer tripad.\n\n\"The kidnappers have been identified as a splinter cell of the $Faction, claiming retribution for past actions taken against them. They've ordered the ransom to be delivered to a fleet waiting in $sep_sar_possibleLoc.\"\n\n$HeOrShe continues, \"The family of $sep_sar_survivorLastName is offering a reward of $sep_sar_creditReward for $sep_sar_survivorHisOrHer safe return and the resolution of this matter.\"",
+
+        # Start bar dialog texts
+        "barMissionBlurb": "You notice an anxious $manOrWoman drinking heavily, muttering complaints about the $Faction on how discounted they treated $himOrHer.",
+        "barMissionOption": "Ask the anxious $manOrWoman on what's bothering $himOrHer",
+        "barMissionOfferText": "$HeOrShe looks at you, downing another glass before erupting in an outburst. \"All I've done for the $Faction... all the years, all the blood... and when my own son is taken, they cannot even spare a single ship to bring $sep_sar_survivorHimOrHer back. That is what I am to them. Nothing. Disposable.\"\n\n$HeOrShe exhales sharply, forcing $himOrHerself to steady before continuing \"$sep_sar_survivorFullName, my son, was abducted while walking home through the district. A splinter group of $Faction thugs took him, demanding $sep_sar_creditRansom for his release. They want the ransom delivered to a fleet waiting in $sep_sar_possibleLoc.\"\n\nHis anger fades into weary desperation. \"You look like a captain. Someone with a ship, someone who can actually do something. If you help me... if you bring him home... I will see you get $sep_sar_creditReward.\"",
 
         # FLEET entity interaction texts
         "entityDialogText": "FLEET SAMPLE: FLEET INTERACTION TEXT",
@@ -105,7 +115,6 @@
         "survivorDeadText": "SAMPLE: SURVIVOR DEAD TEXT",
       },
       {
-        "weight": 100,
         "survivorType": "ADMINISTRATOR", # OFFICER, ADMINISTRATOR, CIVILIAN 
         "entityType": "PLANET", # WRECK, FLEET, PLANET
         "hasBarEvent": false,
