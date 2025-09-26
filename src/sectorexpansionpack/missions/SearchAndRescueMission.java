@@ -102,10 +102,22 @@ public class SearchAndRescueMission extends HubMissionWithBarEvent {
                     preferPlanetWithRuins();
                     PlanetAPI planet = pickPlanet();
 
-                    // TODO: Make this fleet modifiable using the scenario settings
+                    JSONObject fleetSettings = (JSONObject) getScenarioData("entityFleet");
                     beginStageTrigger(Stage.FIND);
-                    triggerCreateFleet(FleetSize.MEDIUM, FleetQuality.DEFAULT, Factions.PIRATES, FleetTypes.PATROL_MEDIUM, planet.getStarSystem());
-                    triggerAutoAdjustFleetStrengthModerate();
+                    triggerCreateFleet(
+                            FleetSize.valueOf(fleetSettings.getString("fleetSize")),
+                            FleetQuality.valueOf(fleetSettings.getString("fleetQuality")),
+                            fleetSettings.getString("factionId"),
+                            fleetSettings.getString("fleetTypes"),
+                            planet.getStarSystem());
+
+                    if (fleetSettings.has("autoAdjust")) {
+                        switch (fleetSettings.getString("autoAdjust")) {
+                            case "MODERATE" -> triggerAutoAdjustFleetStrengthModerate();
+                            case "MAJOR" -> triggerAutoAdjustFleetStrengthMajor();
+                            case "EXTREME" -> triggerAutoAdjustFleetStrengthExtreme();
+                        }
+                    }
 
                     triggerPickLocationAroundEntity(planet, 1000f);
                     triggerSpawnFleetAtPickedLocation();
@@ -116,6 +128,10 @@ public class SearchAndRescueMission extends HubMissionWithBarEvent {
                     triggerMakeFleetNotIgnorePlayer();
                     triggerOrderFleetPatrol(planet);
                     triggerFleetAddDefeatTrigger("SEPSARFleetDefeated");
+
+                    if (fleetSettings.has("fleetName") && !fleetSettings.getString("fleetName").isEmpty()) {
+                        triggerFleetSetName(fleetSettings.getString("fleetName"));
+                    }
 
                     endTrigger();
 

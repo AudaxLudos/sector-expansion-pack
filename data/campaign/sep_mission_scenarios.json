@@ -14,7 +14,12 @@
       "minRepNeeded": "NEUTRAL", # not in use
 
       entityFleet: {
-
+        "factionId": "pirates", # Faction id - required
+        "fleetName": "",
+        "fleetSize": "MEDIUM", # TINY, VERY_SMALL, SMALL, MEDIUM, LARGE, LARGER, VERY_LARGE, HUGE, MAXIMUM - required
+        "fleetQuality": "DEFAULT", # VERY_LOW, LOWER, DEFAULT, HIGHER, VERY_HIGH, SMOD_1, SMOD_2, SMOD_3 - required
+        "fleetTypes": "patrolMedium", # required
+        "autoAdjust": "MODERATE", # MODERATE, MAJOR, EXTREME
       },
 
       # Start contact dialog texts
