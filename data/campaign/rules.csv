@@ -35,8 +35,8 @@ sep_sar_offerOption,sep_sar_option,,SEPAddOption $sep_sar_contactMissionOption s
 sep_sar_offerTextContact1,DialogOptionSelected,$option == sep_sar_start,"$missionId = sep_sar
 AddText $sep_sar_contactMissionOfferText
 SetTextHighlightColors h h h
-SetTextHighlights $sep_sar_survivorFullName $sep_sar_possibleLoc $sep_sar_creditReward",,"contact_accept:ACCEPT
-contact_decline:DECLINE",
+SetTextHighlights $sep_sar_survivorFullName $sep_sar_possibleLoc $sep_sar_creditReward",,"contact_accept:Accept
+contact_decline:Decline",
 # Offered in bar,,,,,,
 sep_sar_blurbBar,sep_sar_blurbBar,,AddText $sep_sar_barMissionBlurb,,,
 sep_sar_offerOptionBar,sep_sar_optionBar,,SEPAddOption $sep_sar_barMissionOption sep_sar_startBar,,,
@@ -84,9 +84,10 @@ defaultLeave:Leave",
 sep_sar_entityPlanetRaidFinished,SEPSARRaidFinished,Call $sep_sar_ref updateData,"AddText $sep_sar_entityRaidFinishedText
 $sep_sar_returnToContact = true
 Call $sep_sar_ref updateStage",,,
-sep_sar_entityFleetOpt,SEPSAREntityOptions,$sep_sar_entityType == FLEET score:1000,,,"sep_sar_payRansom:PAY RANSOM
+sep_sar_entityFleetOpt,SEPSAREntityOptions,$sep_sar_entityType == FLEET score:1000,"SetStoryOption sep_sar_convinceToFree ui_char_spent_story_point ""Convince to free hostage""",,"sep_sar_payRansom:PAY RANSOM
 sep_sar_beginFight:FIGHT
-sep_sar_declineRansom:DECLINE",
+sep_sar_declineRansom:DECLINE
+sep_sar_convinceToFree:STORY POINT OPTION",
 sep_sar_fleetAcceptRansom,DialogOptionSelected,$option == sep_sar_payRansom,"AddText $sep_sar_entityPayRansomText
 $entity.sep_sar_returnToContact = true
 Call $entity.sep_sar_ref updateStage
@@ -102,6 +103,11 @@ sep_sar_fleetDeclineRansom,DialogOptionSelected,$option == sep_sar_declineRansom
 MakeOtherFleetAllowDisengage sep_sar true
 MakeOtherFleetNonHostile sep_sar true
 MakeOtherFleetPreventDisengage sep_sar true",,cutCommLinkNoText:END INTERACTION,
+sep_sar_fleetConvinceToFree,DialogOptionSelected,$option == sep_sar_convinceToFree,"AddText $sep_sar_entityStoryPointText
+$entity.sep_sar_returnToContact = true
+Call $entity.sep_sar_ref updateStage
+MakeOtherFleetAllowDisengage sep_sar true
+MakeOtherFleetNonHostile sep_sar true",,cutCommLinkNoText:END INTERACTION,
 sep_sar_fleetDefeated,SEPSARFleetDefeated,"$someShipsDestroyed
 Call $sep_sar_ref updateData","AddText $sep_sar_entityDefeatedText
 $sep_sar_returnToContact = true

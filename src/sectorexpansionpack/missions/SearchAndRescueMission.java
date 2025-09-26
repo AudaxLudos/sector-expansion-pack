@@ -267,6 +267,10 @@ public class SearchAndRescueMission extends HubMissionWithBarEvent {
         set("$sep_sar_survivorHimOrHer", this.survivor.getHimOrHer());
         set("$sep_sar_survivorManOrWoman", this.survivor.getManOrWoman());
 
+        if (this.entityType == EntityType.FLEET) {
+            set("$sep_sar_entityFaction", this.entity.getFaction().getEntityNamePrefix());
+        }
+
         if (this.currentStage == null) {
             if (!isBarEvent()) {
                 set("$sep_sar_contactMissionBlurb", getDialogText("contactMissionBlurb"));
@@ -285,6 +289,7 @@ public class SearchAndRescueMission extends HubMissionWithBarEvent {
                 set("$sep_sar_entityPayRansomText", getDialogText("entityPayRansomText"));
                 set("$sep_sar_entityFightText", getDialogText("entityFightText"));
                 set("$sep_sar_entityDeclineText", getDialogText("entityDeclineText"));
+                set("$sep_sar_entityStoryPointText", getDialogText("entityStoryPointText"));
                 set("$sep_sar_entityDefeatedText", getDialogText("entityDefeatedText"));
             } else if (this.entityType == EntityType.PLANET_RAID) {
                 set("$sep_sar_entityRaidFinishedText", getDialogText("entityRaidFinishedText"));
