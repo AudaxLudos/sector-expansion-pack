@@ -289,7 +289,7 @@ public class SearchAndRescueMission extends HubMissionWithBarEvent {
                 set("$sep_sar_entityPayRansomText", getDialogText("entityPayRansomText"));
                 set("$sep_sar_entityFightText", getDialogText("entityFightText"));
                 set("$sep_sar_entityDeclineText", getDialogText("entityDeclineText"));
-                set("$sep_sar_entityStoryPointText", getDialogText("entityStoryPointText"));
+                set("$sep_sar_entityPersuadeToFreeText", getDialogText("entityPersuadeToFreeText"));
                 set("$sep_sar_entityDefeatedText", getDialogText("entityDefeatedText"));
             } else if (this.entityType == EntityType.PLANET_RAID) {
                 set("$sep_sar_entityRaidFinishedText", getDialogText("entityRaidFinishedText"));

@@ -84,30 +84,32 @@ defaultLeave:Leave",
 sep_sar_entityPlanetRaidFinished,SEPSARRaidFinished,Call $sep_sar_ref updateData,"AddText $sep_sar_entityRaidFinishedText
 $sep_sar_returnToContact = true
 Call $sep_sar_ref updateStage",,,
-sep_sar_entityFleetOpt,SEPSAREntityOptions,$sep_sar_entityType == FLEET score:1000,"SetStoryOption sep_sar_convinceToFree ui_char_spent_story_point ""Convince to free hostage""",,"sep_sar_payRansom:PAY RANSOM
-sep_sar_beginFight:FIGHT
-sep_sar_declineRansom:DECLINE
-sep_sar_convinceToFree:STORY POINT OPTION",
+sep_sar_entityFleetOpt,SEPSAREntityOptions,$sep_sar_entityType == FLEET score:1000,"SetStoryOption sep_sar_persuadeToFree ui_char_spent_story_point ""Persuade the kidnappers to free the hostage""",,"sep_sar_payRansom:Pay the ransom
+sep_sar_beginFight:Engage the fleet
+sep_sar_persuadeToFree:Persuade to free the hostage
+",
 sep_sar_fleetAcceptRansom,DialogOptionSelected,$option == sep_sar_payRansom,"AddText $sep_sar_entityPayRansomText
 $entity.sep_sar_returnToContact = true
 Call $entity.sep_sar_ref updateStage
 MakeOtherFleetAllowDisengage sep_sar true
-MakeOtherFleetNonHostile sep_sar true",,cutCommLinkNoText:END INTERACTION,
+MakeOtherFleetNonHostile sep_sar true
+$entity.ignorePlayerCommRequests = true",,cutCommLinkNoText:Cut the comm link,
 sep_sar_fleetBeginFight,DialogOptionSelected,$option == sep_sar_beginFight,"AddText $sep_sar_entityFightText
 MakeOtherFleetHostile sep_sar true
 MakeOtherFleetAggressive sep_sar true
 MakeOtherFleetPreventDisengage sep_sar true
 $entity.ignorePlayerCommRequests = true
-",,cutCommLinkNoText:END INTERACTION,
+",,cutCommLinkNoText:Cut the comm link,
 sep_sar_fleetDeclineRansom,DialogOptionSelected,$option == sep_sar_declineRansom,"AddText $sep_sar_entityDeclineText
 MakeOtherFleetAllowDisengage sep_sar true
 MakeOtherFleetNonHostile sep_sar true
-MakeOtherFleetPreventDisengage sep_sar true",,cutCommLinkNoText:END INTERACTION,
-sep_sar_fleetConvinceToFree,DialogOptionSelected,$option == sep_sar_convinceToFree,"AddText $sep_sar_entityStoryPointText
+MakeOtherFleetPreventDisengage sep_sar true",,cutCommLinkNoText:Cut the comm link,
+sep_sar_fleetPersuadeToFree,DialogOptionSelected,$option == sep_sar_persuadeToFree,"AddText $sep_sar_entityPersuadeToFreeText
 $entity.sep_sar_returnToContact = true
 Call $entity.sep_sar_ref updateStage
 MakeOtherFleetAllowDisengage sep_sar true
-MakeOtherFleetNonHostile sep_sar true",,cutCommLinkNoText:END INTERACTION,
+MakeOtherFleetNonHostile sep_sar true
+$entity.ignorePlayerCommRequests = true",,cutCommLinkNoText:Cut the comm link,
 sep_sar_fleetDefeated,SEPSARFleetDefeated,"$someShipsDestroyed
 Call $sep_sar_ref updateData","AddText $sep_sar_entityDefeatedText
 $sep_sar_returnToContact = true

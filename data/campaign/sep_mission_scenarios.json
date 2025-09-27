@@ -112,14 +112,10 @@
         # FLEET entity interaction texts
         "entityDialogText": "The comms channel crackles to life, a grainy image of a hard-eyed officer fills the screen. $HisOrHer voice drips with suspicion as $heOrShe sizes up your $shipOrFleet.\n\n\"So... you must be the ones carrying the ransom. Hmph. Not much to look at, but I suppose credits don't need much of an escort.\"\n\n$HeOrShe narrows his eyes, leaning closer to the pickup. \"We made it clear. $sep_sar_creditRansom credits, transferred clean and quiet. No tricks, no games. Hand it over, and maybe $sep_sar_survivorFullName walks away instead of ending up as broken flesh.\"\n\nThe channel hangs open, the kidnappers clearly waiting for your next move.",
         "entityPayRansomText": "The channel flickers. The hard-eyed officer returns, expression flat. \"Payment confirmed. $sep_sar_creditRansom credits received and cleared.\"\n\n\"We are dispatching a single shuttle carrying the hostage. It will intercept your position in approximately fifteen minutes. Keep your fleet at a safe distance. Any attempt to approach or interfere and we will shoot the shuttle down.\"\n\nThe shuttle appears on your sensors. A quick scan returns no weapons or traps and a single life sign aboard. You authorize the shuttle to dock and find $sep_sar_survivorFullName, alive but shaken.",
-        "entityFightText": "The feed crackles back on. The kidnapper sneers, his voice dripping with bitter disappointment. \"So that's your choice? I thought you'd have the spine to settle this clean, but I see I was wrong. Fine, if it's a fight you want, then it's a fight you'll get.\"",
+        "entityFightText": "The feed crackles back on. The kidnapper sneers, his voice dripping with disappointment. \"So that's your choice? I thought you'd have the spine to settle this clean, but I see I was wrong. Fine, if it's a fight you want, then it's a fight you'll get.\"",
         "entityDeclineText": "FLEET SAMPLE: GO BACK",
-        "entityStoryPointText": "FLEET SAMPLE: STORY POINT TEXT",
-        "entityDefeatedText": "FLEET SAMPLE: SAVE SURVIVOR TEXT",
-
-        # After entity interaction texsts
-        "survivorAliveText": "SAMPLE: SURVIVOR ALIVE TEXT",
-        "survivorDeadText": "SAMPLE: SURVIVOR DEAD TEXT",
+        "entityPersuadeToFreeText": "You open comms and begin to persuade the kidnappers. After a tense back-and-forth, they finally relent. Their demands falter as hesitation takes hold, and they choose to release the hostage.\n\nA lone shuttle is launched, carrying $sep_sar_survivorFullName toward your fleet. The hostage is alive but shaken, spared without a single shot fired.",
+        "entityDefeatedText": "Your crews sweep through the debris field, searching for any trace of the hostage. Among the wreckage, they discover a lone shuttle adrift.\n\nInside, $sep_sar_survivorFullName is found alive, shaken but stable, and quickly transferred to your sickbay for treatment.",
       },
       {
         "survivorType": "ADMINISTRATOR", # OFFICER, ADMINISTRATOR, CIVILIAN 
