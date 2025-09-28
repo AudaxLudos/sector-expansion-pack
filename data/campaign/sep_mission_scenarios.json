@@ -13,6 +13,20 @@
       "needsCommission": false, # not in use
       "minRepNeeded": "NEUTRAL", # not in use
 
+      "survivorStats": {
+        # Affects officer and Admin stats
+        "setLevel": 1, # will set the current level of the officer / administrator
+
+        # Affects officer stats only
+        "mentored": true, # will give increase xp and more skills to select when leveling
+        "maxLevel": 6, # will only take affect if value is beyond 6 (due to player stats), will overwrite player stat modifiers
+        "maxEliteSkills": 3, # will only take affect if value is beyond 3 (due to player stats), will overwrite player stat modifiers
+        "setMaxEliteSkills": 0, # will set any skill available to elite - not in use
+        
+        # Affects contact stats only
+        # TODO: Implement contact stats
+      },
+
       entityFleet: {
         "factionId": "pirates", # Faction id - required
         "fleetName": "",
@@ -23,8 +37,8 @@
       },
 
       # Start contact dialog texts
-      "contactMissionBlurb": "In your custom scenario add this:\n\n\"contactMissionBlurb\":\"SAMPLE TEXT\"",
-      "contactMissionOption": "In your custom scenario add this:\n\n\"contactMissionOption\":\"SAMPLE TEXT\"",
+      "contactMissionBlurb": "In your custom scenario add this:\n\"contactMissionBlurb\":\"SAMPLE TEXT\"",
+      "contactMissionOption": "In your custom scenario add this:\n\"contactMissionOption\":\"SAMPLE TEXT\"",
       "contactMissionOfferText": "In your custom scenario add this:\n\"contactMissionOfferText\":\"SAMPLE TEXT\"",
 
       # Start bar dialog texts
@@ -43,7 +57,7 @@
       "entityFightText": "In your custom scenario add this:\n\"entityFightText\":\"SAMPLE TEXT\"",
       "entityDeclineText": "In your custom scenario add this:\n\"entityDeclineText\":\"SAMPLE TEXT\"",
       "entityDefeatedText": "In your custom scenario add this:\n\"entityDefeatedText\":\"SAMPLE TEXT\"",
-      "entityStoryPointText": "In your custom scenario add this:\n\"entityStoryPointText\":\"SAMPLE TEXT\"",
+      "entityPersuadeToFreeText": "In your custom scenario add this:\n\"entityPersuadeToFreeText\":\"SAMPLE TEXT\"",
 
       # MARKET or PLANET_RAID
       "entityRaidFinishedText": "In your custom scenario add this:\n\"entityDefeatedText\":\"SAMPLE TEXT\"",

@@ -2,7 +2,10 @@ package sectorexpansionpack.missions;
 
 import com.fs.starfarer.api.EveryFrameScript;
 import com.fs.starfarer.api.Global;
-import com.fs.starfarer.api.campaign.*;
+import com.fs.starfarer.api.campaign.CampaignFleetAPI;
+import com.fs.starfarer.api.campaign.InteractionDialogAPI;
+import com.fs.starfarer.api.campaign.PlanetAPI;
+import com.fs.starfarer.api.campaign.SectorEntityToken;
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
 import com.fs.starfarer.api.campaign.rules.MemoryAPI;
 import com.fs.starfarer.api.characters.PersonAPI;
@@ -66,15 +69,24 @@ public class SearchAndRescueMission extends HubMissionWithBarEvent {
             }
 
             // TODO: Make survivor modifiable using the scenario settings
+            JSONObject survivorStats = (JSONObject) getScenarioData("survivorStats");
             this.survivorPostType = PersonPostType.valueOf((String) getScenarioData("survivorType"));
             if (this.survivorPostType == PersonPostType.RANDOM) {
                 this.survivorPostType = (PersonPostType) pickOneObject(Arrays.asList(PersonPostType.OFFICER, PersonPostType.ADMINISTRATOR, PersonPostType.CIVILIAN));
             }
             if (this.survivorPostType == PersonPostType.OFFICER) {
-                this.survivor = OfficerManagerEvent.createOfficer(createdAt.getFaction(), 1, OfficerManagerEvent.SkillPickPreference.ANY, this.genRandom);
+                this.survivor = OfficerManagerEvent.createOfficer(createdAt.getFaction(), survivorStats.getInt("level"), OfficerManagerEvent.SkillPickPreference.ANY, this.genRandom);
                 this.survivor.setPostId(Ranks.POST_OFFICER_FOR_HIRE);
+                this.survivor.getMemoryWithoutUpdate().set("$mentored", survivorStats.getBoolean("mentored"));
+                if (survivorStats.getInt("maxLevel") > 6) {
+                    this.survivor.getMemoryWithoutUpdate().set(MemFlags.OFFICER_MAX_LEVEL, survivorStats.getInt("maxLevel"));
+                }
+                if (survivorStats.getInt("maxEliteSkills") > 3) {
+                    this.survivor.getMemoryWithoutUpdate().set(MemFlags.OFFICER_MAX_ELITE_SKILLS, survivorStats.getInt("maxEliteSkills"));
+                }
             } else if (this.survivorPostType == PersonPostType.ADMINISTRATOR) {
-                this.survivor = OfficerManagerEvent.createAdmin(createdAt.getFaction(), 1, this.genRandom);
+                this.survivor = OfficerManagerEvent.createAdmin(createdAt.getFaction(), survivorStats.getInt("level"), this.genRandom);
+            } else if (this.survivorPostType == PersonPostType.CONTACT) {
             } else {
                 this.survivor = createdAt.getFaction().createRandomPerson(this.genRandom);
             }
