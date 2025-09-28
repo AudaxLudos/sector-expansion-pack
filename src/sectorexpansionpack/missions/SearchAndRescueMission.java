@@ -2,15 +2,13 @@ package sectorexpansionpack.missions;
 
 import com.fs.starfarer.api.EveryFrameScript;
 import com.fs.starfarer.api.Global;
-import com.fs.starfarer.api.campaign.CampaignFleetAPI;
-import com.fs.starfarer.api.campaign.InteractionDialogAPI;
-import com.fs.starfarer.api.campaign.PlanetAPI;
-import com.fs.starfarer.api.campaign.SectorEntityToken;
+import com.fs.starfarer.api.campaign.*;
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
 import com.fs.starfarer.api.campaign.rules.MemoryAPI;
 import com.fs.starfarer.api.characters.PersonAPI;
 import com.fs.starfarer.api.impl.campaign.events.OfficerManagerEvent;
 import com.fs.starfarer.api.impl.campaign.ids.*;
+import com.fs.starfarer.api.impl.campaign.intel.contacts.ContactIntel;
 import com.fs.starfarer.api.impl.campaign.missions.hub.HubMissionWithBarEvent;
 import com.fs.starfarer.api.impl.campaign.missions.hub.ReqMode;
 import com.fs.starfarer.api.impl.campaign.procgen.Constellation;
@@ -87,6 +85,16 @@ public class SearchAndRescueMission extends HubMissionWithBarEvent {
             } else if (this.survivorPostType == PersonPostType.ADMINISTRATOR) {
                 this.survivor = OfficerManagerEvent.createAdmin(createdAt.getFaction(), survivorStats.getInt("level"), this.genRandom);
             } else if (this.survivorPostType == PersonPostType.CONTACT) {
+                this.survivor = createdAt.getFaction().createRandomPerson(this.genRandom);
+                this.survivor.setRankId(survivorStats.getString("rank"));
+                this.survivor.setPostId(survivorStats.getString("post"));
+                this.survivor.setImportance(PersonImportance.valueOf(survivorStats.getString("importance")));
+                if (survivorStats.has("tags")) {
+                    JSONArray tags = survivorStats.getJSONArray("tags");
+                    for (int i = 0; i < tags.length(); i++) {
+                        this.survivor.addTag(tags.getString(i));
+                    }
+                }
             } else {
                 this.survivor = createdAt.getFaction().createRandomPerson(this.genRandom);
             }
@@ -407,6 +415,8 @@ public class SearchAndRescueMission extends HubMissionWithBarEvent {
                         manager.addAvailable(officer);
                     } else if (this.survivorPostType == PersonPostType.ADMINISTRATOR) {
                         manager.addAvailableAdmin(officer);
+                    } else if (this.survivorPostType == PersonPostType.CONTACT) {
+                        ContactIntel.addPotentialContact(this.survivor, getPerson().getMarket(), dialog.getTextPanel());
                     }
 
                     officer.person.getMemoryWithoutUpdate().set("$sep_survivor", true);

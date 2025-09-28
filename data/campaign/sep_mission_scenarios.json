@@ -24,7 +24,10 @@
         "setMaxEliteSkills": 0, # will set any skill available to elite - not in use
         
         # Affects contact stats only
-        # TODO: Implement contact stats
+        "rank": "citizen",
+        "post": "agent",
+        "importance": "HIGH", # VERY_LOW, LOW, MEDIUM, HIGH, VERY_HIGH
+        "tags": ["underworld"] # military, trade, underworld, science, pather
       },
 
       entityFleet: {
