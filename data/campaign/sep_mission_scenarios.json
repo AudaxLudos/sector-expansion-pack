@@ -15,7 +15,7 @@
 
       "survivorStats": {
         # Affects officer and Admin stats
-        "setLevel": 1, # will set the current level of the officer / administrator
+        "level": 1, # will set the current level of the officer / administrator
 
         # Affects officer stats only
         "mentored": true, # will give increase xp and more skills to select when leveling
@@ -132,7 +132,7 @@
         "entityFightText": "The feed crackles back on. The kidnapper sneers, his voice dripping with disappointment. \"So that's your choice? I thought you'd have the spine to settle this clean, but I see I was wrong. Fine, if it's a fight you want, then it's a fight you'll get.\"",
         "entityDeclineText": "FLEET SAMPLE: GO BACK",
         "entityPersuadeToFreeText": "You open comms and begin to persuade the kidnappers. After a tense back-and-forth, they finally relent. Their demands falter as hesitation takes hold, and they choose to release the hostage.\n\nA lone shuttle is launched, carrying $sep_sar_survivorFullName toward your fleet. The hostage is alive but shaken, spared without a single shot fired.",
-        "entityDefeatedText": "Your crews sweep through the debris field, searching for any trace of the hostage. Among the wreckage, they discover a lone shuttle adrift.\n\nInside, $sep_sar_survivorFullName is found alive, shaken but stable, and quickly transferred to your sickbay for treatment.",
+        "entityDefeatedText": "Your sensors officer scans through the debris field, searching for any trace of the hostage. Among the wreckage, they discover a lone shuttle adrift.\n\nInside, $sep_sar_survivorFullName is found alive, shaken but stable, and quickly transferred to your sickbay for treatment.",
       },
       {
         "survivorType": "ADMINISTRATOR", # OFFICER, ADMINISTRATOR, CIVILIAN 

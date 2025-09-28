@@ -66,7 +66,6 @@ public class SearchAndRescueMission extends HubMissionWithBarEvent {
                 setGiverIsPotentialContactOnSuccess();
             }
 
-            // TODO: Make survivor modifiable using the scenario settings
             JSONObject survivorStats = (JSONObject) getScenarioData("survivorStats");
             this.survivorPostType = PersonPostType.valueOf((String) getScenarioData("survivorType"));
             if (this.survivorPostType == PersonPostType.RANDOM) {
