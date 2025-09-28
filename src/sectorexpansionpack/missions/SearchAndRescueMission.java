@@ -7,7 +7,10 @@ import com.fs.starfarer.api.campaign.econ.MarketAPI;
 import com.fs.starfarer.api.campaign.rules.MemoryAPI;
 import com.fs.starfarer.api.characters.PersonAPI;
 import com.fs.starfarer.api.impl.campaign.events.OfficerManagerEvent;
-import com.fs.starfarer.api.impl.campaign.ids.*;
+import com.fs.starfarer.api.impl.campaign.ids.Entities;
+import com.fs.starfarer.api.impl.campaign.ids.MemFlags;
+import com.fs.starfarer.api.impl.campaign.ids.Ranks;
+import com.fs.starfarer.api.impl.campaign.ids.Tags;
 import com.fs.starfarer.api.impl.campaign.intel.contacts.ContactIntel;
 import com.fs.starfarer.api.impl.campaign.missions.hub.HubMissionWithBarEvent;
 import com.fs.starfarer.api.impl.campaign.missions.hub.ReqMode;
@@ -48,12 +51,22 @@ public class SearchAndRescueMission extends HubMissionWithBarEvent {
             }
 
             if (barEvent) {
-                // TODO: Make this bar contact modifiable using the scenario settings
-                setGiverRank(Ranks.CITIZEN);
-                setGiverPost(pickOne(Ranks.POST_AGENT, Ranks.POST_SMUGGLER, Ranks.POST_GANGSTER, Ranks.POST_FENCE, Ranks.POST_CRIMINAL));
-                setGiverImportance(pickImportance());
-                setGiverFaction(Factions.PIRATES);
-                setGiverTags(Tags.CONTACT_TRADE);
+                JSONObject barGiverStats = (JSONObject) getScenarioData("barGiverStats");
+                setGiverRank(barGiverStats.getString("rank"));
+                setGiverPost(barGiverStats.getString("post"));
+                setGiverImportance(PersonImportance.valueOf(barGiverStats.getString("importance")));
+                if (barGiverStats.has("faction") && !barGiverStats.getString("faction").isEmpty()) {
+                    setGiverFaction(barGiverStats.getString("faction"));
+                }
+                if (barGiverStats.has("tags")) {
+                    JSONArray tags = barGiverStats.getJSONArray("tags");
+                    List<String> giverTags = new ArrayList<>();
+                    for (int i = 0; i < tags.length(); i++) {
+                        giverTags.add(tags.getString(i));
+                    }
+                    String[] tagArray = new String[giverTags.size()];
+                    setGiverTags(giverTags.toArray(tagArray));
+                }
                 findOrCreateGiver(createdAt, true, false);
             }
 

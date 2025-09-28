@@ -13,6 +13,14 @@
       "needsCommission": false, # not in use
       "minRepNeeded": "NEUTRAL", # not in use
 
+      "barGiverStats": {
+        "faction": "",
+        "rank": "citizen",
+        "post": "agent",
+        "importance": "HIGH", # VERY_LOW, LOW, MEDIUM, HIGH, VERY_HIGH
+        "tags": ["trade"] # military, trade, underworld, science, pather
+      },
+
       "survivorStats": {
         # Affects officer and Admin stats
         "level": 1, # will set the current level of the officer / administrator
