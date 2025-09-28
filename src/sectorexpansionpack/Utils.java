@@ -1,10 +1,8 @@
 package sectorexpansionpack;
 
 import com.fs.starfarer.api.Global;
-import com.fs.starfarer.api.campaign.CustomCampaignEntityAPI;
 import com.fs.starfarer.api.campaign.SectorEntityToken;
 import com.fs.starfarer.api.characters.OfficerDataAPI;
-import com.fs.starfarer.api.impl.campaign.CryosleeperEntityPlugin;
 import com.fs.starfarer.api.impl.campaign.ids.MemFlags;
 import com.fs.starfarer.api.impl.campaign.ids.Tags;
 import com.fs.starfarer.api.impl.campaign.rulecmd.salvage.special.SleeperPodsSpecial;
@@ -23,8 +21,7 @@ public class Utils {
 
         //import com.fs.starfarer.api.impl.campaign.rulecmd.salvage.special.SleeperPodsSpecial;
         for (SectorEntityToken entity : Global.getSector().getEntitiesWithTag(Tags.SALVAGEABLE)) {
-            if (Misc.getSalvageSpecial(entity) instanceof SleeperPodsSpecial.SleeperPodsSpecialData) {
-                SleeperPodsSpecial.SleeperPodsSpecialData data = (SleeperPodsSpecial.SleeperPodsSpecialData) Misc.getSalvageSpecial(entity);
+            if (Misc.getSalvageSpecial(entity) instanceof SleeperPodsSpecial.SleeperPodsSpecialData data) {
                 if (data.officer != null && data.officer.getMemoryWithoutUpdate().getBoolean(MemFlags.EXCEPTIONAL_SLEEPER_POD_OFFICER)) {
                     System.out.println("System : " + entity.getStarSystem().getName());
                     if (entity.getOrbitFocus() != null) {

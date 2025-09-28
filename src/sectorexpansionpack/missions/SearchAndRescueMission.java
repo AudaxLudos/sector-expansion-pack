@@ -66,116 +66,13 @@ public class SearchAndRescueMission extends HubMissionWithBarEvent {
                 setGiverIsPotentialContactOnSuccess();
             }
 
-            JSONObject survivorStats = (JSONObject) getScenarioData("survivorStats");
-            this.survivorPostType = PersonPostType.valueOf((String) getScenarioData("survivorType"));
-            if (this.survivorPostType == PersonPostType.RANDOM) {
-                this.survivorPostType = (PersonPostType) pickOneObject(Arrays.asList(PersonPostType.OFFICER, PersonPostType.ADMINISTRATOR, PersonPostType.CIVILIAN));
-            }
-            if (this.survivorPostType == PersonPostType.OFFICER) {
-                this.survivor = OfficerManagerEvent.createOfficer(createdAt.getFaction(), survivorStats.getInt("level"), OfficerManagerEvent.SkillPickPreference.ANY, this.genRandom);
-                this.survivor.setPostId(Ranks.POST_OFFICER_FOR_HIRE);
-                this.survivor.getMemoryWithoutUpdate().set("$mentored", survivorStats.getBoolean("mentored"));
-                if (survivorStats.getInt("maxLevel") > 6) {
-                    this.survivor.getMemoryWithoutUpdate().set(MemFlags.OFFICER_MAX_LEVEL, survivorStats.getInt("maxLevel"));
-                }
-                if (survivorStats.getInt("maxEliteSkills") > 3) {
-                    this.survivor.getMemoryWithoutUpdate().set(MemFlags.OFFICER_MAX_ELITE_SKILLS, survivorStats.getInt("maxEliteSkills"));
-                }
-            } else if (this.survivorPostType == PersonPostType.ADMINISTRATOR) {
-                this.survivor = OfficerManagerEvent.createAdmin(createdAt.getFaction(), survivorStats.getInt("level"), this.genRandom);
-            } else if (this.survivorPostType == PersonPostType.CONTACT) {
-                this.survivor = createdAt.getFaction().createRandomPerson(this.genRandom);
-                this.survivor.setRankId(survivorStats.getString("rank"));
-                this.survivor.setPostId(survivorStats.getString("post"));
-                this.survivor.setImportance(PersonImportance.valueOf(survivorStats.getString("importance")));
-                if (survivorStats.has("tags")) {
-                    JSONArray tags = survivorStats.getJSONArray("tags");
-                    for (int i = 0; i < tags.length(); i++) {
-                        this.survivor.addTag(tags.getString(i));
-                    }
-                }
-            } else {
-                this.survivor = createdAt.getFaction().createRandomPerson(this.genRandom);
-            }
-
+            this.survivor = pickSurvivor();
             if (this.survivor == null) {
                 log.info("Failed to create survivor");
                 return false;
             }
 
-            preferSystemInInnerSector();
-            preferSystemInDirectionOfOtherMissions();
-
-            this.entityType = EntityType.valueOf((String) getScenarioData("entityType"));
-            switch (this.entityType) {
-                case WRECK:
-                    requireEntityTags(ReqMode.ALL, Tags.SALVAGEABLE);
-                    requireEntityType(Entities.WRECK);
-                    this.entity = pickEntity();
-                    break;
-                case FLEET:
-                    requireSystemHasSafeStars();
-                    requireSystemTags(ReqMode.NOT_ALL, Tags.THEME_UNSAFE);
-                    preferPlanetNotFullySurveyed();
-                    preferPlanetUnpopulated();
-                    preferPlanetWithRuins();
-                    PlanetAPI planet = pickPlanet();
-
-                    JSONObject fleetSettings = (JSONObject) getScenarioData("entityFleet");
-                    beginStageTrigger(Stage.FIND);
-                    triggerCreateFleet(
-                            FleetSize.valueOf(fleetSettings.getString("fleetSize")),
-                            FleetQuality.valueOf(fleetSettings.getString("fleetQuality")),
-                            fleetSettings.getString("factionId"),
-                            fleetSettings.getString("fleetTypes"),
-                            planet.getStarSystem());
-
-                    if (fleetSettings.has("autoAdjust")) {
-                        switch (fleetSettings.getString("autoAdjust")) {
-                            case "MODERATE" -> triggerAutoAdjustFleetStrengthModerate();
-                            case "MAJOR" -> triggerAutoAdjustFleetStrengthMajor();
-                            case "EXTREME" -> triggerAutoAdjustFleetStrengthExtreme();
-                        }
-                    }
-
-                    triggerPickLocationAroundEntity(planet, 1000f);
-                    triggerSpawnFleetAtPickedLocation();
-
-                    triggerMakeLowRepImpact();
-                    triggerMakeFleetIgnoreOtherFleets();
-                    triggerMakeFleetIgnoredByOtherFleets();
-                    triggerMakeFleetNotIgnorePlayer();
-                    triggerOrderFleetPatrol(planet);
-                    triggerFleetAddDefeatTrigger("SEPSARFleetDefeated");
-
-                    if (fleetSettings.has("fleetName") && !fleetSettings.getString("fleetName").isEmpty()) {
-                        triggerFleetSetName(fleetSettings.getString("fleetName"));
-                    }
-
-                    endTrigger();
-
-                    List<CampaignFleetAPI> fleets = runStageTriggersReturnFleets(Stage.FIND);
-                    this.entity = fleets.get(0);
-                    break;
-                case PLANET_RAID:
-                case PLANET:
-                    requireSystemInterestingAndNotCore();
-                    requirePlanetNotGasGiant();
-                    requirePlanetNotStar();
-                    preferPlanetNotFullySurveyed();
-                    preferPlanetUnpopulated();
-                    this.entity = pickPlanet();
-                    break;
-                case MARKET:
-                    requireMarketNotHidden();
-                    preferMarketFactionHostileTo(getPerson().getFaction().getId());
-                    this.entity = pickMarket().getPrimaryEntity();
-                    break;
-                default:
-                    this.entity = null;
-                    break;
-            }
-
+            this.entity = pickSurvivorEntity();
             if (!setEntityMissionRef(this.entity, "$sep_sar_ref")) {
                 log.info("Failed to find entity containing survivor");
                 return false;
@@ -261,6 +158,122 @@ public class SearchAndRescueMission extends HubMissionWithBarEvent {
             log.error(e);
             return false;
         }
+    }
+
+    public PersonAPI pickSurvivor() throws JSONException {
+        PersonAPI person;
+        JSONObject survivorStats = (JSONObject) getScenarioData("survivorStats");
+        this.survivorPostType = PersonPostType.valueOf((String) getScenarioData("survivorType"));
+        if (this.survivorPostType == PersonPostType.RANDOM) {
+            this.survivorPostType = (PersonPostType) pickOneObject(Arrays.asList(PersonPostType.OFFICER, PersonPostType.ADMINISTRATOR, PersonPostType.CIVILIAN));
+        }
+        if (this.survivorPostType == PersonPostType.OFFICER) {
+            person = OfficerManagerEvent.createOfficer(getPerson().getFaction(), survivorStats.getInt("level"), OfficerManagerEvent.SkillPickPreference.ANY, this.genRandom);
+            person.setPostId(Ranks.POST_OFFICER_FOR_HIRE);
+            person.getMemoryWithoutUpdate().set("$mentored", survivorStats.getBoolean("mentored"));
+            if (survivorStats.getInt("maxLevel") > 6) {
+                person.getMemoryWithoutUpdate().set(MemFlags.OFFICER_MAX_LEVEL, survivorStats.getInt("maxLevel"));
+            }
+            if (survivorStats.getInt("maxEliteSkills") > 3) {
+                person.getMemoryWithoutUpdate().set(MemFlags.OFFICER_MAX_ELITE_SKILLS, survivorStats.getInt("maxEliteSkills"));
+            }
+        } else if (this.survivorPostType == PersonPostType.ADMINISTRATOR) {
+            person = OfficerManagerEvent.createAdmin(getPerson().getFaction(), survivorStats.getInt("level"), this.genRandom);
+        } else if (this.survivorPostType == PersonPostType.CONTACT) {
+            person = getPerson().getFaction().createRandomPerson(this.genRandom);
+            person.setRankId(survivorStats.getString("rank"));
+            person.setPostId(survivorStats.getString("post"));
+            person.setImportance(PersonImportance.valueOf(survivorStats.getString("importance")));
+            if (survivorStats.has("tags")) {
+                JSONArray tags = survivorStats.getJSONArray("tags");
+                for (int i = 0; i < tags.length(); i++) {
+                    person.addTag(tags.getString(i));
+                }
+            }
+        } else {
+            person = getPerson().getFaction().createRandomPerson(this.genRandom);
+        }
+
+        return person;
+    }
+
+    public SectorEntityToken pickSurvivorEntity() throws JSONException {
+        SectorEntityToken entity;
+
+        preferSystemInInnerSector();
+        preferSystemInDirectionOfOtherMissions();
+
+        this.entityType = EntityType.valueOf((String) getScenarioData("entityType"));
+        switch (this.entityType) {
+            case WRECK:
+                requireEntityTags(ReqMode.ALL, Tags.SALVAGEABLE);
+                requireEntityType(Entities.WRECK);
+                entity = pickEntity();
+                break;
+            case FLEET:
+                requireSystemHasSafeStars();
+                requireSystemTags(ReqMode.NOT_ALL, Tags.THEME_UNSAFE);
+                preferPlanetNotFullySurveyed();
+                preferPlanetUnpopulated();
+                preferPlanetWithRuins();
+                PlanetAPI planet = pickPlanet();
+
+                JSONObject fleetSettings = (JSONObject) getScenarioData("entityFleet");
+                beginStageTrigger(Stage.FIND);
+                triggerCreateFleet(
+                        FleetSize.valueOf(fleetSettings.getString("fleetSize")),
+                        FleetQuality.valueOf(fleetSettings.getString("fleetQuality")),
+                        fleetSettings.getString("factionId"),
+                        fleetSettings.getString("fleetTypes"),
+                        planet.getStarSystem());
+
+                if (fleetSettings.has("autoAdjust")) {
+                    switch (fleetSettings.getString("autoAdjust")) {
+                        case "MODERATE" -> triggerAutoAdjustFleetStrengthModerate();
+                        case "MAJOR" -> triggerAutoAdjustFleetStrengthMajor();
+                        case "EXTREME" -> triggerAutoAdjustFleetStrengthExtreme();
+                    }
+                }
+
+                triggerPickLocationAroundEntity(planet, 1000f);
+                triggerSpawnFleetAtPickedLocation();
+
+                triggerMakeLowRepImpact();
+                triggerMakeFleetIgnoreOtherFleets();
+                triggerMakeFleetIgnoredByOtherFleets();
+                triggerMakeFleetNotIgnorePlayer();
+                triggerOrderFleetPatrol(planet);
+                triggerFleetAddDefeatTrigger("SEPSARFleetDefeated");
+
+                if (fleetSettings.has("fleetName") && !fleetSettings.getString("fleetName").isEmpty()) {
+                    triggerFleetSetName(fleetSettings.getString("fleetName"));
+                }
+
+                endTrigger();
+
+                List<CampaignFleetAPI> fleets = runStageTriggersReturnFleets(Stage.FIND);
+                entity = fleets.get(0);
+                break;
+            case PLANET_RAID:
+            case PLANET:
+                requireSystemInterestingAndNotCore();
+                requirePlanetNotGasGiant();
+                requirePlanetNotStar();
+                preferPlanetNotFullySurveyed();
+                preferPlanetUnpopulated();
+                entity = pickPlanet();
+                break;
+            case MARKET:
+                requireMarketNotHidden();
+                preferMarketFactionHostileTo(getPerson().getFaction().getId());
+                entity = pickMarket().getPrimaryEntity();
+                break;
+            default:
+                entity = null;
+                break;
+        }
+
+        return entity;
     }
 
     @Override
