@@ -22,10 +22,10 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 // TODO: Remove listener if mission is abandoned or failed
 // TODO: Find any contact faction market and install special item
-// TODO: Fix softlock when target market changes faction ownership
 // TODO: Add dialog texts
 public class ArtifactIncursionMission extends HubMissionWithBarEvent implements GroundRaidObjectivesListener {
     public static Logger log = Global.getLogger(ArtifactIncursionMission.class);
@@ -104,6 +104,10 @@ public class ArtifactIncursionMission extends HubMissionWithBarEvent implements 
         connectWithMarketDecivilized(Stage.DELIVER_ARTIFACT, Stage.FAILED_DECIV, getPerson().getMarket());
         setStageOnMarketDecivilized(Stage.FAILED_DECIV, this.market);
         setStageOnMarketDecivilized(Stage.FAILED_DECIV, createdAt);
+
+        addNoPenaltyFailureStages(Stage.FAILED_MARKET_FACTION_CHANGED);
+        connectWithMarketFactionChanged(Stage.RAID_ARTIFACT, Stage.FAILED_MARKET_FACTION_CHANGED, this.market);
+        setStageOnMarketFactionChanged(Stage.FAILED_MARKET_FACTION_CHANGED, this.market);
 
         setTimeLimit(Stage.FAILED, MISSION_DURATION, null);
 
@@ -295,12 +299,21 @@ public class ArtifactIncursionMission extends HubMissionWithBarEvent implements 
         this.search.marketReqs.add(new MarketHasSpecialItemsInstalledReq());
     }
 
+    public void connectWithMarketFactionChanged(Object from, Object to, MarketAPI market) {
+        this.connections.add(new StageConnection(from, to, new MarketFactionChangedChecker(market)));
+    }
+
+    public void setStageOnMarketFactionChanged(Object to, MarketAPI market) {
+        this.connections.add(new StageConnection(null, to, new MarketFactionChangedChecker(market)));
+    }
+
     public enum Stage {
         RAID_ARTIFACT,
         DELIVER_ARTIFACT,
         COMPLETED,
         FAILED,
-        FAILED_DECIV
+        FAILED_DECIV,
+        FAILED_MARKET_FACTION_CHANGED
     }
 
     public static class MarketHasSpecialItemsInstalledReq implements MarketRequirement {
@@ -312,6 +325,21 @@ public class ArtifactIncursionMission extends HubMissionWithBarEvent implements 
                 }
             }
             return false;
+        }
+    }
+
+    public static class MarketFactionChangedChecker implements ConditionChecker {
+        public String prevFactionId;
+        public MarketAPI market;
+
+        public MarketFactionChangedChecker(MarketAPI market) {
+            this.prevFactionId = market.getFactionId();
+            this.market = market;
+        }
+
+        @Override
+        public boolean conditionsMet() {
+            return !Objects.equals(this.market.getFactionId(), this.prevFactionId);
         }
     }
 }
