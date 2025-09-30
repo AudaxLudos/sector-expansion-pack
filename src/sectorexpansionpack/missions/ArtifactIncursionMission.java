@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-// TODO: Remove listener if mission is abandoned or failed
 // TODO: Find any contact faction market and install special item
 // TODO: Add dialog texts
 public class ArtifactIncursionMission extends HubMissionWithBarEvent implements GroundRaidObjectivesListener {
@@ -157,6 +156,21 @@ public class ArtifactIncursionMission extends HubMissionWithBarEvent implements 
     @Override
     public void acceptImpl(InteractionDialogAPI dialog, Map<String, MemoryAPI> memoryMap) {
         Global.getSector().getListenerManager().addListener(this);
+    }
+
+    @Override
+    protected void endSuccessImpl(InteractionDialogAPI dialog, Map<String, MemoryAPI> memoryMap) {
+        Global.getSector().getListenerManager().removeListener(this);
+    }
+
+    @Override
+    protected void endFailureImpl(InteractionDialogAPI dialog, Map<String, MemoryAPI> memoryMap) {
+        Global.getSector().getListenerManager().removeListener(this);
+    }
+
+    @Override
+    protected void endAbandonImpl() {
+        Global.getSector().getListenerManager().removeListener(this);
     }
 
     @Override
