@@ -55,7 +55,7 @@ public class ModPlugin extends BaseModPlugin {
     public static JSONObject getMissionScenarioDefaults(String missionId) {
         JSONObject mission;
         try {
-            mission = MISSION_SCENARIOS.getJSONObject(missionId).getJSONObject("defaults");;
+            mission = MISSION_SCENARIOS.getJSONObject(missionId).getJSONObject("defaults");
         } catch (JSONException e) {
             throw new RuntimeException(e);
         }

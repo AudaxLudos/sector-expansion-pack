@@ -1,6 +1,5 @@
 {
   "sep_sar": {
-    # TODO: Add at least 10 different scenarios
     "defaults": {
       "weight": 10, # Probabilty that this scenario will be selected, -1 value wont be selected
       "hasContactEvent": true,
@@ -132,7 +131,7 @@
         # Start contact dialog texts
         "contactMissionBlurb": "\"A ranking official has been kidnapped. I can't spare the resources to mount a rescue, but I trust you enough to offer this mission to you if you're willing.\"",
         "contactMissionOption": "Ask about the kidnapped ranking offical",
-        "contactMissionOfferText": "\"$sep_sar_survivorFullName was abducted shortly after leaving a bar. Soon after, the kidnappers contacted $sep_sar_survivorHisOrHer family, demanding a ransom of $sep_sar_creditRansom in exchange for $sep_sar_survivorLastName's release.\" $heOrShe pauses, transmitting a shared intel briefing from $hisOrHer tripad.\n\n\"The kidnappers have been identified as a splinter cell of the $sep_sar_entityFaction, claiming retribution for past actions taken against them. They've ordered the ransom to be delivered to a fleet waiting in $sep_sar_possibleLoc.\"\n\n$HeOrShe continues, \"The family of $sep_sar_survivorLastName is offering a reward of $sep_sar_creditReward for $sep_sar_survivorHisOrHer safe return and the resolution of this matter.\"",
+        "contactMissionOfferText": "\"$sep_sar_survivorFullName was abducted shortly after leaving a bar. Soon after, the kidnappers contacted $sep_sar_survivorHisOrHer family, demanding a ransom of $sep_sar_creditRansom in exchange for $sep_sar_survivorLastName's release.\" $heOrShe pauses, transmitting a shared intel briefing from $hisOrHer tripad.\n\n\"The kidnappers have been identified as a $sep_sar_entityFaction terrorist group, claiming retribution for past actions taken against them. They've ordered the ransom to be delivered to a fleet waiting in $sep_sar_possibleLoc.\"\n\n$HeOrShe continues, \"The family of $sep_sar_survivorLastName is offering a reward of $sep_sar_creditReward for $sep_sar_survivorHisOrHer safe return and the resolution of this matter.\"",
 
         # Start bar dialog texts
         "barMissionBlurb": "You notice an anxious $manOrWoman drinking heavily, muttering complaints about the $Faction on how discounted they treated $himOrHer.",

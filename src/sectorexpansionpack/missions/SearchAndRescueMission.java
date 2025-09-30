@@ -31,7 +31,7 @@ import java.util.*;
 import java.util.List;
 
 public class SearchAndRescueMission extends HubMissionWithBarEvent {
-    public static final JSONObject scenarioDefaults = ModPlugin.getMissionScenarioDefaults("sep_sar");
+    public static final JSONObject SCENARIO_DEFAULTS = ModPlugin.getMissionScenarioDefaults("sep_sar");
     public static Logger log = Global.getLogger(SearchAndRescueMission.class);
     protected JSONObject scenarioData;
     protected PersonPostType survivorPostType;
@@ -346,7 +346,6 @@ public class SearchAndRescueMission extends HubMissionWithBarEvent {
             if (this.entityType == EntityType.FLEET) {
                 set("$sep_sar_entityPayRansomText", getDialogText("entityPayRansomText"));
                 set("$sep_sar_entityFightText", getDialogText("entityFightText"));
-                set("$sep_sar_entityDeclineText", getDialogText("entityDeclineText"));
                 set("$sep_sar_entityPersuadeToFreeText", getDialogText("entityPersuadeToFreeText"));
                 set("$sep_sar_entityDefeatedText", getDialogText("entityDefeatedText"));
             } else if (this.entityType == EntityType.PLANET_RAID) {
@@ -508,7 +507,7 @@ public class SearchAndRescueMission extends HubMissionWithBarEvent {
         if (this.scenarioData.has(id)) {
             result = this.scenarioData.get(id);
         } else {
-            result = scenarioDefaults.get(id);
+            result = SCENARIO_DEFAULTS.get(id);
         }
         return result;
     }
