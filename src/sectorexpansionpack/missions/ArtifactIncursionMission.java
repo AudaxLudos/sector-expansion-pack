@@ -12,13 +12,15 @@ import com.fs.starfarer.api.impl.campaign.ids.Factions;
 import com.fs.starfarer.api.impl.campaign.ids.Ranks;
 import com.fs.starfarer.api.impl.campaign.ids.Tags;
 import com.fs.starfarer.api.impl.campaign.missions.hub.HubMissionWithBarEvent;
-import com.fs.starfarer.api.impl.campaign.procgen.Constellation;
 import com.fs.starfarer.api.impl.campaign.rulecmd.FireAll;
 import com.fs.starfarer.api.impl.campaign.rulecmd.salvage.MarketCMD;
 import com.fs.starfarer.api.ui.SectorMapAPI;
+import com.fs.starfarer.api.ui.TooltipMakerAPI;
+import com.fs.starfarer.api.util.Misc;
 import com.fs.starfarer.api.util.WeightedRandomPicker;
 import org.apache.log4j.Logger;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -30,9 +32,7 @@ import java.util.Map;
 // TODO: Set the credit reward to 0 if keep artifact option is selected
 // TODO: Add option to keep artifact
 // TODO: Fix softlock when target market changes faction ownership
-// TODO: Add intel descriptions
 // TODO: Add dialog texts
-// TODO: Add map pointers
 public class ArtifactIncursionMission extends HubMissionWithBarEvent implements GroundRaidObjectivesListener {
     public static Logger log = Global.getLogger(ArtifactIncursionMission.class);
     public static float MISSION_DURATION = 120f;
@@ -136,6 +136,41 @@ public class ArtifactIncursionMission extends HubMissionWithBarEvent implements 
     protected void updateInteractionDataImpl() {
         set("$sep_aim_artifactId", this.specialItemSpec.getId());
         set("$sep_aim_artifactName", this.specialItemSpec.getName());
+    }
+
+    @Override
+    public boolean addNextStepText(TooltipMakerAPI info, Color tc, float pad) {
+        if (this.currentStage == Stage.RAID_ARTIFACT) {
+            info.addPara("Take the artifact installed on %s %s facility at %s, in the %s.", pad, tc, tc,
+                    Misc.getAOrAnFor(this.industry.getCurrentName()), this.industry.getCurrentName(),
+                    this.market.getName(), this.market.getStarSystem().getNameWithLowercaseType());
+        } else if (this.currentStage == Stage.DELIVER_ARTIFACT) {
+            info.addPara("Deliver the artifact to %s at %s in the %s.", pad, tc, tc, getPerson().getName().getFullName(),
+                    getPerson().getMarket().getName(), getPerson().getMarket().getStarSystem().getNameWithLowercaseType());
+        }
+        return false;
+    }
+
+    @Override
+    public void addDescriptionForNonEndStage(TooltipMakerAPI info, float width, float height) {
+        float oPad = 10f;
+        Color textColor = Misc.getTextColor();
+        Color boldColor = Misc.getHighlightColor();
+        Color giverColor = getPerson().getFaction().getBaseUIColor();
+        Color targetColor = this.market.getFaction().getBaseUIColor();
+        if (this.currentStage == Stage.RAID_ARTIFACT) {
+            info.addPara("Take the artifact installed on %s %s facility at %s a size %s colony, in the %s controlled by the %s.", oPad,
+                    new Color[]{textColor, boldColor, targetColor, boldColor, textColor, targetColor},
+                    Misc.getAOrAnFor(this.industry.getCurrentName()), this.industry.getCurrentName(),
+                    this.market.getName(), this.market.getSize() + "", this.market.getStarSystem().getNameWithLowercaseType(),
+                    this.market.getFaction().getDisplayName());
+            addCustomRaidInfo(this.market, this.danger, info, oPad);
+        } else if (this.currentStage == Stage.DELIVER_ARTIFACT) {
+            info.addPara("Deliver the artifact to %s at %s, in the %s.", oPad,
+                    new Color[]{boldColor, giverColor, textColor},
+                    getPerson().getName().getFullName(), getPerson().getMarket().getName(),
+                    getPerson().getMarket().getStarSystem().getNameWithLowercaseType());
+        }
     }
 
     @Override
