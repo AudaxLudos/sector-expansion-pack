@@ -169,12 +169,13 @@ public class ArtifactIncursionMission extends HubMissionWithBarEvent implements 
             return;
         }
 
-        requireMarketFaction(getPerson().getMarket().getFactionId());
+        requireMarketFaction(getPerson().getFaction().getId());
         requireMarketNotHidden();
         requireMarketNotInHyperspace();
         requireMarketFactionNotPlayer();
         requireMarketCanUseSpecialItem(this.specialItemData);
         preferMarketSizeAtMost(100);
+        preferMarketIs(getPerson().getMarket());
         MarketAPI market = pickMarket();
 
         if (market == null) {
