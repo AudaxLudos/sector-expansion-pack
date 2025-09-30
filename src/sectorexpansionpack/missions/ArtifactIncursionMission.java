@@ -2,6 +2,7 @@ package sectorexpansionpack.missions;
 
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.campaign.*;
+import com.fs.starfarer.api.campaign.comm.IntelInfoPlugin;
 import com.fs.starfarer.api.campaign.econ.Industry;
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
 import com.fs.starfarer.api.campaign.listeners.GroundRaidObjectivesListener;
@@ -9,6 +10,7 @@ import com.fs.starfarer.api.campaign.rules.MemoryAPI;
 import com.fs.starfarer.api.impl.campaign.graid.GroundRaidObjectivePlugin;
 import com.fs.starfarer.api.impl.campaign.graid.SpecialItemRaidObjectivePluginImpl;
 import com.fs.starfarer.api.impl.campaign.ids.*;
+import com.fs.starfarer.api.impl.campaign.intel.MessageIntel;
 import com.fs.starfarer.api.impl.campaign.missions.hub.HubMissionWithBarEvent;
 import com.fs.starfarer.api.impl.campaign.rulecmd.FireAll;
 import com.fs.starfarer.api.impl.campaign.rulecmd.salvage.MarketCMD;
@@ -24,7 +26,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-// TODO: Find any contact faction market and install special item
+// TODO: Transfer previous special item if selected market industry has one
+// TODO: If contact is part of player faction, complete the mission when raid finishes and set credit reward to 0 or lower
 // TODO: Add dialog texts
 public class ArtifactIncursionMission extends HubMissionWithBarEvent implements GroundRaidObjectivesListener {
     public static Logger log = Global.getLogger(ArtifactIncursionMission.class);
@@ -161,6 +164,39 @@ public class ArtifactIncursionMission extends HubMissionWithBarEvent implements 
     @Override
     protected void endSuccessImpl(InteractionDialogAPI dialog, Map<String, MemoryAPI> memoryMap) {
         Global.getSector().getListenerManager().removeListener(this);
+
+        if (this.result != null && this.result.reward <= 0) {
+            return;
+        }
+
+        requireMarketFaction(getPerson().getMarket().getFactionId());
+        requireMarketNotHidden();
+        requireMarketNotInHyperspace();
+        requireMarketFactionNotPlayer();
+        requireMarketCanUseSpecialItem(this.specialItemData);
+        preferMarketSizeAtMost(100);
+        MarketAPI market = pickMarket();
+
+        if (market == null) {
+            log.info("Failed to find market to install special item");
+            return;
+        }
+
+        Industry ind = pickIndustryToInstallItem(market, this.specialItemData);
+        ind.setSpecialItem(this.specialItemData);
+
+        IntelInfoPlugin message = new MessageIntel("Install special item to " + ind.getCurrentName() + " in the " + market.getName() + " within the " + market.getStarSystem().getNameWithLowercaseTypeShort());
+        Global.getSector().getIntelManager().addIntel(message);
+    }
+
+    public Industry pickIndustryToInstallItem(MarketAPI market, SpecialItemData specialItemData) {
+        WeightedRandomPicker<Industry> industryPicker = new WeightedRandomPicker<>();
+        for (Industry industry : market.getIndustries()) {
+            if (industry.wantsToUseSpecialItem(this.specialItemData)) {
+                industryPicker.add(industry);
+            }
+        }
+        return industryPicker.pick();
     }
 
     @Override
@@ -313,6 +349,10 @@ public class ArtifactIncursionMission extends HubMissionWithBarEvent implements 
         this.search.marketReqs.add(new MarketHasSpecialItemsInstalledReq());
     }
 
+    public void requireMarketCanUseSpecialItem(SpecialItemData specialItemData) {
+        this.search.marketReqs.add(new MarketCanUseSpecialItemReq(specialItemData));
+    }
+
     public void connectWithMarketFactionChanged(Object from, Object to, MarketAPI market) {
         this.connections.add(new StageConnection(from, to, new MarketFactionChangedChecker(market)));
     }
@@ -335,6 +375,24 @@ public class ArtifactIncursionMission extends HubMissionWithBarEvent implements 
         public boolean marketMatchesRequirement(MarketAPI market) {
             for (Industry industry : market.getIndustries()) {
                 if (!industry.getVisibleInstalledItems().isEmpty()) {
+                    return true;
+                }
+            }
+            return false;
+        }
+    }
+
+    public static class MarketCanUseSpecialItemReq implements MarketRequirement {
+        public SpecialItemData specialItemData;
+
+        public MarketCanUseSpecialItemReq(SpecialItemData specialItemData) {
+            this.specialItemData = specialItemData;
+        }
+
+        @Override
+        public boolean marketMatchesRequirement(MarketAPI market) {
+            for (Industry industry : market.getIndustries()) {
+                if (industry.wantsToUseSpecialItem(this.specialItemData)) {
                     return true;
                 }
             }
