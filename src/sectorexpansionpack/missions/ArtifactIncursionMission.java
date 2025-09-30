@@ -30,7 +30,6 @@ import java.util.Map;
 // TODO: Add complications during artifact raid stage including custom dialogs
 // TODO: Add complications during artifact return stage including custom dialogs
 // TODO: Set the credit reward to 0 if keep artifact option is selected
-// TODO: Add option to keep artifact
 // TODO: Fix softlock when target market changes faction ownership
 // TODO: Add dialog texts
 public class ArtifactIncursionMission extends HubMissionWithBarEvent implements GroundRaidObjectivesListener {

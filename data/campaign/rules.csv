@@ -172,11 +172,16 @@ sep_aim_returnOpt,PopulateOptions,"$sep_aim_returnPerson
 Call $sep_aim_ref updateData",SetOptionColor sep_aim_returnArtifact hColor,,sep_aim_returnArtifact:RETURN ARTIFACT OPT,
 sep_aim_returnArtifactTxt,DialogOptionSelected,$option == sep_aim_returnArtifact,"SEPDoHasCargoCheck $sep_aim_artifactId 1 sep_aim_giveArtifact
 SetTooltip sep_aim_giveArtifact ""Need $sep_aim_artifactName in cargo.""
-SetTooltipHighlights sep_aim_giveArtifact $sep_aim_artifactName",RETURN TO CONTACT TEXT,"sep_aim_giveArtifact:GIVE ARTIFACT OPT
+SetTooltipHighlights sep_aim_giveArtifact $sep_aim_artifactName
+SetStoryOption sep_aim_keepArtifact 2 0 general ""keep artifact""",RETURN TO CONTACT TEXT,"sep_aim_giveArtifact:GIVE ARTIFACT OPT
+sep_aim_keepArtifact:KEEP ARTIFACT OPT
 100:cutCommLink:CANCEL OPT",
 sep_aim_returnArtifactGiveTxt,DialogOptionSelected,$option == sep_aim_giveArtifact,"AddRemoveAnyItem SPECIAL $sep_aim_artifactId -1
 $sep_aim_completed = true
 Call $sep_aim_ref updateStage",GIVE ARTIFACT TEXT,contact_pickAnotherGreeting:END INTERACTION,
+sep_aim_returnArtifactKeepTxt,DialogOptionSelected,"$option == sep_aim_keepArtifact
+","$sep_aim_completed = true
+Call $sep_aim_ref updateStage",KEEP ARTIFACT TEXT,contact_pickAnotherGreeting:END INTERACTION,
 "# Artifact Incursion mission
 # END",,,,,,
 ,,,,,,
