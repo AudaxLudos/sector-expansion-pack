@@ -12,6 +12,7 @@
       "entityType": "WRECK", # WRECK, FLEET, PLANET
       "needsCommission": false, # not in use
       "minRepNeeded": "NEUTRAL", # not in use
+      "subjectName": "", # Used when you don't want a specific name for the rescue
 
       "barGiverStats": {
         "faction": "",
@@ -22,7 +23,7 @@
       },
 
       "survivorStats": {
-        # Affects officer and Admin stats
+        # Affects officer and Admin stats only
         "level": 1, # will set the current level of the officer / administrator
 
         # Affects officer stats only
@@ -38,13 +39,19 @@
         "tags": ["underworld"] # military, trade, underworld, science, pather
       },
 
-      entityFleet: {
+      entityStats: {
         "factionId": "pirates", # Faction id - required
+
+        # affects entity is fleet
         "fleetName": "",
         "fleetSize": "MEDIUM", # TINY, VERY_SMALL, SMALL, MEDIUM, LARGE, LARGER, VERY_LARGE, HUGE, MAXIMUM - required
         "fleetQuality": "DEFAULT", # VERY_LOW, LOWER, DEFAULT, HIGHER, VERY_HIGH, SMOD_1, SMOD_2, SMOD_3 - required
         "fleetTypes": "patrolMedium", # required
         "autoAdjust": "MODERATE", # MODERATE, MAJOR, EXTREME
+
+        # affects entity is raidable
+        "raidDangerLevel": "MEDIUM",
+        "marineAmount": 100
       },
 
       # Start contact dialog texts
@@ -57,18 +64,19 @@
       "barMissionOption": "In your custom scenario add this:\n\"barMissionOption\":\"SAMPLE TEXT\"",
       "barMissionOfferText": "In your custom scenario add this:\n\"barMissionOfferText\":\"SAMPLE TEXT\"",
 
-      # WRECK or PLANET or FLEET entity interaction texts
+      # Initial ntity interaction texts
       "entityDialogText": "In your custom scenario add this:\n\"entityDialogText\":\"SAMPLE TEXT\"",
       # After WRECK or PLANET entity interaction texts
       "survivorAliveText": "In your custom scenario add this:\n\"survivorAliveText\":\"SAMPLE TEXT\"",
       "survivorDeadText": "In your custom scenario add this:\n\"survivorDeadText\":\"SAMPLE TEXT\"",
 
-      # FLEET entity interaction texts
+      # FLEET and PLANET_RAID entity interaction texts
       "entityPayRansomText": "In your custom scenario add this:\n\"entityPayRansomText\":\"SAMPLE TEXT\"",
-      "entityFightText": "In your custom scenario add this:\n\"entityFightText\":\"SAMPLE TEXT\"",
-      "entityDeclineText": "In your custom scenario add this:\n\"entityDeclineText\":\"SAMPLE TEXT\"",
-      "entityDefeatedText": "In your custom scenario add this:\n\"entityDefeatedText\":\"SAMPLE TEXT\"",
       "entityPersuadeToFreeText": "In your custom scenario add this:\n\"entityPersuadeToFreeText\":\"SAMPLE TEXT\"",
+
+      # FLEET entity interaction texts
+      "entityDefeatedText": "In your custom scenario add this:\n\"entityDefeatedText\":\"SAMPLE TEXT\"",
+      "entityFightText": "In your custom scenario add this:\n\"entityFightText\":\"SAMPLE TEXT\"",
 
       # MARKET or PLANET_RAID
       "entityRaidFinishedText": "In your custom scenario add this:\n\"entityDefeatedText\":\"SAMPLE TEXT\"",
@@ -99,7 +107,6 @@
     },
     "scenarios": [
       {
-        "survivorType": "OFFICER", # OFFICER, ADMINISTRATOR, CIVILIAN, RANDOM
         "entityType": "WRECK", # WRECK, FLEET, PLANET
 
         # Start contact dialog texts
@@ -120,8 +127,6 @@
         "survivorDeadText": "A short time later, your officers find the survivor and recognize him as our rescue target, $sep_sar_survivorFullName. Unfortunately, $sep_sar_survivorHeOrShe is dead, and according to your chief medical officer, $sep_sar_survivorHeOrShe died of extreme malnutrition and oxygen deprivation.",
       },
       {
-        "weight": 100,
-        "survivorType": "OFFICER", # OFFICER, ADMINISTRATOR, CIVILIAN 
         "entityType": "FLEET", # WRECK, FLEET, PLANET
 
         # Start contact dialog texts
@@ -138,14 +143,13 @@
         "entityDialogText": "The comms channel crackles to life, a grainy image of a hard-eyed officer fills the screen. $HisOrHer voice drips with suspicion as $heOrShe sizes up your $shipOrFleet.\n\n\"So... you must be the ones carrying the ransom. Hmph. Not much to look at, but I suppose credits don't need much of an escort.\"\n\n$HeOrShe narrows his eyes, leaning closer to the pickup. \"We made it clear. $sep_sar_creditRansom credits, transferred clean and quiet. No tricks, no games. Hand it over, and maybe $sep_sar_survivorFullName walks away instead of ending up as broken flesh.\"\n\nThe channel hangs open, the kidnappers clearly waiting for your next move.",
         "entityPayRansomText": "The channel flickers. The hard-eyed officer returns, expression flat. \"Payment confirmed. $sep_sar_creditRansom credits received and cleared.\"\n\n\"We are dispatching a single shuttle carrying the hostage. It will intercept your position in approximately fifteen minutes. Keep your fleet at a safe distance. Any attempt to approach or interfere and we will shoot the shuttle down.\"\n\nThe shuttle appears on your sensors. A quick scan returns no weapons or traps and a single life sign aboard. You authorize the shuttle to dock and find $sep_sar_survivorFullName, alive but shaken.",
         "entityFightText": "The feed crackles back on. The kidnapper sneers, his voice dripping with disappointment. \"So that's your choice? I thought you'd have the spine to settle this clean, but I see I was wrong. Fine, if it's a fight you want, then it's a fight you'll get.\"",
-        "entityDeclineText": "FLEET SAMPLE: GO BACK",
         "entityPersuadeToFreeText": "You open comms and begin to persuade the kidnappers. After a tense back-and-forth, they finally relent. Their demands falter as hesitation takes hold, and they choose to release the hostage.\n\nA lone shuttle is launched, carrying $sep_sar_survivorFullName toward your fleet. The hostage is alive but shaken, spared without a single shot fired.",
         "entityDefeatedText": "Your sensors officer scans through the debris field, searching for any trace of the hostage. Among the wreckage, they discover a lone shuttle adrift.\n\nInside, $sep_sar_survivorFullName is found alive, shaken but stable, and quickly transferred to your sickbay for treatment.",
       },
       {
-        "survivorType": "ADMINISTRATOR", # OFFICER, ADMINISTRATOR, CIVILIAN 
         "entityType": "PLANET", # WRECK, FLEET, PLANET
         "hasBarEvent": false,
+        "subjectName": "survivors",
 
         # Start contact dialog texts
         "contactMissionBlurb": "\"Fleet Intel has filed a search-and-rescue mission for a survey fleet that failed to report back, with orders to recover survivors and secure their data.\"",
@@ -160,47 +164,49 @@
         "survivorDeadText": "After a period of waiting, no responses are received from the surface. With no other option, you dispatch medical and security teams to inspect the grounded emergency shuttles.\n\nThe teams report back with grim findings. The shuttles are filled with bodies, most malnourished or dead from oxygen depletion after their life support failed. No survivors remain.\n\nFurther investigation reveals that the fleet was struck by an unknown hyperspace anomaly that caused its drive bubble to collapse, exposing it to hyperstorms. A few ships managed to reach the system, but damage from the storms rendered them inoperable, forcing the crews to scuttle the remaining vessels for emergency supplies.\n\nYou order the recovery of the remains to ensure they are properly accounted for and given due respect.",
 
         # Ending dialog texts
-        "returnSurvivorAliveText": "You report to $PersonPost $personName about the success of your mission, bringing the good news that a few survivors were found alive and safely recovered.\n\nAfterward, you order your chief security officer to escort the survivors to a safe location while you provide a full report detailing the mission and the circumstances of the rescue before receiving your reward.\n\nBefore you can continue speaking with $personName, $sep_sar_survivorFullName contacts you.",
+        "returnSurvivorAliveText": "You report to $PersonPost $personName about the success of your mission, bringing the good news that a few $sep_sar_subjectName were found alive and safely recovered.\n\nAfterward, you order your chief security officer to escort the survivors to a safe location while you provide a full report detailing the mission and the circumstances of the rescue before receiving your reward.\n\nBefore you can continue speaking with $personName, $sep_sar_survivorFullName contacts you.",
         "survivorDialogText": "\"Captain,\" $sep_sar_survivorHeOrShe says, \"On behalf of the fleet, thank you for saving us. We spoke with our superiors, and we requested to give you a greater reward for bringing us home.\"\n\n$sep_sar_survivorHeOrShe pauses for a moment. \"Some of the crew wish to join you and so do I. I've mostly recovered and convinced my superior to let me go. I just need to file some paperwork, so if you ever get the chance, the crew are available for hire while my contact information will be in your directory.\"\n\nHe thanks you once more before ending the connection.",
         "returnSurvivorDeadText": "You report to $PersonPost $personName about the success of your mission, bringing the grim news that no survivors remained by the time you arrived.\n\nAfterward, you order your chief security officer to escort the recovered remains to a secure location while you provide a full report detailing the mission and the circumstances of the fleet's destruction before receiving your reward."
       },
       {
-        "weight": -1,
-        "survivorType": "ADMINISTRATOR", # OFFICER, ADMINISTRATOR, CIVILIAN 
         "entityType": "PLANET_RAID", # WRECK, FLEET, PLANET
+        "subjectName": "hostages",
+        "hasBarEvent": false,
 
         # Start contact dialog texts
-        "contactMissionBlurb": "PLANET RAID SAMPLE: MISSION BLURB",
-        "contactMissionOption": "PLANET RAID SAMPLE: MISSION OPTION",
-        "contactMissionOfferText": "PLANET RAID SAMPLE: MISSION OFFER TEXT", 
+        "contactMissionBlurb": "A patrol fleet was ambushed after discovering a pirate hideout. Survivors were taken hostage, and a mission has been filed to search and rescue them.",
+        "contactMissionOption": "Ask about rescuing the captured patrol crews",
+        "contactMissionOfferText": "$HeOrShe interacts with $hisOrHer tripad, sending you a brief mission intel. \"A routine patrol operating in $sep_sar_possibleLoc didn't return as scheduled. Their fate only became known when the pirates contacted us, demanding a ransom of $sep_sar_creditRansom for the surviving crew they had taken hostage.\"\n\n$HeOrShe continues, \"Fleet Intelligence determined that the hostages are being held in a pirate hideout. From intercepted communications, they've assessed the strength of the site and estimate that at least $sep_sar_marineAmount marines will be required to free the captives.\"\n\n$HeOrShe adds, \"In return for rescuing the patrol crew, a reward of $sep_sar_creditReward will be provided.\"", 
 
-        # Start bar dialog texts
-        "barMissionBlurb": "PLANET RAID SAMPLE: BAR BLURB",
-        "barMissionOption": "PLANET RAID SAMPLE: BAR OPTION",
-        "barMissionOfferText": "PLANET RAID SAMPLE: BAR OFFER TEXT",
+        # Initial entity interaction texts
+        "entityDialogText": "Upon arriving in orbit of the planet, your sensors officer initiates a surface scan. The sweep passes over mountain ranges and canyons until faint energy signatures and concealed structures are detected deep within the terrain. The readings confirm the presence of the pirate hideout.\n\nWith the location identified, your officers and crew await your decision on how to proceed.",
 
-        # FLEET entity interaction texts
-        "entityDialogText": "PLANET RAID SAMPLE: PLANET INTERACTION TEXT",
-        "entityRaidFinishedText": "PLANET RAID SAMPLE: RAID FINISHED TEXT"
-      },
-      {
-        "weight": -1,
-        "survivorType": "RANDOM", # OFFICER, ADMINISTRATOR, CIVILIAN 
-        "entityType": "MARKET", # WRECK, FLEET, PLANET, MARKET
+        # FLEET and PLANET_RAID entity interaction texts
+        "entityPayRansomText": "You agree to the kidnappers' terms and transfer the ransom as instructed. Soon after, a lone shuttle departs the planet and approaches your ship.\n\nYour sensors officer scans the shuttle, confirming multiple life signs aboard and no possible traps. Once docked, the hatch opens and the weary hostages emerge. $sep_sar_survivorFullName, a ranking official, steps forward and thanks you on behalf of the survivors before being escorted to medical care.",
+        "entityPersuadeToFreeText": "You persuade the kidnappers to release the hostages without payment. After a tense exchange, they agree and send a lone shuttle toward your ship.\n\nYour sensors officer scans the shuttle, confirming multiple life signs aboard and no possible traps. Once docked, the hatch opens and the weary hostages emerge. $sep_sar_survivorFullName, a ranking official, steps forward and thanks you on behalf of the survivors before being escorted to medical care.",
 
-        # Start contact dialog texts
-        "contactMissionBlurb": "MARKET RAID SAMPLE: MISSION BLURB",
-        "contactMissionOption": "MARKET RAID SAMPLE: MISSION OPTION",
-        "contactMissionOfferText": "MARKET RAID SAMPLE: MISSION OFFER TEXT", 
+        # MARKET or PLANET_RAID
+        "entityRaidFinishedText": "Your marines advance into the pirate hideout with practiced precision, clearing the compound room by room. A few hostages are lost in the crossfire, but the assault is controlled and decisive, preventing further casualties.\n\nDuring the operation, $sep_sar_survivorFullName, a ranking official, steps forward and directs your raid leader to the remaining survivors. They are secured and extracted back to your fleet for treatment and safety.",
 
-        # Start bar dialog texts
-        "barMissionBlurb": "MARKET RAID SAMPLE: BAR BLURB",
-        "barMissionOption": "MARKET RAID SAMPLE: BAR OPTION",
-        "barMissionOfferText": "MARKET RAID SAMPLE: BAR OFFER TEXT",
+        # Ending dialog texts
+        "returnSurvivorAliveText": "You report to $PersonPost $personName about the success of your mission, bringing the good news that a few $sep_sar_subjectName were found alive and safely recovered.\n\nAfterward, you order your chief security officer to escort the survivors to a safe location while you provide a full report detailing the mission and the circumstances of the rescue before receiving your reward.\n\nBefore you can continue speaking with $personName, $sep_sar_survivorFullName contacts you.",
+        "survivorDialogText": "\"Captain,\" $sep_sar_survivorHeOrShe says, \"On behalf of the fleet, thank you for saving us. We spoke with our superiors, and we requested to give you a greater reward for bringing us home.\"\n\n$sep_sar_survivorHeOrShe pauses for a moment. \"Some of the crew wish to join you and so do I. I've mostly recovered and convinced my superior to let me go. I just need to file some paperwork, so if you ever get the chance, the crew are available for hire while my contact information will be in your directory.\"\n\nHe thanks you once more before ending the connection.",
+        "returnSurvivorDeadText": "You report to $PersonPost $personName about the success of your mission, bringing the grim news that no survivors remained by the time you arrived.\n\nAfterward, you order your chief security officer to escort the recovered remains to a secure location while you provide a full report detailing the mission and the circumstances of rescue before receiving your reward.",
 
-        # FLEET entity interaction texts
-        "entityDialogText": "MARKET RAID SAMPLE: MARKET INTERACTION TEXT",
-        "entityRaidFinishedText": "MARKET RAID SAMPLE: RAID FINISHED TEXT"
+        "complications": [
+          {
+            "stageTrigger": "FIND", # Accepts FIND, RETURN - required
+            "factionId": "pirates", # Faction id - required
+            "fleetName": "",
+            "fleetSize": "MEDIUM", # TINY, VERY_SMALL, SMALL, MEDIUM, LARGE, LARGER, VERY_LARGE, HUGE, MAXIMUM - required
+            "fleetQuality": "DEFAULT", # VERY_LOW, LOWER, DEFAULT, HIGHER, VERY_HIGH, SMOD_1, SMOD_2, SMOD_3 - required
+            "fleetTypes": "patrolMedium", # required
+            "autoAdjust": "MODERATE", # MODERATE, MAJOR, EXTREME
+            "lowRepImpact": true,
+            "notIgnorePlayer": true,
+            "noFactionInName": false
+          }
+        ]
       }
     ]
   }

@@ -52,9 +52,14 @@ public class ModPlugin extends BaseModPlugin {
         return scenarioPicker.pick();
     }
 
-    public static JSONObject getMissionScenarioDefaults(String missionId) throws JSONException {
-        JSONObject mission = MISSION_SCENARIOS.getJSONObject(missionId);
-        return mission.getJSONObject("defaults");
+    public static JSONObject getMissionScenarioDefaults(String missionId) {
+        JSONObject mission;
+        try {
+            mission = MISSION_SCENARIOS.getJSONObject(missionId).getJSONObject("defaults");;
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
+        return mission;
     }
 
     @Override

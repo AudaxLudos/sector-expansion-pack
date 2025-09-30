@@ -31,6 +31,7 @@ import java.util.*;
 import java.util.List;
 
 public class SearchAndRescueMission extends HubMissionWithBarEvent {
+    public static final JSONObject scenarioDefaults = ModPlugin.getMissionScenarioDefaults("sep_sar");
     public static Logger log = Global.getLogger(SearchAndRescueMission.class);
     protected JSONObject scenarioData;
     protected PersonPostType survivorPostType;
@@ -137,7 +138,7 @@ public class SearchAndRescueMission extends HubMissionWithBarEvent {
                     }
                 }
 
-                triggerPickLocationAroundEntity(this.entity, 1000f);
+                triggerPickLocationAroundEntity(this.entity, 500f);
                 triggerSpawnFleetAtPickedLocation();
 
                 if (complication.has("lowRepImpact") && complication.getBoolean("lowRepImpact")) {
@@ -178,7 +179,9 @@ public class SearchAndRescueMission extends HubMissionWithBarEvent {
         JSONObject survivorStats = (JSONObject) getScenarioData("survivorStats");
         this.survivorPostType = PersonPostType.valueOf((String) getScenarioData("survivorType"));
         if (this.survivorPostType == PersonPostType.RANDOM) {
-            this.survivorPostType = (PersonPostType) pickOneObject(Arrays.asList(PersonPostType.OFFICER, PersonPostType.ADMINISTRATOR, PersonPostType.CIVILIAN));
+            this.survivorPostType = (PersonPostType) pickOneObject(
+                    Arrays.asList(PersonPostType.OFFICER, PersonPostType.ADMINISTRATOR,
+                            PersonPostType.CIVILIAN, PersonPostType.CONTACT));
         }
         if (this.survivorPostType == PersonPostType.OFFICER) {
             person = OfficerManagerEvent.createOfficer(getPerson().getFaction(), survivorStats.getInt("level"), OfficerManagerEvent.SkillPickPreference.ANY, this.genRandom);
@@ -231,17 +234,17 @@ public class SearchAndRescueMission extends HubMissionWithBarEvent {
                 preferPlanetWithRuins();
                 PlanetAPI planet = pickPlanet();
 
-                JSONObject fleetSettings = (JSONObject) getScenarioData("entityFleet");
+                JSONObject entityStats = (JSONObject) getScenarioData("entityStats");
                 beginStageTrigger(Stage.FIND);
                 triggerCreateFleet(
-                        FleetSize.valueOf(fleetSettings.getString("fleetSize")),
-                        FleetQuality.valueOf(fleetSettings.getString("fleetQuality")),
-                        fleetSettings.getString("factionId"),
-                        fleetSettings.getString("fleetTypes"),
+                        FleetSize.valueOf(entityStats.getString("fleetSize")),
+                        FleetQuality.valueOf(entityStats.getString("fleetQuality")),
+                        entityStats.getString("factionId"),
+                        entityStats.getString("fleetTypes"),
                         planet.getStarSystem());
 
-                if (fleetSettings.has("autoAdjust")) {
-                    switch (fleetSettings.getString("autoAdjust")) {
+                if (entityStats.has("autoAdjust")) {
+                    switch (entityStats.getString("autoAdjust")) {
                         case "MODERATE" -> triggerAutoAdjustFleetStrengthModerate();
                         case "MAJOR" -> triggerAutoAdjustFleetStrengthMajor();
                         case "EXTREME" -> triggerAutoAdjustFleetStrengthExtreme();
@@ -258,8 +261,8 @@ public class SearchAndRescueMission extends HubMissionWithBarEvent {
                 triggerOrderFleetPatrol(planet);
                 triggerFleetAddDefeatTrigger("SEPSARFleetDefeated");
 
-                if (fleetSettings.has("fleetName") && !fleetSettings.getString("fleetName").isEmpty()) {
-                    triggerFleetSetName(fleetSettings.getString("fleetName"));
+                if (entityStats.has("fleetName") && !entityStats.getString("fleetName").isEmpty()) {
+                    triggerFleetSetName(entityStats.getString("fleetName"));
                 }
 
                 endTrigger();
@@ -291,7 +294,7 @@ public class SearchAndRescueMission extends HubMissionWithBarEvent {
 
     @Override
     public String getBaseName() {
-        return "Search and Rescue: " + this.survivor.getNameString();
+        return "Search and Rescue";
     }
 
     @Override
@@ -311,9 +314,19 @@ public class SearchAndRescueMission extends HubMissionWithBarEvent {
         set("$sep_sar_survivorHisOrHer", this.survivor.getHisOrHer());
         set("$sep_sar_survivorHimOrHer", this.survivor.getHimOrHer());
         set("$sep_sar_survivorManOrWoman", this.survivor.getManOrWoman());
+        set("$sep_sar_subjectName", getDialogText("subjectName").isEmpty() ? this.survivor.getNameString() : getDialogText("subjectName"));
 
         if (this.entityType == EntityType.FLEET) {
             set("$sep_sar_entityFaction", this.entity.getFaction().getEntityNamePrefix());
+        }
+        if (this.entityType == EntityType.PLANET_RAID) {
+            try {
+                JSONObject entityStats = (JSONObject) getScenarioData("entityStats");
+                set("$sep_sar_raidDangerLevel", MarketCMD.RaidDangerLevel.valueOf(entityStats.getString("raidDangerLevel")));
+                set("$sep_sar_marineAmount", entityStats.getInt("marineAmount"));
+            } catch (JSONException e) {
+                throw new RuntimeException(e);
+            }
         }
 
         if (this.currentStage == null) {
@@ -367,15 +380,21 @@ public class SearchAndRescueMission extends HubMissionWithBarEvent {
 
     @Override
     public boolean addNextStepText(TooltipMakerAPI info, Color tc, float pad) {
+        String prefix = "the ";
+        String subjectName = getDialogText("subjectName");
+        if (subjectName.isEmpty()) {
+            prefix = "";
+            subjectName = this.survivor.getNameString();
+        }
         if (this.currentStage == Stage.FIND) {
             String loc = BreadcrumbSpecial.getLocationDescription(this.entity, false);
-            info.addPara("Search for %s in " + loc, 3f, tc, Misc.getHighlightColor(), this.survivor.getNameString());
+            info.addPara("Search for " + prefix + "%s in " + loc, 3f, tc, Misc.getHighlightColor(), subjectName);
             return true;
         } else if (this.currentStage == Stage.RETURN) {
             info.addPara("Return to " + getPerson().getMarket().getName() + " in the "
                             + getPerson().getMarket().getStarSystem().getNameWithLowercaseTypeShort()
                             + " and talk to " + getPerson().getNameString() + ".",
-                    3f, tc, Misc.getHighlightColor(), this.survivor.getNameString());
+                    3f, tc, Misc.getHighlightColor());
             return true;
         }
         return false;
@@ -383,14 +402,20 @@ public class SearchAndRescueMission extends HubMissionWithBarEvent {
 
     @Override
     public void addDescriptionForNonEndStage(TooltipMakerAPI info, float width, float height) {
+        String prefix = "the ";
+        String subjectName = getDialogText("subjectName");
+        if (subjectName.isEmpty()) {
+            prefix = "";
+            subjectName = this.survivor.getNameString();
+        }
         if (this.currentStage == Stage.FIND) {
             String loc = BreadcrumbSpecial.getLocationDescription(this.entity, false);
-            info.addPara("Search for %s in " + loc, 10f, Misc.getHighlightColor(), this.survivor.getNameString());
+            info.addPara("Search for " + prefix + "%s in " + loc, 10f, Misc.getHighlightColor(), subjectName);
         } else if (this.currentStage == Stage.RETURN) {
-            info.addPara("Return with %s to " + getPerson().getMarket().getName() + " in the "
+            info.addPara("Return with " + prefix + "%s to " + getPerson().getMarket().getName() + " in the "
                             + getPerson().getMarket().getStarSystem().getNameWithLowercaseTypeShort()
                             + " and talk to " + getPerson().getNameString() + ".",
-                    10f, Misc.getHighlightColor(), this.survivor.getNameString());
+                    10f, Misc.getHighlightColor(), subjectName);
         }
     }
 
@@ -445,7 +470,6 @@ public class SearchAndRescueMission extends HubMissionWithBarEvent {
                     }
 
                     officer.person.getMemoryWithoutUpdate().set("$sep_survivor", true);
-
                     break;
                 }
             }
@@ -484,7 +508,7 @@ public class SearchAndRescueMission extends HubMissionWithBarEvent {
         if (this.scenarioData.has(id)) {
             result = this.scenarioData.get(id);
         } else {
-            result = ModPlugin.getMissionScenarioDefaults(getMissionId()).get(id);
+            result = scenarioDefaults.get(id);
         }
         return result;
     }

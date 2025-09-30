@@ -34,16 +34,16 @@ sep_sar_blurb,sep_sar_blurb,,AddText $sep_sar_contactMissionBlurb,,,
 sep_sar_offerOption,sep_sar_option,,SEPAddOption $sep_sar_contactMissionOption sep_sar_start,,,
 sep_sar_offerTextContact1,DialogOptionSelected,$option == sep_sar_start,"$missionId = sep_sar
 AddText $sep_sar_contactMissionOfferText
-SetTextHighlightColors h h h
-SetTextHighlights $sep_sar_survivorFullName $sep_sar_possibleLoc $sep_sar_creditReward",,"contact_accept:Accept
+SetTextHighlightColors h h h h h
+SetTextHighlights $sep_sar_survivorFullName $sep_sar_possibleLoc $sep_sar_creditRansom $sep_sar_marineAmount $sep_sar_creditReward",,"contact_accept:Accept
 contact_decline:Decline",
 # Offered in bar,,,,,,
 sep_sar_blurbBar,sep_sar_blurbBar,,AddText $sep_sar_barMissionBlurb,,,
 sep_sar_offerOptionBar,sep_sar_optionBar,,SEPAddOption $sep_sar_barMissionOption sep_sar_startBar,,,
 sep_sar_offerTextBar1,DialogOptionSelected,$option == sep_sar_startBar,"$missionId = sep_sar
 AddText $sep_sar_barMissionOfferText
-SetTextHighlightColors h h h
-SetTextHighlights $sep_sar_survivorFullName $sep_sar_possibleLoc $sep_sar_creditReward
+SetTextHighlightColors h h h h h
+SetTextHighlights $sep_sar_survivorFullName $sep_sar_possibleLoc $sep_sar_creditRansom $sep_sar_marineAmount $sep_sar_creditReward
 ",,"contact_acceptBar:Accept
 contact_declineBarNoContinue:Decline",
 # Rescue survivor in wreck,,,,,,
@@ -70,26 +70,40 @@ SetTextHighlights $sep_sar_survivorFullName
 $sep_sar_returnToContact = true
 Call $sep_sar_ref updateStage",,defaultLeave:Leave,
 sep_sar_entityMarketRaidBegin,SEPSAREntityOptions,"$sep_sar_entityType == MARKET score:1000
-!$sep_sar_addedRaidObjective","AddRaidObjective genericIcon ""Rescue $sep_sar_survivorFullName"" LOW 5000 SEPSARRaidFinished
+!$sep_sar_addedRaidObjective","$raidDifficulty = $sep_sar_marineAmount
+$raidRestrictToTrigger = SEPSARRaidFinished
+AddRaidObjective genericIcon ""Rescue $sep_sar_survivorFullName"" $sep_sar_raidDangerLevel 5000 SEPSARRaidFinished
 $sep_sar_addedRaidObjective = true
 FireBest OpenInteractionDialog",,"mktRaidNonMarket:Rescue $sep_sar_survivorFullName
 defaultLeave:Leave",
-sep_sar_entityPlanetRaidBegin,SEPSAREntityOptions,$sep_sar_entityType == PLANET_RAID score:1000,FireBest SEPSARRaidBegin,,"mktRaidNonMarket:Rescue $sep_sar_survivorFullName
-defaultLeave:Leave",
-sep_sar_entityPlanetRaidAdd,SEPSARRaidBegin,,"$raidDifficulty = 100
+sep_sar_entityPlanetRaidBegin,SEPSAREntityOptions,$sep_sar_entityType == PLANET_RAID score:1000,FireBest SEPSARRaidBegin,,,
+sep_sar_entityPlanetRaidAdd,SEPSARRaidBegin,,"$raidDifficulty = $sep_sar_marineAmount
 $raidGoBackTrigger = SEPSARRaidBegin
 $raidRestrictToTrigger = SEPSARRaidFinished
-AddRaidObjective genericIcon ""Rescue $sep_sar_survivorFullName"" LOW 5000 SEPSARRaidFinished true",,"mktRaidNonMarket:Rescue $sep_sar_survivorFullName
+AddRaidObjective genericIcon ""Rescue $sep_sar_survivorFullName"" $sep_sar_raidDangerLevel 5000 SEPSARRaidFinished true
+DoCanAffordCheck $sep_sar_creditRansom sep_sar_payRansom
+SetStoryOption sep_sar_persuadeToFree ui_char_spent_story_point ""Persuade the kidnappers to free the hostage""",,"mktRaidNonMarket:Rescue $sep_sar_survivorFullName
+sep_sar_payRansom:Pay the ransom
+sep_sar_persuadeToFree:Persuade to free the hostage
 defaultLeave:Leave",
 sep_sar_entityPlanetRaidFinished,SEPSARRaidFinished,Call $sep_sar_ref updateData,"AddText $sep_sar_entityRaidFinishedText
 $sep_sar_returnToContact = true
 Call $sep_sar_ref updateStage",,,
+sep_sar_planetAcceptRansom,DialogOptionSelected,"$option == sep_sar_payRansom
+$sep_sar_entityType == PLANET_RAID score:1000","AddText $sep_sar_entityPayRansomText
+AddCredits -$sep_sar_creditRansom
+$sep_sar_returnToContact = true",,defaultLeave:Leave,
+sep_sar_planetPersuadeToFree,DialogOptionSelected,"$option == sep_sar_persuadeToFree
+$sep_sar_entityType == PLANET_RAID score:1000","AddText $sep_sar_entityPersuadeToFreeText
+$sep_sar_returnToContact = true
+Call $sep_sar_ref updateStage",,defaultLeave:Leave,
 sep_sar_entityFleetOpt,SEPSAREntityOptions,$sep_sar_entityType == FLEET score:1000,"DoCanAffordCheck $sep_sar_creditRansom sep_sar_payRansom
 SetStoryOption sep_sar_persuadeToFree ui_char_spent_story_point ""Persuade the kidnappers to free the hostage""",,"sep_sar_payRansom:Pay the ransom
 sep_sar_beginFight:Engage the fleet
 sep_sar_persuadeToFree:Persuade to free the hostage
 ",
-sep_sar_fleetAcceptRansom,DialogOptionSelected,$option == sep_sar_payRansom,"AddText $sep_sar_entityPayRansomText
+sep_sar_fleetAcceptRansom,DialogOptionSelected,"$option == sep_sar_payRansom
+$sep_sar_entityType == FLEET score:1000","AddText $sep_sar_entityPayRansomText
 AddCredits -$sep_sar_creditRansom
 $entity.sep_sar_returnToContact = true
 Call $entity.sep_sar_ref updateStage
@@ -102,11 +116,8 @@ MakeOtherFleetAggressive sep_sar true
 MakeOtherFleetPreventDisengage sep_sar true
 $entity.ignorePlayerCommRequests = true
 ",,cutCommLinkNoText:Cut the comm link,
-sep_sar_fleetDeclineRansom,DialogOptionSelected,$option == sep_sar_declineRansom,"AddText $sep_sar_entityDeclineText
-MakeOtherFleetAllowDisengage sep_sar true
-MakeOtherFleetNonHostile sep_sar true
-MakeOtherFleetPreventDisengage sep_sar true",,cutCommLinkNoText:Cut the comm link,
-sep_sar_fleetPersuadeToFree,DialogOptionSelected,$option == sep_sar_persuadeToFree,"AddText $sep_sar_entityPersuadeToFreeText
+sep_sar_fleetPersuadeToFree,DialogOptionSelected,"$option == sep_sar_persuadeToFree
+$sep_sar_entityType == FLEET score:1000","AddText $sep_sar_entityPersuadeToFreeText
 $entity.sep_sar_returnToContact = true
 Call $entity.sep_sar_ref updateStage
 MakeOtherFleetAllowDisengage sep_sar true
