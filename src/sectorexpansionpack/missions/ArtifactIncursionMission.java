@@ -29,7 +29,6 @@ import java.util.Map;
 // TODO: Find any contact faction market and install special item
 // TODO: Add complications during artifact raid stage including custom dialogs
 // TODO: Add complications during artifact return stage including custom dialogs
-// TODO: Set the credit reward to 0 if keep artifact option is selected
 // TODO: Fix softlock when target market changes faction ownership
 // TODO: Add dialog texts
 public class ArtifactIncursionMission extends HubMissionWithBarEvent implements GroundRaidObjectivesListener {
@@ -170,6 +169,18 @@ public class ArtifactIncursionMission extends HubMissionWithBarEvent implements 
                     getPerson().getName().getFullName(), getPerson().getMarket().getName(),
                     getPerson().getMarket().getStarSystem().getNameWithLowercaseType());
         }
+    }
+
+    @Override
+    public boolean callEvent(String ruleId, InteractionDialogAPI dialog, List<Misc.Token> params, Map<String, MemoryAPI> memoryMap) {
+        String action = params.get(0).getString(memoryMap);
+
+        if (action.equals("setZeroCreditReward")) {
+            setCreditReward(0);
+            return true;
+        }
+
+        return super.callEvent(ruleId, dialog, params, memoryMap);
     }
 
     @Override

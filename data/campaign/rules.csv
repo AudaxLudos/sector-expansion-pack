@@ -180,7 +180,8 @@ sep_aim_returnArtifactGiveTxt,DialogOptionSelected,$option == sep_aim_giveArtifa
 $sep_aim_completed = true
 Call $sep_aim_ref updateStage",GIVE ARTIFACT TEXT,contact_pickAnotherGreeting:END INTERACTION,
 sep_aim_returnArtifactKeepTxt,DialogOptionSelected,"$option == sep_aim_keepArtifact
-","$sep_aim_completed = true
+","Call $sep_aim_ref setZeroCreditReward
+$sep_aim_completed = true
 Call $sep_aim_ref updateStage",KEEP ARTIFACT TEXT,contact_pickAnotherGreeting:END INTERACTION,
 "# Artifact Incursion mission
 # END",,,,,,
