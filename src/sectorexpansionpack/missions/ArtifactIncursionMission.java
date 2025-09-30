@@ -12,11 +12,14 @@ import com.fs.starfarer.api.impl.campaign.ids.Factions;
 import com.fs.starfarer.api.impl.campaign.ids.Ranks;
 import com.fs.starfarer.api.impl.campaign.ids.Tags;
 import com.fs.starfarer.api.impl.campaign.missions.hub.HubMissionWithBarEvent;
+import com.fs.starfarer.api.impl.campaign.procgen.Constellation;
 import com.fs.starfarer.api.impl.campaign.rulecmd.FireAll;
 import com.fs.starfarer.api.impl.campaign.rulecmd.salvage.MarketCMD;
+import com.fs.starfarer.api.ui.SectorMapAPI;
 import com.fs.starfarer.api.util.WeightedRandomPicker;
 import org.apache.log4j.Logger;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -133,6 +136,17 @@ public class ArtifactIncursionMission extends HubMissionWithBarEvent implements 
     protected void updateInteractionDataImpl() {
         set("$sep_aim_artifactId", this.specialItemSpec.getId());
         set("$sep_aim_artifactName", this.specialItemSpec.getName());
+    }
+
+    @Override
+    public List<ArrowData> getArrowData(SectorMapAPI map) {
+        List<ArrowData> result = new ArrayList<>();
+
+        ArrowData arrow = new ArrowData(Global.getSector().getPlayerFleet(), getMapLocation(map));
+        arrow.width = 14f;
+        result.add(arrow);
+
+        return result;
     }
 
     @Override
