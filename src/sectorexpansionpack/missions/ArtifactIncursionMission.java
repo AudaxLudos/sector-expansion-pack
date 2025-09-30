@@ -25,7 +25,6 @@ import java.util.Map;
 
 // TODO: Remove listener if mission is abandoned or failed
 // TODO: Find any contact faction market and install special item
-// TODO: Add complications during artifact return stage including custom dialogs
 // TODO: Fix softlock when target market changes faction ownership
 // TODO: Add dialog texts
 public class ArtifactIncursionMission extends HubMissionWithBarEvent implements GroundRaidObjectivesListener {
@@ -122,6 +121,26 @@ public class ArtifactIncursionMission extends HubMissionWithBarEvent implements 
             triggerCreateMediumPatrolAroundMarket(this.market, Stage.RAID_ARTIFACT, 0f);
             triggerCreateLargePatrolAroundMarket(this.market, Stage.RAID_ARTIFACT, 0f);
         }
+
+        triggerComplicationBegin(Stage.DELIVER_ARTIFACT, ComplicationSpawn.EXITING_SYSTEM,
+                this.market.getStarSystem(), this.market.getFactionId(),
+                "the " + this.specialItemSpec.getName(), "it",
+                "the " + this.specialItemSpec.getName() + " you stole from " + this.market.getName(),
+                0,
+                true, ComplicationRepImpact.FULL, null);
+        if (this.market.getSize() <= 4) {
+            triggerSetFleetSize(FleetSize.LARGE);
+        } else if (this.market.getSize() <= 6) {
+            triggerSetFleetSize(FleetSize.LARGER);
+            triggerSetFleetQuality(FleetQuality.HIGHER);
+            triggerSetFleetType(FleetTypes.PATROL_LARGE);
+        } else {
+            triggerSetFleetSize(FleetSize.VERY_LARGE);
+            triggerSetFleetQuality(FleetQuality.VERY_HIGH);
+            triggerSetFleetType(FleetTypes.PATROL_LARGE);
+        }
+        triggerFleetSetName("Quick Reaction Force");
+        triggerComplicationEnd(false);
 
         return true;
     }
