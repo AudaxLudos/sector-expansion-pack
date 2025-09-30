@@ -8,9 +8,7 @@ import com.fs.starfarer.api.campaign.listeners.GroundRaidObjectivesListener;
 import com.fs.starfarer.api.campaign.rules.MemoryAPI;
 import com.fs.starfarer.api.impl.campaign.graid.GroundRaidObjectivePlugin;
 import com.fs.starfarer.api.impl.campaign.graid.SpecialItemRaidObjectivePluginImpl;
-import com.fs.starfarer.api.impl.campaign.ids.Factions;
-import com.fs.starfarer.api.impl.campaign.ids.Ranks;
-import com.fs.starfarer.api.impl.campaign.ids.Tags;
+import com.fs.starfarer.api.impl.campaign.ids.*;
 import com.fs.starfarer.api.impl.campaign.missions.hub.HubMissionWithBarEvent;
 import com.fs.starfarer.api.impl.campaign.rulecmd.FireAll;
 import com.fs.starfarer.api.impl.campaign.rulecmd.salvage.MarketCMD;
@@ -27,7 +25,6 @@ import java.util.Map;
 
 // TODO: Remove listener if mission is abandoned or failed
 // TODO: Find any contact faction market and install special item
-// TODO: Add complications during artifact raid stage including custom dialogs
 // TODO: Add complications during artifact return stage including custom dialogs
 // TODO: Fix softlock when target market changes faction ownership
 // TODO: Add dialog texts
@@ -117,6 +114,15 @@ public class ArtifactIncursionMission extends HubMissionWithBarEvent implements 
         setCreditRewardWithBonus(CreditReward.VERY_HIGH, bonus);
         setRepChanges(0.1f, 0.2f, 0.1f, 0.2f);
 
+        if (this.market.getSize() <= 4) {
+            triggerCreateMediumPatrolAroundMarket(this.market, Stage.RAID_ARTIFACT, 0f);
+        } else if (this.market.getSize() <= 6) {
+            triggerCreateLargePatrolAroundMarket(this.market, Stage.RAID_ARTIFACT, 0f);
+        } else {
+            triggerCreateMediumPatrolAroundMarket(this.market, Stage.RAID_ARTIFACT, 0f);
+            triggerCreateLargePatrolAroundMarket(this.market, Stage.RAID_ARTIFACT, 0f);
+        }
+
         return true;
     }
 
@@ -205,7 +211,7 @@ public class ArtifactIncursionMission extends HubMissionWithBarEvent implements 
                 if (obj instanceof SpecialItemRaidObjectivePluginImpl plugin) {
                     if (plugin.getItemSpec() == this.specialItemSpec && plugin.getSource() == this.industry) {
                         this.objectivePlugin = plugin;
-                        obj.setNameOverride("Take " + plugin.getItemSpec().getName() + " for " + getPerson().getNameString());
+                        plugin.setNameOverride("Take " + plugin.getItemSpec().getName() + " for " + getPerson().getNameString());
                         return;
                     }
                 }
