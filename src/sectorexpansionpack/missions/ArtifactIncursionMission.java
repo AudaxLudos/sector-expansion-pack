@@ -28,7 +28,11 @@ import java.util.Objects;
 
 // TODO: Transfer previous special item if selected market industry has one
 // TODO: If contact is part of player faction, complete the mission when raid finishes and set credit reward to 0 or lower
-// TODO: Add dialog texts
+// TODO: Delay special item installation by some days
+// TODO: Improve special item installation message
+// TODO: Add chance to get a military contact from bar event
+// TODO: Add failure details to deciv and market faction changed stages
+// TODO: Add custom dialogs to quick reaction force fleet
 public class ArtifactIncursionMission extends HubMissionWithBarEvent implements GroundRaidObjectivesListener {
     public static Logger log = Global.getLogger(ArtifactIncursionMission.class);
     public static float MISSION_DURATION = 120f;
@@ -185,15 +189,15 @@ public class ArtifactIncursionMission extends HubMissionWithBarEvent implements 
 
         Industry ind = pickIndustryToInstallItem(market, this.specialItemData);
         ind.setSpecialItem(this.specialItemData);
-
         IntelInfoPlugin message = new MessageIntel("Install special item to " + ind.getCurrentName() + " in the " + market.getName() + " within the " + market.getStarSystem().getNameWithLowercaseTypeShort());
         Global.getSector().getIntelManager().addIntel(message);
+        log.info("Installing special item in " + ind.getCurrentName() + " on " + market.getName() + " within the " + market.getStarSystem().getNameWithLowercaseTypeShort());
     }
 
     public Industry pickIndustryToInstallItem(MarketAPI market, SpecialItemData specialItemData) {
         WeightedRandomPicker<Industry> industryPicker = new WeightedRandomPicker<>();
         for (Industry industry : market.getIndustries()) {
-            if (industry.wantsToUseSpecialItem(this.specialItemData)) {
+            if (industry.wantsToUseSpecialItem(specialItemData)) {
                 industryPicker.add(industry);
             }
         }
@@ -214,6 +218,15 @@ public class ArtifactIncursionMission extends HubMissionWithBarEvent implements 
     protected void updateInteractionDataImpl() {
         set("$sep_aim_artifactId", this.specialItemSpec.getId());
         set("$sep_aim_artifactName", this.specialItemSpec.getName());
+        set("$sep_aim_industryName", this.industry.getCurrentName());
+        set("$sep_aim_industryAOrAn", Misc.ucFirst(Misc.getAOrAnFor(this.industry.getCurrentName())));
+        set("$sep_aim_marketFactionColor", this.market.getFaction().getBaseUIColor());
+        set("$sep_aim_marketFactionName", this.market.getFaction().getDisplayName());
+        set("$sep_aim_marketName", this.market.getName());
+        set("$sep_aim_marketSystem", this.market.getStarSystem().getNameWithLowercaseType());
+        set("$sep_aim_marines", Misc.getWithDGS(getMarinesRequiredForCustomObjective(this.market, this.danger)));
+        set("$sep_aim_missionDuration", Misc.getWithDGS(MISSION_DURATION) + " days");
+        set("$sep_aim_reward", Misc.getDGSCredits(getCreditsReward()));
     }
 
     @Override
@@ -279,7 +292,6 @@ public class ArtifactIncursionMission extends HubMissionWithBarEvent implements 
         if (priority != 1) {
             return;
         }
-
         if (market == this.market && entity == this.market.getPrimaryEntity()) {
             for (GroundRaidObjectivePlugin obj : objectives) {
                 if (obj instanceof SpecialItemRaidObjectivePluginImpl plugin) {

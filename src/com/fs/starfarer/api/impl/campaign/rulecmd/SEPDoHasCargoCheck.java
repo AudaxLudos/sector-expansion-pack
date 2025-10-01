@@ -31,8 +31,6 @@ public class SEPDoHasCargoCheck extends BaseCommandPlugin {
                 || cargo.getNumWeapons(id) >= quantity
                 || cargo.getQuantity(CargoAPI.CargoItemType.SPECIAL, new SpecialItemData(id, null)) >= quantity;
 
-        System.out.println(hasCargo);
-
         if (!hasCargo) {
             options.setEnabled(option, false);
         }

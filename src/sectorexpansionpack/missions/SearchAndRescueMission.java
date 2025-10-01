@@ -31,7 +31,7 @@ import java.util.*;
 import java.util.List;
 
 public class SearchAndRescueMission extends HubMissionWithBarEvent {
-    public static final JSONObject SCENARIO_DEFAULTS = ModPlugin.getMissionScenarioDefaults("sep_sar");
+    public static JSONObject SCENARIO_DEFAULTS;
     public static Logger log = Global.getLogger(SearchAndRescueMission.class);
     protected JSONObject scenarioData;
     protected PersonPostType survivorPostType;
@@ -39,6 +39,10 @@ public class SearchAndRescueMission extends HubMissionWithBarEvent {
     protected boolean survivorAlive = true;
     protected EntityType entityType;
     protected SectorEntityToken entity;
+
+    public SearchAndRescueMission() {
+        SCENARIO_DEFAULTS = ModPlugin.getMissionScenarioDefaults("sep_sar");
+    }
 
     @Override
     protected boolean create(MarketAPI createdAt, boolean barEvent) {

@@ -63,6 +63,15 @@ public class ModPlugin extends BaseModPlugin {
     }
 
     @Override
+    public void onApplicationLoad() {
+        try {
+            MISSION_SCENARIOS = Global.getSettings().loadJSON("data/campaign/sep_mission_scenarios.json");
+        } catch (IOException | JSONException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
     public void onGameLoad(boolean newGame) {
         try {
             MISSION_SCENARIOS = Global.getSettings().loadJSON("data/campaign/sep_mission_scenarios.json");

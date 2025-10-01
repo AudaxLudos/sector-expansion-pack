@@ -151,38 +151,56 @@ SetTextHighlights $sep_sar_survivorFullName",,contact_pickAnotherGreeting:Contin
 # START",,,,,,
 "## Contact offer dialogs
 ",,,,,,
-sep_aim_blurb,sep_aim_blurb,,,CONTACT MISSION BLURB,,
-sep_aim_offerOption,sep_aim_option,,,,sep_aim_start:CONTACT MISSION OPT,
-sep_aim_offerTextContact1,DialogOptionSelected,$option == sep_aim_start,$missionId = sep_aim,CONTACT MISSION OFFER TXT,"contact_accept:ACCEPT
-contact_decline:DECLINE",
+sep_aim_blurb,sep_aim_blurb,,,"""A rival faction is using an artifact to gain an economic advantage. I need an independent force to 'claim' it and to bring it back to me.""",,
+sep_aim_offerOption,sep_aim_option,,,,sep_aim_start:Ask about 'claiming' a rival's artifact,
+sep_aim_offerTextContact1,DialogOptionSelected,$option == sep_aim_start,"$missionId = sep_aim
+SetTextHighlightColors h $sep_aim_marketFactionColor $sep_aim_marketFactionColor h h h
+SetTextHighlights $sep_aim_artifactName $sep_aim_marketName $sep_aim_marketFactionName $sep_aim_marketSystem $sep_aim_marines $sep_aim_reward
+Call $sep_aim_ref showMap ""Target: $sep_aim_marketName""","$sep_aim_industryAOrAn $sep_aim_industryName facility is using an artifact called '$sep_aim_artifactName'. Its influence is undermining the $personFaction's economic opportunities."" $HeOrShe says, as a mission briefing appears on your screen.
+
+""That’s why I need an independent force to step in, someone who can quietly 'reclaim' the artifact, if possible and ensure it’s moved elsewhere."" $HeOrShe smiles.
+
+""Now, the artifact is located on $sep_aim_marketName, a colony controlled by the $sep_aim_marketFactionName in the $sep_aim_marketSystem. Analysis of the colony’s defenses estimates roughly $sep_aim_marines marines will be required to carry out the mission."" $HeOrShe says, leaning back.
+
+""If successful, the $personFaction has authorized a reward of $sep_aim_reward, along with a sizable boost to your reputation. Interested?","contact_accept:Accept
+contact_decline:Decline",
 "## Bar offer dialogs
 ",,,,,,
 sep_aim_blurbBar,sep_aim_blurbBar,,,BAR MISSION BLURB,,
 sep_aim_offerOptionBar,sep_aim_optionBar,,,,sep_aim_startBar:BAR MISSION OPT,
-sep_aim_offerTextBar1,DialogOptionSelected,$option == sep_aim_startBar,$missionId = sep_aim,BAR MISSION OFFER TXT,"contact_accept:ACCEPT
-contact_decline:DECLINE",
+sep_aim_offerTextBar1,DialogOptionSelected,$option == sep_aim_startBar,$missionId = sep_aim,BAR MISSION OFFER TXT,"contact_acceptBar:Accept
+contact_declineBarNoContinue:Decline",
 "## Raid finished dialogs
 ",,,,,,
-sep_aim_raidFinished,SEPAIMRaidFinished,"$market.sep_aim_targetMarket
+sep_aim_raidFinished,SEPAIMRaidFinished,"$market.sep_aim_targetMarket score:1000
 Call $market.sep_aim_ref updateData","$market.sep_aim_deliverArtifact = true
-Call $market.sep_aim_ref updateStage",RAID COMPLETED TXT,,
+Call $market.sep_aim_ref updateStage","The raid is a success. Your marines push through fortified defenses with precision, suffering a few casualties but managing to overcome the resistance.
+
+They secure the artifact and move it under heavy guard, transporting it aboard a shuttle before returning safely to your ship.",,
 "## Return dialogs
 ",,,,,,
-sep_aim_returnOpt,PopulateOptions,"$sep_aim_returnPerson
-Call $sep_aim_ref updateData",SetOptionColor sep_aim_returnArtifact hColor,,sep_aim_returnArtifact:RETURN ARTIFACT OPT,
-sep_aim_returnArtifactTxt,DialogOptionSelected,$option == sep_aim_returnArtifact,"SEPDoHasCargoCheck $sep_aim_artifactId 1 sep_aim_giveArtifact
+sep_aim_returnArtifact,PickGreeting,"$sep_aim_returnPerson score:1000
+Call $sep_aim_ref updateData
+FireBest GenericMissionReturn","ShowPersonVisual
+SEPDoHasCargoCheck $sep_aim_artifactId 1 sep_aim_giveArtifact
 SetTooltip sep_aim_giveArtifact ""Need $sep_aim_artifactName in cargo.""
 SetTooltipHighlights sep_aim_giveArtifact $sep_aim_artifactName
-SetStoryOption sep_aim_keepArtifact 2 0 general ""keep artifact""",RETURN TO CONTACT TEXT,"sep_aim_giveArtifact:GIVE ARTIFACT OPT
-sep_aim_keepArtifact:KEEP ARTIFACT OPT
-100:cutCommLink:CANCEL OPT",
-sep_aim_returnArtifactGiveTxt,DialogOptionSelected,$option == sep_aim_giveArtifact,"AddRemoveAnyItem SPECIAL $sep_aim_artifactId -1
+SetStoryOption sep_aim_keepArtifact 2 0 general ""keep artifact""","""Captain? I didn’t expect you back so soon,"" $heOrShe says, a flicker of surprise crossing $hisOrHer face. ""I only heard that the raid on the target had started, but I didn’t know it would be finished so quickly.""
+
+$HeOrShe leans forward slightly, eyes narrowing with intent. ""Now, the artifact. Hand it over so I can put it to good use, and you can get your reward.""","sep_aim_keepArtifact:Convince to keep the artifact
+sep_aim_giveArtifact:Deliver the artifact
+cutCommLink:CANCEL OPT",
+sep_aim_returnArtifactGive,DialogOptionSelected,$option == sep_aim_giveArtifact,"AddRemoveAnyItem SPECIAL $sep_aim_artifactId -1
 $sep_aim_completed = true
-Call $sep_aim_ref updateStage",GIVE ARTIFACT TEXT,contact_pickAnotherGreeting:END INTERACTION,
-sep_aim_returnArtifactKeepTxt,DialogOptionSelected,"$option == sep_aim_keepArtifact
+Call $sep_aim_ref updateStage","Your security officer delivers the artifact, and $heOrShe is immediately notified of its arrival. ""Well done, Captain,"" $heOrShe says, a hint of relief in $hisOrHer voice.
+
+""With this, my economic issues are solved while my influence grows stronger. Thank you, Captain,"" $heOrShe adds, giving you a nod of gratitude.",contact_pickAnotherGreeting:Continue,
+sep_aim_returnArtifactKeep,DialogOptionSelected,"$option == sep_aim_keepArtifact
 ","Call $sep_aim_ref setZeroCreditReward
 $sep_aim_completed = true
-Call $sep_aim_ref updateStage",KEEP ARTIFACT TEXT,contact_pickAnotherGreeting:END INTERACTION,
+Call $sep_aim_ref updateStage","$HeOrShe folds $hisOrHer arms, weighing the decision before finally speaking. ""Alright, Captain, if keeping the artifact can benefit the $personFaction's interests, I’ll allow it.""
+
+$HeOrShe’s tone hardens. ""However, the agreed-upon reward stays with me. Take it as a trade-off. You have what you wanted, and I keep my terms intact.""",contact_pickAnotherGreeting:Continue,
 "# Artifact Incursion mission
 # END",,,,,,
 ,,,,,,
