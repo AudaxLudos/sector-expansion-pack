@@ -9,7 +9,10 @@ import com.fs.starfarer.api.campaign.listeners.GroundRaidObjectivesListener;
 import com.fs.starfarer.api.campaign.rules.MemoryAPI;
 import com.fs.starfarer.api.impl.campaign.graid.GroundRaidObjectivePlugin;
 import com.fs.starfarer.api.impl.campaign.graid.SpecialItemRaidObjectivePluginImpl;
-import com.fs.starfarer.api.impl.campaign.ids.*;
+import com.fs.starfarer.api.impl.campaign.ids.Factions;
+import com.fs.starfarer.api.impl.campaign.ids.FleetTypes;
+import com.fs.starfarer.api.impl.campaign.ids.Ranks;
+import com.fs.starfarer.api.impl.campaign.ids.Tags;
 import com.fs.starfarer.api.impl.campaign.intel.MessageIntel;
 import com.fs.starfarer.api.impl.campaign.missions.hub.HubMissionWithBarEvent;
 import com.fs.starfarer.api.impl.campaign.rulecmd.FireAll;
@@ -31,6 +34,7 @@ import java.util.Objects;
 // TODO: Improve special item installation message
 // TODO: Add chance to get a military contact from bar event
 // TODO: Add custom dialogs to quick reaction force fleet
+// TODO: Add bar dialogs
 public class ArtifactIncursionMission extends HubMissionWithBarEvent implements GroundRaidObjectivesListener {
     public static Logger log = Global.getLogger(ArtifactIncursionMission.class);
     public static float MILITARY_CONTACT_CHANCE = 0.5f;
@@ -176,6 +180,14 @@ public class ArtifactIncursionMission extends HubMissionWithBarEvent implements 
     @Override
     public String getBaseName() {
         return "Artifact Incursion";
+    }
+
+    @Override
+    public String getIcon() {
+        if (this.specialItemSpec != null) {
+            return this.specialItemSpec.getIconName();
+        }
+        return super.getIcon();
     }
 
     @Override

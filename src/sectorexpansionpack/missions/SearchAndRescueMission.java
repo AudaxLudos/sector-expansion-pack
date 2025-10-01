@@ -39,6 +39,7 @@ public class SearchAndRescueMission extends HubMissionWithBarEvent {
     protected boolean survivorAlive = true;
     protected EntityType entityType;
     protected SectorEntityToken entity;
+    protected String subjectName = "";
 
     public SearchAndRescueMission() {
         SCENARIO_DEFAULTS = ModPlugin.getMissionScenarioDefaults("sep_sar");
@@ -89,6 +90,8 @@ public class SearchAndRescueMission extends HubMissionWithBarEvent {
                 log.info("Failed to create survivor");
                 return false;
             }
+
+            this.subjectName = getScenarioData("subjectName").toString();
 
             this.entity = pickSurvivorEntity();
             if (!setEntityMissionRef(this.entity, "$sep_sar_ref")) {
@@ -302,80 +305,88 @@ public class SearchAndRescueMission extends HubMissionWithBarEvent {
     }
 
     @Override
-    protected void updateInteractionDataImpl() {
-        set("$sep_sar_survivorAlive", this.survivorAlive);
-        set("$sep_sar_survivorPostType", this.survivorPostType);
-        set("$sep_sar_entityType", this.entityType);
-        set("$sep_sar_creditReward", Misc.getDGSCredits(getCreditsReward()));
-        set("$sep_sar_creditRansom", Misc.getDGSCredits(getCreditsReward() * 0.75f));
-        set("$sep_sar_danger", MarketCMD.RaidDangerLevel.MEDIUM);
-        set("$sep_sar_possibleLoc", BreadcrumbSpecial.getLocationDescription(this.entity, false));
-
-        set("$sep_sar_survivorFullName", this.survivor.getNameString());
-        set("$sep_sar_survivorFirstName", this.survivor.getName().getFirst());
-        set("$sep_sar_survivorLastName", this.survivor.getName().getLast());
-        set("$sep_sar_survivorHeOrShe", this.survivor.getHeOrShe());
-        set("$sep_sar_survivorHisOrHer", this.survivor.getHisOrHer());
-        set("$sep_sar_survivorHimOrHer", this.survivor.getHimOrHer());
-        set("$sep_sar_survivorManOrWoman", this.survivor.getManOrWoman());
-        set("$sep_sar_subjectName", getDialogText("subjectName").isEmpty() ? this.survivor.getNameString() : getDialogText("subjectName"));
-
-        if (this.entityType == EntityType.FLEET) {
-            set("$sep_sar_entityFaction", this.entity.getFaction().getEntityNamePrefix());
+    public String getIcon() {
+        if (this.subjectName.isEmpty()) {
+            return this.survivor.getPortraitSprite();
         }
-        if (this.entityType == EntityType.PLANET_RAID) {
-            try {
-                JSONObject entityStats = (JSONObject) getScenarioData("entityStats");
-                set("$sep_sar_raidDangerLevel", MarketCMD.RaidDangerLevel.valueOf(entityStats.getString("raidDangerLevel")));
-                set("$sep_sar_marineAmount", entityStats.getInt("marineAmount"));
-            } catch (JSONException e) {
-                throw new RuntimeException(e);
-            }
-        }
-
-        if (this.currentStage == null) {
-            if (!isBarEvent()) {
-                set("$sep_sar_contactMissionBlurb", getDialogText("contactMissionBlurb"));
-                set("$sep_sar_contactMissionOption", getDialogText("contactMissionOption"));
-                set("$sep_sar_contactMissionOfferText", getDialogText("contactMissionOfferText"));
-            } else {
-                set("$sep_sar_barMissionBlurb", getDialogText("barMissionBlurb"));
-                set("$sep_sar_barMissionOption", getDialogText("barMissionOption"));
-                set("$sep_sar_barMissionOfferText", getDialogText("barMissionOfferText"));
-            }
-        }
-
-        if (this.currentStage == Stage.FIND) {
-            set("$sep_sar_entityDialogText", getDialogText("entityDialogText"));
-            if (this.entityType == EntityType.FLEET) {
-                set("$sep_sar_entityPayRansomText", getDialogText("entityPayRansomText"));
-                set("$sep_sar_entityFightText", getDialogText("entityFightText"));
-                set("$sep_sar_entityPersuadeToFreeText", getDialogText("entityPersuadeToFreeText"));
-                set("$sep_sar_entityDefeatedText", getDialogText("entityDefeatedText"));
-            } else if (this.entityType == EntityType.PLANET_RAID) {
-                set("$sep_sar_entityRaidFinishedText", getDialogText("entityRaidFinishedText"));
-            }
-            set("$sep_sar_survivorAliveText", getDialogText("survivorAliveText"));
-            set("$sep_sar_survivorDeadText", getDialogText("survivorDeadText"));
-        }
-
-        if (this.currentStage == Stage.RETURN) {
-            set("$sep_sar_returnSurvivorAliveText", getDialogText("returnSurvivorAliveText"));
-            set("$sep_sar_survivorDialogText", getDialogText("survivorDialogText"));
-            set("$sep_sar_returnSurvivorDeadText", getDialogText("returnSurvivorDeadText"));
-        }
+        return super.getIcon();
     }
 
-    public String getDialogText(String id) {
-        String result;
+    @Override
+    protected void updateInteractionDataImpl() {
         try {
-            if (this.scenarioData.has(id)) {
-                result = this.scenarioData.getString(id);
-            } else {
-                result = ModPlugin.getMissionScenarioDefaults(getMissionId()).getString(id);
+            set("$sep_sar_survivorAlive", this.survivorAlive);
+            set("$sep_sar_survivorPostType", this.survivorPostType);
+            set("$sep_sar_entityType", this.entityType);
+            set("$sep_sar_creditReward", Misc.getDGSCredits(getCreditsReward()));
+            set("$sep_sar_creditRansom", Misc.getDGSCredits(getCreditsReward() * 0.75f));
+            set("$sep_sar_danger", MarketCMD.RaidDangerLevel.MEDIUM);
+            set("$sep_sar_possibleLoc", BreadcrumbSpecial.getLocationDescription(this.entity, false));
+
+            set("$sep_sar_survivorFullName", this.survivor.getNameString());
+            set("$sep_sar_survivorFirstName", this.survivor.getName().getFirst());
+            set("$sep_sar_survivorLastName", this.survivor.getName().getLast());
+            set("$sep_sar_survivorHeOrShe", this.survivor.getHeOrShe());
+            set("$sep_sar_survivorHisOrHer", this.survivor.getHisOrHer());
+            set("$sep_sar_survivorHimOrHer", this.survivor.getHimOrHer());
+            set("$sep_sar_survivorManOrWoman", this.survivor.getManOrWoman());
+            set("$sep_sar_subjectName", this.subjectName.isEmpty() ? this.survivor.getNameString() : this.subjectName);
+
+            if (this.entityType == EntityType.FLEET) {
+                set("$sep_sar_entityFaction", this.entity.getFaction().getEntityNamePrefix());
+            }
+            if (this.entityType == EntityType.PLANET_RAID) {
+                try {
+                    JSONObject entityStats = (JSONObject) getScenarioData("entityStats");
+                    set("$sep_sar_raidDangerLevel", MarketCMD.RaidDangerLevel.valueOf(entityStats.getString("raidDangerLevel")));
+                    set("$sep_sar_marineAmount", entityStats.getInt("marineAmount"));
+                } catch (JSONException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+
+            if (this.currentStage == null) {
+                if (!isBarEvent()) {
+                    set("$sep_sar_contactMissionBlurb", getDialogText("contactMissionBlurb"));
+                    set("$sep_sar_contactMissionOption", getDialogText("contactMissionOption"));
+                    set("$sep_sar_contactMissionOfferText", getDialogText("contactMissionOfferText"));
+                } else {
+                    set("$sep_sar_barMissionBlurb", getDialogText("barMissionBlurb"));
+                    set("$sep_sar_barMissionOption", getDialogText("barMissionOption"));
+                    set("$sep_sar_barMissionOfferText", getDialogText("barMissionOfferText"));
+                }
+            }
+
+            if (this.currentStage == Stage.FIND) {
+                set("$sep_sar_entityDialogText", getDialogText("entityDialogText"));
+                if (this.entityType == EntityType.FLEET) {
+                    set("$sep_sar_entityPayRansomText", getDialogText("entityPayRansomText"));
+                    set("$sep_sar_entityFightText", getDialogText("entityFightText"));
+                    set("$sep_sar_entityPersuadeToFreeText", getDialogText("entityPersuadeToFreeText"));
+                    set("$sep_sar_entityDefeatedText", getDialogText("entityDefeatedText"));
+                } else if (this.entityType == EntityType.PLANET_RAID) {
+                    set("$sep_sar_entityRaidFinishedText", getDialogText("entityRaidFinishedText"));
+                }
+                set("$sep_sar_survivorAliveText", getDialogText("survivorAliveText"));
+                set("$sep_sar_survivorDeadText", getDialogText("survivorDeadText"));
+            }
+
+            if (this.currentStage == Stage.RETURN) {
+                set("$sep_sar_returnSurvivorAliveText", getDialogText("returnSurvivorAliveText"));
+                set("$sep_sar_survivorDialogText", getDialogText("survivorDialogText"));
+                set("$sep_sar_returnSurvivorDeadText", getDialogText("returnSurvivorDeadText"));
             }
         } catch (JSONException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    public String getDialogText(String id) throws JSONException {
+        String result;
+        if (this.scenarioData.has(id)) {
+            result = this.scenarioData.getString(id);
+        } else {
+            result = ModPlugin.getMissionScenarioDefaults(getMissionId()).getString(id);
         }
 
         return result;
@@ -383,11 +394,11 @@ public class SearchAndRescueMission extends HubMissionWithBarEvent {
 
     @Override
     public boolean addNextStepText(TooltipMakerAPI info, Color tc, float pad) {
-        String prefix = "the ";
-        String subjectName = getDialogText("subjectName");
-        if (subjectName.isEmpty()) {
-            prefix = "";
-            subjectName = this.survivor.getNameString();
+        String prefix = "";
+        String subjectName = this.survivor.getNameString();
+        if (!this.subjectName.isEmpty()) {
+            prefix = "the ";
+            subjectName = this.subjectName;
         }
         if (this.currentStage == Stage.FIND) {
             String loc = BreadcrumbSpecial.getLocationDescription(this.entity, false);
@@ -405,11 +416,11 @@ public class SearchAndRescueMission extends HubMissionWithBarEvent {
 
     @Override
     public void addDescriptionForNonEndStage(TooltipMakerAPI info, float width, float height) {
-        String prefix = "the ";
-        String subjectName = getDialogText("subjectName");
-        if (subjectName.isEmpty()) {
-            prefix = "";
-            subjectName = this.survivor.getNameString();
+        String prefix = "";
+        String subjectName = this.survivor.getNameString();
+        if (!this.subjectName.isEmpty()) {
+            prefix = "the ";
+            subjectName = this.subjectName;
         }
         if (this.currentStage == Stage.FIND) {
             String loc = BreadcrumbSpecial.getLocationDescription(this.entity, false);
