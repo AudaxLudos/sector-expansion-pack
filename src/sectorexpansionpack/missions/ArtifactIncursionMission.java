@@ -31,7 +31,6 @@ import java.util.Objects;
 // TODO: Delay special item installation by some days
 // TODO: Improve special item installation message
 // TODO: Add chance to get a military contact from bar event
-// TODO: Add failure details to deciv and market faction changed stages
 // TODO: Add custom dialogs to quick reaction force fleet
 public class ArtifactIncursionMission extends HubMissionWithBarEvent implements GroundRaidObjectivesListener {
     public static Logger log = Global.getLogger(ArtifactIncursionMission.class);
@@ -262,6 +261,21 @@ public class ArtifactIncursionMission extends HubMissionWithBarEvent implements 
                     getPerson().getName().getFullName(), getPerson().getMarket().getName(),
                     getPerson().getMarket().getStarSystem().getNameWithLowercaseType());
         }
+    }
+
+    @Override
+    public String getStageDescriptionText() {
+        if (this.currentStage == Stage.FAILED_DECIV) {
+            if (getPerson().getMarket().isPlanetConditionMarketOnly()) {
+                return "The " + getMissionTypeNoun() + " has failed due to " + getPerson().getMarket().getName() + " becoming decivilized. No reputation penalty will be applied for this outcome.";
+            } else if (this.market.isPlanetConditionMarketOnly()) {
+                return "The " + getMissionTypeNoun() + " has failed due to " + this.market.getName() + " becoming decivilized. No reputation penalty will be applied for this outcome.";
+            }
+        } else if (this.currentStage == Stage.FAILED_MARKET_FACTION_CHANGED) {
+            return "The " + getMissionTypeNoun() + " has failed due to " + this.market.getName() + " changing ownership. No reputation penalty will be applied for this outcome.";
+        }
+
+        return null;
     }
 
     @Override
