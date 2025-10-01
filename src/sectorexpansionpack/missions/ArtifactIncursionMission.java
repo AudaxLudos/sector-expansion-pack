@@ -27,13 +27,13 @@ import java.util.Map;
 import java.util.Objects;
 
 // TODO: Transfer previous special item if selected market industry has one
-// TODO: If contact is part of player faction, complete the mission when raid finishes and set credit reward to 0 or lower
 // TODO: Delay special item installation by some days
 // TODO: Improve special item installation message
 // TODO: Add chance to get a military contact from bar event
 // TODO: Add custom dialogs to quick reaction force fleet
 public class ArtifactIncursionMission extends HubMissionWithBarEvent implements GroundRaidObjectivesListener {
     public static Logger log = Global.getLogger(ArtifactIncursionMission.class);
+    public static float MILITARY_CONTACT_CHANCE = 0.5f;
     public static float MISSION_DURATION = 120f;
     protected MarketAPI market;
     protected Industry industry;
@@ -45,12 +45,31 @@ public class ArtifactIncursionMission extends HubMissionWithBarEvent implements 
     @Override
     protected boolean create(MarketAPI createdAt, boolean barEvent) {
         if (barEvent) {
-            setGiverRank(Ranks.CITIZEN);
-            setGiverPost(pickOne(Ranks.POST_AGENT, Ranks.POST_SMUGGLER, Ranks.POST_GANGSTER, Ranks.POST_FENCE, Ranks.POST_CRIMINAL));
-            setGiverImportance(pickImportance());
-            setGiverFaction(Factions.PIRATES);
-            setGiverTags(Tags.CONTACT_UNDERWORLD);
-            findOrCreateGiver(createdAt, true, false);
+            if (rollProbability(MILITARY_CONTACT_CHANCE)) {
+                List<String> posts = new ArrayList<>();
+                posts.add(Ranks.POST_AGENT);
+                if (Misc.isMilitary(createdAt)) {
+                    posts.add(Ranks.POST_BASE_COMMANDER);
+                }
+                if (Misc.hasOrbitalStation(createdAt)) {
+                    posts.add(Ranks.POST_STATION_COMMANDER);
+                }
+                String post = pickOne(posts);
+
+                setGiverRank(pickOne(Ranks.GROUND_CAPTAIN, Ranks.GROUND_COLONEL, Ranks.GROUND_MAJOR,
+                        Ranks.SPACE_COMMANDER, Ranks.SPACE_CAPTAIN, Ranks.SPACE_ADMIRAL));
+                setGiverTags(Tags.CONTACT_MILITARY);
+                setGiverPost(post);
+                setGiverImportance(pickHighImportance());
+                findOrCreateGiver(createdAt, true, false);
+            } else {
+                setGiverRank(Ranks.CITIZEN);
+                setGiverPost(pickOne(Ranks.POST_AGENT, Ranks.POST_SMUGGLER, Ranks.POST_ARMS_DEALER));
+                setGiverImportance(pickHighImportance());
+                setGiverFaction(Factions.PIRATES);
+                setGiverTags(Tags.CONTACT_UNDERWORLD);
+                findOrCreateGiver(createdAt, true, false);
+            }
         }
 
         if (!setPersonMissionRef(getPerson(), "$sep_aim_ref")) {
