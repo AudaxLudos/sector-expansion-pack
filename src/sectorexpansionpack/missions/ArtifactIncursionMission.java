@@ -34,7 +34,6 @@ import java.util.Objects;
 // TODO: Improve special item installation message
 // TODO: Add chance to get a military contact from bar event
 // TODO: Add custom dialogs to quick reaction force fleet
-// TODO: Add bar dialogs
 public class ArtifactIncursionMission extends HubMissionWithBarEvent implements GroundRaidObjectivesListener {
     public static Logger log = Global.getLogger(ArtifactIncursionMission.class);
     public static float MILITARY_CONTACT_CHANCE = 0.5f;

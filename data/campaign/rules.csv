@@ -156,19 +156,22 @@ sep_aim_offerOption,sep_aim_option,,,,sep_aim_start:Ask about 'claiming' a rival
 sep_aim_offerTextContact1,DialogOptionSelected,$option == sep_aim_start,"$missionId = sep_aim
 SetTextHighlightColors h $sep_aim_marketFactionColor $sep_aim_marketFactionColor h h h
 SetTextHighlights $sep_aim_artifactName $sep_aim_marketName $sep_aim_marketFactionName $sep_aim_marketSystem $sep_aim_marines $sep_aim_reward
-Call $sep_aim_ref showMap ""Target: $sep_aim_marketName""","$sep_aim_industryAOrAn $sep_aim_industryName facility is using an artifact called '$sep_aim_artifactName'. Its influence is undermining the $personFaction's economic opportunities."" $HeOrShe says, as a mission briefing appears on your screen.
+Call $sep_aim_ref showMap ""Target: $sep_aim_marketName""","""An artifact called $sep_aim_artifactName is undermining the $personFaction's economic standing. I need an independent force that can take the artifact and place it under $personFaction control,"" $heOrShe says as a mission briefing appears on your screen.
 
-""That’s why I need an independent force to step in, someone who can quietly 'reclaim' the artifact, if possible and ensure it’s moved elsewhere."" $HeOrShe smiles.
-
-""Now, the artifact is located on $sep_aim_marketName, a colony controlled by the $sep_aim_marketFactionName in the $sep_aim_marketSystem. Analysis of the colony’s defenses estimates roughly $sep_aim_marines marines will be required to carry out the mission."" $HeOrShe says, leaning back.
-
-""If successful, the $personFaction has authorized a reward of $sep_aim_reward, along with a sizable boost to your reputation. Interested?","contact_accept:Accept
+""The artifact is on $sep_aim_marketName, a $sep_aim_marketFactionName colony in the $sep_aim_marketSystem. You'll need roughly $sep_aim_marines marines to secure it."" $HeOrShe leans forward slightly. ""If successful, I am authorized to offer $sep_aim_reward credits, along with a sizable boost to your reputation. Interested?""","contact_accept:Accept
 contact_decline:Decline",
 "## Bar offer dialogs
 ",,,,,,
-sep_aim_blurbBar,sep_aim_blurbBar,,,BAR MISSION BLURB,,
-sep_aim_offerOptionBar,sep_aim_optionBar,,,,sep_aim_startBar:BAR MISSION OPT,
-sep_aim_offerTextBar1,DialogOptionSelected,$option == sep_aim_startBar,$missionId = sep_aim,BAR MISSION OFFER TXT,"contact_acceptBar:Accept
+sep_aim_blurbBar,sep_aim_blurbBar,,,"A $manOrWoman sits at the counter, juggling two tripads with an annoyed expression. The untouched drink beside them reflects the glow of the screens.",,
+sep_aim_offerOptionBar,sep_aim_optionBar,,,,sep_aim_startBar:Approach the $manOrWoman with an annoyed expression,
+sep_aim_offerTextBar1,DialogOptionSelected,$option == sep_aim_startBar,"$missionId = sep_aim
+SetTextHighlightColors h $sep_aim_marketFactionColor $sep_aim_marketFactionColor h h h
+SetTextHighlights $sep_aim_artifactName $sep_aim_marketName $sep_aim_marketFactionName $sep_aim_marketSystem $sep_aim_marines $sep_aim_reward
+Call $sep_aim_ref showMap ""Target: $sep_aim_marketName""","$HeOrShe looks at you with annoyance before softening $hisOrHer gaze. ""A Captain, I presume?"" You nod in response. ""Good,"" $heOrShe says. ""I have an issue that might interest you."" $HeOrShe slides a tripad toward you, ""If you're interested, take a look.""
+
+On the tripad, you see details of economic issues caused by an artifact called $sep_aim_artifactName. Reading further, you find that the $personFaction has authorized the seizure of the artifact. Its location revealed to be on $sep_aim_marketName, a $sep_aim_marketFactionName colony in the $sep_aim_marketSystem, along with an outline of the colony's defenses estimating that around $sep_aim_marines marines would be needed to secure it. At the end, a listed reward shows $sep_aim_reward credits.
+
+The $manOrWoman coughs, pulling your attention. ""So, Captain, are you in?""","contact_acceptBar:Accept
 contact_declineBarNoContinue:Decline",
 "## Raid finished dialogs
 ",,,,,,
