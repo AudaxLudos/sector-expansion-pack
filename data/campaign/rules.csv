@@ -1,4 +1,8 @@
 id,trigger,conditions,script,text,options,notes
+"# Expedition Fleet Intel
+# START",,,,,,
+"# Expedition Fleet Intel
+# END",,,,,,
 "# Hiring a rescued survivor
 # START",,,,,,
 sep_survivorGreeting,PickGreeting,"$sep_survivor score:1000

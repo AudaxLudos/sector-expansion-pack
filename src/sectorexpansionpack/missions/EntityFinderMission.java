@@ -1,8 +1,11 @@
 package sectorexpansionpack.missions;
 
+import com.fs.starfarer.api.campaign.PlanetAPI;
+import com.fs.starfarer.api.campaign.SectorEntityToken;
 import com.fs.starfarer.api.campaign.SpecialItemData;
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
 import com.fs.starfarer.api.impl.campaign.missions.hub.HubMissionWithSearch;
+import com.fs.starfarer.api.util.Misc;
 
 public class EntityFinderMission extends HubMissionWithSearch {
     @Override
@@ -12,5 +15,27 @@ public class EntityFinderMission extends HubMissionWithSearch {
 
     public void requireMarketCanUseSpecialItem(SpecialItemData specialItemData) {
         this.search.marketReqs.add(new ArtifactIncursionMission.MarketCanUseSpecialItemReq(specialItemData));
+    }
+
+    public void requirePlanetNoSpecialSalvage() {
+        this.search.planetReqs.add(new PlanetNoSpecialSalvage());
+    }
+
+    public void requireEntityNoSpecialSalvage() {
+        this.search.entityReqs.add(new EntityNoSpecialSalvage());
+    }
+
+    public static class PlanetNoSpecialSalvage implements PlanetRequirement {
+        @Override
+        public boolean planetMatchesRequirement(PlanetAPI planet) {
+            return Misc.getSalvageSpecial(planet) == null;
+        }
+    }
+
+    public static class EntityNoSpecialSalvage implements EntityRequirement {
+        @Override
+        public boolean entityMatchesRequirement(SectorEntityToken entity) {
+            return Misc.getSalvageSpecial(entity) == null;
+        }
     }
 }

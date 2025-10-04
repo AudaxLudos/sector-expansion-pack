@@ -8,6 +8,7 @@ import com.fs.starfarer.api.impl.campaign.ids.Tags;
 import com.fs.starfarer.api.impl.campaign.rulecmd.salvage.special.SleeperPodsSpecial;
 import com.fs.starfarer.api.plugins.OfficerLevelupPlugin;
 import com.fs.starfarer.api.util.Misc;
+import sectorexpansionpack.intel.ExpeditionFleetManager;
 
 public class Utils {
     public void RunCodeScripts() {
@@ -29,6 +30,12 @@ public class Utils {
                     }
                 }
             }
+        }
+
+        //import sectorexpansionpack.intel.ExpeditionFleetManager;
+        ExpeditionFleetManager test = ExpeditionFleetManager.getInstance();
+        if (test != null) {
+            System.out.println(test.getActiveCount());
         }
     }
 }
