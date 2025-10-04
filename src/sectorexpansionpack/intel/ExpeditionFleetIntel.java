@@ -13,6 +13,7 @@ import com.fs.starfarer.api.impl.campaign.intel.group.FleetGroupIntel;
 import com.fs.starfarer.api.impl.campaign.missions.FleetCreatorMission;
 import com.fs.starfarer.api.ui.TooltipMakerAPI;
 import org.apache.log4j.Logger;
+import sectorexpansionpack.intel.misc.ExpeditionFleetDepartureIntel;
 
 import java.awt.*;
 
@@ -46,7 +47,7 @@ public class ExpeditionFleetIntel extends FleetGroupIntel {
         log.info("Created an artifact expedition fleet at " + this.source.getName() + " in " + this.source.getStarSystem().getNameWithLowercaseType());
 
         // TODO: Add special item on target entity
-        // TODO: Send expedition departure intel
+        new ExpeditionFleetDepartureIntel(getRoute(), this.source);
     }
 
     @Override
@@ -70,7 +71,7 @@ public class ExpeditionFleetIntel extends FleetGroupIntel {
         fcm.createFleet(FleetCreatorMission.FleetStyle.QUALITY, 10, this.source.getFactionId(), this.source.getLocationInHyperspace());
         fcm.setFleetSource(this.source);
         fcm.triggerMakeLowRepImpact();
-        fcm.triggerFleetSetName("Artifact Expedition");
+        fcm.triggerFleetSetName("Expedition Fleet");
 
         CampaignFleetAPI fleet = fcm.createFleet();
         if (fleet != null && this.route != null) {

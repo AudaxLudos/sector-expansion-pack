@@ -8,10 +8,12 @@ import com.fs.starfarer.api.campaign.SpecialItemSpecAPI;
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
 import com.fs.starfarer.api.impl.campaign.intel.BaseEventManager;
 import com.fs.starfarer.api.util.WeightedRandomPicker;
+import org.apache.log4j.Logger;
 import sectorexpansionpack.missions.EntityFinderMission;
 
 public class ExpeditionFleetManager extends BaseEventManager {
     public static final String KEY = "$sep_core_artifactExpeditionManager";
+    public static Logger log = Global.getLogger(ExpeditionFleetManager.class);
 
     public ExpeditionFleetManager() {
         Global.getSector().getMemoryWithoutUpdate().set(KEY, this);
@@ -36,6 +38,7 @@ public class ExpeditionFleetManager extends BaseEventManager {
     protected EveryFrameScript createEvent() {
         SpecialItemSpecAPI specialItemSpec = pickSpecialItem();
         if (specialItemSpec == null) {
+            log.info("Failed to get special item");
             return null;
         }
 
@@ -46,6 +49,7 @@ public class ExpeditionFleetManager extends BaseEventManager {
         efm.requireMarketCanUseSpecialItem(new SpecialItemData(specialItemSpec.getId(), null));
         MarketAPI source = efm.pickMarket();
         if (source == null) {
+            log.info("Failed to find source market");
             return null;
         }
 
@@ -53,11 +57,13 @@ public class ExpeditionFleetManager extends BaseEventManager {
         efm.preferPlanetInDirectionOfOtherMissions();
         SectorEntityToken target = efm.pickPlanet();
         if (target == null) {
+            log.info("Failed to find target entity");
             return null;
         }
 
         ExpeditionFleetIntel event = new ExpeditionFleetIntel(specialItemSpec, source, target);
         if (event.isDone()) {
+            log.info("Failed to create ExpeditionFleetIntel event");
             return null;
         }
 

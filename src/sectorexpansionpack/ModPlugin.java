@@ -2,10 +2,12 @@ package sectorexpansionpack;
 
 import com.fs.starfarer.api.BaseModPlugin;
 import com.fs.starfarer.api.Global;
+import com.fs.starfarer.api.campaign.SectorAPI;
 import com.fs.starfarer.api.util.WeightedRandomPicker;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import sectorexpansionpack.intel.ExpeditionFleetManager;
 
 import java.io.IOException;
 import java.util.Random;
@@ -64,15 +66,20 @@ public class ModPlugin extends BaseModPlugin {
 
     @Override
     public void onApplicationLoad() {
-        try {
-            MISSION_SCENARIOS = Global.getSettings().loadJSON("data/campaign/sep_mission_scenarios.json");
-        } catch (IOException | JSONException e) {
-            throw new RuntimeException(e);
-        }
+        loadMissionScenarios();
     }
 
     @Override
     public void onGameLoad(boolean newGame) {
+        loadMissionScenarios();
+
+        SectorAPI sector = Global.getSector();
+        if (!sector.hasScript(ExpeditionFleetManager.class)) {
+            sector.addScript(new ExpeditionFleetManager());
+        }
+    }
+
+    public void loadMissionScenarios() {
         try {
             MISSION_SCENARIOS = Global.getSettings().loadJSON("data/campaign/sep_mission_scenarios.json");
         } catch (IOException | JSONException e) {
