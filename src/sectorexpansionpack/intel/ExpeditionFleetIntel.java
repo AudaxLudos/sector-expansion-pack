@@ -19,6 +19,7 @@ import com.fs.starfarer.api.ui.TooltipMakerAPI;
 import com.fs.starfarer.api.util.Misc;
 import com.fs.starfarer.api.util.WeightedRandomPicker;
 import org.apache.log4j.Logger;
+import sectorexpansionpack.Utils;
 import sectorexpansionpack.intel.misc.ExpeditionFleetDepartureIntel;
 import sectorexpansionpack.missions.EntityFinderMission;
 
@@ -37,6 +38,8 @@ public class ExpeditionFleetIntel extends FleetGroupIntel {
     public static String RETURN_ACTION = "return_action";
     public static String DOCK_ACTION = "dock_action";
 
+    protected float revealChance = 0.25f;
+    protected boolean isLeaked = false;
     protected FGWaitAction lootAction;
     protected SpecialItemSpecAPI specialItemSpec;
     protected SpecialItemData specialItemData;
@@ -66,8 +69,11 @@ public class ExpeditionFleetIntel extends FleetGroupIntel {
         this.target.getMemoryWithoutUpdate().set(EVENT_KEY, this);
         Misc.setSalvageSpecial(this.target, new SEPHiddenItemSpecial.HiddenSpecialItemSpecialData(this.specialItemSpec.getId()));
 
-        // TODO: Roll chance to reveal fleet
-        new ExpeditionFleetDepartureIntel(getRoute(), this.source);
+        if (Utils.rollProbability(this.revealChance)) {
+            new ExpeditionFleetDepartureIntel(getRoute(), this.source);
+        } else {
+            this.revealChance += 0.1f;
+        }
     }
 
     @Override

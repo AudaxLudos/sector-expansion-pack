@@ -66,7 +66,6 @@ public class ExpeditionFleetDepartureIntel extends BaseIntelPlugin {
 
         Color tc = getBulletColorForMode(mode);
         Color g = Misc.getGrayColor();
-        Color h = Misc.getHighlightColor();
 
         bullet(info);
         boolean isUpdate = getListInfoParam() != null;
@@ -75,9 +74,6 @@ public class ExpeditionFleetDepartureIntel extends BaseIntelPlugin {
             info.addPara("Faction: " + this.faction.getDisplayName(), initPad, tc,
                     this.faction.getBaseUIColor(), this.faction.getDisplayName());
             initPad = 0f;
-            info.addPara("Destination: Unknown", initPad, tc, g, "Unknown");
-            initPad = 0f;
-            info.addPara("Artifact: Unknown", initPad, tc, g, "Unknown");
         }
 
         if (isUpdate) {
@@ -90,6 +86,10 @@ public class ExpeditionFleetDepartureIntel extends BaseIntelPlugin {
                 info.addPara("Recently launched", tc, initPad);
             }
         }
+
+        initPad = 0f;
+        info.addPara("Destination: Unknown", initPad, tc, g, "Unknown");
+        info.addPara("Artifact: Unknown", initPad, tc, g, "Unknown");
 
         unindent(info);
     }
@@ -116,8 +116,6 @@ public class ExpeditionFleetDepartureIntel extends BaseIntelPlugin {
 
     @Override
     protected void advanceImpl(float amount) {
-        super.advanceImpl(amount);
-
         if (this.route.getDelay() > 0) return;
         if (this.sinceLaunched <= 0 && amount > 0) {
             sendUpdateIfPlayerHasIntel(new Object(), true);
@@ -131,7 +129,7 @@ public class ExpeditionFleetDepartureIntel extends BaseIntelPlugin {
     public boolean shouldRemoveIntel() {
         if (this.route.getDelay() > 0) return false;
         if (isImportant()) return false;
-        return !(this.sinceLaunched < getBaseDaysAfterEnd());
+        return !(this.sinceLaunched <= getBaseDaysAfterEnd());
     }
 
     @Override
