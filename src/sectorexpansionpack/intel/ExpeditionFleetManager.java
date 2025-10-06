@@ -53,6 +53,7 @@ public class ExpeditionFleetManager extends BaseEventManager {
             return null;
         }
 
+        efm.requirePlanetWithRuins();
         efm.requirePlanetUnexploredRuins();
         efm.preferPlanetInDirectionOfOtherMissions();
         SectorEntityToken target = efm.pickPlanet();
