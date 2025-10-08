@@ -66,10 +66,10 @@ public class ExpeditionFleetIntel extends FleetGroupIntel {
         getRoute().setDelay((float) (3f + Math.random() * 6f));
         log.info("Created an expedition fleet at " + this.source.getName() + " in " + this.source.getStarSystem().getNameWithLowercaseType() + " and will goto " + this.target.getStarSystem().getNameWithLowercaseTypeShort());
 
-        // Mark source so it won't be reselected for next expedition
+        // Mark source so it won't be reselected for future expedition
         this.source.getMemoryWithoutUpdate().set(SOURCE_KEY, true);
 
-        // Mark target so it won't be reselected for next expedition
+        // Mark target so it won't be reselected for future expedition
         Misc.makeImportant(this.target, "specialItemLocation");
         this.target.getMemoryWithoutUpdate().set(TARGET_KEY, true);
         this.target.getMemoryWithoutUpdate().set(EVENT_KEY, this);

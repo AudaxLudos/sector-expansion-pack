@@ -17,7 +17,7 @@ import java.util.Set;
 
 public class ExpeditionFleetDepartureIntel extends BaseIntelPlugin {
     protected RouteManager.RouteData route;
-    protected float sinceLaunched = 0f;
+    protected Float sinceLaunched;
     protected FactionAPI faction;
     protected MarketAPI source;
 
@@ -114,6 +114,7 @@ public class ExpeditionFleetDepartureIntel extends BaseIntelPlugin {
     @Override
     protected void advanceImpl(float amount) {
         if (this.route.getDelay() > 0) return;
+        if (this.sinceLaunched == null) this.sinceLaunched = 0f;
         if (this.sinceLaunched <= 0 && amount > 0) {
             sendUpdateIfPlayerHasIntel(new Object(), true);
         }
@@ -126,7 +127,7 @@ public class ExpeditionFleetDepartureIntel extends BaseIntelPlugin {
     public boolean shouldRemoveIntel() {
         if (this.route.getDelay() > 0) return false;
         if (isImportant()) return false;
-        return this.sinceLaunched > getBaseDaysAfterEnd();
+        return this.sinceLaunched == null || !(this.sinceLaunched < getBaseDaysAfterEnd());
     }
 
     @Override

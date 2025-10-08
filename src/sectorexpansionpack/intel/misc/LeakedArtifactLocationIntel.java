@@ -9,6 +9,7 @@ import com.fs.starfarer.api.impl.campaign.rulecmd.salvage.special.BreadcrumbSpec
 import com.fs.starfarer.api.ui.SectorMapAPI;
 import com.fs.starfarer.api.ui.TooltipMakerAPI;
 import com.fs.starfarer.api.util.Misc;
+import com.fs.starfarer.api.util.MutableValue;
 import sectorexpansionpack.intel.ExpeditionFleetIntel;
 
 import java.awt.*;

@@ -44,8 +44,7 @@ public class SEPHiddenItemSpecial extends BaseSalvageSpecial {
             addText("GET SPECIAL ITEM TEXT.");
 
             if (this.entity.getMemoryWithoutUpdate().get(ExpeditionFleetIntel.EVENT_KEY) instanceof ExpeditionFleetIntel intel) {
-                intel.unsetTargetMem();
-                intel.failFleet();
+                intel.finish(true);
             }
 
             SpecialItemData specialItemData = new SpecialItemData(this.data.specialItemId, null);

@@ -31,7 +31,7 @@ public class ExpeditionFleetManager extends BaseEventManager {
 
     @Override
     protected int getMaxConcurrent() {
-        return 4;
+        return 100;
     }
 
     @Override

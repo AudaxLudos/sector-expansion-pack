@@ -30,7 +30,7 @@ public class EntityFinderMission extends HubMissionWithSearch {
     }
 
     public void requirePlanetNoMemoryFlag(String flag) {
-        this.search.marketReqs.add(new MarketBooleanMemoryFlag(flag, true));
+        this.search.planetReqs.add(new PlanetBooleanMemoryFlag(flag, true));
     }
 
     public static class PlanetNoSpecialSalvage implements PlanetRequirement {
