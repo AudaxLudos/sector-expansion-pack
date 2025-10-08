@@ -1,7 +1,8 @@
 {
   "graphics": {
     "intel": {
-      "sep_expeditionFleet": "graphics/sectorexpansionpack/icons/expeditionfleet.png"
+      "sep_expeditionFleet": "graphics/sectorexpansionpack/icons/expedition_fleet.png",
+      "sep_toArtifact": "graphics/sectorexpansionpack/icons/to_artifact.png"
     }
   }
 }

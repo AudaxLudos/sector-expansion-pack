@@ -21,6 +21,7 @@ import com.fs.starfarer.api.util.WeightedRandomPicker;
 import org.apache.log4j.Logger;
 import sectorexpansionpack.Utils;
 import sectorexpansionpack.intel.misc.ExpeditionFleetDepartureIntel;
+import sectorexpansionpack.intel.misc.LeakedArtifactLocationIntel;
 import sectorexpansionpack.missions.EntityFinderMission;
 
 import java.awt.*;
@@ -38,7 +39,7 @@ public class ExpeditionFleetIntel extends FleetGroupIntel {
     public static String RETURN_ACTION = "return_action";
     public static String DOCK_ACTION = "dock_action";
 
-    protected float revealChance = 0.25f;
+    protected float revealChance = 0.2f;
     protected boolean isLeaked = false;
     protected FGWaitAction lootAction;
     protected SpecialItemSpecAPI specialItemSpec;
@@ -64,6 +65,8 @@ public class ExpeditionFleetIntel extends FleetGroupIntel {
         getRoute().setDelay((float) (3f + Math.random() * 6f));
         log.info("Created an expedition fleet at " + this.source.getName() + " in " + this.source.getStarSystem().getNameWithLowercaseType() + " and will goto " + this.target.getStarSystem().getNameWithLowercaseTypeShort());
 
+        // TODO: Mark the source market and ensure the market won't be selected for new expeditions
+
         Misc.makeImportant(this.target, "specialItemLocation");
         this.target.getMemoryWithoutUpdate().set(TARGET_KEY, true);
         this.target.getMemoryWithoutUpdate().set(EVENT_KEY, this);
@@ -86,6 +89,7 @@ public class ExpeditionFleetIntel extends FleetGroupIntel {
             unsetTargetMem();
             this.target.getMemoryWithoutUpdate().unset(MemFlags.SALVAGE_SPECIAL_DATA);
 
+            // TODO: Make fleet aggressive and defensive when they reach the location
             if (isSpawnedFleets()) {
                 Misc.makeImportant(this.fleets.get(0), "hasSpecialItem");
                 Misc.addDefeatTrigger(this.fleets.get(0), "SEPEFGIFleetDefeated");
@@ -112,7 +116,16 @@ public class ExpeditionFleetIntel extends FleetGroupIntel {
             Global.getSector().getIntelManager().addIntel(message);
             log.info("Installing special item in " + ind.getCurrentName() + " on " + market.getName() + " within the " + market.getStarSystem().getNameWithLowercaseTypeShort());
         }
-        // TODO: Roll chance to leak the expedition's status
+
+        if (!this.isLeaked && !PREPARE_ACTION.equals(action.getId()) && !DOCK_ACTION.equals(action.getId())) {
+            if (Utils.rollProbability(this.revealChance)) {
+                this.isLeaked = true;
+
+                new LeakedArtifactLocationIntel(action.getId(), this.source, this.target, 3f);
+            } else {
+                this.revealChance += 0.2f;
+            }
+        }
     }
 
     @Override

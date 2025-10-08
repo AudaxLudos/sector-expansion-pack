@@ -50,10 +50,6 @@ public class ExpeditionFleetDepartureIntel extends BaseIntelPlugin {
                 this.faction.getBaseUIColor(), this.faction.getPersonNamePrefix());
 
         addBulletPoints(info, ListInfoMode.IN_DESC);
-
-        info.addPara("You can obtain the artifact by following the fleet and looting the location first.", oPad, tc);
-        info.addPara("Allowing the fleet to return with the artifact will make the %s use it.", oPad,
-                this.faction.getBaseUIColor(), this.faction.getPersonNamePrefix());
     }
 
     @Override
@@ -76,6 +72,11 @@ public class ExpeditionFleetDepartureIntel extends BaseIntelPlugin {
             initPad = 0f;
         }
 
+        info.addPara("Destination: Unknown", initPad, tc, g, "Unknown");
+        initPad = 0f;
+        info.addPara("Artifact: Unknown", initPad, tc, g, "Unknown");
+        initPad = 0f;
+
         if (isUpdate) {
             info.addPara("Fleet launched", tc, initPad);
         } else {
@@ -86,10 +87,6 @@ public class ExpeditionFleetDepartureIntel extends BaseIntelPlugin {
                 info.addPara("Recently launched", tc, initPad);
             }
         }
-
-        initPad = 0f;
-        info.addPara("Destination: Unknown", initPad, tc, g, "Unknown");
-        info.addPara("Artifact: Unknown", initPad, tc, g, "Unknown");
 
         unindent(info);
     }
@@ -129,7 +126,7 @@ public class ExpeditionFleetDepartureIntel extends BaseIntelPlugin {
     public boolean shouldRemoveIntel() {
         if (this.route.getDelay() > 0) return false;
         if (isImportant()) return false;
-        return !(this.sinceLaunched <= getBaseDaysAfterEnd());
+        return this.sinceLaunched > getBaseDaysAfterEnd();
     }
 
     @Override
@@ -142,7 +139,6 @@ public class ExpeditionFleetDepartureIntel extends BaseIntelPlugin {
         Set<String> tags = super.getIntelTags(map);
         tags.add(Tags.INTEL_FLEET_DEPARTURES);
         tags.add(this.faction.getId());
-        tags.add("Leaks");
         return tags;
     }
 
