@@ -15,6 +15,18 @@ import java.util.Random;
 public class Utils {
     public static Random random = new Random();
 
+    public static void setRandom(Random random) {
+        Utils.random = random;
+    }
+
+    public static boolean rollProbability(float p) {
+        return random.nextFloat() >= p;
+    }
+
+    public static boolean rollProbability(Random random, float p) {
+        return random.nextFloat() >= p;
+    }
+
     public void RunCodeScripts() {
         for (OfficerDataAPI officer : Global.getSector().getPlayerFleet().getFleetData().getOfficersCopy()) {
             OfficerLevelupPlugin plugin = (OfficerLevelupPlugin) Global.getSettings().getPlugin("officerLevelUp");
@@ -41,17 +53,5 @@ public class Utils {
         if (test != null) {
             System.out.println(test.getActiveCount());
         }
-    }
-
-    public static void setRandom(Random random) {
-        Utils.random = random;
-    }
-
-    public static boolean rollProbability(float p) {
-        return random.nextFloat() >= p;
-    }
-
-    public static boolean rollProbability(Random random, float p) {
-        return random.nextFloat() >= p;
     }
 }

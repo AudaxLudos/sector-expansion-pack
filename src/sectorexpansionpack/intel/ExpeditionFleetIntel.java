@@ -30,6 +30,7 @@ import java.util.Map;
 
 public class ExpeditionFleetIntel extends FleetGroupIntel {
     public static final String EVENT_KEY = "$sep_efi_eventRef";
+    public static final String SOURCE_KEY = "$sep_efi_source";
     public static final String FLEET_KEY = "$sep_efi_fleet";
     public static final String TARGET_KEY = "$sep_efi_target";
     public static Logger log = Global.getLogger(ExpeditionFleetIntel.class);
@@ -65,8 +66,10 @@ public class ExpeditionFleetIntel extends FleetGroupIntel {
         getRoute().setDelay((float) (3f + Math.random() * 6f));
         log.info("Created an expedition fleet at " + this.source.getName() + " in " + this.source.getStarSystem().getNameWithLowercaseType() + " and will goto " + this.target.getStarSystem().getNameWithLowercaseTypeShort());
 
-        // TODO: Mark the source market and ensure the market won't be selected for new expeditions
+        // Mark source so it won't be reselected for next expedition
+        this.source.getMemoryWithoutUpdate().set(SOURCE_KEY, true);
 
+        // Mark target so it won't be reselected for next expedition
         Misc.makeImportant(this.target, "specialItemLocation");
         this.target.getMemoryWithoutUpdate().set(TARGET_KEY, true);
         this.target.getMemoryWithoutUpdate().set(EVENT_KEY, this);
@@ -86,7 +89,7 @@ public class ExpeditionFleetIntel extends FleetGroupIntel {
         }
 
         if (action.getId().equals(LOOT_ACTION)) {
-            unsetTargetMem();
+            Misc.makeUnimportant(this.target, "specialItemLocation");
             this.target.getMemoryWithoutUpdate().unset(MemFlags.SALVAGE_SPECIAL_DATA);
 
             // TODO: Make fleet aggressive and defensive when they reach the location
@@ -158,6 +161,7 @@ public class ExpeditionFleetIntel extends FleetGroupIntel {
     protected void notifyEnded() {
         unsetTargetMem();
         unsetFleetMem();
+        unsetSourceMem();
 
         log.info("Expedition Fleet Intel Ended");
     }
@@ -232,7 +236,7 @@ public class ExpeditionFleetIntel extends FleetGroupIntel {
         this.target.getMemoryWithoutUpdate().unset(EVENT_KEY);
     }
 
-    public void failFleet() {
-        finish(false);
+    public void unsetSourceMem() {
+        this.source.getMemoryWithoutUpdate().unset(SOURCE_KEY);
     }
 }

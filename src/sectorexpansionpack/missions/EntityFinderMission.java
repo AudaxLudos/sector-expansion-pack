@@ -25,6 +25,14 @@ public class EntityFinderMission extends HubMissionWithSearch {
         this.search.entityReqs.add(new EntityNoSpecialSalvage());
     }
 
+    public void requireMarketNoMemoryFlag(String flag) {
+        this.search.marketReqs.add(new MarketBooleanMemoryFlag(flag, true));
+    }
+
+    public void requirePlanetNoMemoryFlag(String flag) {
+        this.search.marketReqs.add(new MarketBooleanMemoryFlag(flag, true));
+    }
+
     public static class PlanetNoSpecialSalvage implements PlanetRequirement {
         @Override
         public boolean planetMatchesRequirement(PlanetAPI planet) {
@@ -36,6 +44,44 @@ public class EntityFinderMission extends HubMissionWithSearch {
         @Override
         public boolean entityMatchesRequirement(SectorEntityToken entity) {
             return Misc.getSalvageSpecial(entity) == null;
+        }
+    }
+
+    public static class MarketBooleanMemoryFlag implements MarketRequirement {
+        String flag;
+        boolean negate;
+
+        public MarketBooleanMemoryFlag(String flag, boolean negate) {
+            this.flag = flag;
+            this.negate = negate;
+        }
+
+        @Override
+        public boolean marketMatchesRequirement(MarketAPI market) {
+            boolean memVal = market.getMemoryWithoutUpdate().getBoolean(this.flag);
+            if (this.negate) {
+                return !memVal;
+            }
+            return memVal;
+        }
+    }
+
+    public static class PlanetBooleanMemoryFlag implements PlanetRequirement {
+        String flag;
+        boolean negate;
+
+        public PlanetBooleanMemoryFlag(String flag, boolean negate) {
+            this.flag = flag;
+            this.negate = negate;
+        }
+
+        @Override
+        public boolean planetMatchesRequirement(PlanetAPI planet) {
+            boolean memVal = planet.getMemoryWithoutUpdate().getBoolean(this.flag);
+            if (this.negate) {
+                return !memVal;
+            }
+            return memVal;
         }
     }
 }

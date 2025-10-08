@@ -43,6 +43,7 @@ public class ExpeditionFleetManager extends BaseEventManager {
         }
 
         EntityFinderMission efm = new EntityFinderMission();
+        efm.requireMarketNoMemoryFlag(ExpeditionFleetIntel.SOURCE_KEY);
         efm.requireMarketNotHidden();
         efm.requireMarketFactionNotPlayer();
         efm.requireMarketStabilityAtLeast(8);
@@ -53,6 +54,7 @@ public class ExpeditionFleetManager extends BaseEventManager {
             return null;
         }
 
+        efm.requirePlanetNoMemoryFlag(ExpeditionFleetIntel.TARGET_KEY);
         efm.requirePlanetWithRuins();
         efm.requirePlanetUnexploredRuins();
         efm.preferPlanetInDirectionOfOtherMissions();

@@ -4,11 +4,8 @@ import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.campaign.FactionAPI;
 import com.fs.starfarer.api.campaign.SectorEntityToken;
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
-import com.fs.starfarer.api.impl.campaign.ids.Tags;
 import com.fs.starfarer.api.impl.campaign.intel.BaseIntelPlugin;
-import com.fs.starfarer.api.impl.campaign.intel.group.FGAction;
 import com.fs.starfarer.api.impl.campaign.rulecmd.salvage.special.BreadcrumbSpecial;
-import com.fs.starfarer.api.ui.LabelAPI;
 import com.fs.starfarer.api.ui.SectorMapAPI;
 import com.fs.starfarer.api.ui.TooltipMakerAPI;
 import com.fs.starfarer.api.util.Misc;
@@ -57,12 +54,12 @@ public class LeakedArtifactLocationIntel extends BaseIntelPlugin {
                     possibleLoc, this.faction.getPersonNamePrefix());
         } else if (ExpeditionFleetIntel.LOOT_ACTION.equals(this.actionId)) {
             info.addPara("The artifact is rumored to be carried by %s %s expedition fleet who is scheduled to return to %s in the %s.", oPad,
-                    new Color[] {tc, fc, fc, fc},
+                    new Color[]{tc, fc, fc, fc},
                     this.faction.getPersonNamePrefixAOrAn(), this.faction.getPersonNamePrefix(),
                     this.source.getName(), this.source.getStarSystem().getNameWithLowercaseTypeShort());
         } else if (ExpeditionFleetIntel.RETURN_ACTION.equals(this.actionId)) {
             info.addPara("The artifact is rumored to be carried by %s %s expedition fleet who is docking to %s in the %s.", oPad,
-                    new Color[] {tc, fc, fc, fc},
+                    new Color[]{tc, fc, fc, fc},
                     this.faction.getPersonNamePrefixAOrAn(), this.faction.getPersonNamePrefix(),
                     this.source.getName(), this.source.getStarSystem().getNameWithLowercaseTypeShort());
         }
