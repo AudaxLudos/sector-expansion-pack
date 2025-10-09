@@ -22,6 +22,7 @@ import com.fs.starfarer.api.ui.TooltipMakerAPI;
 import com.fs.starfarer.api.util.Misc;
 import com.fs.starfarer.api.util.WeightedRandomPicker;
 import org.apache.log4j.Logger;
+import sectorexpansionpack.intel.misc.ArtifactInstallationIntel;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -218,8 +219,8 @@ public class ArtifactIncursionMission extends HubMissionWithBarEvent implements 
 
         Industry ind = pickIndustryToInstallItem(market, this.specialItemData);
         ind.setSpecialItem(this.specialItemData);
-        IntelInfoPlugin message = new MessageIntel("Install special item to " + ind.getCurrentName() + " in the " + market.getName() + " within the " + market.getStarSystem().getNameWithLowercaseTypeShort());
-        Global.getSector().getIntelManager().addIntel(message);
+        ArtifactInstallationIntel intel = new ArtifactInstallationIntel(market, ind, this.specialItemSpec);
+        Global.getSector().getIntelManager().queueIntel(intel);
         log.info("Installing special item in " + ind.getCurrentName() + " on " + market.getName() + " within the " + market.getStarSystem().getNameWithLowercaseTypeShort());
     }
 

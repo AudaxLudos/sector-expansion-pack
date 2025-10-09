@@ -2,12 +2,10 @@ package sectorexpansionpack.intel;
 
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.campaign.*;
-import com.fs.starfarer.api.campaign.comm.IntelInfoPlugin;
 import com.fs.starfarer.api.campaign.econ.Industry;
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
 import com.fs.starfarer.api.campaign.rules.MemoryAPI;
 import com.fs.starfarer.api.impl.campaign.ids.MemFlags;
-import com.fs.starfarer.api.impl.campaign.intel.MessageIntel;
 import com.fs.starfarer.api.impl.campaign.intel.group.FGAction;
 import com.fs.starfarer.api.impl.campaign.intel.group.FGTravelAction;
 import com.fs.starfarer.api.impl.campaign.intel.group.FGWaitAction;
@@ -19,6 +17,7 @@ import com.fs.starfarer.api.util.Misc;
 import com.fs.starfarer.api.util.WeightedRandomPicker;
 import org.apache.log4j.Logger;
 import sectorexpansionpack.Utils;
+import sectorexpansionpack.intel.misc.ArtifactInstallationIntel;
 import sectorexpansionpack.intel.misc.ExpeditionFleetDepartureIntel;
 import sectorexpansionpack.intel.misc.LeakedArtifactLocationIntel;
 import sectorexpansionpack.missions.EntityFinderMission;
@@ -120,8 +119,8 @@ public class ExpeditionFleetIntel extends FleetGroupIntel {
 
             Industry ind = pickIndustryToInstallItem(market, this.specialItemData);
             ind.setSpecialItem(this.specialItemData);
-            IntelInfoPlugin message = new MessageIntel("Install special item to " + ind.getCurrentName() + " in the " + market.getName() + " within the " + market.getStarSystem().getNameWithLowercaseTypeShort());
-            Global.getSector().getIntelManager().addIntel(message);
+            ArtifactInstallationIntel intel = new ArtifactInstallationIntel(market, ind, this.specialItemSpec);
+            Global.getSector().getIntelManager().queueIntel(intel);
             log.info("Installing special item in " + ind.getCurrentName() + " on " + market.getName() + " within the " + market.getStarSystem().getNameWithLowercaseTypeShort());
         }
 

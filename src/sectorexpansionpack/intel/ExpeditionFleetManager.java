@@ -36,6 +36,7 @@ public class ExpeditionFleetManager extends BaseEventManager {
 
     @Override
     protected EveryFrameScript createEvent() {
+        // TODO: Move selection settings to expedition intel
         SpecialItemSpecAPI specialItemSpec = pickSpecialItem();
         if (specialItemSpec == null) {
             log.info("Failed to get special item");
