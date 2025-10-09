@@ -21,7 +21,6 @@ public class LeakedArtifactLocationIntel extends BaseIntelPlugin {
     protected MarketAPI source;
     protected SectorEntityToken target;
     protected FactionAPI faction;
-    protected float sinceKnown;
     protected boolean showArtifact = false;
     protected long queuedTimestamp;
     protected ExpeditionFleetIntel intel;
@@ -71,6 +70,62 @@ public class LeakedArtifactLocationIntel extends BaseIntelPlugin {
         }
 
         addBulletPoints(info, ListInfoMode.IN_DESC);
+
+        addCreatedTimestamp(info, tc, oPad);
+    }
+
+    public void addCreatedTimestamp(TooltipMakerAPI info, Color tc, float pad) {
+        Color h = Misc.getHighlightColor();
+
+        long ts = this.queuedTimestamp;
+
+        long msPerMin = 60L * 1000L;
+        long msPerHour = msPerMin * 60L;
+        long msPerDay = msPerHour * 24L;
+        long msPerMonth = msPerDay * 30L;
+        long msPerCycle = msPerDay * 365L;
+
+        long diff = Global.getSector().getClock().getTimestamp() - ts;
+
+        String agoStr;
+        List<String> highlights = new ArrayList<>();
+        if (diff < msPerHour) {
+            long minutes = diff / msPerMin;
+            agoStr = minutes + " " + (minutes == 1 ? "minute" : "minutes");
+        } else if (diff < msPerDay) {
+            long hours = diff / msPerHour;
+            agoStr = hours + " " + (hours == 1 ? "hour" : "hours");
+            long rem = diff - hours * msPerHour;
+            long minutes = rem / msPerMin;
+            agoStr += " " + minutes + " " + (minutes == 1 ? "minute" : "minutes");
+        } else if (diff < msPerMonth) {
+            long days = diff / msPerDay;
+            agoStr = days + " " + (days == 1 ? "day" : "days");
+            highlights.add("" + days);
+        } else if (diff < msPerCycle) {
+            long months = diff / msPerMonth;
+            agoStr = months + " " + (months == 1 ? "month" : "months");
+            long rem = diff - months * msPerMonth;
+            long days = rem / msPerDay;
+            agoStr += " and " + days + " " + (days == 1 ? "day" : "days");
+            highlights.add("" + months);
+            highlights.add("" + days);
+        } else {
+            long cycles = diff / msPerCycle;
+            agoStr = cycles + " " + (cycles == 1 ? "cycle" : "cycles");
+            long rem = diff - cycles * msPerCycle;
+            long months = rem / msPerMonth;
+            agoStr += " and " + months + " " + (months == 1 ? "month" : "months");
+            highlights.add("" + cycles);
+            highlights.add("" + months);
+        }
+
+        long days = diff / msPerDay;
+        if (days >= 1) {
+            info.addPara("Leak is " + agoStr + " old.", pad, tc, h, highlights.toArray(new String[0]));
+        } else {
+            info.addPara("Leak is less than a day old.", pad);
+        }
     }
 
     @Override
