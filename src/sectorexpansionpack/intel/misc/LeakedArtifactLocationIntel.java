@@ -9,10 +9,11 @@ import com.fs.starfarer.api.impl.campaign.rulecmd.salvage.special.BreadcrumbSpec
 import com.fs.starfarer.api.ui.SectorMapAPI;
 import com.fs.starfarer.api.ui.TooltipMakerAPI;
 import com.fs.starfarer.api.util.Misc;
-import com.fs.starfarer.api.util.MutableValue;
 import sectorexpansionpack.intel.ExpeditionFleetIntel;
 
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 public class LeakedArtifactLocationIntel extends BaseIntelPlugin {
@@ -22,14 +23,18 @@ public class LeakedArtifactLocationIntel extends BaseIntelPlugin {
     protected FactionAPI faction;
     protected float sinceKnown;
     protected boolean showArtifact = false;
+    protected long queuedTimestamp;
+    protected ExpeditionFleetIntel intel;
 
-    public LeakedArtifactLocationIntel(String actionId, MarketAPI source, SectorEntityToken target, float postingRangeLY) {
+    public LeakedArtifactLocationIntel(String actionId, MarketAPI source, SectorEntityToken target, ExpeditionFleetIntel intel) {
         this.actionId = actionId;
         this.source = source;
         this.target = target;
         this.faction = source.getFaction();
+        this.intel = intel;
+        this.queuedTimestamp = Global.getSector().getClock().getTimestamp();
 
-        setPostingRangeLY(postingRangeLY, true);
+        setPostingRangeLY(3f, true);
         setPostingLocation(source.getPrimaryEntity());
 
         Global.getSector().getIntelManager().queueIntel(this);
@@ -101,19 +106,9 @@ public class LeakedArtifactLocationIntel extends BaseIntelPlugin {
     }
 
     @Override
-    protected void advanceImpl(float amount) {
-        if (this.sinceKnown <= 0 && amount > 0) {
-            sendUpdateIfPlayerHasIntel(new Object(), true);
-        }
-
-        float days = Misc.getDays(amount);
-        this.sinceKnown += days;
-    }
-
-    @Override
     public boolean shouldRemoveIntel() {
         if (isImportant()) return false;
-        return this.sinceKnown > getBaseDaysAfterEnd();
+        return this.intel.isEnded();
     }
 
     @Override
@@ -137,10 +132,5 @@ public class LeakedArtifactLocationIntel extends BaseIntelPlugin {
     @Override
     public String getSortString() {
         return getName();
-    }
-
-    @Override
-    protected float getBaseDaysAfterEnd() {
-        return 15f;
     }
 }

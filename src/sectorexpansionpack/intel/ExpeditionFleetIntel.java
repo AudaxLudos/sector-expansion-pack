@@ -6,7 +6,6 @@ import com.fs.starfarer.api.campaign.comm.IntelInfoPlugin;
 import com.fs.starfarer.api.campaign.econ.Industry;
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
 import com.fs.starfarer.api.campaign.rules.MemoryAPI;
-import com.fs.starfarer.api.impl.campaign.fleets.RouteManager;
 import com.fs.starfarer.api.impl.campaign.ids.MemFlags;
 import com.fs.starfarer.api.impl.campaign.intel.MessageIntel;
 import com.fs.starfarer.api.impl.campaign.intel.group.FGAction;
@@ -28,10 +27,14 @@ import java.awt.*;
 import java.util.List;
 import java.util.Map;
 
+// Won't be seen by the player
+// Will be used to send out departure and leak intel
+// Should replace with custom RouteFleetSpawner to make it less heavy but this works
 public class ExpeditionFleetIntel extends FleetGroupIntel {
     public static final String EVENT_KEY = "$sep_efi_eventRef";
     public static final String SOURCE_KEY = "$sep_efi_source";
-    public static final String FLEET_KEY = "$sep_efi_fleet";
+    public static final String MAIN_FLEET_KEY = "$sep_efi_fleet";
+    public static final String SUPPLY_FLEET_KEY = "$sep_efi_fleet";
     public static final String TARGET_KEY = "$sep_efi_target";
     public static Logger log = Global.getLogger(ExpeditionFleetIntel.class);
     public static String PREPARE_ACTION = "prepare_action";
@@ -68,6 +71,7 @@ public class ExpeditionFleetIntel extends FleetGroupIntel {
 
         // Mark source so it won't be reselected for future expedition
         this.source.getMemoryWithoutUpdate().set(SOURCE_KEY, true);
+        // TODO: Mark faction so it won't be reselected for future expedition
 
         // Mark target so it won't be reselected for future expedition
         Misc.makeImportant(this.target, "specialItemLocation");
@@ -78,7 +82,7 @@ public class ExpeditionFleetIntel extends FleetGroupIntel {
         if (Utils.rollProbability(this.revealChance)) {
             new ExpeditionFleetDepartureIntel(getRoute(), this.source);
         } else {
-            this.revealChance += 0.1f;
+            this.revealChance += 0.2f;
         }
     }
 
@@ -93,9 +97,10 @@ public class ExpeditionFleetIntel extends FleetGroupIntel {
             this.target.getMemoryWithoutUpdate().unset(MemFlags.SALVAGE_SPECIAL_DATA);
 
             // TODO: Make fleet aggressive and defensive when they reach the location
-            if (isSpawnedFleets()) {
-                Misc.makeImportant(this.fleets.get(0), "hasSpecialItem");
-                Misc.addDefeatTrigger(this.fleets.get(0), "SEPEFGIFleetDefeated");
+            CampaignFleetAPI mainFleet = getMainFleet();
+            if (mainFleet != null) {
+                Misc.makeImportant(mainFleet, "hasSpecialItem");
+                Misc.addDefeatTrigger(mainFleet, "SEPEFGIFleetDefeated");
             }
         } else if (action.getId().equals(DOCK_ACTION)) {
             EntityFinderMission efm = new EntityFinderMission();
@@ -124,27 +129,12 @@ public class ExpeditionFleetIntel extends FleetGroupIntel {
             if (Utils.rollProbability(this.revealChance)) {
                 this.isLeaked = true;
 
-                new LeakedArtifactLocationIntel(action.getId(), this.source, this.target, 3f);
+                new LeakedArtifactLocationIntel(action.getId(), this.source, this.target, this);
+                log.info(String.format("Create LeakedArtifactLocationIntel at %s in the %s", this.source.getName(), this.source.getStarSystem().getNameWithLowercaseTypeShort()));
             } else {
                 this.revealChance += 0.2f;
             }
         }
-    }
-
-    @Override
-    public CampaignFleetAPI spawnFleet(RouteManager.RouteData route) {
-        super.spawnFleet(route);
-
-        // If the fleet spawns midway
-        // We ensure that the fleet is marked properly
-        if (isSpawnedFleets()) {
-            if (this.lootAction.isActionFinished()) {
-                Misc.makeImportant(this.fleets.get(0), "hasSpecialItem");
-                Misc.addDefeatTrigger(this.fleets.get(0), "SEPEFGIFleetDefeated");
-            }
-        }
-
-        return null;
     }
 
     public Industry pickIndustryToInstallItem(MarketAPI market, SpecialItemData specialItemData) {
@@ -159,11 +149,26 @@ public class ExpeditionFleetIntel extends FleetGroupIntel {
 
     @Override
     protected void notifyEnded() {
-        unsetTargetMem();
-        unsetFleetMem();
-        unsetSourceMem();
+        // Unset source memory flags
+        this.source.getMemoryWithoutUpdate().unset(SOURCE_KEY);
 
-        log.info("Expedition Fleet Intel Ended");
+        // Unset target memory flags
+        Misc.makeUnimportant(this.target, "specialItemLocation");
+        this.target.getMemoryWithoutUpdate().unset(TARGET_KEY);
+        this.target.getMemoryWithoutUpdate().unset(EVENT_KEY);
+
+        // Unset fleet memory flags
+        CampaignFleetAPI mainFleet = getMainFleet();
+        if (mainFleet != null) {
+            Misc.makeUnimportant(mainFleet, "hasSpecialItem");
+            mainFleet.getMemoryWithoutUpdate().unset(MAIN_FLEET_KEY);
+            mainFleet.getMemoryWithoutUpdate().unset(EVENT_KEY);
+        }
+    }
+
+    @Override
+    protected boolean shouldAbort() {
+        return isSpawnedFleets() && getMainFleet() == null;
     }
 
     @Override
@@ -179,13 +184,20 @@ public class ExpeditionFleetIntel extends FleetGroupIntel {
         fcm.createFleet(FleetCreatorMission.FleetStyle.QUALITY, 10, this.source.getFactionId(), this.source.getLocationInHyperspace());
         fcm.setFleetSource(this.source);
         fcm.triggerMakeLowRepImpact();
-        fcm.triggerSetFleetFlag(FLEET_KEY);
+        fcm.triggerSetFleetFlag(MAIN_FLEET_KEY);
         fcm.triggerSetFleetMemoryValue(EVENT_KEY, this);
         fcm.triggerFleetSetName("Expedition Fleet");
 
         CampaignFleetAPI fleet = fcm.createFleet();
         if (fleet != null && this.route != null) {
             setLocationAndCoordinates(fleet, this.route.getCurrent());
+            if (fleet.getMemoryWithoutUpdate().getBoolean(MAIN_FLEET_KEY)) {
+                if (getAction(LOOT_ACTION) == null) {
+                    // Ensure fleet is marked properly when it spawns midway
+                    Misc.makeImportant(fleet, "hasSpecialItem");
+                    Misc.addDefeatTrigger(fleet, "SEPEFGIFleetDefeated");
+                }
+            }
             this.fleets.add(fleet);
         }
     }
@@ -197,7 +209,7 @@ public class ExpeditionFleetIntel extends FleetGroupIntel {
 
     @Override
     protected SectorEntityToken getDestination() {
-        return this.target.getStarSystem().getHyperspaceAnchor();
+        return this.target;
     }
 
     @Override
@@ -207,10 +219,12 @@ public class ExpeditionFleetIntel extends FleetGroupIntel {
 
     @Override
     protected void addNonUpdateBulletPoints(TooltipMakerAPI info, Color tc, Object param, ListInfoMode mode, float initPad) {
+        // Won't be seen by the player
     }
 
     @Override
     protected void addUpdateBulletPoints(TooltipMakerAPI info, Color tc, Object param, ListInfoMode mode, float initPad) {
+        // Won't be seen by the player
     }
 
     @Override
@@ -224,19 +238,15 @@ public class ExpeditionFleetIntel extends FleetGroupIntel {
         return super.callEvent(ruleId, dialog, params, memoryMap);
     }
 
-    public void unsetFleetMem() {
-        Misc.makeUnimportant(this.fleets.get(0), "hasSpecialItem");
-        this.fleets.get(0).getMemoryWithoutUpdate().unset(FLEET_KEY);
-        this.fleets.get(0).getMemoryWithoutUpdate().unset(EVENT_KEY);
-    }
+    public CampaignFleetAPI getMainFleet() {
+        if (isSpawnedFleets()) {
+            for (CampaignFleetAPI fleet : getFleets()) {
+                if (fleet.getMemoryWithoutUpdate().getBoolean(MAIN_FLEET_KEY)) {
+                    return fleet;
+                }
+            }
+        }
 
-    public void unsetTargetMem() {
-        Misc.makeUnimportant(this.target, "specialItemLocation");
-        this.target.getMemoryWithoutUpdate().unset(TARGET_KEY);
-        this.target.getMemoryWithoutUpdate().unset(EVENT_KEY);
-    }
-
-    public void unsetSourceMem() {
-        this.source.getMemoryWithoutUpdate().unset(SOURCE_KEY);
+        return null;
     }
 }
