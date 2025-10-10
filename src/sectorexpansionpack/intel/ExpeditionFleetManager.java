@@ -2,6 +2,7 @@ package sectorexpansionpack.intel;
 
 import com.fs.starfarer.api.EveryFrameScript;
 import com.fs.starfarer.api.Global;
+import com.fs.starfarer.api.campaign.FactionAPI;
 import com.fs.starfarer.api.campaign.SectorEntityToken;
 import com.fs.starfarer.api.campaign.SpecialItemData;
 import com.fs.starfarer.api.campaign.SpecialItemSpecAPI;
@@ -36,15 +37,20 @@ public class ExpeditionFleetManager extends BaseEventManager {
 
     @Override
     protected EveryFrameScript createEvent() {
-        // TODO: Move selection settings to expedition intel
         SpecialItemSpecAPI specialItemSpec = pickSpecialItem();
         if (specialItemSpec == null) {
             log.info("Failed to get special item");
             return null;
         }
 
+        String factionId = pickFactionId();
+        if (factionId == null || factionId.isEmpty()) {
+            log.info("Failed to find faction");
+            return null;
+        }
+
         EntityFinderMission efm = new EntityFinderMission();
-        efm.requireMarketNoMemoryFlag(ExpeditionFleetIntel.SOURCE_KEY);
+        efm.requireMarketFaction(factionId);
         efm.requireMarketNotHidden();
         efm.requireMarketFactionNotPlayer();
         efm.requireMarketStabilityAtLeast(8);
@@ -79,5 +85,20 @@ public class ExpeditionFleetManager extends BaseEventManager {
         specialItemPicker.addAll(Global.getSettings().getAllSpecialItemSpecs());
 
         return specialItemPicker.pick();
+    }
+
+    public String pickFactionId() {
+        WeightedRandomPicker<String> factionPicker = new WeightedRandomPicker<>();
+        for (FactionAPI faction : Global.getSector().getAllFactions()) {
+            if (faction.getMemoryWithoutUpdate().getBoolean(ExpeditionFleetIntel.FACTION_KEY)) {
+                continue;
+            }
+            if (!faction.isShowInIntelTab()) {
+                continue;
+            }
+            factionPicker.add(faction.getId());
+        }
+
+        return factionPicker.pick();
     }
 }

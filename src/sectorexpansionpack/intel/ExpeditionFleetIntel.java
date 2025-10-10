@@ -31,9 +31,9 @@ import java.util.Map;
 // Should replace with custom RouteFleetSpawner to make it less heavy but this works
 public class ExpeditionFleetIntel extends FleetGroupIntel {
     public static final String EVENT_KEY = "$sep_efi_eventRef";
-    public static final String SOURCE_KEY = "$sep_efi_source";
-    public static final String MAIN_FLEET_KEY = "$sep_efi_fleet";
-    public static final String SUPPLY_FLEET_KEY = "$sep_efi_fleet";
+    public static final String FACTION_KEY = "$sep_efi_sourceFaction";
+    public static final String MAIN_FLEET_KEY = "$sep_efi_mainFleet";
+    public static final String SUPPLY_FLEET_KEY = "$sep_efi_supplyFleet";
     public static final String TARGET_KEY = "$sep_efi_target";
     public static Logger log = Global.getLogger(ExpeditionFleetIntel.class);
     public static String PREPARE_ACTION = "prepare_action";
@@ -44,7 +44,6 @@ public class ExpeditionFleetIntel extends FleetGroupIntel {
 
     protected float revealChance = 0.2f;
     protected boolean isLeaked = false;
-    protected FGWaitAction lootAction;
     protected SpecialItemSpecAPI specialItemSpec;
     protected SpecialItemData specialItemData;
     protected MarketAPI source;
@@ -59,8 +58,7 @@ public class ExpeditionFleetIntel extends FleetGroupIntel {
         setFaction(source.getFactionId());
         addAction(new FGWaitAction(this.source.getPrimaryEntity(), 15f, "preparing for expedition"), PREPARE_ACTION);
         addAction(new FGTravelAction(this.source.getPrimaryEntity(), this.target.getStarSystem().getCenter()), GOTO_ACTION);
-        this.lootAction = new FGWaitAction(this.target, 30f, "exploring " + target.getName());
-        addAction(this.lootAction, LOOT_ACTION);
+        addAction(new FGWaitAction(this.target, 30f, "exploring " + target.getName()), LOOT_ACTION);
         addAction(new FGTravelAction(this.target, this.source.getPrimaryEntity()), RETURN_ACTION);
         addAction(new FGWaitAction(this.source.getPrimaryEntity(), 15f, "Docking to " + source.getName()), DOCK_ACTION);
 
@@ -68,9 +66,8 @@ public class ExpeditionFleetIntel extends FleetGroupIntel {
         getRoute().setDelay((float) (3f + Math.random() * 6f));
         log.info("Created an expedition fleet at " + this.source.getName() + " in " + this.source.getStarSystem().getNameWithLowercaseType() + " and will goto " + this.target.getStarSystem().getNameWithLowercaseTypeShort());
 
-        // Mark source so it won't be reselected for future expedition
-        this.source.getMemoryWithoutUpdate().set(SOURCE_KEY, true);
-        // TODO: Mark faction so it won't be reselected for future expedition
+        // Mark faction so it won't be reselected for future expedition
+        this.source.getFaction().getMemoryWithoutUpdate().set(FACTION_KEY, true);
 
         // Mark target so it won't be reselected for future expedition
         Misc.makeImportant(this.target, "specialItemLocation");
@@ -117,6 +114,7 @@ public class ExpeditionFleetIntel extends FleetGroupIntel {
                 return;
             }
 
+            // TODO: Delay installation by a few days
             Industry ind = pickIndustryToInstallItem(market, this.specialItemData);
             ind.setSpecialItem(this.specialItemData);
             ArtifactInstallationIntel intel = new ArtifactInstallationIntel(market, ind, this.specialItemSpec);
@@ -148,8 +146,8 @@ public class ExpeditionFleetIntel extends FleetGroupIntel {
 
     @Override
     protected void notifyEnded() {
-        // Unset source memory flags
-        this.source.getMemoryWithoutUpdate().unset(SOURCE_KEY);
+        // Unset faction memory flags
+        this.source.getFaction().getMemoryWithoutUpdate().unset(FACTION_KEY);
 
         // Unset target memory flags
         Misc.makeUnimportant(this.target, "specialItemLocation");
@@ -177,6 +175,7 @@ public class ExpeditionFleetIntel extends FleetGroupIntel {
 
     @Override
     protected void spawnFleets() {
+        // TODO: Add supply fleets
         FleetCreatorMission fcm = new FleetCreatorMission(getRandom());
 
         fcm.beginFleet();

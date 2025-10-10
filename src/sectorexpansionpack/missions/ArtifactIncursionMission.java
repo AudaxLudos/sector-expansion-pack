@@ -2,7 +2,6 @@ package sectorexpansionpack.missions;
 
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.campaign.*;
-import com.fs.starfarer.api.campaign.comm.IntelInfoPlugin;
 import com.fs.starfarer.api.campaign.econ.Industry;
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
 import com.fs.starfarer.api.campaign.listeners.GroundRaidObjectivesListener;
@@ -13,7 +12,6 @@ import com.fs.starfarer.api.impl.campaign.ids.Factions;
 import com.fs.starfarer.api.impl.campaign.ids.FleetTypes;
 import com.fs.starfarer.api.impl.campaign.ids.Ranks;
 import com.fs.starfarer.api.impl.campaign.ids.Tags;
-import com.fs.starfarer.api.impl.campaign.intel.MessageIntel;
 import com.fs.starfarer.api.impl.campaign.missions.hub.HubMissionWithBarEvent;
 import com.fs.starfarer.api.impl.campaign.rulecmd.FireAll;
 import com.fs.starfarer.api.impl.campaign.rulecmd.salvage.MarketCMD;
@@ -217,6 +215,7 @@ public class ArtifactIncursionMission extends HubMissionWithBarEvent implements 
             return;
         }
 
+        // TODO: Delay installation by a few days
         Industry ind = pickIndustryToInstallItem(market, this.specialItemData);
         ind.setSpecialItem(this.specialItemData);
         ArtifactInstallationIntel intel = new ArtifactInstallationIntel(market, ind, this.specialItemSpec);

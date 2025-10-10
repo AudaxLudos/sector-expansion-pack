@@ -183,9 +183,4 @@ public class LeakedArtifactLocationIntel extends BaseIntelPlugin {
         tags.add("Leaks");
         return tags;
     }
-
-    @Override
-    public String getSortString() {
-        return getName();
-    }
 }
