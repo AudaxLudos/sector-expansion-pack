@@ -86,7 +86,7 @@ public class ArtifactInstallationIntel extends BaseIntelPlugin {
 
     @Override
     public String getIcon() {
-        return this.specialItemSpec.getIconName();
+        return Global.getSettings().getSpriteName("intel", "sep_artifactInstallation");
     }
 
     @Override
