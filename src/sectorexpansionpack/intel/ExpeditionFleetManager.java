@@ -2,19 +2,11 @@ package sectorexpansionpack.intel;
 
 import com.fs.starfarer.api.EveryFrameScript;
 import com.fs.starfarer.api.Global;
-import com.fs.starfarer.api.campaign.FactionAPI;
-import com.fs.starfarer.api.campaign.SectorEntityToken;
-import com.fs.starfarer.api.campaign.SpecialItemData;
-import com.fs.starfarer.api.campaign.SpecialItemSpecAPI;
-import com.fs.starfarer.api.campaign.econ.MarketAPI;
 import com.fs.starfarer.api.impl.campaign.intel.BaseEventManager;
-import com.fs.starfarer.api.util.WeightedRandomPicker;
-import org.apache.log4j.Logger;
-import sectorexpansionpack.missions.EntityFinderMission;
 
 public class ExpeditionFleetManager extends BaseEventManager {
     public static final String KEY = "$sep_core_artifactExpeditionManager";
-    public static Logger log = Global.getLogger(ExpeditionFleetManager.class);
+    protected int counter = 0;
 
     public ExpeditionFleetManager() {
         super();
@@ -46,7 +38,6 @@ public class ExpeditionFleetManager extends BaseEventManager {
     protected EveryFrameScript createEvent() {
         ExpeditionFleetIntel event = new ExpeditionFleetIntel();
         if (event.isDone()) {
-            log.info("Failed to create expedition event");
             event = null;
         }
 

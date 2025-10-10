@@ -51,6 +51,7 @@ public class ExpeditionFleetIntel extends FleetGroupIntel {
     protected SectorEntityToken target;
 
     public ExpeditionFleetIntel() {
+        setRandom(Utils.random);
         pickSpecialItem();
         if (isDone()) {
             log.info("Failed to get special item");
@@ -102,17 +103,18 @@ public class ExpeditionFleetIntel extends FleetGroupIntel {
     }
 
     public void pickSpecialItem() {
-        WeightedRandomPicker<SpecialItemSpecAPI> specialItemPicker = new WeightedRandomPicker<>();
+        WeightedRandomPicker<SpecialItemSpecAPI> specialItemPicker = new WeightedRandomPicker<>(getRandom());
         specialItemPicker.addAll(Global.getSettings().getAllSpecialItemSpecs());
 
         this.specialItemSpec = specialItemPicker.pick();
         if (this.specialItemSpec == null) {
             endImmediately();
         }
+        this.specialItemData = new SpecialItemData(this.specialItemSpec.getId(), null);
     }
 
     public void pickFactionId() {
-        WeightedRandomPicker<String> factionPicker = new WeightedRandomPicker<>();
+        WeightedRandomPicker<String> factionPicker = new WeightedRandomPicker<>(getRandom());
         for (FactionAPI faction : Global.getSector().getAllFactions()) {
             if (faction.getMemoryWithoutUpdate().getBoolean(ExpeditionFleetIntel.FACTION_KEY)) {
                 continue;
@@ -135,7 +137,7 @@ public class ExpeditionFleetIntel extends FleetGroupIntel {
         efm.requireMarketNotHidden();
         efm.requireMarketFactionNotPlayer();
         efm.requireMarketStabilityAtLeast(8);
-        efm.requireMarketCanUseSpecialItem(new SpecialItemData(this.specialItemSpec.getId(), null));
+        efm.requireMarketCanUseSpecialItem(this.specialItemData);
         this.source = efm.pickMarket();
         if (this.source == null) {
             endImmediately();
@@ -221,12 +223,14 @@ public class ExpeditionFleetIntel extends FleetGroupIntel {
     @Override
     protected void notifyEnded() {
         // Unset faction memory flags
-        this.source.getFaction().getMemoryWithoutUpdate().unset(FACTION_KEY);
+        Global.getSector().getFaction(this.factionId).getMemoryWithoutUpdate().unset(FACTION_KEY);
 
         // Unset target memory flags
-        Misc.makeUnimportant(this.target, "specialItemLocation");
-        this.target.getMemoryWithoutUpdate().unset(TARGET_KEY);
-        this.target.getMemoryWithoutUpdate().unset(EVENT_KEY);
+        if (this.target != null) {
+            Misc.makeUnimportant(this.target, "specialItemLocation");
+            this.target.getMemoryWithoutUpdate().unset(TARGET_KEY);
+            this.target.getMemoryWithoutUpdate().unset(EVENT_KEY);
+        }
 
         // Unset fleet memory flags
         CampaignFleetAPI mainFleet = getMainFleet();
@@ -253,6 +257,7 @@ public class ExpeditionFleetIntel extends FleetGroupIntel {
         FleetCreatorMission fcm = new FleetCreatorMission(getRandom());
 
         fcm.beginFleet();
+        fcm.setGenRandom(Utils.random);
         fcm.createFleet(FleetCreatorMission.FleetStyle.QUALITY, 10, this.factionId, this.source.getLocationInHyperspace());
         fcm.setFleetSource(this.source);
         fcm.triggerMakeLowRepImpact();

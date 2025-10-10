@@ -57,7 +57,9 @@ public class ArtifactInstallationIntel extends BaseIntelPlugin {
         float oPad = 10f;
 
         float initPad = pad;
-        if (mode == ListInfoMode.IN_DESC) initPad = oPad;
+        if (mode == ListInfoMode.IN_DESC) {
+            initPad = oPad;
+        }
 
         Color tc = getBulletColorForMode(mode);
         Color h = Misc.getHighlightColor();
@@ -94,8 +96,13 @@ public class ArtifactInstallationIntel extends BaseIntelPlugin {
 
     @Override
     public boolean shouldRemoveIntel() {
-        if (isImportant()) return false;
-        return getDaysSincePlayerVisible() > 30f;
+        if (isImportant()) {
+            return false;
+        }
+        if (getDaysSincePlayerVisible() < 30) {
+            return false;
+        }
+        return super.shouldRemoveIntel();
     }
 
     @Override

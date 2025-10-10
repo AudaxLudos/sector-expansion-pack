@@ -6,8 +6,14 @@ import com.fs.starfarer.api.campaign.SpecialItemData;
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
 import com.fs.starfarer.api.impl.campaign.missions.hub.HubMissionWithSearch;
 import com.fs.starfarer.api.util.Misc;
+import sectorexpansionpack.Utils;
 
 public class EntityFinderMission extends HubMissionWithSearch {
+    public EntityFinderMission() {
+        super();
+        setGenRandom(Utils.random);
+    }
+
     @Override
     protected boolean create(MarketAPI createdAt, boolean barEvent) {
         return false;

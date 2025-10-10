@@ -20,6 +20,7 @@ import com.fs.starfarer.api.ui.TooltipMakerAPI;
 import com.fs.starfarer.api.util.Misc;
 import com.fs.starfarer.api.util.WeightedRandomPicker;
 import org.apache.log4j.Logger;
+import sectorexpansionpack.Utils;
 import sectorexpansionpack.intel.misc.ArtifactInstallationIntel;
 
 import java.awt.*;
@@ -43,6 +44,11 @@ public class ArtifactIncursionMission extends HubMissionWithBarEvent implements 
     protected SpecialItemData specialItemData;
     protected MarketCMD.RaidDangerLevel danger;
     protected SpecialItemRaidObjectivePluginImpl objectivePlugin;
+
+    public ArtifactIncursionMission() {
+        super();
+        setGenRandom(Utils.random);
+    }
 
     @Override
     protected boolean create(MarketAPI createdAt, boolean barEvent) {

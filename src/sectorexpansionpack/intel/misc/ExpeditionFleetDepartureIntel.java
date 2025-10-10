@@ -58,7 +58,9 @@ public class ExpeditionFleetDepartureIntel extends BaseIntelPlugin {
         float oPad = 10f;
 
         float initPad = pad;
-        if (mode == ListInfoMode.IN_DESC) initPad = oPad;
+        if (mode == ListInfoMode.IN_DESC) {
+            initPad = oPad;
+        }
 
         Color tc = getBulletColorForMode(mode);
         Color g = Misc.getGrayColor();
@@ -113,8 +115,12 @@ public class ExpeditionFleetDepartureIntel extends BaseIntelPlugin {
 
     @Override
     protected void advanceImpl(float amount) {
-        if (this.route.getDelay() > 0) return;
-        if (this.sinceLaunched == null) this.sinceLaunched = 0f;
+        if (this.route.getDelay() > 0) {
+            return;
+        }
+        if (this.sinceLaunched == null) {
+            this.sinceLaunched = 0f;
+        }
         if (this.sinceLaunched <= 0 && amount > 0) {
             sendUpdateIfPlayerHasIntel(new Object(), true);
         }
@@ -125,8 +131,12 @@ public class ExpeditionFleetDepartureIntel extends BaseIntelPlugin {
 
     @Override
     public boolean shouldRemoveIntel() {
-        if (this.route.getDelay() > 0) return false;
-        if (isImportant()) return false;
+        if (this.route.getDelay() > 0) {
+            return false;
+        }
+        if (isImportant()) {
+            return false;
+        }
         return this.sinceLaunched == null || !(this.sinceLaunched < getBaseDaysAfterEnd());
     }
 

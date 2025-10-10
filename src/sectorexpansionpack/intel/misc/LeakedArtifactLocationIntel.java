@@ -134,7 +134,9 @@ public class LeakedArtifactLocationIntel extends BaseIntelPlugin {
         float oPad = 10f;
 
         float initPad = pad;
-        if (mode == ListInfoMode.IN_DESC) initPad = oPad;
+        if (mode == ListInfoMode.IN_DESC) {
+            initPad = oPad;
+        }
 
         Color tc = getBulletColorForMode(mode);
         Color g = Misc.getGrayColor();
@@ -162,7 +164,9 @@ public class LeakedArtifactLocationIntel extends BaseIntelPlugin {
 
     @Override
     public boolean shouldRemoveIntel() {
-        if (isImportant()) return false;
+        if (isImportant()) {
+            return false;
+        }
         return this.intel.isEnded();
     }
 

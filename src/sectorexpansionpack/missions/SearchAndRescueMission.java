@@ -25,10 +25,13 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import sectorexpansionpack.ModPlugin;
+import sectorexpansionpack.Utils;
 
 import java.awt.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 public class SearchAndRescueMission extends HubMissionWithBarEvent {
     public static JSONObject SCENARIO_DEFAULTS;
@@ -42,14 +45,15 @@ public class SearchAndRescueMission extends HubMissionWithBarEvent {
     protected String subjectName = "";
 
     public SearchAndRescueMission() {
+        super();
         SCENARIO_DEFAULTS = ModPlugin.getMissionScenarioDefaults("sep_sar");
+        setGenRandom(Utils.random);
     }
 
     @Override
     protected boolean create(MarketAPI createdAt, boolean barEvent) {
         try {
-            this.genRandom = new Random(Long.parseLong(Global.getSector().getSeedString().replaceAll("\\D", "")));
-            this.scenarioData = ModPlugin.getRandomMissionScenario(getMissionId(), this.genRandom, barEvent);
+            this.scenarioData = ModPlugin.getRandomMissionScenario(getMissionId(), getGenRandom(), barEvent);
 
             if (this.scenarioData == null) {
                 log.info("Failed to choose a mission scenario");
@@ -191,7 +195,7 @@ public class SearchAndRescueMission extends HubMissionWithBarEvent {
                             PersonPostType.CIVILIAN, PersonPostType.CONTACT));
         }
         if (this.survivorPostType == PersonPostType.OFFICER) {
-            person = OfficerManagerEvent.createOfficer(getPerson().getFaction(), survivorStats.getInt("level"), OfficerManagerEvent.SkillPickPreference.ANY, this.genRandom);
+            person = OfficerManagerEvent.createOfficer(getPerson().getFaction(), survivorStats.getInt("level"), OfficerManagerEvent.SkillPickPreference.ANY, getGenRandom());
             person.setPostId(Ranks.POST_OFFICER_FOR_HIRE);
             person.getMemoryWithoutUpdate().set("$mentored", survivorStats.getBoolean("mentored"));
             if (survivorStats.getInt("maxLevel") > 6) {
@@ -201,9 +205,9 @@ public class SearchAndRescueMission extends HubMissionWithBarEvent {
                 person.getMemoryWithoutUpdate().set(MemFlags.OFFICER_MAX_ELITE_SKILLS, survivorStats.getInt("maxEliteSkills"));
             }
         } else if (this.survivorPostType == PersonPostType.ADMINISTRATOR) {
-            person = OfficerManagerEvent.createAdmin(getPerson().getFaction(), survivorStats.getInt("level"), this.genRandom);
+            person = OfficerManagerEvent.createAdmin(getPerson().getFaction(), survivorStats.getInt("level"), getGenRandom());
         } else if (this.survivorPostType == PersonPostType.CONTACT) {
-            person = getPerson().getFaction().createRandomPerson(this.genRandom);
+            person = getPerson().getFaction().createRandomPerson(getGenRandom());
             person.setRankId(survivorStats.getString("rank"));
             person.setPostId(survivorStats.getString("post"));
             person.setImportance(PersonImportance.valueOf(survivorStats.getString("importance")));
@@ -214,7 +218,7 @@ public class SearchAndRescueMission extends HubMissionWithBarEvent {
                 }
             }
         } else {
-            person = getPerson().getFaction().createRandomPerson(this.genRandom);
+            person = getPerson().getFaction().createRandomPerson(getGenRandom());
         }
 
         return person;
@@ -540,7 +544,7 @@ public class SearchAndRescueMission extends HubMissionWithBarEvent {
     }
 
     public int getCreditRewardValue(int min, int max) {
-        int reward = min + this.genRandom.nextInt(max - min + 1);
+        int reward = min + getGenRandom().nextInt(max - min + 1);
         reward = reward / 1000 * 1000;
         if (reward > 100000) {
             reward = reward / 10000 * 10000;
