@@ -64,12 +64,14 @@ public class ExpeditionFleetIntel extends FleetGroupIntel {
 
         createRoute(source.getFactionId(), 10, 1, null);
         getRoute().setDelay((float) (3f + Math.random() * 6f));
-        log.info("Created an expedition fleet at " + this.source.getName() + " in " + this.source.getStarSystem().getNameWithLowercaseType() + " and will goto " + this.target.getStarSystem().getNameWithLowercaseTypeShort());
+        log.info(String.format("Creating expedition fleet %s %s in the %s that will goto %s",
+                this.source.getOnOrAt(), this.source.getName(), this.source.getStarSystem().getNameWithLowercaseTypeShort(),
+                this.target.getStarSystem().getNameWithLowercaseTypeShort()));
 
-        // Mark faction so it won't be reselected for future expedition
+        // Mark source faction so it won't be reselected for future expeditions
         this.source.getFaction().getMemoryWithoutUpdate().set(FACTION_KEY, true);
 
-        // Mark target so it won't be reselected for future expedition
+        // Mark target so it won't be reselected for future expeditions
         Misc.makeImportant(this.target, "specialItemLocation");
         this.target.getMemoryWithoutUpdate().set(TARGET_KEY, true);
         this.target.getMemoryWithoutUpdate().set(EVENT_KEY, this);
@@ -117,9 +119,10 @@ public class ExpeditionFleetIntel extends FleetGroupIntel {
             // TODO: Delay installation by a few days
             Industry ind = pickIndustryToInstallItem(market, this.specialItemData);
             ind.setSpecialItem(this.specialItemData);
-            ArtifactInstallationIntel intel = new ArtifactInstallationIntel(market, ind, this.specialItemSpec);
-            Global.getSector().getIntelManager().queueIntel(intel);
-            log.info("Installing special item in " + ind.getCurrentName() + " on " + market.getName() + " within the " + market.getStarSystem().getNameWithLowercaseTypeShort());
+            new ArtifactInstallationIntel(market, ind, this.specialItemSpec);
+            log.info(String.format("Installing %s to %s facility %s %s in the %s",
+                    this.specialItemSpec.getName(), ind.getCurrentName(), market.getOnOrAt(),
+                    market.getName(), market.getStarSystem().getNameWithLowercaseTypeShort()));
         }
 
         if (!this.isLeaked && !PREPARE_ACTION.equals(action.getId()) && !DOCK_ACTION.equals(action.getId())) {
@@ -127,7 +130,8 @@ public class ExpeditionFleetIntel extends FleetGroupIntel {
                 this.isLeaked = true;
 
                 new LeakedArtifactLocationIntel(action.getId(), this.source, this.target, this);
-                log.info(String.format("Create LeakedArtifactLocationIntel at %s in the %s", this.source.getName(), this.source.getStarSystem().getNameWithLowercaseTypeShort()));
+                log.info(String.format("Leaking expedition intel at %s in the %s",
+                        this.source.getName(), this.source.getStarSystem().getNameWithLowercaseTypeShort()));
             } else {
                 this.revealChance += 0.2f;
             }

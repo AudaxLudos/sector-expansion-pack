@@ -24,6 +24,11 @@ public class ArtifactInstallationIntel extends BaseIntelPlugin {
         this.faction = market.getFaction();
         this.industry = industry;
         this.specialItemSpec = specialItemSpec;
+
+        setPostingRangeLY(3f, true);
+        setPostingLocation(this.market.getPrimaryEntity());
+
+        Global.getSector().getIntelManager().queueIntel(this);
     }
 
     @Override
