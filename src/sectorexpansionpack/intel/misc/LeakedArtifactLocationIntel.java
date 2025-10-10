@@ -23,7 +23,7 @@ public class LeakedArtifactLocationIntel extends BaseIntelPlugin {
     protected FactionAPI faction;
     protected boolean showArtifact = false;
     protected long queuedTimestamp;
-    protected ExpeditionFleetIntel intel;
+    protected BaseIntelPlugin intel;
 
     public LeakedArtifactLocationIntel(String actionId, MarketAPI source, SectorEntityToken target, ExpeditionFleetIntel intel) {
         this.actionId = actionId;

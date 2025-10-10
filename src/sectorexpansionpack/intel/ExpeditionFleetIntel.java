@@ -44,25 +44,42 @@ public class ExpeditionFleetIntel extends FleetGroupIntel {
 
     protected float revealChance = 0.2f;
     protected boolean isLeaked = false;
+    protected String factionId;
     protected SpecialItemSpecAPI specialItemSpec;
     protected SpecialItemData specialItemData;
     protected MarketAPI source;
     protected SectorEntityToken target;
 
-    public ExpeditionFleetIntel(SpecialItemSpecAPI specialItemSpec, MarketAPI source, SectorEntityToken target) {
-        this.specialItemSpec = specialItemSpec;
-        this.specialItemData = new SpecialItemData(specialItemSpec.getId(), null);
-        this.source = source;
-        this.target = target;
+    public ExpeditionFleetIntel() {
+        pickSpecialItem();
+        if (isDone()) {
+            log.info("Failed to get special item");
+            return;
+        }
+        pickFactionId();
+        if (isDone()) {
+            log.info("Failed to find faction");
+            return;
+        }
+        pickMarket();
+        if (isDone()) {
+            log.info("Failed to find source market");
+            return;
+        }
+        pickTarget();
+        if (isDone()) {
+            log.info("Failed to find target entity");
+            return;
+        }
 
-        setFaction(source.getFactionId());
+        setFaction(this.factionId);
         addAction(new FGWaitAction(this.source.getPrimaryEntity(), 15f, "preparing for expedition"), PREPARE_ACTION);
         addAction(new FGTravelAction(this.source.getPrimaryEntity(), this.target.getStarSystem().getCenter()), GOTO_ACTION);
-        addAction(new FGWaitAction(this.target, 30f, "exploring " + target.getName()), LOOT_ACTION);
+        addAction(new FGWaitAction(this.target, 30f, "exploring " + this.target.getName()), LOOT_ACTION);
         addAction(new FGTravelAction(this.target, this.source.getPrimaryEntity()), RETURN_ACTION);
-        addAction(new FGWaitAction(this.source.getPrimaryEntity(), 15f, "Docking to " + source.getName()), DOCK_ACTION);
+        addAction(new FGWaitAction(this.source.getPrimaryEntity(), 15f, "Docking to " + this.source.getName()), DOCK_ACTION);
 
-        createRoute(source.getFactionId(), 10, 1, null);
+        createRoute(this.factionId, 10, 1, null);
         getRoute().setDelay((float) (3f + Math.random() * 6f));
         log.info(String.format("Creating expedition fleet %s %s in the %s that will goto %s",
                 this.source.getOnOrAt(), this.source.getName(), this.source.getStarSystem().getNameWithLowercaseTypeShort(),
@@ -84,6 +101,59 @@ public class ExpeditionFleetIntel extends FleetGroupIntel {
         }
     }
 
+    public void pickSpecialItem() {
+        WeightedRandomPicker<SpecialItemSpecAPI> specialItemPicker = new WeightedRandomPicker<>();
+        specialItemPicker.addAll(Global.getSettings().getAllSpecialItemSpecs());
+
+        this.specialItemSpec = specialItemPicker.pick();
+        if (this.specialItemSpec == null) {
+            endImmediately();
+        }
+    }
+
+    public void pickFactionId() {
+        WeightedRandomPicker<String> factionPicker = new WeightedRandomPicker<>();
+        for (FactionAPI faction : Global.getSector().getAllFactions()) {
+            if (faction.getMemoryWithoutUpdate().getBoolean(ExpeditionFleetIntel.FACTION_KEY)) {
+                continue;
+            }
+            if (!faction.isShowInIntelTab()) {
+                continue;
+            }
+            factionPicker.add(faction.getId());
+        }
+
+        this.factionId = factionPicker.pick();
+        if (this.factionId == null || this.factionId.isEmpty()) {
+            endImmediately();
+        }
+    }
+
+    public void pickMarket() {
+        EntityFinderMission efm = new EntityFinderMission();
+        efm.requireMarketFaction(this.factionId);
+        efm.requireMarketNotHidden();
+        efm.requireMarketFactionNotPlayer();
+        efm.requireMarketStabilityAtLeast(8);
+        efm.requireMarketCanUseSpecialItem(new SpecialItemData(this.specialItemSpec.getId(), null));
+        this.source = efm.pickMarket();
+        if (this.source == null) {
+            endImmediately();
+        }
+    }
+
+    public void pickTarget() {
+        EntityFinderMission efm = new EntityFinderMission();
+        efm.requirePlanetNoMemoryFlag(ExpeditionFleetIntel.TARGET_KEY);
+        efm.requirePlanetWithRuins();
+        efm.requirePlanetUnexploredRuins();
+        efm.preferPlanetInDirectionOfOtherMissions();
+        this.target = efm.pickPlanet();
+        if (this.target == null) {
+            endImmediately();
+        }
+    }
+
     @Override
     protected void notifyActionFinished(FGAction action) {
         if (action == null) {
@@ -102,7 +172,7 @@ public class ExpeditionFleetIntel extends FleetGroupIntel {
             }
         } else if (action.getId().equals(DOCK_ACTION)) {
             EntityFinderMission efm = new EntityFinderMission();
-            efm.requireMarketFaction(this.source.getFactionId());
+            efm.requireMarketFaction(this.factionId);
             efm.requireMarketNotHidden();
             efm.requireMarketNotInHyperspace();
             efm.requireMarketFactionNotPlayer();
@@ -183,7 +253,7 @@ public class ExpeditionFleetIntel extends FleetGroupIntel {
         FleetCreatorMission fcm = new FleetCreatorMission(getRandom());
 
         fcm.beginFleet();
-        fcm.createFleet(FleetCreatorMission.FleetStyle.QUALITY, 10, this.source.getFactionId(), this.source.getLocationInHyperspace());
+        fcm.createFleet(FleetCreatorMission.FleetStyle.QUALITY, 10, this.factionId, this.source.getLocationInHyperspace());
         fcm.setFleetSource(this.source);
         fcm.triggerMakeLowRepImpact();
         fcm.triggerSetFleetFlag(MAIN_FLEET_KEY);

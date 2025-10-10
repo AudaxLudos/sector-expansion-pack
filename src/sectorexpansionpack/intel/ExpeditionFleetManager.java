@@ -17,12 +17,19 @@ public class ExpeditionFleetManager extends BaseEventManager {
     public static Logger log = Global.getLogger(ExpeditionFleetManager.class);
 
     public ExpeditionFleetManager() {
+        super();
         Global.getSector().getMemoryWithoutUpdate().set(KEY, this);
     }
 
     public static ExpeditionFleetManager getInstance() {
         Object test = Global.getSector().getMemoryWithoutUpdate().get(KEY);
         return (ExpeditionFleetManager) test;
+    }
+
+    @Override
+    protected float getBaseInterval() {
+        // Do this every 4 months
+        return 94f;
     }
 
     @Override
@@ -37,68 +44,18 @@ public class ExpeditionFleetManager extends BaseEventManager {
 
     @Override
     protected EveryFrameScript createEvent() {
-        SpecialItemSpecAPI specialItemSpec = pickSpecialItem();
-        if (specialItemSpec == null) {
-            log.info("Failed to get special item");
-            return null;
-        }
-
-        String factionId = pickFactionId();
-        if (factionId == null || factionId.isEmpty()) {
-            log.info("Failed to find faction");
-            return null;
-        }
-
-        EntityFinderMission efm = new EntityFinderMission();
-        efm.requireMarketFaction(factionId);
-        efm.requireMarketNotHidden();
-        efm.requireMarketFactionNotPlayer();
-        efm.requireMarketStabilityAtLeast(8);
-        efm.requireMarketCanUseSpecialItem(new SpecialItemData(specialItemSpec.getId(), null));
-        MarketAPI source = efm.pickMarket();
-        if (source == null) {
-            log.info("Failed to find source market");
-            return null;
-        }
-
-        efm.requirePlanetNoMemoryFlag(ExpeditionFleetIntel.TARGET_KEY);
-        efm.requirePlanetWithRuins();
-        efm.requirePlanetUnexploredRuins();
-        efm.preferPlanetInDirectionOfOtherMissions();
-        SectorEntityToken target = efm.pickPlanet();
-        if (target == null) {
-            log.info("Failed to find target entity");
-            return null;
-        }
-
-        ExpeditionFleetIntel event = new ExpeditionFleetIntel(specialItemSpec, source, target);
+        ExpeditionFleetIntel event = new ExpeditionFleetIntel();
         if (event.isDone()) {
-            log.info("Failed to create ExpeditionFleetIntel event");
-            return null;
+            log.info("Failed to create expedition event");
+            event = null;
+        }
+
+        if (event == null) {
+            // Force an expedition to ensure at least one happens every 4 months
+            // Doing this to make it more consistent and often
+            this.tracker.forceIntervalElapsed();
         }
 
         return event;
-    }
-
-    public SpecialItemSpecAPI pickSpecialItem() {
-        WeightedRandomPicker<SpecialItemSpecAPI> specialItemPicker = new WeightedRandomPicker<>();
-        specialItemPicker.addAll(Global.getSettings().getAllSpecialItemSpecs());
-
-        return specialItemPicker.pick();
-    }
-
-    public String pickFactionId() {
-        WeightedRandomPicker<String> factionPicker = new WeightedRandomPicker<>();
-        for (FactionAPI faction : Global.getSector().getAllFactions()) {
-            if (faction.getMemoryWithoutUpdate().getBoolean(ExpeditionFleetIntel.FACTION_KEY)) {
-                continue;
-            }
-            if (!faction.isShowInIntelTab()) {
-                continue;
-            }
-            factionPicker.add(faction.getId());
-        }
-
-        return factionPicker.pick();
     }
 }
