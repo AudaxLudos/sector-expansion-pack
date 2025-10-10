@@ -39,12 +39,17 @@ public class ArtifactInstallationIntel extends BaseIntelPlugin {
         Color fc = this.faction.getBaseUIColor();
         float oPad = 10f;
 
-        info.addImage(this.faction.getLogo(), width, 128, oPad);
+        info.addImages(width, 96f, oPad, 3f, this.faction.getCrest(), this.specialItemSpec.getIconName());
 
-        info.addPara("Your contacts %s %s let you know that the %s has installed an artifact called %s on their %s in the %s", oPad,
-                new Color[]{tc, fc, fc, h, h, h},
-                this.market.getOnOrAt(), this.market.getName(), this.faction.getPersonNamePrefix(), this.specialItemSpec.getName(),
-                this.industry.getCurrentName(), this.market.getStarSystem().getNameWithLowercaseTypeShort());
+        info.addPara("Your contacts %s %s in the %s let you know that the %s has secured an artifact.", oPad,
+                new Color[]{tc, fc, h, fc},
+                this.market.getOnOrAt(), this.market.getName(), this.market.getStarSystem().getNameWithLowercaseTypeShort(),
+                this.faction.getPersonNamePrefix());
+
+        info.addPara("The artifact is called %s and is now installed on %s %s facility.", oPad,
+                new Color[]{h, tc, h},
+                this.specialItemSpec.getName(), Misc.getAOrAnFor(this.industry.getCurrentName()),
+                this.industry.getCurrentName());
 
         addBulletPoints(info, ListInfoMode.IN_DESC);
 
@@ -63,16 +68,16 @@ public class ArtifactInstallationIntel extends BaseIntelPlugin {
 
         Color tc = getBulletColorForMode(mode);
         Color h = Misc.getHighlightColor();
+        Color fc = this.faction.getBaseUIColor();
 
         bullet(info);
         boolean isUpdate = getListInfoParam() != null;
 
         if (mode != ListInfoMode.IN_DESC) {
-            info.addPara("System: %s", initPad, tc, h, this.market.getStarSystem().getNameWithLowercaseTypeShort());
+            info.addPara("Faction: %s", initPad, tc, fc, this.faction.getPersonNamePrefix());
             initPad = 0f;
-            info.addPara("Market: %s", initPad, tc, h, this.market.getName());
-            initPad = 0f;
-            info.addPara("Artifact: %s", initPad, tc, h, this.specialItemSpec.getName());
+            info.addPara("%s installed %s %s", initPad, tc, h, this.specialItemSpec.getName(),
+                    this.market.getOnOrAt(), this.market.getName());
             initPad = 0f;
         }
 
