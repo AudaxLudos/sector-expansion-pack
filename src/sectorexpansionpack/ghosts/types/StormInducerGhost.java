@@ -8,17 +8,17 @@ import com.fs.starfarer.api.impl.campaign.terrain.HyperspaceTerrainPlugin;
 import com.fs.starfarer.api.util.IntervalUtil;
 import com.fs.starfarer.api.util.Misc;
 
-public class StormPacifierGhost extends BaseSensorGhost {
+public class StormInducerGhost extends BaseSensorGhost {
     protected IntervalUtil timer = new IntervalUtil(0.2f, 0.3f);
     protected float radius;
 
-    public StormPacifierGhost(SensorGhostManager manager, float radius) {
+    public StormInducerGhost(SensorGhostManager manager, float radius) {
         super(manager, 20);
         this.radius = radius;
 
         initEntity(genMediumSensorProfile(), genMediumRadius());
         this.entity.addTag(Tags.UNAFFECTED_BY_SLIPSTREAM);
-        setDespawnRange(-1000f);
+        setDespawnRange(-2000f);
 
         if (!placeNearPlayer()) {
             setCreationFailed();
@@ -27,7 +27,7 @@ public class StormPacifierGhost extends BaseSensorGhost {
 
         CampaignFleetAPI playerFleet = Global.getSector().getPlayerFleet();
 
-        addBehavior(new GBCircle(playerFleet, genDelay(15f), 25, 50f, getRandom().nextBoolean() ? 1f : -1f));
+        addBehavior(new GBDartAround(playerFleet, genDelay(15f), 50, 0f, 100f));
         addBehavior(new GBGoAwayFrom(genFloat(1f, 3f), playerFleet, this.fleeBurnLevel));
     }
 
@@ -45,8 +45,8 @@ public class StormPacifierGhost extends BaseSensorGhost {
             if (terrainPlugin != null && this.entity.isInHyperspace()) {
                 terrainPlugin.setTileState(
                         this.entity.getLocation(), this.radius,
-                        HyperspaceTerrainPlugin.CellState.OFF,
-                        1f, 0f);
+                        HyperspaceTerrainPlugin.CellState.SIGNAL,
+                        0f, 0f);
             }
         }
     }
