@@ -7,6 +7,7 @@ import com.fs.starfarer.api.util.WeightedRandomPicker;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import sectorexpansionpack.ghosts.types.StormPacifierGhostCreator;
 import sectorexpansionpack.intel.ExpeditionFleetManager;
 
 import java.io.IOException;
@@ -79,6 +80,8 @@ public class ModPlugin extends BaseModPlugin {
         }
 
         Utils.setRandom(new Random(Long.parseLong(Global.getSector().getSeedString().replaceAll("\\D", ""))));
+
+        StormPacifierGhostCreator.register();
     }
 
     public void loadMissionScenarios() {
