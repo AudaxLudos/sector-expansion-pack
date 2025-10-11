@@ -3,18 +3,13 @@ id,trigger,conditions,script,text,options,notes
 # START",,,,,,
 sep_efi_fleetHasArtifact,OpenCommLink,"$entity.sep_efi_mainFleet score:1000
 $entity.sep_efi_hasArtifact score:1000","ShowDefaultVisual
-SetStoryOption sep_efi_persuadeToGiveCargo ui_char_spent_story_point ""Persuade the fleet to give the artifact""",FLEET INITIAL INTERACTION TEXT,"sep_efi_demandCargo:Demand cargo
-sep_efi_persuadeToGiveCargo:Persuade to give cargo
-cutCommLink:Close comm link",
-sep_efi_fleetDemandArtifact,DialogOptionSelected,$option == sep_efi_demandCargo,"MakeOtherFleetHostile sep_efi true
-MakeOtherFleetAggressive sep_efi true
-MakeOtherFleetPreventDisengage sep_efi true
-$entity.ignorePlayerCommRequests = true",FLEET DEMAND OPTION TEXT,cutCommLink:Cut the comm link,
-sep_efi_fleetPserudeToGiveArtifact,DialogOptionSelected,$option == sep_efi_persuadeToGiveCargo,"Call $entity.sep_efi_ref giveArtifact
+SetStoryOption sep_efi_persuadeToGiveCargo ui_char_spent_story_point ""Persuade the fleet to give the artifact""
+$entity.ignorePlayerCommRequests = true","The other captain looks up briefly, expression calm. ""Captain,"" $heOrShe says in a clipped tone. ""I’m in the middle of fleet operations and can’t afford distractions. If this isn’t urgent, you’ve got one chance, make it quick.""","sep_efi_persuadeToGive:Persuade to give cargo
+cutCommLink:Cut the comm link",
+sep_efi_fleetPersudeToGive,DialogOptionSelected,$option == sep_efi_persuadeToGive,"Call $entity.sep_efi_ref giveArtifact
 Call $entity.sep_efi_ref endEvent
 MakeOtherFleetAllowDisengage sep_efi true
-MakeOtherFleetNonHostile sep_efi true
-$entity.ignorePlayerCommRequests = true",FLEET PERSUADE OPTION TEXT,cutCommLink:Cut the comm link,
+MakeOtherFleetNonHostile sep_efi true","The captain blinks, momentarily taken aback by your request. ""You’re serious about this?"" $heOrShe asks, studying you for a moment before letting out a quiet sigh. ""Fine… you’ve made your point, Captain. I’ll authorize the transfer. Just make sure it’s worth the trouble.""",cutCommLink:Cut the comm link,
 "# Expedition Fleet Intel
 # END",,,,,,
 "# Hiring a rescued survivor

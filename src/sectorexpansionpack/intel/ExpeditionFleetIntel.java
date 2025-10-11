@@ -31,6 +31,7 @@ import java.util.Map;
 // Won't be seen by the player
 // Will be used to send out departure and leak intel
 // Should replace with custom RouteFleetSpawner to make it less heavy but this works
+// Could make a BaseHubEvent with the same functionality as BaseHubMission but NO
 public class ExpeditionFleetIntel extends FleetGroupIntel {
     public static final String EVENT_KEY = "$sep_efi_ref";
     public static final String FACTION_KEY = "$sep_efi_sourceFaction";
