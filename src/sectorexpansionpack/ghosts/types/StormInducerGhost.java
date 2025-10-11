@@ -16,7 +16,7 @@ public class StormInducerGhost extends BaseSensorGhost {
         super(manager, 20);
         this.radius = radius;
 
-        initEntity(genMediumSensorProfile(), genMediumRadius());
+        initEntity(genLargeSensorProfile(), genSmallRadius());
         this.entity.addTag(Tags.UNAFFECTED_BY_SLIPSTREAM);
         setDespawnRange(-2000f);
 

@@ -16,9 +16,9 @@ public class StormPacifierGhost extends BaseSensorGhost {
         super(manager, 20);
         this.radius = radius;
 
-        initEntity(genMediumSensorProfile(), genMediumRadius());
+        initEntity(genSmallSensorProfile(), genLargeRadius());
         this.entity.addTag(Tags.UNAFFECTED_BY_SLIPSTREAM);
-        setDespawnRange(-1000f);
+        setDespawnRange(-2000f);
 
         if (!placeNearPlayer()) {
             setCreationFailed();
