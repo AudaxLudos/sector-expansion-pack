@@ -12,9 +12,6 @@ public class SEPHiddenItemSpecial extends BaseSalvageSpecial {
     public static final String CONTINUE = "continue";
     HiddenSpecialItemSpecialData data;
 
-    public SEPHiddenItemSpecial() {
-    }
-
     @Override
     public void init(InteractionDialogAPI dialog, Object specialData) {
         super.init(dialog, specialData);
@@ -44,6 +41,7 @@ public class SEPHiddenItemSpecial extends BaseSalvageSpecial {
             addText("GET SPECIAL ITEM TEXT.");
 
             if (this.entity.getMemoryWithoutUpdate().get(ExpeditionFleetIntel.EVENT_KEY) instanceof ExpeditionFleetIntel intel) {
+                intel.unsetEventMemoryFlags();
                 intel.finish(true);
             }
 

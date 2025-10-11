@@ -17,7 +17,9 @@ import java.util.Map;
 public class SEPDoHasCargoCheck extends BaseCommandPlugin {
     @Override
     public boolean execute(String ruleId, InteractionDialogAPI dialog, List<Misc.Token> params, Map<String, MemoryAPI> memoryMap) {
-        if (dialog == null) return false;
+        if (dialog == null) {
+            return false;
+        }
 
         OptionPanelAPI options = dialog.getOptionPanel();
 

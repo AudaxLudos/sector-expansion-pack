@@ -5,12 +5,14 @@ import com.fs.starfarer.api.campaign.*;
 import com.fs.starfarer.api.campaign.econ.Industry;
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
 import com.fs.starfarer.api.campaign.rules.MemoryAPI;
+import com.fs.starfarer.api.impl.campaign.ids.Factions;
 import com.fs.starfarer.api.impl.campaign.ids.MemFlags;
 import com.fs.starfarer.api.impl.campaign.intel.group.FGAction;
 import com.fs.starfarer.api.impl.campaign.intel.group.FGTravelAction;
 import com.fs.starfarer.api.impl.campaign.intel.group.FGWaitAction;
 import com.fs.starfarer.api.impl.campaign.intel.group.FleetGroupIntel;
 import com.fs.starfarer.api.impl.campaign.missions.FleetCreatorMission;
+import com.fs.starfarer.api.impl.campaign.rulecmd.AddRemoveCommodity;
 import com.fs.starfarer.api.impl.campaign.rulecmd.salvage.special.SEPHiddenItemSpecial;
 import com.fs.starfarer.api.ui.TooltipMakerAPI;
 import com.fs.starfarer.api.util.Misc;
@@ -30,11 +32,12 @@ import java.util.Map;
 // Will be used to send out departure and leak intel
 // Should replace with custom RouteFleetSpawner to make it less heavy but this works
 public class ExpeditionFleetIntel extends FleetGroupIntel {
-    public static final String EVENT_KEY = "$sep_efi_eventRef";
+    public static final String EVENT_KEY = "$sep_efi_ref";
     public static final String FACTION_KEY = "$sep_efi_sourceFaction";
     public static final String MAIN_FLEET_KEY = "$sep_efi_mainFleet";
     public static final String SUPPLY_FLEET_KEY = "$sep_efi_supplyFleet";
     public static final String TARGET_KEY = "$sep_efi_target";
+    public static final String HAS_ARTIFACT = "$sep_efi_hasArtifact";
     public static Logger log = Global.getLogger(ExpeditionFleetIntel.class);
     public static String PREPARE_ACTION = "prepare_action";
     public static String GOTO_ACTION = "travel_action";
@@ -42,6 +45,7 @@ public class ExpeditionFleetIntel extends FleetGroupIntel {
     public static String RETURN_ACTION = "return_action";
     public static String DOCK_ACTION = "dock_action";
 
+    protected EntityFinderMission efm;
     protected float revealChance = 0.2f;
     protected boolean isLeaked = false;
     protected String factionId;
@@ -52,6 +56,7 @@ public class ExpeditionFleetIntel extends FleetGroupIntel {
 
     public ExpeditionFleetIntel() {
         setRandom(Utils.random);
+        this.efm = new EntityFinderMission();
         pickSpecialItem();
         if (isDone()) {
             log.info("Failed to get special item");
@@ -132,25 +137,23 @@ public class ExpeditionFleetIntel extends FleetGroupIntel {
     }
 
     public void pickMarket() {
-        EntityFinderMission efm = new EntityFinderMission();
-        efm.requireMarketFaction(this.factionId);
-        efm.requireMarketNotHidden();
-        efm.requireMarketFactionNotPlayer();
-        efm.requireMarketStabilityAtLeast(8);
-        efm.requireMarketCanUseSpecialItem(this.specialItemData);
-        this.source = efm.pickMarket();
+        this.efm.requireMarketFaction(this.factionId);
+        this.efm.requireMarketNotHidden();
+        this.efm.requireMarketFactionNotPlayer();
+        this.efm.requireMarketStabilityAtLeast(8);
+        this.efm.requireMarketCanUseSpecialItem(this.specialItemData);
+        this.source = this.efm.pickMarket();
         if (this.source == null) {
             endImmediately();
         }
     }
 
     public void pickTarget() {
-        EntityFinderMission efm = new EntityFinderMission();
-        efm.requirePlanetNoMemoryFlag(ExpeditionFleetIntel.TARGET_KEY);
-        efm.requirePlanetWithRuins();
-        efm.requirePlanetUnexploredRuins();
-        efm.preferPlanetInDirectionOfOtherMissions();
-        this.target = efm.pickPlanet();
+        this.efm.requirePlanetNoMemoryFlag(ExpeditionFleetIntel.TARGET_KEY);
+        this.efm.requirePlanetWithRuins();
+        this.efm.requirePlanetUnexploredRuins();
+        this.efm.preferPlanetInDirectionOfOtherMissions();
+        this.target = this.efm.pickPlanet();
         if (this.target == null) {
             endImmediately();
         }
@@ -162,7 +165,7 @@ public class ExpeditionFleetIntel extends FleetGroupIntel {
             return;
         }
 
-        if (action.getId().equals(LOOT_ACTION)) {
+        if (LOOT_ACTION.equals(action.getId())) {
             Misc.makeUnimportant(this.target, "specialItemLocation");
             this.target.getMemoryWithoutUpdate().unset(MemFlags.SALVAGE_SPECIAL_DATA);
 
@@ -171,17 +174,17 @@ public class ExpeditionFleetIntel extends FleetGroupIntel {
             if (mainFleet != null) {
                 Misc.makeImportant(mainFleet, "hasSpecialItem");
                 Misc.addDefeatTrigger(mainFleet, "SEPEFGIFleetDefeated");
+                mainFleet.getMemoryWithoutUpdate().set(HAS_ARTIFACT, true);
             }
-        } else if (action.getId().equals(DOCK_ACTION)) {
-            EntityFinderMission efm = new EntityFinderMission();
-            efm.requireMarketFaction(this.factionId);
-            efm.requireMarketNotHidden();
-            efm.requireMarketNotInHyperspace();
-            efm.requireMarketFactionNotPlayer();
-            efm.requireMarketCanUseSpecialItem(this.specialItemData);
-            efm.preferMarketSizeAtMost(100);
-            efm.preferMarketIs(this.source);
-            MarketAPI market = efm.pickMarket();
+        } else if (DOCK_ACTION.equals(action.getId())) {
+            this.efm.requireMarketFaction(this.factionId);
+            this.efm.requireMarketNotHidden();
+            this.efm.requireMarketNotInHyperspace();
+            this.efm.requireMarketFactionNotPlayer();
+            this.efm.requireMarketCanUseSpecialItem(this.specialItemData);
+            this.efm.preferMarketSizeAtMost(100);
+            this.efm.preferMarketIs(this.source);
+            MarketAPI market = this.efm.pickMarket();
 
             if (market == null) {
                 log.info("Failed to find market to install special item");
@@ -222,8 +225,14 @@ public class ExpeditionFleetIntel extends FleetGroupIntel {
 
     @Override
     protected void notifyEnded() {
+        unsetEventMemoryFlags();
+    }
+
+    public void unsetEventMemoryFlags() {
         // Unset faction memory flags
-        Global.getSector().getFaction(this.factionId).getMemoryWithoutUpdate().unset(FACTION_KEY);
+        if (this.faction != null) {
+            this.faction.getMemoryWithoutUpdate().unset(FACTION_KEY);
+        }
 
         // Unset target memory flags
         if (this.target != null) {
@@ -237,6 +246,7 @@ public class ExpeditionFleetIntel extends FleetGroupIntel {
         if (mainFleet != null) {
             Misc.makeUnimportant(mainFleet, "hasSpecialItem");
             mainFleet.getMemoryWithoutUpdate().unset(MAIN_FLEET_KEY);
+            mainFleet.getMemoryWithoutUpdate().unset(HAS_ARTIFACT);
             mainFleet.getMemoryWithoutUpdate().unset(EVENT_KEY);
         }
     }
@@ -265,6 +275,10 @@ public class ExpeditionFleetIntel extends FleetGroupIntel {
         fcm.triggerSetFleetMemoryValue(EVENT_KEY, this);
         fcm.triggerFleetSetName("Expedition Fleet");
 
+        if (Factions.LUDDIC_PATH.equals(this.faction.getId())) {
+            fcm.triggerFleetPatherNoDefaultTithe();
+        }
+
         CampaignFleetAPI fleet = fcm.createFleet();
         if (fleet != null && this.route != null) {
             setLocationAndCoordinates(fleet, this.route.getCurrent());
@@ -273,6 +287,7 @@ public class ExpeditionFleetIntel extends FleetGroupIntel {
                     // Ensure fleet is marked properly when it spawns midway
                     Misc.makeImportant(fleet, "hasSpecialItem");
                     Misc.addDefeatTrigger(fleet, "SEPEFGIFleetDefeated");
+                    fleet.getMemoryWithoutUpdate().set(HAS_ARTIFACT, true);
                 }
             }
             this.fleets.add(fleet);
@@ -308,7 +323,13 @@ public class ExpeditionFleetIntel extends FleetGroupIntel {
     public boolean callEvent(String ruleId, InteractionDialogAPI dialog, List<Misc.Token> params, Map<String, MemoryAPI> memoryMap) {
         String action = params.get(0).getString(memoryMap);
 
-        if (action.equals("removeDefeatTrigger")) {
+        if ("endEvent".equals(action)) {
+            unsetEventMemoryFlags();
+            finish(true);
+            return true;
+        } else if ("giveArtifact".equals(action)) {
+            Global.getSector().getPlayerFleet().getCargo().addSpecial(this.specialItemData, 1f);
+            AddRemoveCommodity.addItemGainText(this.specialItemData, 1, dialog.getTextPanel());
             return true;
         }
 
