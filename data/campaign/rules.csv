@@ -166,8 +166,7 @@ SetTextHighlights $sep_sar_survivorFullName",,contact_pickAnotherGreeting:Contin
 # END",,,,,,
 "# Artifact Incursion mission
 # START",,,,,,
-"## Contact offer dialogs
-",,,,,,
+## Contact offer dialogs,,,,,,
 sep_aim_blurb,sep_aim_blurb,,,"""A rival faction is using an artifact to gain an economic advantage. I need an independent force to 'claim' it and to bring it back to me.""",,
 sep_aim_offerOption,sep_aim_option,,,,sep_aim_start:Ask about 'claiming' a rival's artifact,
 sep_aim_offerTextContact1,DialogOptionSelected,$option == sep_aim_start,"$missionId = sep_aim
@@ -177,8 +176,7 @@ Call $sep_aim_ref showMap ""Target: $sep_aim_marketName""","""An artifact called
 
 ""The artifact is on $sep_aim_marketName, a $sep_aim_marketFactionName colony in the $sep_aim_marketSystem. You'll need roughly $sep_aim_marines marines to secure it."" $HeOrShe leans forward slightly. ""If successful, I am authorized to offer $sep_aim_reward credits, along with a sizable boost to your reputation. Interested?""","contact_accept:Accept
 contact_decline:Decline",
-"## Bar offer dialogs
-",,,,,,
+## Bar offer dialogs,,,,,,
 sep_aim_blurbBar,sep_aim_blurbBar,,,"A $manOrWoman sits at the counter, juggling two tripads with an annoyed expression. The untouched drink beside them reflects the glow of the screens.",,
 sep_aim_offerOptionBar,sep_aim_optionBar,,,,sep_aim_startBar:Approach the $manOrWoman with an annoyed expression,
 sep_aim_offerTextBar1,DialogOptionSelected,$option == sep_aim_startBar,"$missionId = sep_aim
@@ -190,15 +188,13 @@ On the tripad, you see details of economic issues caused by an artifact called $
 
 The $manOrWoman coughs, pulling your attention. ""So, Captain, are you in?""","contact_acceptBar:Accept
 contact_declineBarNoContinue:Decline",
-"## Raid finished dialogs
-",,,,,,
+## Raid finished dialogs,,,,,,
 sep_aim_raidFinished,SEPAIMRaidFinished,"$market.sep_aim_targetMarket score:1000
 Call $market.sep_aim_ref updateData","$market.sep_aim_deliverArtifact = true
 Call $market.sep_aim_ref updateStage","The raid is a success. Your marines push through fortified defenses with precision, suffering a few casualties but managing to overcome the resistance.
 
 They secure the artifact and move it under heavy guard, transporting it aboard a shuttle before returning safely to your ship.",,
-"## Return dialogs
-",,,,,,
+## Return dialogs,,,,,,
 sep_aim_returnArtifact,PickGreeting,"$sep_aim_returnPerson score:1000
 Call $sep_aim_ref updateData
 FireBest GenericMissionReturn","ShowPersonVisual
@@ -223,9 +219,17 @@ Call $sep_aim_ref updateStage","$HeOrShe folds $hisOrHer arms, weighing the deci
 $HeOrShe’s tone hardens. ""However, the agreed-upon reward stays with me. Take it as a trade-off. You have what you wanted, and I keep my terms intact.""",contact_pickAnotherGreeting:Continue,
 "# Artifact Incursion mission
 # END",,,,,,
-,,,,,,
-,,,,,,
-,,,,,,
-,,,,,,
-,,,,,,
-,,,,,,
+"# Ghosts research mission
+# START",,,,,,
+## Contact offer dialogs,,,,,,
+sep_grm_blurb,sep_grm_blurb,,,CONTACT MISSION BLURB,,
+sep_grm_offerOption,sep_grm_option,,,,sep_grm_start:CONTACT MISSION OPTION,
+sep_grm_offerTextContact1,DialogOptionSelected,$option == sep_grm_start,$missionId = sep_grm,CONTACT MISSION OFFER TEXT,"contact_accept:Accept
+contact_decline:Decline",
+## Bar offer dialogs,,,,,,
+sep_grm_blurbBar,sep_grm_blurbBar,,,BAR MISSION BLURB,,
+sep_grm_offerOptionBar,sep_grm_optionBar,,,,sep_grm_startBar:BAR MISSION OPTION,
+sep_grm_offerTextBar1,DialogOptionSelected,$option == sep_grm_startBar,$missionId = sep_grm,BAR MISSION OFFER TEXT,"contact_acceptBar:Accept
+contact_declineBarNoContinue:Decline",
+"# Ghosts research mission
+# END",,,,,,
