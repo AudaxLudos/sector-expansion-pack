@@ -1,6 +1,8 @@
 package sectorexpansionpack;
 
 import com.fs.starfarer.api.Global;
+import com.fs.starfarer.api.campaign.CampaignFleetAPI;
+import com.fs.starfarer.api.campaign.CustomCampaignEntityAPI;
 import com.fs.starfarer.api.campaign.SectorEntityToken;
 import com.fs.starfarer.api.characters.OfficerDataAPI;
 import com.fs.starfarer.api.impl.campaign.ids.MemFlags;
@@ -10,6 +12,9 @@ import com.fs.starfarer.api.plugins.OfficerLevelupPlugin;
 import com.fs.starfarer.api.util.Misc;
 import sectorexpansionpack.intel.ExpeditionFleetManager;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 import java.util.Random;
 
 public class Utils {
@@ -25,6 +30,23 @@ public class Utils {
 
     public static boolean rollProbability(Random random, float p) {
         return random.nextFloat() >= p;
+    }
+
+    public static List<CustomCampaignEntityAPI> getNearbyEntitiesWithType(SectorEntityToken from, String entityType, float maxDist) {
+        List<CustomCampaignEntityAPI> result = new ArrayList<>();
+        for (Object other : from.getContainingLocation().getEntities(CustomCampaignEntityAPI.class)) {
+            if (other instanceof CustomCampaignEntityAPI entity) {
+                if (!Objects.equals(entity.getCustomEntityType(), entityType)) {
+                    continue;
+                }
+                float dist = Misc.getDistance(from.getLocation(), entity.getLocation());
+                if (dist <= maxDist) {
+                    result.add(entity);
+                }
+            }
+        }
+
+        return result;
     }
 
     public void RunCodeScripts() {

@@ -1,18 +1,34 @@
 package sectorexpansionpack.missions;
 
 import com.fs.starfarer.api.Global;
+import com.fs.starfarer.api.campaign.CampaignFleetAPI;
+import com.fs.starfarer.api.campaign.CustomCampaignEntityAPI;
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
+import com.fs.starfarer.api.impl.campaign.ids.Entities;
 import com.fs.starfarer.api.impl.campaign.ids.Ranks;
-import com.fs.starfarer.api.impl.campaign.ids.Tags;
 import com.fs.starfarer.api.impl.campaign.missions.hub.HubMissionWithBarEvent;
 import com.fs.starfarer.api.ui.TooltipMakerAPI;
+import com.fs.starfarer.api.util.IntervalUtil;
+import com.fs.starfarer.api.util.Misc;
 import org.apache.log4j.Logger;
+import sectorexpansionpack.Utils;
 
 import java.awt.*;
+import java.util.List;
 
 public class GhostsResearchMission extends HubMissionWithBarEvent {
+    public static final String PROGRESS_STEP_UPDATE = "progress_step_update";
     public static Logger log = Global.getLogger(GhostsResearchMission.class);
-    protected float progress = 0f;
+    protected IntervalUtil timer = new IntervalUtil(0.9f, 1.1f);
+    protected List<CustomCampaignEntityAPI> ghostsCache;
+    protected float currProgress;
+    protected float maxProgress;
+    protected int lastUpdateStep = -1;
+
+    public GhostsResearchMission() {
+        super();
+        setGenRandom(Utils.random);
+    }
 
     @Override
     protected boolean create(MarketAPI createdAt, boolean barEvent) {
@@ -20,14 +36,16 @@ public class GhostsResearchMission extends HubMissionWithBarEvent {
             setGiverRank(pickOne(Ranks.CITIZEN, Ranks.ARISTOCRAT));
             setGiverPost(pickOne(Ranks.POST_SCIENTIST, Ranks.POST_ACADEMICIAN));
             setGiverImportance(pickImportance());
-            setGiverTags(Tags.CONTACT_SCIENCE);
             findOrCreateGiver(createdAt, true, false);
         }
 
-        if (setPersonMissionRef(getPerson(), "$sep_grm_ref")) {
+        if (!setPersonMissionRef(getPerson(), "$sep_grm_ref")) {
             log.info("Failed to find or create mission giver");
             return false;
         }
+
+        // Number of days needed to get max progress
+        this.maxProgress = genRoundNumber(12, 16);
 
         makeImportant(getPerson(), "$sep_grm_returnPerson", Stage.DELIVER_DATA);
 
@@ -45,8 +63,47 @@ public class GhostsResearchMission extends HubMissionWithBarEvent {
     }
 
     @Override
+    protected void advanceImpl(float amount) {
+        super.advanceImpl(amount);
+
+        float days = Misc.getDays(amount);
+
+        if (this.currProgress >= this.maxProgress && this.currentStage == Stage.GATHER_DATA) {
+            setCurrentStage(Stage.DELIVER_DATA, null, null);
+        }
+
+        // Update the player in increments of 20%
+        int currUpdateStep = Math.round(this.currProgress / (this.maxProgress * 0.2f));
+        if (currUpdateStep > this.lastUpdateStep) {
+            this.lastUpdateStep = currUpdateStep;
+            // Don't send update at 0% and 100%
+            if (currUpdateStep > 0 && currUpdateStep < 5) {
+                sendUpdateIfPlayerHasIntel(PROGRESS_STEP_UPDATE, true);
+            }
+        }
+
+        if (!Global.getSector().getPlayerFleet().isInHyperspace()) {
+            return;
+        }
+
+        this.timer.advance(days);
+        if (this.timer.intervalElapsed()) {
+            CampaignFleetAPI pf = Global.getSector().getPlayerFleet();
+            if (pf == null) {
+                return;
+            }
+            this.ghostsCache = Utils.getNearbyEntitiesWithType(pf, Entities.SENSOR_GHOST, 2000);
+        }
+
+        if (this.ghostsCache != null && !this.ghostsCache.isEmpty()) {
+            this.currProgress += days;
+            this.currProgress = Math.min(this.currProgress, this.maxProgress);
+        }
+    }
+
+    @Override
     public String getBaseName() {
-        return "Ghosts Research";
+        return "Sensor Ghosts Research";
     }
 
     @Override
@@ -56,27 +113,43 @@ public class GhostsResearchMission extends HubMissionWithBarEvent {
 
     @Override
     public boolean addNextStepText(TooltipMakerAPI info, Color tc, float pad) {
+        Color h = Misc.getHighlightColor();
+
         if (this.currentStage == Stage.GATHER_DATA) {
-
+            if (getListInfoParam() == PROGRESS_STEP_UPDATE) {
+                info.addPara("Research Progress increased by %s", pad, tc, h, "20%");
+                info.addPara("Research Progress is now at %s", 0f, tc, h, getProgressPercent() + "%");
+            } else {
+                info.addPara("Look for sensor ghosts in hyperspace", pad, tc, h, getProgressPercent() + "%");
+                info.addPara("Research Progress: %s", 0f, tc, h, getProgressPercent() + "%");
+            }
+            return true;
         } else if (this.currentStage == Stage.DELIVER_DATA) {
-
+            info.addPara("Research Progress: %s", 3f, tc, h, getProgressPercent() + "%");
+            return true;
         }
+
+        return false;
     }
 
     @Override
     public void addDescriptionForNonEndStage(TooltipMakerAPI info, float width, float height) {
         float oPad = 10f;
+        Color h = Misc.getHighlightColor();
 
         if (this.currentStage == Stage.GATHER_DATA) {
-
+            info.addPara("Research Progress: %s", oPad, h, getProgressPercent() + "%");
         } else if (this.currentStage == Stage.DELIVER_DATA) {
 
         }
     }
 
-    @Override
-    public void advance(float amount) {
-        super.advance(amount);
+    public int getProgressPercent() {
+        return Math.round(getProgress() * 100f);
+    }
+
+    public float getProgress() {
+        return Math.min(this.currProgress / this.maxProgress, 1f);
     }
 
     public enum Stage {
