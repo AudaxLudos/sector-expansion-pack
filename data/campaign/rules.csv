@@ -222,14 +222,28 @@ $HeOrShe’s tone hardens. ""However, the agreed-upon reward stays with me. Take
 "# Ghosts research mission
 # START",,,,,,
 ## Contact offer dialogs,,,,,,
-sep_grm_blurb,sep_grm_blurb,,,CONTACT MISSION BLURB,,
-sep_grm_offerOption,sep_grm_option,,,,sep_grm_start:CONTACT MISSION OPTION,
-sep_grm_offerTextContact1,DialogOptionSelected,$option == sep_grm_start,$missionId = sep_grm,CONTACT MISSION OFFER TEXT,"contact_accept:Accept
+sep_harm_blurb,sep_harm_blurb,,,“Here's one. A researcher is looking for a fleet to gather telemetry on hyperspace anomalies. May take some time but the pay is good.”,,
+sep_harm_offerOption,sep_harm_option,,,,sep_harm_start:Ask about studying hyperspace anomalies,
+sep_harm_offerTextContact1,DialogOptionSelected,$option == sep_harm_start,"$missionId = sep_harm
+SetTextHighlightColors h h
+SetTextHighlights $sep_harm_dataInDays $sep_harm_reward","$HeOrShe scrolls through $hisOrHer tripad, searching for the mission entry.
+
+""Here it is,"" $heOrShe says. ""The researcher needs about $sep_harm_dataInDays days’ worth of hyperspace anomaly data. They're providing a few researchers and some equipment to assist. All you need to do is locate the anomalies and let the team handle the rest.""
+
+$HeOrShe continues, transmitting the full mission briefing. ""There’s no set deadline for this assignment. Just gather the required data and return it here. Once done, the researcher is offering an $sep_harm_reward. Interested?""
+
+You skim through the finer details of the mission. According to the researcher, hyperspace anomalies often occur near the fringes of the sector and often appear near high-energy waves, like those emitted by sensor bursts.","contact_accept:Accept
 contact_decline:Decline",
 ## Bar offer dialogs,,,,,,
-sep_grm_blurbBar,sep_grm_blurbBar,,,BAR MISSION BLURB,,
-sep_grm_offerOptionBar,sep_grm_optionBar,,,,sep_grm_startBar:BAR MISSION OPTION,
-sep_grm_offerTextBar1,DialogOptionSelected,$option == sep_grm_startBar,$missionId = sep_grm,BAR MISSION OFFER TEXT,"contact_acceptBar:Accept
+sep_harm_blurbBar,sep_harm_blurbBar,,,You notice a table filled with research papers and a $personPost frantically rearranging them.,,
+sep_harm_offerOptionBar,sep_harm_optionBar,,,,sep_harm_startBar:Approach the $personPost rearranging research papers,
+sep_harm_offerTextBar1,DialogOptionSelected,$option == sep_harm_startBar,"$missionId = sep_harm
+SetTextHighlightColors h h
+SetTextHighlights $sep_harm_dataInDays $sep_harm_reward","""This isn't enough,"" $heOrShe grumbles. ""I need something more, more..."" $HeOrShe looks at you curiously. ""...accurate.""
+
+""A captain?"" $HeOrShe asks. You nod in response. ""Great! You're just in time. I need $sep_harm_dataInDays days’ worth of hyperspace anomaly data. If you haven’t encountered them before, hyperspace anomalies often occur near the fringes of the sector and often appear near high-energy waves, like those emitted by sensor bursts,"" $heOrShe continues.
+
+""I'll provide a few researchers and some equipment to assist. All you need to do is locate the anomalies and let the team handle the rest."" $HeOrShe hands you a tripad with a hastily written contract. ""There’s no set deadline for this assignment. Just gather the required data and deliver it to me. Once done, I’ll pay you $sep_harm_reward. Interested?""","contact_acceptBar:Accept
 contact_declineBarNoContinue:Decline",
 "# Ghosts research mission
 # END",,,,,,

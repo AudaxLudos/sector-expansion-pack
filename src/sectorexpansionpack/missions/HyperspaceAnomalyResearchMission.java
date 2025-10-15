@@ -16,16 +16,16 @@ import sectorexpansionpack.Utils;
 import java.awt.*;
 import java.util.List;
 
-public class GhostsResearchMission extends HubMissionWithBarEvent {
+public class HyperspaceAnomalyResearchMission extends HubMissionWithBarEvent {
     public static final String PROGRESS_STEP_UPDATE = "progress_step_update";
-    public static Logger log = Global.getLogger(GhostsResearchMission.class);
+    public static Logger log = Global.getLogger(HyperspaceAnomalyResearchMission.class);
     protected IntervalUtil timer = new IntervalUtil(0.9f, 1.1f);
     protected List<CustomCampaignEntityAPI> ghostsCache;
     protected float currProgress;
     protected float maxProgress;
     protected int lastUpdateStep = -1;
 
-    public GhostsResearchMission() {
+    public HyperspaceAnomalyResearchMission() {
         super();
         setGenRandom(Utils.random);
     }
@@ -39,7 +39,7 @@ public class GhostsResearchMission extends HubMissionWithBarEvent {
             findOrCreateGiver(createdAt, true, false);
         }
 
-        if (!setPersonMissionRef(getPerson(), "$sep_grm_ref")) {
+        if (!setPersonMissionRef(getPerson(), "$sep_harm_ref")) {
             log.info("Failed to find or create mission giver");
             return false;
         }
@@ -47,7 +47,7 @@ public class GhostsResearchMission extends HubMissionWithBarEvent {
         // Number of days needed to get max progress
         this.maxProgress = genRoundNumber(12, 16);
 
-        makeImportant(getPerson(), "$sep_grm_returnPerson", Stage.DELIVER_DATA);
+        makeImportant(getPerson(), "$sep_harm_returnPerson", Stage.DELIVER_DATA);
 
         setStartingStage(Stage.GATHER_DATA);
         setSuccessStage(Stage.COMPLETED);
@@ -103,12 +103,13 @@ public class GhostsResearchMission extends HubMissionWithBarEvent {
 
     @Override
     public String getBaseName() {
-        return "Sensor Ghosts Research";
+        return "Hyperspace Anomaly Research";
     }
 
     @Override
     protected void updateInteractionDataImpl() {
-        super.updateInteractionDataImpl();
+        set("$sep_harm_dataInDays", getDays(this.maxProgress));
+        set("$sep_harm_reward", Misc.getDGSCredits(getCreditsReward()));
     }
 
     @Override
@@ -120,7 +121,7 @@ public class GhostsResearchMission extends HubMissionWithBarEvent {
                 info.addPara("Research Progress increased by %s", pad, tc, h, "20%");
                 info.addPara("Research Progress is now at %s", 0f, tc, h, getProgressPercent() + "%");
             } else {
-                info.addPara("Look for sensor ghosts in hyperspace", pad, tc, h, getProgressPercent() + "%");
+                info.addPara("Gather data from hyperspace anomalies.", pad, tc, h, getProgressPercent() + "%");
                 info.addPara("Research Progress: %s", 0f, tc, h, getProgressPercent() + "%");
             }
             return true;
@@ -138,7 +139,13 @@ public class GhostsResearchMission extends HubMissionWithBarEvent {
         Color h = Misc.getHighlightColor();
 
         if (this.currentStage == Stage.GATHER_DATA) {
+            info.addPara("Gather data from hyperspace anomalies.", oPad, h, getProgressPercent() + "%");
+            bullet(info);
             info.addPara("Research Progress: %s", oPad, h, getProgressPercent() + "%");
+            unindent(info);
+            info.addPara("According to the researcher, hyperspace anomalies often occur near the fringes of " +
+                    "the sector and often appear near high-energy wave, like those emitted by sensor " +
+                    "bursts.", oPad, h, getProgressPercent() + "%");
         } else if (this.currentStage == Stage.DELIVER_DATA) {
 
         }
