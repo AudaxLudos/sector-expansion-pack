@@ -24,6 +24,7 @@ public class HyperspaceAnomalyResearchMission extends HubMissionWithBarEvent {
     protected float currProgress;
     protected float maxProgress;
     protected int lastUpdateStep = -1;
+    protected boolean isBarEvent;
 
     public HyperspaceAnomalyResearchMission() {
         super();
@@ -44,6 +45,7 @@ public class HyperspaceAnomalyResearchMission extends HubMissionWithBarEvent {
             return false;
         }
 
+        this.isBarEvent = barEvent;
         // Number of days needed to get max progress
         this.maxProgress = genRoundNumber(12, 16);
 
@@ -52,6 +54,8 @@ public class HyperspaceAnomalyResearchMission extends HubMissionWithBarEvent {
         setStartingStage(Stage.GATHER_DATA);
         setSuccessStage(Stage.COMPLETED);
         addFailureStages(Stage.FAILED);
+
+        setStageOnMemoryFlag(Stage.COMPLETED, getPerson(), "$sep_harm_completed");
 
         addNoPenaltyFailureStages(Stage.FAILED_DECIV);
         connectWithMarketDecivilized(Stage.DELIVER_DATA, Stage.FAILED_DECIV, getPerson().getMarket());
@@ -73,7 +77,7 @@ public class HyperspaceAnomalyResearchMission extends HubMissionWithBarEvent {
         }
 
         // Update the player in increments of 20%
-        int currUpdateStep = Math.round(this.currProgress / (this.maxProgress * 0.2f));
+        int currUpdateStep = (int) (this.currProgress / (this.maxProgress * 0.2f));
         if (currUpdateStep > this.lastUpdateStep) {
             this.lastUpdateStep = currUpdateStep;
             // Don't send update at 0% and 100%
@@ -110,6 +114,7 @@ public class HyperspaceAnomalyResearchMission extends HubMissionWithBarEvent {
     protected void updateInteractionDataImpl() {
         set("$sep_harm_dataInDays", getDays(this.maxProgress));
         set("$sep_harm_reward", Misc.getDGSCredits(getCreditsReward()));
+        set("$sep_harm_isBarEvent", this.isBarEvent);
     }
 
     @Override
@@ -118,7 +123,6 @@ public class HyperspaceAnomalyResearchMission extends HubMissionWithBarEvent {
 
         if (this.currentStage == Stage.GATHER_DATA) {
             if (getListInfoParam() == PROGRESS_STEP_UPDATE) {
-                info.addPara("Research Progress increased by %s", pad, tc, h, "20%");
                 info.addPara("Research Progress is now at %s", 0f, tc, h, getProgressPercent() + "%");
             } else {
                 info.addPara("Gather data from hyperspace anomalies.", pad, tc, h, getProgressPercent() + "%");
@@ -126,7 +130,9 @@ public class HyperspaceAnomalyResearchMission extends HubMissionWithBarEvent {
             }
             return true;
         } else if (this.currentStage == Stage.DELIVER_DATA) {
-            info.addPara("Research Progress: %s", 3f, tc, h, getProgressPercent() + "%");
+            info.addPara("Deliver the completed hyperspace anomaly data to %s at %s, in the %s.", pad, tc, h,
+                    getPerson().getName().getFullName(), getPerson().getMarket().getName(),
+                    getPerson().getMarket().getStarSystem().getNameWithLowercaseTypeShort());
             return true;
         }
 
@@ -147,7 +153,10 @@ public class HyperspaceAnomalyResearchMission extends HubMissionWithBarEvent {
                     "the sector and often appear near high-energy wave, like those emitted by sensor " +
                     "bursts.", oPad, h, getProgressPercent() + "%");
         } else if (this.currentStage == Stage.DELIVER_DATA) {
-
+            info.addPara("Deliver the completed hyperspace anomaly data to %s at %s, in the %s.", oPad,
+                    new Color[]{h, h, h},
+                    getPerson().getName().getFullName(), getPerson().getMarket().getName(),
+                    getPerson().getMarket().getStarSystem().getNameWithLowercaseTypeShort());
         }
     }
 

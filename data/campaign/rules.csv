@@ -230,7 +230,7 @@ SetTextHighlights $sep_harm_dataInDays $sep_harm_reward","$HeOrShe scrolls throu
 
 ""Here it is,"" $heOrShe says. ""The researcher needs about $sep_harm_dataInDays days’ worth of hyperspace anomaly data. They're providing a few researchers and some equipment to assist. All you need to do is locate the anomalies and let the team handle the rest.""
 
-$HeOrShe continues, transmitting the full mission briefing. ""There’s no set deadline for this assignment. Just gather the required data and return it here. Once done, the researcher is offering an $sep_harm_reward. Interested?""
+$HeOrShe continues, transmitting the full mission briefing. ""There’s no set deadline for this assignment. Just gather the required data and return it here. Once done, the researcher will award you $sep_harm_reward. Interested?""
 
 You skim through the finer details of the mission. According to the researcher, hyperspace anomalies often occur near the fringes of the sector and often appear near high-energy waves, like those emitted by sensor bursts.","contact_accept:Accept
 contact_decline:Decline",
@@ -239,11 +239,30 @@ sep_harm_blurbBar,sep_harm_blurbBar,,,You notice a table filled with research pa
 sep_harm_offerOptionBar,sep_harm_optionBar,,,,sep_harm_startBar:Approach the $personPost rearranging research papers,
 sep_harm_offerTextBar1,DialogOptionSelected,$option == sep_harm_startBar,"$missionId = sep_harm
 SetTextHighlightColors h h
-SetTextHighlights $sep_harm_dataInDays $sep_harm_reward","""This isn't enough,"" $heOrShe grumbles. ""I need something more, more..."" $HeOrShe looks at you curiously. ""...accurate.""
+SetTextHighlights $sep_harm_dataInDays $sep_harm_reward","""This isn't enough,"" $heOrShe grumbles. ""I need something more, more..."" $HeOrShe looks at you curiously. ""...accurate."" $HeOrShe pauses.
 
 ""A captain?"" $HeOrShe asks. You nod in response. ""Great! You're just in time. I need $sep_harm_dataInDays days’ worth of hyperspace anomaly data. If you haven’t encountered them before, hyperspace anomalies often occur near the fringes of the sector and often appear near high-energy waves, like those emitted by sensor bursts,"" $heOrShe continues.
 
 ""I'll provide a few researchers and some equipment to assist. All you need to do is locate the anomalies and let the team handle the rest."" $HeOrShe hands you a tripad with a hastily written contract. ""There’s no set deadline for this assignment. Just gather the required data and deliver it to me. Once done, I’ll pay you $sep_harm_reward. Interested?""","contact_acceptBar:Accept
 contact_declineBarNoContinue:Decline",
+## Return data dialogs,,,,,,
+sep_harm_returnDataContact,PickGreeting,"$sep_harm_returnPerson score:1000
+Call $sep_harm_ref updateData
+!$sep_harm_isBarEvent
+FireBest GenericMissionReturn","ShowPersonVisual
+$sep_harm_completed = true
+Call $sep_harm_ref updateStage","You transmit the completed hyperspace anomaly data to the $personPost.
+
+$HeOrShe thanks you for the data before sending you your reward.",contact_pickAnotherGreeting:Continue,
+sep_harm_returnDataBar,PickGreeting,"$sep_harm_returnPerson score:1000
+Call $sep_harm_ref updateData
+$sep_harm_isBarEvent
+FireBest GenericMissionReturn","ShowPersonVisual
+$sep_harm_completed = true
+Call $sep_harm_ref updateStage","You transmit the completed hyperspace anomaly data to the $personPost.
+
+$HeOrShe thanks you for the data before getting lost in its details, even forgeting to close connection.",contact_pickAnotherGreeting:Continue,
+,,,,,,
+,,,,,,
 "# Ghosts research mission
 # END",,,,,,
