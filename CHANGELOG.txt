@@ -1,0 +1,21 @@
+### 0.0.93a
+- Add fleet eater ghost
+- Add hyperspace anomaly research mission
+- Add storm inducer ghost
+- Add storm pacifier ghost
+
+### 0.0.63a
+- Add artifact installation intel
+- Add leaked artifact location intel
+- Add expedition fleet departure intel
+- Add expedition fleets
+- Add artifact incursion mission
+- Add search and rescue mission
+
+### 0.0.10a
+- Add ship accipiter destroyer with variants
+- Add ship wonder destroyer with variants
+- Add ship hornet frigate with variants
+
+### 0.0.0a
+- Add initial mod files
