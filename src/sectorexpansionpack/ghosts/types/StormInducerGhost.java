@@ -2,7 +2,10 @@ package sectorexpansionpack.ghosts.types;
 
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.campaign.CampaignFleetAPI;
-import com.fs.starfarer.api.impl.campaign.ghosts.*;
+import com.fs.starfarer.api.impl.campaign.ghosts.BaseSensorGhost;
+import com.fs.starfarer.api.impl.campaign.ghosts.GBDartAround;
+import com.fs.starfarer.api.impl.campaign.ghosts.GBGoAwayFrom;
+import com.fs.starfarer.api.impl.campaign.ghosts.SensorGhostManager;
 import com.fs.starfarer.api.impl.campaign.ids.Tags;
 import com.fs.starfarer.api.impl.campaign.terrain.HyperspaceTerrainPlugin;
 import com.fs.starfarer.api.util.IntervalUtil;

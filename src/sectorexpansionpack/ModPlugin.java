@@ -7,7 +7,7 @@ import com.fs.starfarer.api.util.WeightedRandomPicker;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import sectorexpansionpack.ghosts.types.StormInducerGhost;
+import sectorexpansionpack.ghosts.types.FleetEaterGhostCreator;
 import sectorexpansionpack.ghosts.types.StormInducerGhostCreator;
 import sectorexpansionpack.ghosts.types.StormPacifierGhostCreator;
 import sectorexpansionpack.intel.ExpeditionFleetManager;
@@ -85,6 +85,7 @@ public class ModPlugin extends BaseModPlugin {
 
         StormPacifierGhostCreator.register();
         StormInducerGhostCreator.register();
+        FleetEaterGhostCreator.register();
     }
 
     public void loadMissionScenarios() {

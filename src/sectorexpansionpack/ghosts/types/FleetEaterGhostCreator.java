@@ -9,9 +9,9 @@ import com.fs.starfarer.api.impl.campaign.ghosts.SensorGhostManager;
 import java.util.ArrayList;
 import java.util.List;
 
-public class StormPacifierGhostCreator extends BaseSensorGhostCreator {
+public class FleetEaterGhostCreator extends BaseSensorGhostCreator {
     public static void register() {
-        SensorGhostManager.CREATORS.add(new StormPacifierGhostCreator());
+        SensorGhostManager.CREATORS.add(new FleetEaterGhostCreator());
     }
 
     @Override
@@ -21,7 +21,7 @@ public class StormPacifierGhostCreator extends BaseSensorGhostCreator {
         }
 
         List<SensorGhost> result = new ArrayList<>();
-        SensorGhost g = new StormPacifierGhost(manager, 1000f);
+        SensorGhost g = new FleetEaterGhost(manager);
         if (!g.isCreationFailed()) {
             result.add(g);
         }
@@ -30,14 +30,12 @@ public class StormPacifierGhostCreator extends BaseSensorGhostCreator {
 
     @Override
     public float getFrequency(SensorGhostManager manager) {
+        if (Global.getSettings().isDevMode()) {
+            return 10000f;
+        }
         return 10f *
                 GhostFrequencies.getNotInCoreFactor() *
                 (0.25f + 0.75f * GhostFrequencies.getFringeFactor()) *
                 GhostFrequencies.getSBFactor(manager, 1f, 4f);
-    }
-
-    @Override
-    public boolean canSpawnWhilePlayerInOrNearSlipstream() {
-        return true;
     }
 }
