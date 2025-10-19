@@ -41,16 +41,12 @@ public class ExpeditionFleetManager extends BaseEventManager {
             event = null;
         }
 
-        if (event == null) {
-            // Stop forcing event if passed a certain amount of checks;
-            if (this.counter < 5) {
-                // Force an expedition to ensure at least one happens every 4 months
-                // Doing this to make it more consistent
-                this.tracker.forceIntervalElapsed();
-                this.counter++;
-            } else {
-                this.counter = 0;
-            }
+        // Stop forcing event if passed a certain amount of checks;
+        if (event == null && this.counter < 5) {
+            // Force an expedition to ensure at least one happens every 4 months
+            // Doing this to make it more consistent
+            this.counter++;
+            return createEvent();
         } else {
             this.counter = 0;
         }
