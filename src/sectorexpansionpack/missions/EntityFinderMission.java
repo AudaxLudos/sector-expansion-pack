@@ -8,10 +8,12 @@ import com.fs.starfarer.api.impl.campaign.missions.hub.HubMissionWithSearch;
 import com.fs.starfarer.api.util.Misc;
 import sectorexpansionpack.Utils;
 
+import java.util.Random;
+
 public class EntityFinderMission extends HubMissionWithSearch {
     public EntityFinderMission() {
         super();
-        setGenRandom(Utils.random);
+        setGenRandom(new Random(Utils.random.nextLong()));
     }
 
     @Override

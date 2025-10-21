@@ -11,6 +11,7 @@ import sectorexpansionpack.ghosts.types.FleetEaterGhostCreator;
 import sectorexpansionpack.ghosts.types.StormInducerGhostCreator;
 import sectorexpansionpack.ghosts.types.StormPacifierGhostCreator;
 import sectorexpansionpack.intel.ExpeditionFleetManager;
+import sectorexpansionpack.intel.IncursionFleetManager;
 
 import java.io.IOException;
 import java.util.Random;
@@ -74,14 +75,17 @@ public class ModPlugin extends BaseModPlugin {
 
     @Override
     public void onGameLoad(boolean newGame) {
+        Utils.setRandom(new Random(Long.parseLong(Global.getSector().getSeedString().replaceAll("\\D", ""))));
+
         loadMissionScenarios();
 
         SectorAPI sector = Global.getSector();
         if (!sector.hasScript(ExpeditionFleetManager.class)) {
             sector.addScript(new ExpeditionFleetManager());
         }
-
-        Utils.setRandom(new Random(Long.parseLong(Global.getSector().getSeedString().replaceAll("\\D", ""))));
+        /*if (!sector.hasScript(IncursionFleetManager.class)) {
+            sector.addScript(new IncursionFleetManager());
+        }*/
 
         StormPacifierGhostCreator.register();
         StormInducerGhostCreator.register();

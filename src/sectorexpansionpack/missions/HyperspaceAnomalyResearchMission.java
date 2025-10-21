@@ -15,6 +15,7 @@ import sectorexpansionpack.Utils;
 
 import java.awt.*;
 import java.util.List;
+import java.util.Random;
 
 public class HyperspaceAnomalyResearchMission extends HubMissionWithBarEvent {
     public static final String PROGRESS_STEP_UPDATE = "progress_step_update";
@@ -28,7 +29,7 @@ public class HyperspaceAnomalyResearchMission extends HubMissionWithBarEvent {
 
     public HyperspaceAnomalyResearchMission() {
         super();
-        setGenRandom(Utils.random);
+        setGenRandom(new Random(Utils.random.nextLong()));
     }
 
     @Override

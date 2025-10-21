@@ -27,6 +27,7 @@ import sectorexpansionpack.missions.EntityFinderMission;
 import java.awt.*;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 // Won't be seen by the player
 // Will be used to send out departure and leak intel
@@ -56,7 +57,7 @@ public class ExpeditionFleetIntel extends FleetGroupIntel {
     protected SectorEntityToken target;
 
     public ExpeditionFleetIntel() {
-        setRandom(Utils.random);
+        setRandom(new Random(Utils.random.nextLong()));
         this.efm = new EntityFinderMission();
         pickSpecialItem();
         if (isDone()) {

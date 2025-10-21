@@ -28,10 +28,8 @@ import sectorexpansionpack.ModPlugin;
 import sectorexpansionpack.Utils;
 
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
 
 public class SearchAndRescueMission extends HubMissionWithBarEvent {
     public static JSONObject SCENARIO_DEFAULTS;
@@ -47,7 +45,7 @@ public class SearchAndRescueMission extends HubMissionWithBarEvent {
     public SearchAndRescueMission() {
         super();
         SCENARIO_DEFAULTS = ModPlugin.getMissionScenarioDefaults("sep_sar");
-        setGenRandom(Utils.random);
+        setGenRandom(new Random(Utils.random.nextLong()));
     }
 
     @Override

@@ -24,10 +24,8 @@ import sectorexpansionpack.Utils;
 import sectorexpansionpack.intel.misc.ArtifactInstallationIntel;
 
 import java.awt.*;
-import java.util.ArrayList;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
 
 // TODO: Transfer previous special item if selected market industry has one
 // TODO: Delay special item installation by some days
@@ -47,7 +45,7 @@ public class ArtifactIncursionMission extends HubMissionWithBarEvent implements 
 
     public ArtifactIncursionMission() {
         super();
-        setGenRandom(Utils.random);
+        setGenRandom(new Random(Utils.random.nextLong()));
     }
 
     @Override
