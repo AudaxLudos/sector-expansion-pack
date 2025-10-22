@@ -78,14 +78,7 @@ public class ModPlugin extends BaseModPlugin {
         Utils.setRandom(new Random(Long.parseLong(Global.getSector().getSeedString().replaceAll("\\D", ""))));
 
         loadMissionScenarios();
-
-        SectorAPI sector = Global.getSector();
-        if (!sector.hasScript(ExpeditionFleetManager.class)) {
-            sector.addScript(new ExpeditionFleetManager());
-        }
-        /*if (!sector.hasScript(IncursionFleetManager.class)) {
-            sector.addScript(new IncursionFleetManager());
-        }*/
+        loadNeededScripts();
 
         StormPacifierGhostCreator.register();
         StormInducerGhostCreator.register();
@@ -97,6 +90,16 @@ public class ModPlugin extends BaseModPlugin {
             MISSION_SCENARIOS = Global.getSettings().loadJSON("data/campaign/sep_mission_scenarios.json");
         } catch (IOException | JSONException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    public void loadNeededScripts() {
+        SectorAPI sector = Global.getSector();
+        if (!sector.hasScript(ExpeditionFleetManager.class)) {
+            sector.addScript(new ExpeditionFleetManager());
+        }
+        if (!sector.hasScript(IncursionFleetManager.class)) {
+            sector.addScript(new IncursionFleetManager());
         }
     }
 }

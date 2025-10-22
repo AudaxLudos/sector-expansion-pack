@@ -3,6 +3,7 @@ package sectorexpansionpack.missions;
 import com.fs.starfarer.api.campaign.PlanetAPI;
 import com.fs.starfarer.api.campaign.SectorEntityToken;
 import com.fs.starfarer.api.campaign.SpecialItemData;
+import com.fs.starfarer.api.campaign.econ.Industry;
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
 import com.fs.starfarer.api.impl.campaign.missions.hub.HubMissionWithSearch;
 import com.fs.starfarer.api.util.Misc;
@@ -31,6 +32,14 @@ public class EntityFinderMission extends HubMissionWithSearch {
 
     public void requireEntityNoSpecialSalvage() {
         this.search.entityReqs.add(new EntityNoSpecialSalvage());
+    }
+
+    public void requireMarketUsesSpecialItems() {
+        this.search.marketReqs.add(new MarketUsesSpecialItems());
+    }
+
+    public void requireMarketHasCompatibleSpecialItemsWithOther(MarketAPI other) {
+        this.search.marketReqs.add(new MarketHasCompatibleSpecialItemsWithOther(other));
     }
 
     public void requireMarketNoMemoryFlag(String flag) {
@@ -71,6 +80,41 @@ public class EntityFinderMission extends HubMissionWithSearch {
                 return !memVal;
             }
             return memVal;
+        }
+    }
+
+    public static class MarketUsesSpecialItems implements MarketRequirement {
+        @Override
+        public boolean marketMatchesRequirement(MarketAPI market) {
+            for (Industry i : market.getIndustries()) {
+                if (i.getSpecialItem() != null) {
+                    return true;
+                }
+            }
+            return false;
+        }
+    }
+
+    public static class MarketHasCompatibleSpecialItemsWithOther implements MarketRequirement {
+        MarketAPI other;
+
+        public MarketHasCompatibleSpecialItemsWithOther(MarketAPI other) {
+            this.other = other;
+        }
+
+        @Override
+        public boolean marketMatchesRequirement(MarketAPI market) {
+            for (Industry ind : market.getIndustries()) {
+                SpecialItemData otherData = ind.getSpecialItem();
+                if (otherData != null) {
+                    for (Industry otherInd : this.other.getIndustries()) {
+                        if (otherInd.wantsToUseSpecialItem(otherData)) {
+                            return true;
+                        }
+                    }
+                }
+            }
+            return false;
         }
     }
 
