@@ -13,9 +13,11 @@ import com.fs.starfarer.api.impl.campaign.intel.group.FGRaidAction;
 import com.fs.starfarer.api.impl.campaign.intel.group.GenericRaidFGI;
 import com.fs.starfarer.api.impl.campaign.missions.FleetCreatorMission;
 import com.fs.starfarer.api.impl.campaign.missions.hub.HubMissionWithTriggers;
+import com.fs.starfarer.api.util.Misc;
 import com.fs.starfarer.api.util.WeightedRandomPicker;
 import org.apache.log4j.Logger;
 import sectorexpansionpack.Utils;
+import sectorexpansionpack.intel.misc.ArtifactInstallationIntel;
 import sectorexpansionpack.missions.EntityFinderMission;
 
 import java.awt.*;
@@ -26,6 +28,8 @@ public class IncursionFleetIntel extends GenericRaidFGI {
     public static final String FACTION_KEY = "$sep_ifi_sourceFaction";
     public static final String FLEET_KEY = "$sep_ifi_fleet";
     public static final String MAIN_FLEET_KEY = "$sep_ifi_mainFleet";
+    public static final String TARGET_KEY = "$sep_efi_target";
+    public static final String HAS_ARTIFACT = "$sep_efi_hasArtifact";
     public static Logger log = Global.getLogger(IncursionFleetIntel.class);
 
     protected EntityFinderMission efm;
@@ -195,8 +199,50 @@ public class IncursionFleetIntel extends GenericRaidFGI {
         if (PAYLOAD_ACTION.equals(action.getId())) {
 
         } else if (RETURN_ACTION.equals(action.getId())) {
+            this.efm.requireMarketFaction(this.source.getFactionId());
+            this.efm.requireMarketNotHidden();
+            this.efm.requireMarketNotInHyperspace();
+            this.efm.requireMarketFactionNotPlayer();
+            this.efm.requireMarketCanUseSpecialItem(this.specialItemData);
+            this.efm.preferMarketSizeAtMost(100);
+            this.efm.preferMarketIs(this.source);
+            MarketAPI market = this.efm.pickMarket();
 
+            if (market == null) {
+                log.info("Failed to find market to install special item");
+                return;
+            }
+
+            // TODO: Delay installation by a few days
+            Industry ind = pickIndustryToInstallItem(market, this.specialItemData);
+            ind.setSpecialItem(this.specialItemData);
+            new ArtifactInstallationIntel(market, ind, this.specialItemSpec);
+            log.info(String.format("Installing %s to %s facility %s %s in the %s",
+                    this.specialItemSpec.getName(), ind.getCurrentName(), market.getOnOrAt(),
+                    market.getName(), market.getStarSystem().getNameWithLowercaseTypeShort()));
         }
+    }
+
+    public CampaignFleetAPI getMainFleet() {
+        if (isSpawnedFleets()) {
+            for (CampaignFleetAPI fleet : getFleets()) {
+                if (fleet.getMemoryWithoutUpdate().getBoolean(MAIN_FLEET_KEY)) {
+                    return fleet;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    public Industry pickIndustryToInstallItem(MarketAPI market, SpecialItemData specialItemData) {
+        WeightedRandomPicker<Industry> industryPicker = new WeightedRandomPicker<>();
+        for (Industry industry : market.getIndustries()) {
+            if (industry.wantsToUseSpecialItem(specialItemData)) {
+                industryPicker.add(industry);
+            }
+        }
+        return industryPicker.pick();
     }
 
     @Override
