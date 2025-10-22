@@ -197,7 +197,12 @@ public class IncursionFleetIntel extends GenericRaidFGI {
         super.notifyActionFinished(action);
 
         if (PAYLOAD_ACTION.equals(action.getId())) {
-
+            CampaignFleetAPI mainFleet = getMainFleet();
+            if (mainFleet != null) {
+                Misc.makeImportant(mainFleet, "hasSpecialItem");
+                Misc.addDefeatTrigger(mainFleet, "SEPIFGIFleetDefeated");
+                mainFleet.getMemoryWithoutUpdate().set(HAS_ARTIFACT, true);
+            }
         } else if (RETURN_ACTION.equals(action.getId())) {
             this.efm.requireMarketFaction(this.source.getFactionId());
             this.efm.requireMarketNotHidden();
