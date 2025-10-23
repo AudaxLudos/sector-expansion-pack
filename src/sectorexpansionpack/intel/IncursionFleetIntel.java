@@ -251,6 +251,34 @@ public class IncursionFleetIntel extends GenericRaidFGI {
     }
 
     @Override
+    protected void notifyEnded() {
+        super.notifyEnded();
+        unsetEventMemoryFlags();
+    }
+
+    public void unsetEventMemoryFlags() {
+        // Unset faction memory flags
+        if (this.faction != null) {
+            this.faction.getMemoryWithoutUpdate().unset(FACTION_KEY);
+        }
+
+        // Unset target memory flags
+        if (this.target != null) {
+            this.target.getMemoryWithoutUpdate().unset(TARGET_KEY);
+            this.target.getMemoryWithoutUpdate().unset(EVENT_KEY);
+        }
+
+        // Unset fleet memory flags
+        CampaignFleetAPI mainFleet = getMainFleet();
+        if (mainFleet != null) {
+            Misc.makeUnimportant(mainFleet, "hasSpecialItem");
+            mainFleet.getMemoryWithoutUpdate().unset(MAIN_FLEET_KEY);
+            mainFleet.getMemoryWithoutUpdate().unset(HAS_ARTIFACT);
+            mainFleet.getMemoryWithoutUpdate().unset(EVENT_KEY);
+        }
+    }
+
+    @Override
     public boolean isSucceeded() {
         return this.returnAction.isActionFinished() && super.isSucceeded();
     }
