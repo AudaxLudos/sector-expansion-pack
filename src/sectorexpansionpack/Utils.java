@@ -3,12 +3,16 @@ package sectorexpansionpack;
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.campaign.CustomCampaignEntityAPI;
 import com.fs.starfarer.api.campaign.SectorEntityToken;
+import com.fs.starfarer.api.campaign.SpecialItemData;
+import com.fs.starfarer.api.campaign.econ.Industry;
+import com.fs.starfarer.api.campaign.econ.MarketAPI;
 import com.fs.starfarer.api.characters.OfficerDataAPI;
 import com.fs.starfarer.api.impl.campaign.ids.MemFlags;
 import com.fs.starfarer.api.impl.campaign.ids.Tags;
 import com.fs.starfarer.api.impl.campaign.rulecmd.salvage.special.SleeperPodsSpecial;
 import com.fs.starfarer.api.plugins.OfficerLevelupPlugin;
 import com.fs.starfarer.api.util.Misc;
+import com.fs.starfarer.api.util.WeightedRandomPicker;
 import sectorexpansionpack.intel.ExpeditionFleetManager;
 
 import java.util.ArrayList;
@@ -46,6 +50,16 @@ public class Utils {
         }
 
         return result;
+    }
+
+    public static Industry pickIndustryToInstallItem(MarketAPI market, SpecialItemData specialItemData) {
+        WeightedRandomPicker<Industry> industryPicker = new WeightedRandomPicker<>();
+        for (Industry industry : market.getIndustries()) {
+            if (industry.wantsToUseSpecialItem(specialItemData)) {
+                industryPicker.add(industry);
+            }
+        }
+        return industryPicker.pick();
     }
 
     public void RunCodeScripts() {

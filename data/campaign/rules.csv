@@ -1,6 +1,5 @@
 id,trigger,conditions,script,text,options,notes
-"# Expedition Fleet Intel
-# START",,,,,,
+# Expedition Fleet Intel START,,,,,,
 sep_efi_fleetHasArtifact,OpenCommLink,"$entity.sep_efi_mainFleet score:1000
 $entity.sep_efi_hasArtifact score:1000","ShowDefaultVisual
 SetStoryOption sep_efi_persuadeToGiveCargo ui_char_spent_story_point ""Persuade the fleet to give the artifact""
@@ -10,10 +9,8 @@ sep_efi_fleetPersudeToGive,DialogOptionSelected,$option == sep_efi_persuadeToGiv
 Call $entity.sep_efi_ref endEvent
 MakeOtherFleetAllowDisengage sep_efi true
 MakeOtherFleetNonHostile sep_efi true","The captain blinks, momentarily taken aback by your request. ""You’re serious about this?"" $heOrShe asks, studying you for a moment before letting out a quiet sigh. ""Fine… you’ve made your point, Captain. I’ll authorize the transfer. Just make sure it’s worth the trouble.""",cutCommLink:Cut the comm link,
-"# Expedition Fleet Intel
-# END",,,,,,
-"# Hiring a rescued survivor
-# START",,,,,,
+# Expedition Fleet Intel END,,,,,,
+# Hiring a rescued survivor START,,,,,,
 sep_survivorGreeting,PickGreeting,"$sep_survivor score:1000
 $ome_hireable score:100","ShowPersonVisual
 FireAll PopulateOptionsHire","After a short wait, your connection request is accepted.
@@ -38,12 +35,9 @@ AddText ""You have $player.creditsStr credits available.""
 SetTextHighlightColors hColor
 SetTextHighlights $player.creditsStr
 FireBest HireOptionSet",,,
-"# Hiring a rescued survivor
-# END",,,,,,
-"# Search and rescue mission
-# START",,,,,,
-"# Offered by contact
-",,,,,,
+# Hiring a rescued survivor END,,,,,,
+# Search and rescue mission START,,,,,,
+# Offered by contact,,,,,,
 sep_sar_blurb,sep_sar_blurb,,AddText $sep_sar_contactMissionBlurb,,,
 sep_sar_offerOption,sep_sar_option,,SEPAddOption $sep_sar_contactMissionOption sep_sar_start,,,
 sep_sar_offerTextContact1,DialogOptionSelected,$option == sep_sar_start,"$missionId = sep_sar
@@ -51,8 +45,7 @@ AddText $sep_sar_contactMissionOfferText
 SetTextHighlightColors h h h h h h
 SetTextHighlights $sep_sar_survivorFullName $sep_sar_creditRansom $sep_sar_possibleLoc $sep_sar_creditRansom $sep_sar_marineAmount $sep_sar_creditReward",,"contact_accept:Accept
 contact_decline:Decline",
-"# Offered in bar
-",,,,,,
+# Offered in bar,,,,,,
 sep_sar_blurbBar,sep_sar_blurbBar,,AddText $sep_sar_barMissionBlurb,,,
 sep_sar_offerOptionBar,sep_sar_optionBar,,SEPAddOption $sep_sar_barMissionOption sep_sar_startBar,,,
 sep_sar_offerTextBar1,DialogOptionSelected,$option == sep_sar_startBar,"$missionId = sep_sar
@@ -60,8 +53,7 @@ AddText $sep_sar_barMissionOfferText
 SetTextHighlightColors h h h h h h
 SetTextHighlights $sep_sar_survivorFullName $sep_sar_creditRansom $sep_sar_possibleLoc $sep_sar_creditRansom $sep_sar_marineAmount $sep_sar_creditReward",,"contact_acceptBar:Accept
 contact_declineBarNoContinue:Decline",
-"# Rescue survivor in wreck
-",,,,,,
+# Rescue survivor in wreck,,,,,,
 sep_sar_wreckRescueText,OpenInteractionDialog,"$sep_sar_survivorEntity score:1000
 Call $sep_sar_ref updateData
 !$sep_sar_addedRaidObjective","ShowDefaultVisual
@@ -142,8 +134,7 @@ sep_sar_fleetDefeated,SEPSARFleetDefeated,"$someShipsDestroyed
 Call $sep_sar_ref updateData","AddText $sep_sar_entityDefeatedText
 $sep_sar_returnToContact = true
 Call $sep_sar_ref updateStage",,,
-"# Return survivor to contact
-",,,,,,
+# Return survivor to contact,,,,,,
 sep_sar_returnGreeting,PickGreeting,"$sep_sar_contactPerson score:1000
 Call $sep_sar_ref updateData
 FireBest GenericMissionReturn","ShowPersonVisual
@@ -162,10 +153,8 @@ Call $sep_sar_ref updateStage",,contact_pickAnotherGreeting:Continue,
 sep_sar_returnSurvivorDead,SEPSARContactOptions,!$sep_sar_survivorAlive score:1000,"AddText $sep_sar_returnSurvivorDeadText
 SetTextHighlightColors h
 SetTextHighlights $sep_sar_survivorFullName",,contact_pickAnotherGreeting:Continue,
-"# Search and rescue mission
-# END",,,,,,
-"# Artifact Incursion mission
-# START",,,,,,
+# Search and rescue mission END,,,,,,
+# Artifact Incursion mission START,,,,,,
 ## Contact offer dialogs,,,,,,
 sep_aim_blurb,sep_aim_blurb,,,"""A rival faction is using an artifact to gain an economic advantage. I need an independent force to 'claim' it and to bring it back to me.""",,
 sep_aim_offerOption,sep_aim_option,,,,sep_aim_start:Ask about 'claiming' a rival's artifact,
@@ -205,7 +194,7 @@ SetStoryOption sep_aim_keepArtifact 2 0 general ""keep artifact""","""Captain? I
 
 $HeOrShe leans forward slightly, eyes narrowing with intent. ""Now, the artifact. Hand it over so I can put it to good use, and you can get your reward.""","sep_aim_keepArtifact:Convince to keep the artifact
 sep_aim_giveArtifact:Deliver the artifact
-cutCommLink:CANCEL OPT",
+cutCommLink:Go back and think about your decision",
 sep_aim_returnArtifactGive,DialogOptionSelected,$option == sep_aim_giveArtifact,"AddRemoveAnyItem SPECIAL $sep_aim_artifactId -1
 $sep_aim_completed = true
 Call $sep_aim_ref updateStage","Your security officer delivers the artifact, and $heOrShe is immediately notified of its arrival. ""Well done, Captain,"" $heOrShe says, a hint of relief in $hisOrHer voice.
@@ -217,10 +206,8 @@ $sep_aim_completed = true
 Call $sep_aim_ref updateStage","$HeOrShe folds $hisOrHer arms, weighing the decision before finally speaking. ""Alright, Captain, if keeping the artifact can benefit the $personFaction's interests, I’ll allow it.""
 
 $HeOrShe’s tone hardens. ""However, the agreed-upon reward stays with me. Take it as a trade-off. You have what you wanted, and I keep my terms intact.""",contact_pickAnotherGreeting:Continue,
-"# Artifact Incursion mission
-# END",,,,,,
-"# Ghosts research mission
-# START",,,,,,
+# Artifact Incursion mission END,,,,,,
+# Ghosts research mission START,,,,,,
 ## Contact offer dialogs,,,,,,
 sep_harm_blurb,sep_harm_blurb,,,“Here's one. A researcher is looking for a fleet to gather telemetry on hyperspace anomalies. May take some time but the pay is good.”,,
 sep_harm_offerOption,sep_harm_option,,,,sep_harm_start:Ask about studying hyperspace anomalies,
@@ -262,7 +249,4 @@ $sep_harm_completed = true
 Call $sep_harm_ref updateStage","You transmit the completed hyperspace anomaly data to the $personPost.
 
 $HeOrShe thanks you for the data before getting lost in its details, even forgeting to close connection.",contact_pickAnotherGreeting:Continue,
-,,,,,,
-,,,,,,
-"# Ghosts research mission
-# END",,,,,,
+# Ghosts research mission END,,,,,,

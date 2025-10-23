@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+// TODO: Add checks for special items that are player used only or that has commodity demand affects
 // Won't be seen by the player
 // Will be used to send out departure and leak intel
 // Should replace with custom RouteFleetSpawner to make it less heavy but this works
@@ -195,7 +196,7 @@ public class ExpeditionFleetIntel extends FleetGroupIntel {
             }
 
             // TODO: Delay installation by a few days
-            Industry ind = pickIndustryToInstallItem(market, this.specialItemData);
+            Industry ind = Utils.pickIndustryToInstallItem(market, this.specialItemData);
             ind.setSpecialItem(this.specialItemData);
             new ArtifactInstallationIntel(market, ind, this.specialItemSpec);
             log.info(String.format("Installing %s to %s facility %s %s in the %s",
@@ -214,16 +215,6 @@ public class ExpeditionFleetIntel extends FleetGroupIntel {
                 this.revealChance += 0.2f;
             }
         }
-    }
-
-    public Industry pickIndustryToInstallItem(MarketAPI market, SpecialItemData specialItemData) {
-        WeightedRandomPicker<Industry> industryPicker = new WeightedRandomPicker<>();
-        for (Industry industry : market.getIndustries()) {
-            if (industry.wantsToUseSpecialItem(specialItemData)) {
-                industryPicker.add(industry);
-            }
-        }
-        return industryPicker.pick();
     }
 
     @Override

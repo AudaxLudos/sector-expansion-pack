@@ -27,6 +27,8 @@ import java.awt.*;
 import java.util.List;
 import java.util.Random;
 
+// TODO: Add custom dialogs to quick reaction force fleet
+// TODO: Add checks for special items that are player used only or that has commodity demand affects
 public class IncursionFleetIntel extends GenericRaidFGI {
     public static final String EVENT_KEY = "$sep_ifi_ref";
     public static final String FACTION_KEY = "$sep_ifi_sourceFaction";
@@ -487,7 +489,7 @@ public class IncursionFleetIntel extends GenericRaidFGI {
             }
 
             // TODO: Delay installation by a few days
-            Industry ind = pickIndustryToInstallItem(market, this.specialItemData);
+            Industry ind = Utils.pickIndustryToInstallItem(market, this.specialItemData);
             ind.setSpecialItem(this.specialItemData);
             new ArtifactInstallationIntel(market, ind, this.specialItemSpec);
             log.info(String.format("Installing %s to %s facility %s %s in the %s",
@@ -506,16 +508,6 @@ public class IncursionFleetIntel extends GenericRaidFGI {
         }
 
         return null;
-    }
-
-    public Industry pickIndustryToInstallItem(MarketAPI market, SpecialItemData specialItemData) {
-        WeightedRandomPicker<Industry> industryPicker = new WeightedRandomPicker<>();
-        for (Industry industry : market.getIndustries()) {
-            if (industry.wantsToUseSpecialItem(specialItemData)) {
-                industryPicker.add(industry);
-            }
-        }
-        return industryPicker.pick();
     }
 
     @Override

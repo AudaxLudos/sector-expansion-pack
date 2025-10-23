@@ -27,12 +27,7 @@ import java.awt.*;
 import java.util.*;
 import java.util.List;
 
-// TODO: Transfer previous special item if selected market industry has one
-// TODO: Delay special item installation by some days
-// TODO: Improve special item installation message
-// TODO: Add chance to get a military contact from bar event
 // TODO: Add custom dialogs to quick reaction force fleet
-// TODO: Add checks for special items that are player used only or that has commodity demand affects
 public class ArtifactIncursionMission extends HubMissionWithBarEvent implements GroundRaidObjectivesListener {
     public static Logger log = Global.getLogger(ArtifactIncursionMission.class);
     public static float MILITARY_CONTACT_CHANCE = 0.5f;
@@ -61,22 +56,18 @@ public class ArtifactIncursionMission extends HubMissionWithBarEvent implements 
                 if (Misc.hasOrbitalStation(createdAt)) {
                     posts.add(Ranks.POST_STATION_COMMANDER);
                 }
-                String post = pickOne(posts);
-
                 setGiverRank(pickOne(Ranks.GROUND_CAPTAIN, Ranks.GROUND_COLONEL, Ranks.GROUND_MAJOR,
                         Ranks.SPACE_COMMANDER, Ranks.SPACE_CAPTAIN, Ranks.SPACE_ADMIRAL));
+                setGiverPost(pickOne(posts));
                 setGiverTags(Tags.CONTACT_MILITARY);
-                setGiverPost(post);
-                setGiverImportance(pickHighImportance());
-                findOrCreateGiver(createdAt, true, false);
             } else {
                 setGiverRank(Ranks.CITIZEN);
                 setGiverPost(pickOne(Ranks.POST_AGENT, Ranks.POST_SMUGGLER, Ranks.POST_ARMS_DEALER));
-                setGiverImportance(pickHighImportance());
                 setGiverFaction(Factions.PIRATES);
                 setGiverTags(Tags.CONTACT_UNDERWORLD);
-                findOrCreateGiver(createdAt, true, false);
             }
+            setGiverImportance(pickHighImportance());
+            findOrCreateGiver(createdAt, true, false);
         }
 
         if (!setPersonMissionRef(getPerson(), "$sep_aim_ref")) {
@@ -104,19 +95,19 @@ public class ArtifactIncursionMission extends HubMissionWithBarEvent implements 
         this.market = pickMarket();
 
         if (!setMarketMissionRef(this.market, "$sep_aim_ref")) {
-            log.info("Failed find to find target market");
+            log.info("Failed to find target market");
             return false;
         }
 
         pickIndustryWithItem();
         if (this.industry == null) {
-            log.info("Failed find to find industry with artifact");
+            log.info("Failed to find industry with artifact");
             return false;
         }
 
         pickItemFromIndustry();
         if (this.specialItemSpec == null || this.specialItemData == null) {
-            log.info("Failed find to find item to raid");
+            log.info("Failed to find item to raid");
             return false;
         }
 
@@ -180,6 +171,40 @@ public class ArtifactIncursionMission extends HubMissionWithBarEvent implements 
         return true;
     }
 
+    public void pickIndustryWithItem() {
+        WeightedRandomPicker<Industry> industryPicker = new WeightedRandomPicker<>(getGenRandom());
+        for (Industry industry : this.market.getIndustries()) {
+            for (SpecialItemData ignored : industry.getVisibleInstalledItems()) {
+                industryPicker.add(industry);
+            }
+        }
+
+        this.industry = industryPicker.pick();
+    }
+
+    public void pickItemFromIndustry() {
+        WeightedRandomPicker<SpecialItemData> specialItemPicker = new WeightedRandomPicker<>(getGenRandom());
+        for (Industry industry : this.market.getIndustries()) {
+            for (SpecialItemData data : industry.getVisibleInstalledItems()) {
+                specialItemPicker.add(data);
+            }
+        }
+
+        this.specialItemData = specialItemPicker.pick();
+        if (this.specialItemData == null) {
+            return;
+        }
+        this.specialItemSpec = Global.getSettings().getSpecialItemSpec(this.specialItemData.getId());
+    }
+
+    public MarketCMD.RaidDangerLevel getDangerLevel() {
+        MarketCMD.RaidDangerLevel level = this.specialItemSpec.getBaseDanger();
+        if (this.industry != null) {
+            level = this.industry.adjustItemDangerLevel(this.specialItemData.getId(), this.specialItemData.getData(), level);
+        }
+        return level;
+    }
+
     @Override
     public String getBaseName() {
         return "Artifact Incursion";
@@ -220,22 +245,15 @@ public class ArtifactIncursionMission extends HubMissionWithBarEvent implements 
             return;
         }
 
-        // TODO: Delay installation by a few days
-        Industry ind = pickIndustryToInstallItem(market, this.specialItemData);
+        // TODO: Delay special item installation by some days
+        // TODO: Transfer previous colony item if any to another faction's market
+        // TODO: Add checks for special items that are player used only or that has commodity demand affects
+        Industry ind = Utils.pickIndustryToInstallItem(market, this.specialItemData);
         ind.setSpecialItem(this.specialItemData);
-        ArtifactInstallationIntel intel = new ArtifactInstallationIntel(market, ind, this.specialItemSpec);
-        Global.getSector().getIntelManager().queueIntel(intel);
-        log.info("Installing special item in " + ind.getCurrentName() + " on " + market.getName() + " within the " + market.getStarSystem().getNameWithLowercaseTypeShort());
-    }
-
-    public Industry pickIndustryToInstallItem(MarketAPI market, SpecialItemData specialItemData) {
-        WeightedRandomPicker<Industry> industryPicker = new WeightedRandomPicker<>();
-        for (Industry industry : market.getIndustries()) {
-            if (industry.wantsToUseSpecialItem(specialItemData)) {
-                industryPicker.add(industry);
-            }
-        }
-        return industryPicker.pick();
+        new ArtifactInstallationIntel(market, ind, this.specialItemSpec);
+        log.info(String.format("Installing %s to %s facility %s %s in the %s",
+                this.specialItemSpec.getName(), ind.getCurrentName(), market.getOnOrAt(),
+                market.getName(), market.getStarSystem().getNameWithLowercaseTypeShort()));
     }
 
     @Override
@@ -371,40 +389,6 @@ public class ArtifactIncursionMission extends HubMissionWithBarEvent implements 
             FireAll.fire(null, dialog, memoryMap, "SEPAIMRaidFinished");
             Global.getSector().getListenerManager().removeListener(this);
         }
-    }
-
-    public MarketCMD.RaidDangerLevel getDangerLevel() {
-        MarketCMD.RaidDangerLevel level = this.specialItemSpec.getBaseDanger();
-        if (this.industry != null) {
-            level = this.industry.adjustItemDangerLevel(this.specialItemData.getId(), this.specialItemData.getData(), level);
-        }
-        return level;
-    }
-
-    public void pickIndustryWithItem() {
-        WeightedRandomPicker<Industry> industryPicker = new WeightedRandomPicker<>();
-        for (Industry industry : this.market.getIndustries()) {
-            for (SpecialItemData ignored : industry.getVisibleInstalledItems()) {
-                industryPicker.add(industry);
-            }
-        }
-
-        this.industry = industryPicker.pick();
-    }
-
-    public void pickItemFromIndustry() {
-        WeightedRandomPicker<SpecialItemData> specialItemPicker = new WeightedRandomPicker<>();
-        for (Industry industry : this.market.getIndustries()) {
-            for (SpecialItemData data : industry.getVisibleInstalledItems()) {
-                specialItemPicker.add(data);
-            }
-        }
-
-        this.specialItemData = specialItemPicker.pick();
-        if (this.specialItemData == null) {
-            return;
-        }
-        this.specialItemSpec = Global.getSettings().getSpecialItemSpec(this.specialItemData.getId());
     }
 
     public void requireMarketHasSpecialItemsInstalled() {
