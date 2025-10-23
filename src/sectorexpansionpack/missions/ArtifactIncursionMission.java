@@ -8,10 +8,7 @@ import com.fs.starfarer.api.campaign.listeners.GroundRaidObjectivesListener;
 import com.fs.starfarer.api.campaign.rules.MemoryAPI;
 import com.fs.starfarer.api.impl.campaign.graid.GroundRaidObjectivePlugin;
 import com.fs.starfarer.api.impl.campaign.graid.SpecialItemRaidObjectivePluginImpl;
-import com.fs.starfarer.api.impl.campaign.ids.Factions;
-import com.fs.starfarer.api.impl.campaign.ids.FleetTypes;
-import com.fs.starfarer.api.impl.campaign.ids.Ranks;
-import com.fs.starfarer.api.impl.campaign.ids.Tags;
+import com.fs.starfarer.api.impl.campaign.ids.*;
 import com.fs.starfarer.api.impl.campaign.missions.hub.HubMissionWithBarEvent;
 import com.fs.starfarer.api.impl.campaign.rulecmd.FireAll;
 import com.fs.starfarer.api.impl.campaign.rulecmd.salvage.MarketCMD;
@@ -174,9 +171,14 @@ public class ArtifactIncursionMission extends HubMissionWithBarEvent implements 
     public void pickIndustryWithItem() {
         WeightedRandomPicker<Industry> industryPicker = new WeightedRandomPicker<>(getGenRandom());
         for (Industry industry : this.market.getIndustries()) {
-            for (SpecialItemData ignored : industry.getVisibleInstalledItems()) {
-                industryPicker.add(industry);
+            SpecialItemData itemData = industry.getSpecialItem();
+            // TODO: Add modded colony items that is used by players only or has commodity demand effects
+            if (itemData == null
+                    || itemData.getId().equals(Items.CORONAL_PORTAL)
+                    || itemData.getId().equals(Items.ORBITAL_FUSION_LAMP)) {
+                continue;
             }
+            industryPicker.add(industry);
         }
 
         this.industry = industryPicker.pick();
@@ -246,8 +248,7 @@ public class ArtifactIncursionMission extends HubMissionWithBarEvent implements 
         }
 
         // TODO: Delay special item installation by some days
-        // TODO: Transfer previous colony item if any to another faction's market
-        // TODO: Add checks for special items that are player used only or that has commodity demand affects
+        // TODO: Transfer previous colony item if any to another same faction market
         Industry ind = Utils.pickIndustryToInstallItem(market, this.specialItemData);
         ind.setSpecialItem(this.specialItemData);
         new ArtifactInstallationIntel(market, ind, this.specialItemSpec);
@@ -420,9 +421,14 @@ public class ArtifactIncursionMission extends HubMissionWithBarEvent implements 
         @Override
         public boolean marketMatchesRequirement(MarketAPI market) {
             for (Industry industry : market.getIndustries()) {
-                if (!industry.getVisibleInstalledItems().isEmpty()) {
-                    return true;
+                SpecialItemData itemData = industry.getSpecialItem();
+                // TODO: Add modded colony items that is used by players only or has commodity demand effects
+                if (itemData == null
+                        || itemData.getId().equals(Items.CORONAL_PORTAL)
+                        || itemData.getId().equals(Items.ORBITAL_FUSION_LAMP)) {
+                    continue;
                 }
+                return true;
             }
             return false;
         }
