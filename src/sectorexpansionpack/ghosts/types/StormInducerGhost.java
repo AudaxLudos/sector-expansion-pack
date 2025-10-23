@@ -30,7 +30,7 @@ public class StormInducerGhost extends BaseSensorGhost {
 
         CampaignFleetAPI playerFleet = Global.getSector().getPlayerFleet();
 
-        addBehavior(new GBDartAround(playerFleet, genDelay(15f), 50, 0f, 100f));
+        addBehavior(new GBDartAround(playerFleet, genDelay(7f), 50, 0f, 100f));
         addBehavior(new GBGoAwayFrom(genFloat(1f, 3f), playerFleet, this.fleeBurnLevel));
     }
 

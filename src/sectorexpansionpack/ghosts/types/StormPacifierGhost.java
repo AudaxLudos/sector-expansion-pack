@@ -30,7 +30,7 @@ public class StormPacifierGhost extends BaseSensorGhost {
 
         CampaignFleetAPI playerFleet = Global.getSector().getPlayerFleet();
 
-        addBehavior(new GBCircle(playerFleet, genDelay(15f), 25, 50f, getRandom().nextBoolean() ? 1f : -1f));
+        addBehavior(new GBCircle(playerFleet, genDelay(7f), 25, 50f, getRandom().nextBoolean() ? 1f : -1f));
         addBehavior(new GBGoAwayFrom(genFloat(1f, 3f), playerFleet, this.fleeBurnLevel));
     }
 

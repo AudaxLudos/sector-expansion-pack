@@ -30,9 +30,6 @@ public class FleetEaterGhostCreator extends BaseSensorGhostCreator {
 
     @Override
     public float getFrequency(SensorGhostManager manager) {
-        if (Global.getSettings().isDevMode()) {
-            return 10000f;
-        }
         return 10f *
                 GhostFrequencies.getNotInCoreFactor() *
                 (0.25f + 0.75f * GhostFrequencies.getFringeFactor()) *
