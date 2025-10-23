@@ -3,18 +3,24 @@ package sectorexpansionpack.missions;
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.campaign.CampaignFleetAPI;
 import com.fs.starfarer.api.campaign.CustomCampaignEntityAPI;
+import com.fs.starfarer.api.campaign.InteractionDialogAPI;
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
+import com.fs.starfarer.api.campaign.rules.MemoryAPI;
 import com.fs.starfarer.api.impl.campaign.ids.Entities;
 import com.fs.starfarer.api.impl.campaign.ids.Ranks;
+import com.fs.starfarer.api.impl.campaign.intel.events.ht.HTPoints;
+import com.fs.starfarer.api.impl.campaign.intel.events.ht.HyperspaceTopographyEventIntel;
 import com.fs.starfarer.api.impl.campaign.missions.hub.HubMissionWithBarEvent;
 import com.fs.starfarer.api.ui.TooltipMakerAPI;
 import com.fs.starfarer.api.util.IntervalUtil;
 import com.fs.starfarer.api.util.Misc;
 import org.apache.log4j.Logger;
 import sectorexpansionpack.Utils;
+import sectorexpansionpack.intel.events.ht.HTAnomalyResearchFactor;
 
 import java.awt.*;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 // TODO: Add hyperspace topography event progress when mission ends successfully
@@ -110,6 +116,12 @@ public class HyperspaceAnomalyResearchMission extends HubMissionWithBarEvent {
     @Override
     public String getBaseName() {
         return "Hyperspace Anomaly Research";
+    }
+
+    @Override
+    protected void endSuccessImpl(InteractionDialogAPI dialog, Map<String, MemoryAPI> memoryMap) {
+        HyperspaceTopographyEventIntel intel = HyperspaceTopographyEventIntel.get();
+        intel.addFactor(new HTAnomalyResearchFactor(genRoundNumber(HTPoints.HIGH_MIN, HTPoints.HIGH_MAX)), dialog);
     }
 
     @Override
