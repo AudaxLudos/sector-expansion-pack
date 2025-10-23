@@ -89,9 +89,6 @@ public class ExpeditionFleetIntel extends FleetGroupIntel {
 
         createRoute(this.factionId, 10, 1, null);
         getRoute().setDelay((float) (3f + Math.random() * 6f));
-        log.info(String.format("Creating expedition fleet %s %s in the %s that will goto %s",
-                this.source.getOnOrAt(), this.source.getName(), this.source.getStarSystem().getNameWithLowercaseTypeShort(),
-                this.target.getStarSystem().getNameWithLowercaseTypeShort()));
 
         // Mark source faction so it won't be reselected for future expeditions
         this.source.getFaction().getMemoryWithoutUpdate().set(FACTION_KEY, true);
@@ -107,6 +104,10 @@ public class ExpeditionFleetIntel extends FleetGroupIntel {
         } else {
             this.revealChance += 0.2f;
         }
+
+        log.info(String.format("Creating expedition fleet %s %s in the %s that will goto %s",
+                this.source.getOnOrAt(), this.source.getName(), this.source.getStarSystem().getNameWithLowercaseTypeShort(),
+                this.target.getStarSystem().getNameWithLowercaseTypeShort()));
     }
 
     public void pickSpecialItem() {
@@ -227,6 +228,7 @@ public class ExpeditionFleetIntel extends FleetGroupIntel {
 
     @Override
     protected void notifyEnded() {
+        super.notifyEnding();
         unsetEventMemoryFlags();
     }
 

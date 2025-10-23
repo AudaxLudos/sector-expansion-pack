@@ -1,9 +1,7 @@
 package sectorexpansionpack.intel;
 
 import com.fs.starfarer.api.Global;
-import com.fs.starfarer.api.campaign.CampaignFleetAPI;
-import com.fs.starfarer.api.campaign.SpecialItemData;
-import com.fs.starfarer.api.campaign.SpecialItemSpecAPI;
+import com.fs.starfarer.api.campaign.*;
 import com.fs.starfarer.api.campaign.econ.Industry;
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
 import com.fs.starfarer.api.fleet.FleetMemberAPI;
@@ -12,7 +10,12 @@ import com.fs.starfarer.api.impl.campaign.intel.group.FGAction;
 import com.fs.starfarer.api.impl.campaign.intel.group.FGRaidAction;
 import com.fs.starfarer.api.impl.campaign.intel.group.GenericRaidFGI;
 import com.fs.starfarer.api.impl.campaign.missions.FleetCreatorMission;
+import com.fs.starfarer.api.impl.campaign.missions.hub.BaseHubMission;
 import com.fs.starfarer.api.impl.campaign.missions.hub.HubMissionWithTriggers;
+import com.fs.starfarer.api.impl.campaign.rulecmd.salvage.MarketCMD;
+import com.fs.starfarer.api.ui.Alignment;
+import com.fs.starfarer.api.ui.LabelAPI;
+import com.fs.starfarer.api.ui.TooltipMakerAPI;
 import com.fs.starfarer.api.util.Misc;
 import com.fs.starfarer.api.util.WeightedRandomPicker;
 import org.apache.log4j.Logger;
@@ -21,6 +24,7 @@ import sectorexpansionpack.intel.misc.ArtifactInstallationIntel;
 import sectorexpansionpack.missions.EntityFinderMission;
 
 import java.awt.*;
+import java.util.List;
 import java.util.Random;
 
 public class IncursionFleetIntel extends GenericRaidFGI {
@@ -76,12 +80,20 @@ public class IncursionFleetIntel extends GenericRaidFGI {
         params.noun = "incursion";
         params.forcesNoun = "incursion forces";
 
+        // TODO: Scale fleets based on target faction system presence
         params.fleetSizes.add(10);
         params.fleetSizes.add(8);
         params.fleetSizes.add(8);
 
         this.params = params;
         initActions();
+
+        // Mark source faction so it won't be reselected for future expeditions
+        this.source.getFaction().getMemoryWithoutUpdate().set(FACTION_KEY, true);
+
+        // Mark target so it won't be reselected for future expeditions
+        this.target.getMemoryWithoutUpdate().set(TARGET_KEY, true);
+        this.target.getMemoryWithoutUpdate().set(EVENT_KEY, this);
 
         Global.getSector().getIntelManager().queueIntel(this);
 
@@ -138,7 +150,6 @@ public class IncursionFleetIntel extends GenericRaidFGI {
         this.specialItemSpec = Global.getSettings().getSpecialItemSpec(this.specialItemData.getId());
         if (this.specialItemSpec == null) {
             endImmediately();
-            return;
         }
     }
 
@@ -146,8 +157,9 @@ public class IncursionFleetIntel extends GenericRaidFGI {
     protected void configureFleet(int size, FleetCreatorMission m) {
         m.triggerSetFleetFlag(FLEET_KEY);
 
+        // TODO: Scale fleet quality based on source size, is military, has heavy industry
         if (size == 10) {
-            m.triggerSetFleetQuality(HubMissionWithTriggers.FleetQuality.SMOD_3);;
+            m.triggerSetFleetQuality(HubMissionWithTriggers.FleetQuality.SMOD_3);
             m.triggerSetFleetFlag(MAIN_FLEET_KEY);
         } else if (getRandom().nextFloat() < 0.5f) {
             m.triggerSetFleetQuality(HubMissionWithTriggers.FleetQuality.SMOD_1);
@@ -185,6 +197,262 @@ public class IncursionFleetIntel extends GenericRaidFGI {
         } else {
             fleet.setName("Incursion Light Detachment");
             fleet.getCommander().setRankId(Ranks.SPACE_COMMANDER);
+        }
+
+        if (isCurrent(TRAVEL_ACTION) && this.raidAction.getSuccessFraction() > 0f && this.raidAction.isActionFinished()
+                && fleet.getMemoryWithoutUpdate().getBoolean(MAIN_FLEET_KEY)) {
+            // Ensure fleet is marked properly when it spawns midway
+            Misc.makeImportant(fleet, "hasSpecialItem");
+            Misc.addDefeatTrigger(fleet, "SEPEFGIFleetDefeated");
+            fleet.getMemoryWithoutUpdate().set(HAS_ARTIFACT, true);
+        }
+    }
+
+    @Override
+    protected void addNonUpdateBulletPoints(TooltipMakerAPI info, Color tc, Object param, ListInfoMode mode, float initPad) {
+        Color h = Misc.getHighlightColor();
+        Color s = this.raidAction.getSystemNameHighlightColor();
+        FGAction curr = getCurrentAction();
+        StarSystemAPI system = this.raidAction.getWhere();
+        String forces = getForcesNoun();
+
+        float untilDeployment = getETAUntil(PREPARE_ACTION);
+        float untilDeparture = getETAUntil(TRAVEL_ACTION);
+        float untilRaid = getETAUntil(PAYLOAD_ACTION);
+        float untilReturn = getETAUntil(RETURN_ACTION, true);
+        if (!isEnding()) {
+            if (mode == ListInfoMode.MESSAGES || getElapsed() <= 0f) { // initial notification only, not updates
+                addTargetingBulletPoint(info, tc, param, mode, initPad);
+                initPad = 0f;
+            }
+            if (untilDeployment > 0) {
+                addETABulletPoints(null, null, false, untilDeployment, ETAType.DEPLOYMENT, info, tc, initPad);
+                initPad = 0f;
+            } else if (untilDeparture > 0) {
+                addETABulletPoints(null, null, false, untilDeparture, ETAType.DEPARTURE, info, tc, initPad);
+                initPad = 0f;
+            }
+            if (untilRaid > 0 && getSource().getContainingLocation() != system) {
+                addETABulletPoints(system.getNameWithLowercaseTypeShort(), s, false, untilRaid, ETAType.ARRIVING,
+                        info, tc, initPad);
+                initPad = 0f;
+            }
+            if (untilReturn > 0 && RETURN_ACTION.equals(curr.getId()) && getSource().getContainingLocation() != system) {
+                StarSystemAPI from = getSource().getStarSystem();
+
+                addETABulletPoints(from.getNameWithLowercaseTypeShort(), null, false, untilReturn, ETAType.RETURNING,
+                        info, tc, initPad);
+                initPad = 0f;
+            }
+            if ((mode == ListInfoMode.INTEL || mode == ListInfoMode.MAP_TOOLTIP)
+                    && curr != null && curr.getId().equals(PAYLOAD_ACTION)) {
+                LabelAPI label = info.addPara("Operating in the " + system.getNameWithLowercaseTypeShort(), tc, initPad);
+                label.setHighlightColors(s);
+                label.setHighlight(system.getNameWithNoType());
+                initPad = 0f;
+            }
+        }
+
+        if (mode != ListInfoMode.IN_DESC && isEnding()) {
+            if (!isSucceeded()) {
+                if (!isAborted() && !isFailed()) {
+                    info.addPara("The " + forces + " have failed to achieve their objective", tc, initPad);
+                } else {
+                    if (isFailedButNotDefeated()) {
+                        info.addPara("The " + forces + " have failed to achieve their objective", tc, initPad);
+                    } else {
+                        info.addPara("The " + forces + " have been defeated and scatter", tc, initPad);
+                    }
+                }
+            }
+        }
+    }
+
+    @Override
+    protected void addUpdateBulletPoints(TooltipMakerAPI info, Color tc, Object param, ListInfoMode mode, float initPad) {
+        StarSystemAPI system = this.raidAction.getWhere();
+        String forces = getForcesNoun();
+        String noun = getNoun();
+        Color s = this.raidAction.getSystemNameHighlightColor();
+
+        if (ABORT_UPDATE.equals(param)) {
+            if (isInPreLaunchDelay()) {
+                info.addPara("The " + noun + " was aborted in the planning stages", tc, initPad);
+            } else {
+                info.addPara("The " + forces + " have been defeated and scatter", tc, initPad);
+            }
+        } else if (FLEET_LAUNCH_UPDATE.equals(param)) {
+            float untilDeparture = getETAUntil(TRAVEL_ACTION);
+            float untilRaid = getETAUntil(PAYLOAD_ACTION);
+            info.addPara("Fleet deployment in progress", tc, initPad);
+            initPad = 0f;
+            if (untilDeparture > 0) {
+                addETABulletPoints(null, null, false, untilDeparture, ETAType.DEPARTURE, info, tc, initPad);
+            }
+            if (untilRaid > 0 && getSource().getContainingLocation() != system) {
+                addETABulletPoints(system.getNameWithLowercaseTypeShort(), s, false, untilRaid, ETAType.ARRIVING,
+                        info, tc, initPad);
+            }
+        } else if (PREPARE_ACTION.equals(param)) {
+            float untilRaid = getETAUntil(PAYLOAD_ACTION);
+            addETABulletPoints(system.getNameWithLowercaseTypeShort(), s, true, untilRaid, ETAType.ARRIVING,
+                    info, tc, initPad);
+        } else if (TRAVEL_ACTION.equals(param)) {
+            addArrivedBulletPoint(system.getNameWithLowercaseTypeShort(), s, info, tc, initPad);
+        } else if (PAYLOAD_ACTION.equals(param)) {
+            if (isSucceeded()) {
+                info.addPara("The " + forces + " are withdrawing", tc, initPad);
+            } else {
+                if (isAborted()) {
+                    info.addPara("The " + forces + " have been defeated and scatter", tc, initPad);
+                } else {
+                    info.addPara("The " + forces + " have failed to achieve their objective", tc, initPad);
+                }
+            }
+        } else if (RETURN_ACTION.equals(param)) {
+            float untilReturn = getETAUntil(RETURN_ACTION);
+            if (untilReturn > 0 && getSource().getContainingLocation() != system) {
+                addETABulletPoints(system.getNameWithLowercaseTypeShort(), s, false, untilReturn, ETAType.RETURNING,
+                        info, tc, initPad);
+            }
+        }
+    }
+
+    @Override
+    protected void addAssessmentSection(TooltipMakerAPI info, float width, float height, float opad) {
+        Color h = Misc.getHighlightColor();
+        Color tc = Misc.getTextColor();
+        FactionAPI faction = getFaction();
+        List<MarketAPI> targets = this.params.raidParams.allowedTargets;
+        FGAction action = getCurrentAction();
+        String noun = getNoun();
+        String forcesNoun = getForcesNoun();
+        StarSystemAPI system = this.raidAction.getWhere();
+
+        if (!isEnding() && !isSucceeded() && !isFailed()) {
+            float raidStr = getRoute().getExtra().getStrengthModifiedByDamage();
+            info.addSectionHeading("Assessment", faction.getBaseUIColor(), faction.getDarkUIColor(), Alignment.MID, opad);
+
+            if (action != null && RETURN_ACTION.equals(action.getId())) {
+                String strDesc = Misc.getStrengthDesc(raidStr);
+                int numFleets = getApproximateNumberOfFleets();
+                String fleets = "fleets";
+                if (numFleets == 1) {
+                    fleets = "fleet";
+                }
+
+                info.addPara("The %s are projected to be %s and likely comprised of %s %s. " +
+                                "The command fleet is likely carrying the raided colony item", opad,
+                        new Color[]{tc, h, tc, h},
+                        forcesNoun, strDesc, numFleets + "", fleets);
+            } else {
+                if (targets.isEmpty()) {
+                    info.addPara("There are no colonies for the " + noun + " to target in the system.", opad);
+                } else {
+                    boolean potentialDanger = addStrengthDesc(info, opad, system, forcesNoun,
+                            "the " + noun + " is unlikely to find success",
+                            "the outcome of the " + noun + " is uncertain",
+                            "the " + noun + " is likely to find success");
+
+                    if (potentialDanger) {
+                        String safe = "should be safe from the " + noun;
+                        String risk = "are at risk of being raided and losing stability:";
+                        String highlight = "losing stability:";
+                        if (this.params.raidParams.bombardment == MarketCMD.BombardType.SATURATION) {
+                            risk = "are at risk of suffering a saturation bombardment resulting in catastrophic damage:";
+                            highlight = "catastrophic damage";
+                        } else if (this.params.raidParams.bombardment == MarketCMD.BombardType.TACTICAL) {
+                            risk = "are at risk of suffering a tactical bombardment and having their military infrastructure disrupted:";
+                            highlight = "military infrastructure disrupted";
+                        } else if (!this.params.raidParams.disrupt.isEmpty()) {
+                            risk = "are at risk of being raided and having their operations severely disrupted";
+                            highlight = "operations severely disrupted";
+                        }
+                        if (getAssessmentRiskStringOverride() != null) {
+                            risk = getAssessmentRiskStringOverride();
+                        }
+                        if (getAssessmentRiskStringHighlightOverride() != null) {
+                            highlight = getAssessmentRiskStringHighlightOverride();
+                        }
+                        showMarketsInDanger(info, opad, width, system, targets,
+                                safe, risk, highlight);
+                    }
+                }
+                addPostAssessmentSection(info, width, height, opad);
+            }
+        }
+    }
+
+    @Override
+    protected String getAssessmentRiskStringOverride() {
+        return "are at risk of being raided and losing one of its used colony items:";
+    }
+
+    @Override
+    protected String getAssessmentRiskStringHighlightOverride() {
+        return "losing its used colony items";
+    }
+
+    @Override
+    protected void addStatusSection(TooltipMakerAPI info, float width, float height, float opad) {
+        FGAction curr = getCurrentAction();
+
+        if (curr != null || isEnding() || isSucceeded()) {
+            String noun = getNoun();
+            String forces = getForcesNoun();
+            info.addSectionHeading("Status",
+                    this.faction.getBaseUIColor(), this.faction.getDarkUIColor(), Alignment.MID, opad);
+            if (isEnding() && !isSucceeded()) {
+                if (isFailed() || isAborted()) {
+                    if (isFailedButNotDefeated()) {
+                        info.addPara("The " + forces + " are withdrawing.", opad);
+                    } else {
+                        info.addPara("The " + forces + " have been defeated and any "
+                                + "remaining ships are retreating in disarray.", opad);
+                    }
+                } else {
+                    info.addPara("The " + forces + " are withdrawing.", opad);
+                }
+            } else if (isEnding() || isSucceeded()) {
+                info.addPara("The " + noun + " was successful and the " + forces + " are withdrawing.", opad);
+            } else if (curr != null) {
+                StarSystemAPI to = this.raidAction.getWhere();
+                if (isInPreLaunchDelay()) {
+                    if (getSource().getMarket() != null) {
+                        BaseHubMission.addStandardMarketDesc("The " + noun + " is in the planning stages on",
+                                getSource().getMarket(), info, opad);
+                        boolean mil = isSourceFunctionalMilitaryMarket();
+                        if (mil) {
+                            info.addPara("Disrupting the military facilities " + getSource().getMarket().getOnOrAt() +
+                                    " " + getSource().getMarket().getName() + " will abort the " + noun + ".", opad);
+                        }
+                    }
+                } else if (PREPARE_ACTION.equals(curr.getId())) {
+                    if (getSource().getMarket() != null) {
+                        BaseHubMission.addStandardMarketDesc("Making preparations in orbit around",
+                                getSource().getMarket(), info, opad);
+                    } else {
+                        info.addPara("Making preparations in orbit around " + getSource().getName() + ".", opad);
+                    }
+                } else if (TRAVEL_ACTION.equals(curr.getId())) {
+                    if (getSource().getMarket() == null) {
+                        info.addPara("Traveling to the " +
+                                to.getNameWithLowercaseTypeShort() + ".", opad);
+                    } else {
+                        info.addPara("Traveling from " + getSource().getMarket().getName() + " to the " +
+                                to.getNameWithLowercaseTypeShort() + ".", opad);
+                    }
+                } else if (PAYLOAD_ACTION.equals(curr.getId())) {
+                    addPayloadActionStatus(info, width, height, opad);
+                } else if (RETURN_ACTION.equals(curr.getId())) {
+                    if (getSource().getMarket() == null) {
+                        info.addPara("Returning to their port of origin.", opad);
+                    } else {
+                        info.addPara("Returning to " + getSource().getMarket().getName() + " in the " +
+                                this.origin.getContainingLocation().getNameWithLowercaseTypeShort() + ".", opad);
+                    }
+                }
+            }
         }
     }
 
