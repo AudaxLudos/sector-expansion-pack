@@ -40,6 +40,7 @@ public class ExpeditionFleetIntel extends FleetGroupIntel {
     public static final String MAIN_FLEET_KEY = "$sep_efi_mainFleet";
     public static final String SUPPLY_FLEET_KEY = "$sep_efi_supplyFleet";
     public static final String TARGET_KEY = "$sep_efi_target";
+    public static final String GUARDED_KEY = "$sep_efi_targetGuarded";
     public static final String HAS_ARTIFACT = "$sep_efi_hasArtifact";
     public static Logger log = Global.getLogger(ExpeditionFleetIntel.class);
     public static String PREPARE_ACTION = "prepare_action";
@@ -169,11 +170,13 @@ public class ExpeditionFleetIntel extends FleetGroupIntel {
             return;
         }
 
-        if (LOOT_ACTION.equals(action.getId())) {
+        if (GOTO_ACTION.equals(action.getId())) {
+            this.target.getMemoryWithoutUpdate().set(GUARDED_KEY, true);
+        } else if (LOOT_ACTION.equals(action.getId())) {
             Misc.makeUnimportant(this.target, "specialItemLocation");
             this.target.getMemoryWithoutUpdate().unset(MemFlags.SALVAGE_SPECIAL_DATA);
+            this.target.getMemoryWithoutUpdate().unset(GUARDED_KEY);
 
-            // TODO: Make fleet aggressive and defensive when they reach the location
             CampaignFleetAPI mainFleet = getMainFleet();
             if (mainFleet != null) {
                 Misc.makeImportant(mainFleet, "hasSpecialItem");
