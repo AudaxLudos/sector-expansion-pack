@@ -64,30 +64,29 @@ public class IncursionFleetIntel extends GenericRaidFGI {
             return;
         }
 
-        GenericRaidParams params = new GenericRaidParams(getRandom(), true);
-        params.makeFleetsHostile = false; // will be made hostile when they arrive, not before
-        params.source = this.source;
-        params.prepDays = 21f + getRandom().nextFloat() * 7f;
-        params.payloadDays = 27f + 7f * getRandom().nextFloat();
+        this.params = new GenericRaidParams(getRandom(), true);
+        this.params.makeFleetsHostile = false; // will be made hostile when they arrive, not before
+        this.params.source = this.source;
+        this.params.prepDays = 21f + getRandom().nextFloat() * 7f;
+        this.params.payloadDays = 27f + 7f * getRandom().nextFloat();
 
-        params.raidParams.where = this.target.getStarSystem();
-        params.raidParams.type = FGRaidAction.FGRaidType.SEQUENTIAL;
-        params.raidParams.allowedTargets.add(this.target);
-        params.raidParams.allowNonHostileTargets = false;
-        params.raidParams.raidsPerColony = 3;
+        this.params.raidParams.where = this.target.getStarSystem();
+        this.params.raidParams.type = FGRaidAction.FGRaidType.SEQUENTIAL;
+        this.params.raidParams.allowedTargets.add(this.target);
+        this.params.raidParams.allowNonHostileTargets = false;
+        this.params.raidParams.raidsPerColony = 3;
 
-        params.factionId = this.source.getFactionId();
-        params.style = FleetCreatorMission.FleetStyle.QUALITY;
-        params.repImpact = HubMissionWithTriggers.ComplicationRepImpact.FULL;
-        params.noun = "incursion";
-        params.forcesNoun = "incursion forces";
+        this.params.factionId = this.source.getFactionId();
+        this.params.style = FleetCreatorMission.FleetStyle.QUALITY;
+        this.params.repImpact = HubMissionWithTriggers.ComplicationRepImpact.FULL;
+        this.params.noun = "incursion";
+        this.params.forcesNoun = "incursion forces";
 
         // TODO: Scale fleets based on target faction system presence
-        params.fleetSizes.add(10);
-        params.fleetSizes.add(8);
-        params.fleetSizes.add(8);
+        this.params.fleetSizes.add(10);
+        this.params.fleetSizes.add(8);
+        this.params.fleetSizes.add(8);
 
-        this.params = params;
         initActions();
 
         // Mark source faction so it won't be reselected for future expeditions

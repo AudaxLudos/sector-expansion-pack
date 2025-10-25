@@ -7,17 +7,18 @@ import com.fs.starfarer.api.campaign.econ.MarketAPI;
 import com.fs.starfarer.api.campaign.rules.MemoryAPI;
 import com.fs.starfarer.api.impl.campaign.ids.Factions;
 import com.fs.starfarer.api.impl.campaign.ids.MemFlags;
-import com.fs.starfarer.api.impl.campaign.intel.group.FGAction;
-import com.fs.starfarer.api.impl.campaign.intel.group.FGTravelAction;
-import com.fs.starfarer.api.impl.campaign.intel.group.FGWaitAction;
-import com.fs.starfarer.api.impl.campaign.intel.group.FleetGroupIntel;
+import com.fs.starfarer.api.impl.campaign.ids.Ranks;
+import com.fs.starfarer.api.impl.campaign.ids.Stats;
+import com.fs.starfarer.api.impl.campaign.intel.group.*;
 import com.fs.starfarer.api.impl.campaign.missions.FleetCreatorMission;
+import com.fs.starfarer.api.impl.campaign.missions.hub.HubMissionWithTriggers;
 import com.fs.starfarer.api.impl.campaign.rulecmd.AddRemoveCommodity;
 import com.fs.starfarer.api.impl.campaign.rulecmd.salvage.special.SEPHiddenItemSpecial;
 import com.fs.starfarer.api.ui.TooltipMakerAPI;
 import com.fs.starfarer.api.util.Misc;
 import com.fs.starfarer.api.util.WeightedRandomPicker;
 import org.apache.log4j.Logger;
+import org.lwjgl.util.vector.Vector2f;
 import sectorexpansionpack.Utils;
 import sectorexpansionpack.intel.misc.ArtifactInstallationIntel;
 import sectorexpansionpack.intel.misc.ExpeditionFleetDepartureIntel;
@@ -35,20 +36,23 @@ import java.util.Random;
 // Should replace with custom RouteFleetSpawner to make it less heavy but this works
 // Could make a BaseHubEvent with the same functionality as BaseHubMission but NO
 public class ExpeditionFleetIntel extends FleetGroupIntel {
+    public static final String PREPARE_ACTION = "prepare_action";
+    public static final String GOTO_ACTION = "travel_action";
+    public static final String LOOT_ACTION = "loot_action";
+    public static final String RETURN_ACTION = "return_action";
+    public static final String DOCK_ACTION = "dock_action";
     public static final String EVENT_KEY = "$sep_efi_ref";
     public static final String FACTION_KEY = "$sep_efi_sourceFaction";
+    public static final String FLEET_KEY = "$sep_efi_fleet";
     public static final String MAIN_FLEET_KEY = "$sep_efi_mainFleet";
-    public static final String SUPPLY_FLEET_KEY = "$sep_efi_supplyFleet";
     public static final String TARGET_KEY = "$sep_efi_target";
     public static final String GUARDED_KEY = "$sep_efi_targetGuarded";
     public static final String HAS_ARTIFACT = "$sep_efi_hasArtifact";
     public static Logger log = Global.getLogger(ExpeditionFleetIntel.class);
-    public static String PREPARE_ACTION = "prepare_action";
-    public static String GOTO_ACTION = "travel_action";
-    public static String LOOT_ACTION = "loot_action";
-    public static String RETURN_ACTION = "return_action";
-    public static String DOCK_ACTION = "dock_action";
 
+    protected GenericRaidFGI.GenericRaidParams params;
+    protected Integer maxFleetSize = 0;
+    protected HubMissionWithTriggers.FleetQuality maxFleetQuality = HubMissionWithTriggers.FleetQuality.DEFAULT;
     protected EntityFinderMission efm;
     protected float revealChance = 0.2f;
     protected boolean isLeaked = false;
@@ -82,15 +86,41 @@ public class ExpeditionFleetIntel extends FleetGroupIntel {
             return;
         }
 
-        setFaction(this.factionId);
-        addAction(new FGWaitAction(this.source.getPrimaryEntity(), 15f, "preparing for expedition"), PREPARE_ACTION);
-        addAction(new FGTravelAction(this.source.getPrimaryEntity(), this.target.getStarSystem().getCenter()), GOTO_ACTION);
-        addAction(new FGWaitAction(this.target, 30f, "exploring " + this.target.getName()), LOOT_ACTION);
-        addAction(new FGTravelAction(this.target, this.source.getPrimaryEntity()), RETURN_ACTION);
-        addAction(new FGWaitAction(this.source.getPrimaryEntity(), 15f, "Docking to " + this.source.getName()), DOCK_ACTION);
+        this.params = new GenericRaidFGI.GenericRaidParams(getRandom(), false);
+        this.params.source = this.source;
+        this.params.factionId = this.factionId;
 
-        createRoute(this.factionId, 10, 1, null);
-        getRoute().setDelay((float) (3f + Math.random() * 6f));
+        float baseDifficulty = 6f;
+        if (this.source.getSize() <= 4) {
+            this.maxFleetSize = 6;
+        } else if (this.source.getSize() <= 6) {
+            baseDifficulty = 8f;
+            this.maxFleetSize = 8;
+        } else {
+            baseDifficulty = 12f;
+            this.maxFleetSize = 10;
+        }
+
+        float difficultyMult = this.source.getStats().getDynamic().getMod(Stats.COMBAT_FLEET_SIZE_MULT).computeEffective(0f);
+        if (difficultyMult < 1f) {
+            difficultyMult = 1f;
+        }
+
+        float totalDifficulty = baseDifficulty * difficultyMult;
+
+        this.params.fleetSizes.add(this.maxFleetSize);
+        totalDifficulty -= this.maxFleetSize;
+
+        while (totalDifficulty > 0) {
+            int min = 3;
+            int max = this.maxFleetSize - 2;
+            int diff = min + getRandom().nextInt(max - min + 1);
+
+            this.params.fleetSizes.add(diff);
+            totalDifficulty -= diff;
+        }
+
+        initActions();
 
         // Mark source faction so it won't be reselected for future expeditions
         this.source.getFaction().getMemoryWithoutUpdate().set(FACTION_KEY, true);
@@ -110,6 +140,23 @@ public class ExpeditionFleetIntel extends FleetGroupIntel {
         log.info(String.format("Creating expedition fleet %s %s in the %s that will goto %s",
                 this.source.getOnOrAt(), this.source.getName(), this.source.getStarSystem().getNameWithLowercaseTypeShort(),
                 this.target.getStarSystem().getNameWithLowercaseTypeShort()));
+    }
+
+    protected void initActions() {
+        setFaction(this.factionId);
+        addAction(new FGWaitAction(this.source.getPrimaryEntity(), 15f, "preparing for expedition"), PREPARE_ACTION);
+        addAction(new FGTravelAction(this.source.getPrimaryEntity(), this.target.getStarSystem().getCenter()), GOTO_ACTION);
+        addAction(new FGWaitAction(this.target, 30f, "exploring " + this.target.getName()), LOOT_ACTION);
+        addAction(new FGTravelAction(this.target, this.source.getPrimaryEntity()), RETURN_ACTION);
+        addAction(new FGWaitAction(this.source.getPrimaryEntity(), 15f, "Docking to " + this.source.getName()), DOCK_ACTION);
+
+        int total = 0;
+        for (Integer i : this.params.fleetSizes) {
+            total += i;
+        }
+
+        createRoute(this.params.factionId, total, this.params.fleetSizes.size(), null, this.params);
+        getRoute().setDelay((float) (3f + Math.random() * 6f));
     }
 
     public void pickSpecialItem() {
@@ -261,35 +308,151 @@ public class ExpeditionFleetIntel extends FleetGroupIntel {
 
     @Override
     protected void spawnFleets() {
-        // TODO: Add supply fleets
-        FleetCreatorMission fcm = new FleetCreatorMission(getRandom());
+        Float damage = null;
+        if (this.route != null && this.route.getExtra() != null) {
+            damage = this.route.getExtra().damage;
+        }
+        if (damage == null) {
+            damage = 0f;
+        }
 
-        fcm.beginFleet();
-        fcm.setGenRandom(Utils.random);
-        fcm.createFleet(FleetCreatorMission.FleetStyle.QUALITY, 10, this.factionId, this.source.getLocationInHyperspace());
-        fcm.setFleetSource(this.source);
-        fcm.triggerMakeLowRepImpact();
-        fcm.triggerSetFleetFlag(MAIN_FLEET_KEY);
-        fcm.triggerSetFleetMemoryValue(EVENT_KEY, this);
-        fcm.triggerFleetSetName("Expedition Fleet");
+        WeightedRandomPicker<Integer> picker = new WeightedRandomPicker<>(getRandom());
+        picker.addAll(this.params.fleetSizes);
+
+        int total = 0;
+        for (Integer i : this.params.fleetSizes) {
+            total += i;
+        }
+
+        float spawnsToSkip = total * damage * 0.5f;
+        float skipped = 0f;
+
+        while (!picker.isEmpty()) {
+            Integer size = picker.pickAndRemove();
+            if (skipped < spawnsToSkip && getRandom().nextFloat() < damage) {
+                skipped += size;
+                continue;
+            }
+
+            CampaignFleetAPI fleet = createFleet(size, damage);
+
+            if (fleet != null && this.route != null) {
+                setLocationAndCoordinates(fleet, this.route.getCurrent());
+                this.fleets.add(fleet);
+            }
+        }
+    }
+
+    protected CampaignFleetAPI createFleet(int size, float damage) {
+        Vector2f loc = this.params.source.getLocationInHyperspace();
+        boolean pirate = this.faction.getCustomBoolean(Factions.CUSTOM_PIRATE_BEHAVIOR);
+
+        FleetCreatorMission m = new FleetCreatorMission(getRandom());
+
+        preConfigureFleet(size, m);
+
+        m.beginFleet();
+
+        String factionId = getFleetCreationFactionOverride(size);
+        if (factionId == null) {
+            factionId = this.params.factionId;
+        }
+
+        m.createFleet(this.params.style, size, factionId, loc);
+        m.triggerSetFleetFaction(this.params.factionId);
+
+        m.setFleetSource(this.params.source);
+        setFleetCreatorQualityFromRoute(m);
+        m.setFleetDamageTaken(damage);
+
+        if (pirate) {
+            m.triggerSetPirateFleet();
+        } else {
+            m.triggerSetWarFleet();
+        }
 
         if (Factions.LUDDIC_PATH.equals(this.faction.getId())) {
-            fcm.triggerFleetPatherNoDefaultTithe();
+            m.triggerFleetPatherNoDefaultTithe();
         }
 
-        CampaignFleetAPI fleet = fcm.createFleet();
-        if (fleet != null && this.route != null) {
-            setLocationAndCoordinates(fleet, this.route.getCurrent());
-            if (fleet.getMemoryWithoutUpdate().getBoolean(MAIN_FLEET_KEY)) {
-                if (getAction(LOOT_ACTION) == null) {
-                    // Ensure fleet is marked properly when it spawns midway
-                    Misc.makeImportant(fleet, "hasSpecialItem");
-                    Misc.addDefeatTrigger(fleet, "SEPEFGIFleetDefeated");
-                    fleet.getMemoryWithoutUpdate().set(HAS_ARTIFACT, true);
-                }
+        /*if (params.makeFleetsHostile) {
+            for (MarketAPI market : params.raidParams.allowedTargets) {
+                m.triggerMakeHostileToFaction(market.getFactionId());
             }
-            this.fleets.add(fleet);
+            m.triggerMakeHostile();
+            if (Factions.LUDDIC_PATH.equals(faction.getId())) {
+                m.triggerFleetPatherNoDefaultTithe();
+            }
         }
+
+        if (params.repImpact == ComplicationRepImpact.LOW || params.repImpact == null) {
+            m.triggerMakeLowRepImpact();
+        } else if (params.repImpact == ComplicationRepImpact.NONE) {
+            m.triggerMakeNoRepImpact();
+        }
+
+        if (params.repImpact != ComplicationRepImpact.FULL) {
+            m.triggerMakeAlwaysSpreadTOffHostility();
+        }*/
+
+        configureFleet(size, m);
+
+        CampaignFleetAPI fleet = m.createFleet();
+        if (fleet != null) {
+            configureFleet(size, fleet);
+        }
+
+        return fleet;
+    }
+
+    protected String getFleetCreationFactionOverride(int size) {
+        return null;
+    }
+
+    protected void preConfigureFleet(int size, FleetCreatorMission m) {
+    }
+
+    protected void configureFleet(int size, FleetCreatorMission m) {
+        m.triggerSetFleetFlag(FLEET_KEY);
+
+        if (size == this.maxFleetSize) {
+            m.triggerSetFleetQuality(this.maxFleetQuality);
+            m.triggerSetFleetFlag(MAIN_FLEET_KEY);
+        } else {
+            m.triggerSetFleetQuality(this.maxFleetQuality.prev());
+        }
+
+        boolean lightDetachment = size <= 5;
+        if (lightDetachment) {
+            m.triggerSetFleetMaxShipSize(3);
+        }
+    }
+
+    protected void configureFleet(int size, CampaignFleetAPI fleet) {
+        if (size == this.maxFleetSize) {
+            fleet.setName("Expedition Command Fleet");
+            fleet.getCommander().setRankId(Ranks.SPACE_ADMIRAL);
+            setNeverStraggler(fleet);
+        } else {
+            fleet.setName("Expedition Supply Fleet");
+            fleet.getCommander().setRankId(Ranks.SPACE_COMMANDER);
+        }
+
+        if (fleet.getMemoryWithoutUpdate().getBoolean(MAIN_FLEET_KEY)) {
+            if (isCurrent(RETURN_ACTION) || isCurrent(DOCK_ACTION)) {
+                // Ensure fleet is marked properly when it spawns midway
+                Misc.makeImportant(fleet, "hasSpecialItem");
+                Misc.addDefeatTrigger(fleet, "SEPEFGIFleetDefeated");
+                fleet.getMemoryWithoutUpdate().set(HAS_ARTIFACT, true);
+            }
+        }
+    }
+
+    public void setFleetCreatorQualityFromRoute(FleetCreatorMission m) {
+        if (m == null || this.route == null || this.route.getExtra() == null || this.route.getExtra().quality == null) {
+            return;
+        }
+        m.getPreviousCreateFleetAction().qualityOverride = this.route.getExtra().quality;
     }
 
     @Override

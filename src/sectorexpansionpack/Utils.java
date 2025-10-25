@@ -7,6 +7,7 @@ import com.fs.starfarer.api.campaign.SpecialItemData;
 import com.fs.starfarer.api.campaign.econ.Industry;
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
 import com.fs.starfarer.api.characters.OfficerDataAPI;
+import com.fs.starfarer.api.impl.campaign.ids.Items;
 import com.fs.starfarer.api.impl.campaign.ids.MemFlags;
 import com.fs.starfarer.api.impl.campaign.ids.Tags;
 import com.fs.starfarer.api.impl.campaign.rulecmd.salvage.special.SleeperPodsSpecial;
@@ -60,6 +61,33 @@ public class Utils {
             }
         }
         return industryPicker.pick();
+    }
+
+    public static boolean hasNanoforge(MarketAPI market) {
+        for (Industry industry : market.getIndustries()) {
+            SpecialItemData itemData = industry.getSpecialItem();
+            if (itemData == null) {
+                continue;
+            }
+            if (Objects.equals(itemData.getId(), Items.CORRUPTED_NANOFORGE)
+                    || Objects.equals(itemData.getId(), Items.PRISTINE_NANOFORGE)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static boolean hasCryoEngine(MarketAPI market) {
+        for (Industry industry : market.getIndustries()) {
+            SpecialItemData itemData = industry.getSpecialItem();
+            if (itemData == null) {
+                continue;
+            }
+            if (Objects.equals(itemData.getId(), Items.CRYOARITHMETIC_ENGINE)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public void RunCodeScripts() {
