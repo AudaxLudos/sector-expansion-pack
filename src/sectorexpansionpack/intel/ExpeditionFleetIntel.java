@@ -25,9 +25,9 @@ import sectorexpansionpack.missions.EntityFinderMission;
 import java.awt.*;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Random;
 
-// TODO: Add checks for special items that are player used only or that has commodity demand affects
 // Won't be seen by the player
 // Will be used to send out departure and leak intel
 // Should replace with custom RouteFleetSpawner to make it less heavy but this works
@@ -135,9 +135,10 @@ public class ExpeditionFleetIntel extends FleetGroupIntel {
             this.revealChance += 0.2f;
         }
 
-        log.info(String.format("Creating expedition fleet %s %s in the %s that will goto %s",
-                this.source.getOnOrAt(), this.source.getName(), this.source.getStarSystem().getNameWithLowercaseTypeShort(),
-                this.target.getStarSystem().getNameWithLowercaseTypeShort()));
+        log.info(String.format("Starting %s expedition at %s in the %s, targeting %s in the %s",
+                this.source.getFaction().getDisplayName(),
+                this.source.getName(), this.source.getStarSystem().getNameWithLowercaseTypeShort(),
+                this.target.getName(), this.target.getStarSystem().getNameWithLowercaseTypeShort()));
     }
 
     protected void initActions() {
@@ -159,7 +160,13 @@ public class ExpeditionFleetIntel extends FleetGroupIntel {
 
     public void pickSpecialItem() {
         WeightedRandomPicker<SpecialItemSpecAPI> specialItemPicker = new WeightedRandomPicker<>(getRandom());
-        specialItemPicker.addAll(Global.getSettings().getAllSpecialItemSpecs());
+        for (SpecialItemSpecAPI spec : Global.getSettings().getAllSpecialItemSpecs()) {
+            if (Objects.equals(spec.getId(), Items.CORONAL_PORTAL)
+                    || Objects.equals(spec.getId(), Items.ORBITAL_FUSION_LAMP)) {
+                continue;
+            }
+            specialItemPicker.add(spec);
+        }
 
         this.specialItemSpec = specialItemPicker.pick();
         if (this.specialItemSpec == null) {
@@ -422,9 +429,14 @@ public class ExpeditionFleetIntel extends FleetGroupIntel {
     protected void configureFleet(int size, FleetCreatorMission m) {
         m.triggerSetFleetFlag(FLEET_KEY);
 
-        if (size == this.maxFleetSize) {
+        if (size == this.maxFleetSize) { // Command Fleet
             m.triggerSetFleetQuality(this.maxFleetQuality);
             m.triggerSetFleetFlag(MAIN_FLEET_KEY);
+            if (isCurrent(RETURN_ACTION) || isCurrent(DOCK_ACTION)) {
+                // Ensure fleet is marked properly when it spawns midway
+                m.triggerFleetMakeImportantPermanent(HAS_ARTIFACT);
+                m.triggerFleetAddDefeatTriggerPermanent("SEPEFGIFleetDefeated");
+            }
         } else {
             m.triggerSetFleetQuality(this.maxFleetQuality.prev());
         }
@@ -436,22 +448,13 @@ public class ExpeditionFleetIntel extends FleetGroupIntel {
     }
 
     protected void configureFleet(int size, CampaignFleetAPI fleet) {
-        if (size == this.maxFleetSize) {
+        if (size == this.maxFleetSize) { // Command Fleet
             fleet.setName("Expedition Command Fleet");
             fleet.getCommander().setRankId(Ranks.SPACE_ADMIRAL);
             setNeverStraggler(fleet);
         } else {
             fleet.setName("Expedition Supply Fleet");
             fleet.getCommander().setRankId(Ranks.SPACE_COMMANDER);
-        }
-
-        if (fleet.getMemoryWithoutUpdate().getBoolean(MAIN_FLEET_KEY)) {
-            if (isCurrent(RETURN_ACTION) || isCurrent(DOCK_ACTION)) {
-                // Ensure fleet is marked properly when it spawns midway
-                Misc.makeImportant(fleet, "hasSpecialItem");
-                Misc.addDefeatTrigger(fleet, "SEPEFGIFleetDefeated");
-                fleet.getMemoryWithoutUpdate().set(HAS_ARTIFACT, true);
-            }
         }
     }
 

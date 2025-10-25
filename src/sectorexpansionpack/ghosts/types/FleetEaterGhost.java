@@ -3,7 +3,6 @@ package sectorexpansionpack.ghosts.types;
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.Script;
 import com.fs.starfarer.api.campaign.CampaignFleetAPI;
-import com.fs.starfarer.api.campaign.CustomCampaignEntityAPI;
 import com.fs.starfarer.api.fleet.FleetMemberAPI;
 import com.fs.starfarer.api.impl.campaign.ghosts.*;
 import com.fs.starfarer.api.impl.campaign.ids.Tags;
