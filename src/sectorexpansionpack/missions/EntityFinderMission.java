@@ -127,8 +127,8 @@ public class EntityFinderMission extends HubMissionWithSearch {
 
         @Override
         public boolean marketMatchesRequirement(MarketAPI market) {
-            // TODO: Add checks for special items that are player used only or that has commodity demand affects
-            // TODO: Add modded colony items that is used by players only or has commodity demand effects
+            // TODO: Filter vanilla colony items that is player use only or has demand effects
+            // TODO: Filter modded colony items that is player use only or has demand effects
             for (Industry ind : market.getIndustries()) {
                 SpecialItemData otherData = ind.getSpecialItem();
                 if (otherData != null) {

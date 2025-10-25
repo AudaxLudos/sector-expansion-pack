@@ -162,7 +162,7 @@ public class ExpeditionFleetIntel extends FleetGroupIntel {
     public void pickSpecialItem() {
         WeightedRandomPicker<SpecialItemSpecAPI> specialItemPicker = new WeightedRandomPicker<>(getRandom());
         for (SpecialItemSpecAPI spec : Global.getSettings().getAllSpecialItemSpecs()) {
-            // TODO: Add modded colony items that is used by players only or has commodity demand effects
+            // TODO: Filter modded colony items that is player use only or has demand effects
             if (Objects.equals(spec.getId(), Items.CORONAL_PORTAL)
                     || Objects.equals(spec.getId(), Items.ORBITAL_FUSION_LAMP)) {
                 continue;
@@ -433,6 +433,7 @@ public class ExpeditionFleetIntel extends FleetGroupIntel {
     protected void configureFleet(int size, FleetCreatorMission m) {
         m.triggerSetFleetFlag(FLEET_KEY);
 
+        // IDEA: Scale fleet quality base on source market ship quality
         if (size == this.maxFleetSize) { // Main Fleet
             m.triggerSetFleetQuality(this.maxFleetQuality);
             m.triggerSetFleetFlag(MAIN_FLEET_KEY);
