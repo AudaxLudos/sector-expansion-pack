@@ -4,11 +4,11 @@ sep_efi_targetGuarded,OpenInteractionDialog,"$sep_efi_target score:1000
 $sep_efi_targetGuarded score:1000
 ",ShowDefaultVisual,"Your $shipOrFleet approaches $entityName.
 
-A nearby fleet is tracking your movements, making survey operations impossible to do.",defaultLeave:Leave,
+A nearby fleet is preventing you from conducting survey operations.",defaultLeave:Leave,
 sep_efi_fleetHasArtifact,OpenCommLink,"$entity.sep_efi_mainFleet score:1000
 $entity.sep_efi_hasArtifact score:1000","ShowDefaultVisual
 SetStoryOption sep_efi_persuadeToGive ui_char_spent_story_point ""Persuade the fleet to give the artifact""
-$entity.ignorePlayerCommRequests = true","The other captain looks up briefly, expression calm. ""Captain,"" $heOrShe says in a clipped tone. ""I’m in the middle of fleet operations and can’t afford distractions. If this isn’t urgent, you’ve got one chance, make it quick.""","sep_efi_persuadeToGive:Persuade to give cargo
+$entity.ignorePlayerCommRequests = true","""Captain,"" $heOrShe says in a clipped tone. ""I’m currently busy and can’t afford distractions. If this isn’t urgent, you’ve got one chance, make it quick.""","sep_efi_persuadeToGive:Persuade to give cargo
 cutCommLink:Cut the comm link",
 sep_efi_fleetPersudeToGive,DialogOptionSelected,$option == sep_efi_persuadeToGive,"Call $entity.sep_efi_ref giveArtifact
 Call $entity.sep_efi_ref endEvent

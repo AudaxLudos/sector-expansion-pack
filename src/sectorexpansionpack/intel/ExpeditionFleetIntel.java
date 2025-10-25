@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Random;
 
+// IDEA: Create a base expedition class then create a generic expedition intel
 // Won't be seen by the player
 // Will be used to send out departure and leak intel
 // Should replace with custom RouteFleetSpawner to make it less heavy but this works
@@ -98,6 +99,7 @@ public class ExpeditionFleetIntel extends FleetGroupIntel {
             this.maxFleetSize = 10;
         }
 
+        // IDEA: Scale fleet quality base on source market ship quality
         float difficultyMult = this.source.getStats().getDynamic().getMod(Stats.COMBAT_FLEET_SIZE_MULT).computeEffective(0f);
         if (difficultyMult < 1f) {
             difficultyMult = 1f;
@@ -160,6 +162,7 @@ public class ExpeditionFleetIntel extends FleetGroupIntel {
     public void pickSpecialItem() {
         WeightedRandomPicker<SpecialItemSpecAPI> specialItemPicker = new WeightedRandomPicker<>(getRandom());
         for (SpecialItemSpecAPI spec : Global.getSettings().getAllSpecialItemSpecs()) {
+            // TODO: Add modded colony items that is used by players only or has commodity demand effects
             if (Objects.equals(spec.getId(), Items.CORONAL_PORTAL)
                     || Objects.equals(spec.getId(), Items.ORBITAL_FUSION_LAMP)) {
                 continue;
@@ -206,6 +209,7 @@ public class ExpeditionFleetIntel extends FleetGroupIntel {
 
     public void pickTarget() {
         if (this.efm.rollProbability(WRECK_CHANCE)) {
+            this.efm.requireEntityNoMemoryFlag(ExpeditionFleetIntel.TARGET_KEY);
             this.efm.requireEntityNoSpecialSalvage();
             this.efm.requireEntityType(Entities.WRECK);
             this.efm.preferEntityInDirectionOfOtherMissions();

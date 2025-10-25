@@ -42,6 +42,10 @@ public class EntityFinderMission extends HubMissionWithSearch {
         this.search.marketReqs.add(new MarketHasCompatibleSpecialItemsWithOther(other));
     }
 
+    public void requireEntityNoMemoryFlag(String flag) {
+        this.search.entityReqs.add(new EntityBooleanMemoryFlag(flag, true));
+    }
+
     public void requireMarketNoMemoryFlag(String flag) {
         this.search.marketReqs.add(new MarketBooleanMemoryFlag(flag, true));
     }
@@ -61,6 +65,25 @@ public class EntityFinderMission extends HubMissionWithSearch {
         @Override
         public boolean entityMatchesRequirement(SectorEntityToken entity) {
             return Misc.getSalvageSpecial(entity) == null;
+        }
+    }
+
+    public static class EntityBooleanMemoryFlag implements EntityRequirement {
+        String flag;
+        boolean negate;
+
+        public EntityBooleanMemoryFlag(String flag, boolean negate) {
+            this.flag = flag;
+            this.negate = negate;
+        }
+
+        @Override
+        public boolean entityMatchesRequirement(SectorEntityToken entity) {
+            boolean memVal = entity.getMemoryWithoutUpdate().getBoolean(this.flag);
+            if (this.negate) {
+                return !memVal;
+            }
+            return memVal;
         }
     }
 
@@ -104,6 +127,8 @@ public class EntityFinderMission extends HubMissionWithSearch {
 
         @Override
         public boolean marketMatchesRequirement(MarketAPI market) {
+            // TODO: Add checks for special items that are player used only or that has commodity demand affects
+            // TODO: Add modded colony items that is used by players only or has commodity demand effects
             for (Industry ind : market.getIndustries()) {
                 SpecialItemData otherData = ind.getSpecialItem();
                 if (otherData != null) {
