@@ -54,7 +54,6 @@ public class ExpeditionFleetIntel extends FleetGroupIntel {
     protected EntityFinderMission efm;
     protected float revealChance = 0.2f;
     protected boolean isLeaked = false;
-    protected String factionId;
     protected SpecialItemSpecAPI specialItemSpec;
     protected SpecialItemData specialItemData;
     protected MarketAPI source;
@@ -68,7 +67,7 @@ public class ExpeditionFleetIntel extends FleetGroupIntel {
             log.info("Failed to get special item");
             return;
         }
-        pickFactionId();
+        pickFaction();
         if (isDone()) {
             log.info("Failed to find faction");
             return;
@@ -85,8 +84,8 @@ public class ExpeditionFleetIntel extends FleetGroupIntel {
         }
 
         this.params = new GenericRaidFGI.GenericRaidParams(getRandom(), false);
+        this.params.factionId = getFaction().getId();
         this.params.source = this.source;
-        this.params.factionId = this.factionId;
 
         float baseDifficulty = 6f;
         if (this.source.getSize() <= 4) {
@@ -142,7 +141,7 @@ public class ExpeditionFleetIntel extends FleetGroupIntel {
     }
 
     protected void initActions() {
-        setFaction(this.factionId);
+        setFaction(this.params.factionId);
         addAction(new FGWaitAction(this.source.getPrimaryEntity(), 15f, "preparing for expedition"), PREPARE_ACTION);
         addAction(new FGTravelAction(this.source.getPrimaryEntity(), this.target.getStarSystem().getCenter()), GOTO_ACTION);
         addAction(new FGWaitAction(this.target, 30f, "exploring " + this.target.getName()), LOOT_ACTION);
@@ -175,8 +174,8 @@ public class ExpeditionFleetIntel extends FleetGroupIntel {
         this.specialItemData = new SpecialItemData(this.specialItemSpec.getId(), null);
     }
 
-    public void pickFactionId() {
-        WeightedRandomPicker<String> factionPicker = new WeightedRandomPicker<>(getRandom());
+    public void pickFaction() {
+        WeightedRandomPicker<FactionAPI> factionPicker = new WeightedRandomPicker<>(getRandom());
         for (FactionAPI faction : Global.getSector().getAllFactions()) {
             if (faction.getMemoryWithoutUpdate().getBoolean(ExpeditionFleetIntel.FACTION_KEY)) {
                 continue;
@@ -184,17 +183,17 @@ public class ExpeditionFleetIntel extends FleetGroupIntel {
             if (!faction.isShowInIntelTab()) {
                 continue;
             }
-            factionPicker.add(faction.getId());
+            factionPicker.add(faction);
         }
 
-        this.factionId = factionPicker.pick();
-        if (this.factionId == null || this.factionId.isEmpty()) {
+        setFaction(factionPicker.pick());
+        if (getFaction() == null) {
             endImmediately();
         }
     }
 
     public void pickMarket() {
-        this.efm.requireMarketFaction(this.factionId);
+        this.efm.requireMarketFaction(getFaction().getId());
         this.efm.requireMarketNotHidden();
         this.efm.requireMarketFactionNotPlayer();
         this.efm.requireMarketStabilityAtLeast(8);
@@ -245,7 +244,7 @@ public class ExpeditionFleetIntel extends FleetGroupIntel {
                 mainFleet.getMemoryWithoutUpdate().set(HAS_ARTIFACT, true);
             }
         } else if (DOCK_ACTION.equals(action.getId())) {
-            this.efm.requireMarketFaction(this.factionId);
+            this.efm.requireMarketFaction(getFaction().getId());
             this.efm.requireMarketNotHidden();
             this.efm.requireMarketNotInHyperspace();
             this.efm.requireMarketFactionNotPlayer();
@@ -273,8 +272,9 @@ public class ExpeditionFleetIntel extends FleetGroupIntel {
                 this.isLeaked = true;
 
                 new LeakedArtifactLocationIntel(action.getId(), this.source, this.target, this);
-                log.info(String.format("Leaking expedition intel at %s in the %s",
-                        this.source.getName(), this.source.getStarSystem().getNameWithLowercaseTypeShort()));
+                log.info(String.format("Leaking %s expedition intel at %s in the %s",
+                        getFaction().getDisplayName(), this.source.getName(),
+                        this.source.getStarSystem().getNameWithLowercaseTypeShort()));
             } else {
                 this.revealChance += 0.2f;
             }
@@ -282,15 +282,15 @@ public class ExpeditionFleetIntel extends FleetGroupIntel {
     }
 
     @Override
-    protected void notifyEnded() {
+    protected void notifyEnding() {
         super.notifyEnding();
         unsetEventMemoryFlags();
     }
 
     public void unsetEventMemoryFlags() {
         // Unset faction memory flags
-        if (this.faction != null) {
-            this.faction.getMemoryWithoutUpdate().unset(FACTION_KEY);
+        if (getFaction() != null) {
+            getFaction().getMemoryWithoutUpdate().unset(FACTION_KEY);
         }
 
         // Unset target memory flags
@@ -300,13 +300,13 @@ public class ExpeditionFleetIntel extends FleetGroupIntel {
             this.target.getMemoryWithoutUpdate().unset(EVENT_KEY);
         }
 
-        // Unset fleet memory flags
-        CampaignFleetAPI mainFleet = getMainFleet();
-        if (mainFleet != null) {
-            Misc.makeUnimportant(mainFleet, "hasSpecialItem");
-            mainFleet.getMemoryWithoutUpdate().unset(MAIN_FLEET_KEY);
-            mainFleet.getMemoryWithoutUpdate().unset(HAS_ARTIFACT);
-            mainFleet.getMemoryWithoutUpdate().unset(EVENT_KEY);
+        // Unset fleets memory flags
+        for (CampaignFleetAPI fleet : this.fleets) {
+            Misc.makeUnimportant(fleet, "hasSpecialItem");
+            fleet.getMemoryWithoutUpdate().unset(FLEET_KEY);
+            fleet.getMemoryWithoutUpdate().unset(MAIN_FLEET_KEY);
+            fleet.getMemoryWithoutUpdate().unset(HAS_ARTIFACT);
+            fleet.getMemoryWithoutUpdate().unset(EVENT_KEY);
         }
     }
 
@@ -359,7 +359,7 @@ public class ExpeditionFleetIntel extends FleetGroupIntel {
 
     protected CampaignFleetAPI createFleet(int size, float damage) {
         Vector2f loc = this.params.source.getLocationInHyperspace();
-        boolean pirate = this.faction.getCustomBoolean(Factions.CUSTOM_PIRATE_BEHAVIOR);
+        boolean pirate = getFaction().getCustomBoolean(Factions.CUSTOM_PIRATE_BEHAVIOR);
 
         FleetCreatorMission m = new FleetCreatorMission(getRandom());
 
@@ -385,7 +385,7 @@ public class ExpeditionFleetIntel extends FleetGroupIntel {
             m.triggerSetWarFleet();
         }
 
-        if (Factions.LUDDIC_PATH.equals(this.faction.getId())) {
+        if (Factions.LUDDIC_PATH.equals(getFaction().getId())) {
             m.triggerFleetPatherNoDefaultTithe();
         }
 
@@ -429,14 +429,9 @@ public class ExpeditionFleetIntel extends FleetGroupIntel {
     protected void configureFleet(int size, FleetCreatorMission m) {
         m.triggerSetFleetFlag(FLEET_KEY);
 
-        if (size == this.maxFleetSize) { // Command Fleet
+        if (size == this.maxFleetSize) { // Main Fleet
             m.triggerSetFleetQuality(this.maxFleetQuality);
             m.triggerSetFleetFlag(MAIN_FLEET_KEY);
-            if (isCurrent(RETURN_ACTION) || isCurrent(DOCK_ACTION)) {
-                // Ensure fleet is marked properly when it spawns midway
-                m.triggerFleetMakeImportantPermanent(HAS_ARTIFACT);
-                m.triggerFleetAddDefeatTriggerPermanent("SEPEFGIFleetDefeated");
-            }
         } else {
             m.triggerSetFleetQuality(this.maxFleetQuality.prev());
         }
@@ -448,10 +443,16 @@ public class ExpeditionFleetIntel extends FleetGroupIntel {
     }
 
     protected void configureFleet(int size, CampaignFleetAPI fleet) {
-        if (size == this.maxFleetSize) { // Command Fleet
+        if (size == this.maxFleetSize) { // Main Fleet
             fleet.setName("Expedition Command Fleet");
             fleet.getCommander().setRankId(Ranks.SPACE_ADMIRAL);
             setNeverStraggler(fleet);
+            if (isCurrent(RETURN_ACTION) || isCurrent(DOCK_ACTION)) {
+                // Ensure fleet is marked properly when it spawns midway
+                Misc.makeImportant(fleet, "hasSpecialItem");
+                Misc.addDefeatTrigger(fleet, "SEPEFGIFleetDefeated");
+                fleet.getMemoryWithoutUpdate().set(HAS_ARTIFACT, true);
+            }
         } else {
             fleet.setName("Expedition Supply Fleet");
             fleet.getCommander().setRankId(Ranks.SPACE_COMMANDER);
