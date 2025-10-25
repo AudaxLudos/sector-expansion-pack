@@ -29,29 +29,19 @@ public class SEPHiddenItemSpecial extends BaseSalvageSpecial {
             return;
         }
 
-        addText("FIND SPECIAL ITEM TEXT.");
+        addText("Your salvage crews find a well-hidden safe. After an EMP pulse and some delicate work " +
+                "with a plasma cutter, the safe yields its contents.");
 
-        this.options.clearOptions();
-        this.options.addOption("Continue", CONTINUE);
-    }
-
-    @Override
-    public void optionSelected(String optionText, Object optionData) {
-        if (CONTINUE.equals(optionData)) {
-            addText("GET SPECIAL ITEM TEXT.");
-
-            if (this.entity.getMemoryWithoutUpdate().get(ExpeditionFleetIntel.EVENT_KEY) instanceof ExpeditionFleetIntel intel) {
-                intel.unsetEventMemoryFlags();
-                intel.finish(true);
-            }
-
-            SpecialItemData specialItemData = new SpecialItemData(this.data.specialItemId, null);
-            this.playerFleet.getCargo().addSpecial(specialItemData, 1);
-            AddRemoveCommodity.addItemGainText(specialItemData, 1, this.text);
-
-            setDone(true);
-            setShowAgain(false);
+        if (this.entity.getMemoryWithoutUpdate().get(ExpeditionFleetIntel.EVENT_KEY) instanceof ExpeditionFleetIntel intel) {
+            intel.unsetEventMemoryFlags();
+            intel.finish(true);
         }
+
+        SpecialItemData specialItemData = new SpecialItemData(this.data.specialItemId, null);
+        this.playerFleet.getCargo().addSpecial(specialItemData, 1);
+        AddRemoveCommodity.addItemGainText(specialItemData, 1, this.text);
+
+        setDone(true);
     }
 
     public static class HiddenSpecialItemSpecialData implements SalvageSpecialInteraction.SalvageSpecialData {
