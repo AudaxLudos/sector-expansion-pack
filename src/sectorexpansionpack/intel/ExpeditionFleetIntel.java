@@ -5,10 +5,7 @@ import com.fs.starfarer.api.campaign.*;
 import com.fs.starfarer.api.campaign.econ.Industry;
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
 import com.fs.starfarer.api.campaign.rules.MemoryAPI;
-import com.fs.starfarer.api.impl.campaign.ids.Factions;
-import com.fs.starfarer.api.impl.campaign.ids.MemFlags;
-import com.fs.starfarer.api.impl.campaign.ids.Ranks;
-import com.fs.starfarer.api.impl.campaign.ids.Stats;
+import com.fs.starfarer.api.impl.campaign.ids.*;
 import com.fs.starfarer.api.impl.campaign.intel.group.*;
 import com.fs.starfarer.api.impl.campaign.missions.FleetCreatorMission;
 import com.fs.starfarer.api.impl.campaign.missions.hub.HubMissionWithTriggers;
@@ -48,6 +45,7 @@ public class ExpeditionFleetIntel extends FleetGroupIntel {
     public static final String TARGET_KEY = "$sep_efi_target";
     public static final String GUARDED_KEY = "$sep_efi_targetGuarded";
     public static final String HAS_ARTIFACT = "$sep_efi_hasArtifact";
+    public static final float WRECK_CHANCE = 0.5f;
     public static Logger log = Global.getLogger(ExpeditionFleetIntel.class);
 
     protected GenericRaidFGI.GenericRaidParams params;
@@ -201,11 +199,20 @@ public class ExpeditionFleetIntel extends FleetGroupIntel {
     }
 
     public void pickTarget() {
-        this.efm.requirePlanetNoMemoryFlag(ExpeditionFleetIntel.TARGET_KEY);
-        this.efm.requirePlanetWithRuins();
-        this.efm.requirePlanetUnexploredRuins();
-        this.efm.preferPlanetInDirectionOfOtherMissions();
-        this.target = this.efm.pickPlanet();
+        if (this.efm.rollProbability(WRECK_CHANCE)) {
+            this.efm.requireEntityNoSpecialSalvage();
+            this.efm.requireEntityType(Entities.WRECK);
+            this.efm.preferEntityInDirectionOfOtherMissions();
+            this.efm.preferEntityUndiscovered();
+            this.target = this.efm.pickEntity();
+        } else {
+            this.efm.requirePlanetNoMemoryFlag(ExpeditionFleetIntel.TARGET_KEY);
+            this.efm.requirePlanetWithRuins();
+            this.efm.requirePlanetUnexploredRuins();
+            this.efm.preferPlanetInDirectionOfOtherMissions();
+            this.target = this.efm.pickPlanet();
+        }
+
         if (this.target == null) {
             endImmediately();
         }
