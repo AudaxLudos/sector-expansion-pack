@@ -99,7 +99,6 @@ public class ExpeditionFleetIntel extends FleetGroupIntel {
             this.maxFleetSize = 10;
         }
 
-        // IDEA: Scale fleet quality base on source market ship quality
         float difficultyMult = this.source.getStats().getDynamic().getMod(Stats.COMBAT_FLEET_SIZE_MULT).computeEffective(0f);
         if (difficultyMult < 1f) {
             difficultyMult = 1f;
@@ -262,6 +261,7 @@ public class ExpeditionFleetIntel extends FleetGroupIntel {
                 return;
             }
 
+            // IDEA: Create a courier fleet that transfers the colony item to another faction market if the source market can't use it
             // TODO: Delay installation by a few days
             Industry ind = Utils.pickIndustryToInstallItem(market, this.specialItemData);
             ind.setSpecialItem(this.specialItemData);
@@ -435,6 +435,8 @@ public class ExpeditionFleetIntel extends FleetGroupIntel {
     }
 
     protected void configureFleet(int size, FleetCreatorMission m) {
+        m.triggerSetFleetQuality(HubMissionWithTriggers.FleetQuality.DEFAULT);
+        m.triggerSetFleetOfficers(HubMissionWithTriggers.OfficerNum.DEFAULT, HubMissionWithTriggers.OfficerQuality.DEFAULT);
         m.triggerSetFleetFlag(FLEET_KEY);
 
         // IDEA: Scale fleet quality base on source market ship quality
