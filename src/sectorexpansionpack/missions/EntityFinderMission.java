@@ -131,11 +131,16 @@ public class EntityFinderMission extends HubMissionWithSearch {
             // TODO: Filter modded colony items that is player use only or has demand effects
             for (Industry ind : market.getIndustries()) {
                 SpecialItemData otherData = ind.getSpecialItem();
-                if (otherData != null) {
-                    for (Industry otherInd : this.other.getIndustries()) {
-                        if (otherInd.wantsToUseSpecialItem(otherData)) {
-                            return true;
-                        }
+                if (otherData == null) {
+                    continue;
+                }
+                // TODO: Filter modded colony items that is player use only or has demand effects
+                if (Objects.equals(otherData.getId(), Items.CORONAL_PORTAL) || Objects.equals(otherData.getId(), Items.ORBITAL_FUSION_LAMP)) {
+                    continue;
+                }
+                for (Industry otherInd : this.other.getIndustries()) {
+                    if (otherInd.wantsToUseSpecialItem(otherData)) {
+                        return true;
                     }
                 }
             }
