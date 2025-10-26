@@ -76,8 +76,8 @@ public class ArtifactInstallationIntel extends BaseIntelPlugin {
         if (mode != ListInfoMode.IN_DESC) {
             info.addPara("Faction: %s", initPad, tc, fc, this.faction.getPersonNamePrefix());
             initPad = 0f;
-            info.addPara("%s installed %s %s", initPad, tc, h, this.specialItemSpec.getName(),
-                    this.market.getOnOrAt(), this.market.getName());
+            info.addPara("%s installed " + this.market.getOnOrAt() + " %s", initPad, tc, h,
+                    this.specialItemSpec.getName(), this.market.getName());
             initPad = 0f;
         }
 

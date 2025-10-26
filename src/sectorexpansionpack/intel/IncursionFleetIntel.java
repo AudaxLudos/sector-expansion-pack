@@ -33,8 +33,8 @@ public class IncursionFleetIntel extends GenericRaidFGI {
     public static final String FACTION_KEY = "$sep_ifi_sourceFaction";
     public static final String FLEET_KEY = "$sep_ifi_fleet";
     public static final String MAIN_FLEET_KEY = "$sep_ifi_mainFleet";
-    public static final String TARGET_KEY = "$sep_efi_target";
-    public static final String HAS_ARTIFACT = "$sep_efi_hasArtifact";
+    public static final String TARGET_KEY = "$sep_ifi_target";
+    public static final String HAS_ARTIFACT = "$sep_ifi_hasArtifact";
     public static Logger log = Global.getLogger(IncursionFleetIntel.class);
 
     protected Integer maxFleetSize = 10;
@@ -77,9 +77,9 @@ public class IncursionFleetIntel extends GenericRaidFGI {
 
         this.params.raidParams.where = this.target.getStarSystem();
         this.params.raidParams.type = FGRaidAction.FGRaidType.SEQUENTIAL;
-        this.params.raidParams.allowedTargets.add(this.target);
-        this.params.raidParams.allowNonHostileTargets = false;
+        this.params.raidParams.tryToCaptureObjectives = false;
         this.params.raidParams.raidsPerColony = 3;
+        this.params.raidParams.allowedTargets.add(this.target);
 
         this.params.factionId = this.source.getFactionId();
         this.params.style = FleetCreatorMission.FleetStyle.QUALITY;
@@ -90,7 +90,7 @@ public class IncursionFleetIntel extends GenericRaidFGI {
         // here might be a better way of scaling difficulty like using fleet points instead but this works for now
         float baseDifficulty = getMarketPresenceDifficulty(this.target.getStarSystem(), this.target.getFactionId());
         // A bit of variance so that fleets aren't always strong against target market
-        float variance = 0.5f + getRandom().nextFloat() * 0.5f;
+        float variance = 0.5f + (getRandom().nextFloat() * 0.75f);
         int totalDifficulty = Math.round(baseDifficulty * variance);
         log.info(String.format("Total fleet difficulty spawned at %s is %s", this.source.getName(), totalDifficulty));
 
@@ -532,11 +532,27 @@ public class IncursionFleetIntel extends GenericRaidFGI {
         super.notifyActionFinished(action);
 
         if (PAYLOAD_ACTION.equals(action.getId())) {
-            CampaignFleetAPI mainFleet = getMainFleet();
-            if (mainFleet != null) {
-                Misc.makeImportant(mainFleet, "hasSpecialItem");
-                Misc.addDefeatTrigger(mainFleet, "SEPIFGIFleetDefeated");
-                mainFleet.getMemoryWithoutUpdate().set(HAS_ARTIFACT, true);
+            if (this.raidAction.getSuccessFraction() > 0) {
+                CampaignFleetAPI mainFleet = getMainFleet();
+                if (mainFleet != null) {
+                    Misc.makeImportant(mainFleet, "hasSpecialItem");
+                    Misc.addDefeatTrigger(mainFleet, "SEPIFGIFleetDefeated");
+                    mainFleet.getMemoryWithoutUpdate().set(HAS_ARTIFACT, true);
+                }
+
+                for (Industry ind : this.target.getIndustries()) {
+                    if (ind.getSpecialItem() != null && ind.getSpecialItem() == this.specialItemData) {
+                        log.info(String.format("Removing %s from %s at %s in the %s due to an incursion",
+                                this.specialItemSpec.getName(), ind.getCurrentName(), this.target.getName(),
+                                this.target.getStarSystem().getNameWithLowercaseTypeShort()));
+                        ind.setSpecialItem(null);
+                        break;
+                    }
+                }
+
+                log.info(String.format("The %s incursion is successful at %s in the %s",
+                        this.faction.getDisplayName(), this.target.getName(),
+                        this.target.getStarSystem().getNameWithLowercaseTypeShort()));
             }
         } else if (RETURN_ACTION.equals(action.getId())) {
             this.efm.requireMarketFaction(this.source.getFactionId());

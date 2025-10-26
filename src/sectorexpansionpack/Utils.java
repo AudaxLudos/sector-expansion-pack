@@ -15,6 +15,8 @@ import com.fs.starfarer.api.plugins.OfficerLevelupPlugin;
 import com.fs.starfarer.api.util.Misc;
 import com.fs.starfarer.api.util.WeightedRandomPicker;
 import sectorexpansionpack.intel.ExpeditionFleetManager;
+import sectorexpansionpack.intel.IncursionFleetIntel;
+import sectorexpansionpack.intel.IncursionFleetManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -61,60 +63,5 @@ public class Utils {
             }
         }
         return industryPicker.pick();
-    }
-
-    public static boolean hasNanoforge(MarketAPI market) {
-        for (Industry industry : market.getIndustries()) {
-            SpecialItemData itemData = industry.getSpecialItem();
-            if (itemData == null) {
-                continue;
-            }
-            if (Objects.equals(itemData.getId(), Items.CORRUPTED_NANOFORGE)
-                    || Objects.equals(itemData.getId(), Items.PRISTINE_NANOFORGE)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public static boolean hasCryoEngine(MarketAPI market) {
-        for (Industry industry : market.getIndustries()) {
-            SpecialItemData itemData = industry.getSpecialItem();
-            if (itemData == null) {
-                continue;
-            }
-            if (Objects.equals(itemData.getId(), Items.CRYOARITHMETIC_ENGINE)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public void RunCodeScripts() {
-        for (OfficerDataAPI officer : Global.getSector().getPlayerFleet().getFleetData().getOfficersCopy()) {
-            OfficerLevelupPlugin plugin = (OfficerLevelupPlugin) Global.getSettings().getPlugin("officerLevelUp");
-            System.out.println("Max Level : " + plugin.getMaxLevel(officer.getPerson()));
-            for (String key : officer.getPerson().getMemoryWithoutUpdate().getKeys()) {
-                System.out.println(key + " : " + officer.getPerson().getMemoryWithoutUpdate().get(key));
-            }
-        }
-
-        //import com.fs.starfarer.api.impl.campaign.rulecmd.salvage.special.SleeperPodsSpecial;
-        for (SectorEntityToken entity : Global.getSector().getEntitiesWithTag(Tags.SALVAGEABLE)) {
-            if (Misc.getSalvageSpecial(entity) instanceof SleeperPodsSpecial.SleeperPodsSpecialData data) {
-                if (data.officer != null && data.officer.getMemoryWithoutUpdate().getBoolean(MemFlags.EXCEPTIONAL_SLEEPER_POD_OFFICER)) {
-                    System.out.println("System : " + entity.getStarSystem().getName());
-                    if (entity.getOrbitFocus() != null) {
-                        System.out.println(entity.getOrbitFocus().getName());
-                    }
-                }
-            }
-        }
-
-        //import sectorexpansionpack.intel.ExpeditionFleetManager;
-        ExpeditionFleetManager test = ExpeditionFleetManager.getInstance();
-        if (test != null) {
-            System.out.println(test.getActiveCount());
-        }
     }
 }
