@@ -5,7 +5,10 @@ import com.fs.starfarer.api.campaign.*;
 import com.fs.starfarer.api.campaign.econ.Industry;
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
 import com.fs.starfarer.api.fleet.FleetMemberAPI;
+import com.fs.starfarer.api.impl.campaign.fleets.FleetFactoryV3;
+import com.fs.starfarer.api.impl.campaign.fleets.FleetParamsV3;
 import com.fs.starfarer.api.impl.campaign.ids.Ranks;
+import com.fs.starfarer.api.impl.campaign.ids.Stats;
 import com.fs.starfarer.api.impl.campaign.intel.group.FGAction;
 import com.fs.starfarer.api.impl.campaign.intel.group.FGRaidAction;
 import com.fs.starfarer.api.impl.campaign.intel.group.GenericRaidFGI;
@@ -27,8 +30,6 @@ import java.awt.*;
 import java.util.List;
 import java.util.Random;
 
-// TODO: Add custom dialogs to quick reaction force fleet
-// TODO: Add checks for special items that are player used only or that has commodity demand affects
 public class IncursionFleetIntel extends GenericRaidFGI {
     public static final String EVENT_KEY = "$sep_ifi_ref";
     public static final String FACTION_KEY = "$sep_ifi_sourceFaction";
@@ -38,6 +39,7 @@ public class IncursionFleetIntel extends GenericRaidFGI {
     public static final String HAS_ARTIFACT = "$sep_efi_hasArtifact";
     public static Logger log = Global.getLogger(IncursionFleetIntel.class);
 
+    protected Integer maxFleetSize = 10;
     protected EntityFinderMission efm;
     protected MarketAPI source;
     protected MarketAPI target;
@@ -82,10 +84,28 @@ public class IncursionFleetIntel extends GenericRaidFGI {
         this.params.noun = "incursion";
         this.params.forcesNoun = "incursion forces";
 
-        // TODO: Scale fleets based on target faction system presence
-        this.params.fleetSizes.add(10);
-        this.params.fleetSizes.add(8);
-        this.params.fleetSizes.add(8);
+        // here might be a better way of scaling difficulty like using fleet points instead but this works for now
+        float baseDifficulty = getMarketPresenceDifficulty(this.target.getStarSystem(), this.target.getFactionId());
+        // A bit of variance so that fleets aren't always strong against target market
+        float variance = 0.5f + getRandom().nextFloat() * 0.5f;
+        int totalDifficulty = Math.round(baseDifficulty * variance);
+        log.info(String.format("Total fleet difficulty spawned at %s is %s", this.source.getName(), totalDifficulty));
+
+        if (totalDifficulty - 10 < 0) {
+            this.maxFleetSize = totalDifficulty;
+        }
+
+        this.params.fleetSizes.add(this.maxFleetSize);
+        totalDifficulty -= this.maxFleetSize;
+
+        while (totalDifficulty > 0) {
+            int min = 3;
+            int max = this.maxFleetSize - 2;
+            int diff = min + getRandom().nextInt(max - min + 1);
+
+            this.params.fleetSizes.add(diff);
+            totalDifficulty -= diff;
+        }
 
         initActions();
 
@@ -107,8 +127,6 @@ public class IncursionFleetIntel extends GenericRaidFGI {
     public void pickSource() {
         this.efm.requireMarketNotHidden();
         this.efm.requireMarketFactionNotPlayer();
-        this.efm.requireMarketStabilityAtLeast(8);
-        this.efm.preferMarketHasSpaceport();
         this.efm.preferMarketMilitary();
         this.source = this.efm.pickMarket();
         if (this.source == null) {
@@ -154,18 +172,45 @@ public class IncursionFleetIntel extends GenericRaidFGI {
         }
     }
 
+    public float getMarketPresenceDifficulty(StarSystemAPI system, String factionId) {
+        float difficulty = 0f;
+        for (MarketAPI market : Misc.getMarketsInLocation(system, factionId)) {
+            difficulty += estimateMarketDifficulty(market);
+        }
+
+        return difficulty;
+    }
+
+    public int estimateMarketDifficulty(MarketAPI market) {
+        float difficulty = 0f;
+
+        int maxLight = (int) market.getStats().getDynamic().getMod(Stats.PATROL_NUM_LIGHT_MOD).computeEffective(0);
+        int maxMedium = (int) market.getStats().getDynamic().getMod(Stats.PATROL_NUM_MEDIUM_MOD).computeEffective(0);
+        int maxHeavy = (int) market.getStats().getDynamic().getMod(Stats.PATROL_NUM_HEAVY_MOD).computeEffective(0);
+        float fleetSizeMult = market.getStats().getDynamic().getMod(Stats.COMBAT_FLEET_SIZE_MULT).computeEffective(0f);
+        float fleetQualityMult = Misc.getShipQuality(this.target);
+
+        for (int i = 0; i < maxLight; i++) {
+            difficulty += 1 * fleetSizeMult * fleetQualityMult;
+        }
+        for (int i = 0; i < maxMedium; i++) {
+            difficulty += 2 * fleetSizeMult * fleetQualityMult;
+        }
+        for (int i = 0; i < maxHeavy; i++) {
+            difficulty += 4 * fleetSizeMult * fleetQualityMult;
+        }
+
+        return Math.round(difficulty);
+    }
+
     @Override
     protected void configureFleet(int size, FleetCreatorMission m) {
+        m.triggerSetFleetOfficers(HubMissionWithTriggers.OfficerNum.DEFAULT, HubMissionWithTriggers.OfficerQuality.DEFAULT);
+        m.triggerSetFleetQuality(HubMissionWithTriggers.FleetQuality.DEFAULT);
         m.triggerSetFleetFlag(FLEET_KEY);
 
-        // TODO: Scale fleet quality based on source size, is military, has heavy industry
-        if (size == 10) {
-            m.triggerSetFleetQuality(HubMissionWithTriggers.FleetQuality.SMOD_3);
+        if (size == this.maxFleetSize) {
             m.triggerSetFleetFlag(MAIN_FLEET_KEY);
-        } else if (getRandom().nextFloat() < 0.5f) {
-            m.triggerSetFleetQuality(HubMissionWithTriggers.FleetQuality.SMOD_1);
-        } else {
-            m.triggerSetFleetQuality(HubMissionWithTriggers.FleetQuality.SMOD_2);
         }
 
         boolean lightDetachment = size <= 5;
@@ -185,10 +230,16 @@ public class IncursionFleetIntel extends GenericRaidFGI {
             }
         }
 
-        if (size == 10) {
+        if (size == this.maxFleetSize) {
             fleet.setName("Incursion Command Fleet");
             fleet.getCommander().setRankId(Ranks.SPACE_ADMIRAL);
             setNeverStraggler(fleet);
+            if (isCurrent(TRAVEL_ACTION) && this.raidAction.getSuccessFraction() > 0f && this.raidAction.isActionFinished()) {
+                // Ensure fleet is marked properly when it spawns midway
+                Misc.makeImportant(fleet, "hasSpecialItem");
+                Misc.addDefeatTrigger(fleet, "SEPEFGIFleetDefeated");
+                fleet.getMemoryWithoutUpdate().set(HAS_ARTIFACT, true);
+            }
         } else if (hasCombatCapital) {
             fleet.setName("Incursion Assault Detachment");
             fleet.getCommander().setRankId(Ranks.SPACE_CAPTAIN);
@@ -198,14 +249,6 @@ public class IncursionFleetIntel extends GenericRaidFGI {
         } else {
             fleet.setName("Incursion Light Detachment");
             fleet.getCommander().setRankId(Ranks.SPACE_COMMANDER);
-        }
-
-        if (isCurrent(TRAVEL_ACTION) && this.raidAction.getSuccessFraction() > 0f && this.raidAction.isActionFinished()
-                && fleet.getMemoryWithoutUpdate().getBoolean(MAIN_FLEET_KEY)) {
-            // Ensure fleet is marked properly when it spawns midway
-            Misc.makeImportant(fleet, "hasSpecialItem");
-            Misc.addDefeatTrigger(fleet, "SEPEFGIFleetDefeated");
-            fleet.getMemoryWithoutUpdate().set(HAS_ARTIFACT, true);
         }
     }
 
@@ -391,7 +434,7 @@ public class IncursionFleetIntel extends GenericRaidFGI {
 
     @Override
     protected String getAssessmentRiskStringHighlightOverride() {
-        return "losing its used colony items";
+        return "losing one of its used colony items";
     }
 
     @Override
@@ -510,9 +553,13 @@ public class IncursionFleetIntel extends GenericRaidFGI {
     }
 
     @Override
-    protected void notifyEnded() {
-        super.notifyEnded();
+    protected void notifyEnding() {
+        super.notifyEnding();
         unsetEventMemoryFlags();
+
+        if (this.endingTimeRemaining > 0f) {
+            log.info(String.format("Ending %s incursion event", this.source.getFaction().getDisplayName()));
+        }
     }
 
     public void unsetEventMemoryFlags() {
@@ -528,22 +575,22 @@ public class IncursionFleetIntel extends GenericRaidFGI {
         }
 
         // Unset fleet memory flags
-        CampaignFleetAPI mainFleet = getMainFleet();
-        if (mainFleet != null) {
-            Misc.makeUnimportant(mainFleet, "hasSpecialItem");
-            mainFleet.getMemoryWithoutUpdate().unset(MAIN_FLEET_KEY);
-            mainFleet.getMemoryWithoutUpdate().unset(HAS_ARTIFACT);
-            mainFleet.getMemoryWithoutUpdate().unset(EVENT_KEY);
+        for (CampaignFleetAPI fleet : this.fleets) {
+            Misc.makeUnimportant(fleet, "hasSpecialItem");
+            fleet.getMemoryWithoutUpdate().unset(FLEET_KEY);
+            fleet.getMemoryWithoutUpdate().unset(MAIN_FLEET_KEY);
+            fleet.getMemoryWithoutUpdate().unset(HAS_ARTIFACT);
+            fleet.getMemoryWithoutUpdate().unset(EVENT_KEY);
         }
+    }
+
+    @Override
+    protected boolean shouldAbort() {
+        return isSpawnedFleets() && getMainFleet() == null;
     }
 
     @Override
     public boolean isSucceeded() {
         return this.returnAction.isActionFinished() && super.isSucceeded();
-    }
-
-    @Override
-    public boolean isFailed() {
-        return super.isFailed();
     }
 }
