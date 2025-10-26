@@ -289,6 +289,10 @@ public class ExpeditionFleetIntel extends FleetGroupIntel {
     protected void notifyEnding() {
         super.notifyEnding();
         unsetEventMemoryFlags();
+
+        if (this.endingTimeRemaining > 0f) {
+            log.info(String.format("Ending %s expedition event", this.source.getFaction().getDisplayName()));
+        }
     }
 
     public void unsetEventMemoryFlags() {

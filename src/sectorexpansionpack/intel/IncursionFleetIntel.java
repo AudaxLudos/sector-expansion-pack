@@ -5,8 +5,6 @@ import com.fs.starfarer.api.campaign.*;
 import com.fs.starfarer.api.campaign.econ.Industry;
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
 import com.fs.starfarer.api.fleet.FleetMemberAPI;
-import com.fs.starfarer.api.impl.campaign.fleets.FleetFactoryV3;
-import com.fs.starfarer.api.impl.campaign.fleets.FleetParamsV3;
 import com.fs.starfarer.api.impl.campaign.ids.Ranks;
 import com.fs.starfarer.api.impl.campaign.ids.Stats;
 import com.fs.starfarer.api.impl.campaign.intel.group.FGAction;
@@ -48,8 +46,13 @@ public class IncursionFleetIntel extends GenericRaidFGI {
 
     public IncursionFleetIntel() {
         super(null);
-        this.efm = new EntityFinderMission();
         setRandom(new Random(Utils.random.nextLong()));
+        this.efm = new EntityFinderMission();
+        pickFaction();
+        if (isDone()) {
+            log.info("Failed to find faction");
+            return;
+        }
         pickSource();
         if (isDone()) {
             log.info("Failed to find source market");
@@ -124,7 +127,26 @@ public class IncursionFleetIntel extends GenericRaidFGI {
                 this.target.getName(), this.target.getStarSystem().getNameWithLowercaseTypeShort()));
     }
 
+    public void pickFaction() {
+        WeightedRandomPicker<FactionAPI> factionPicker = new WeightedRandomPicker<>(getRandom());
+        for (FactionAPI faction : Global.getSector().getAllFactions()) {
+            if (faction.getMemoryWithoutUpdate().getBoolean(ExpeditionFleetIntel.FACTION_KEY)) {
+                continue;
+            }
+            if (!faction.isShowInIntelTab()) {
+                continue;
+            }
+            factionPicker.add(faction);
+        }
+
+        setFaction(factionPicker.pick());
+        if (getFaction() == null) {
+            endImmediately();
+        }
+    }
+
     public void pickSource() {
+        this.efm.requireMarketFaction(getFaction().getId());
         this.efm.requireMarketNotHidden();
         this.efm.requireMarketFactionNotPlayer();
         this.efm.preferMarketMilitary();
