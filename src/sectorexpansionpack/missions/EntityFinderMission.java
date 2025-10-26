@@ -5,10 +5,12 @@ import com.fs.starfarer.api.campaign.SectorEntityToken;
 import com.fs.starfarer.api.campaign.SpecialItemData;
 import com.fs.starfarer.api.campaign.econ.Industry;
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
+import com.fs.starfarer.api.impl.campaign.ids.Items;
 import com.fs.starfarer.api.impl.campaign.missions.hub.HubMissionWithSearch;
 import com.fs.starfarer.api.util.Misc;
 import sectorexpansionpack.Utils;
 
+import java.util.Objects;
 import java.util.Random;
 
 public class EntityFinderMission extends HubMissionWithSearch {
@@ -127,8 +129,6 @@ public class EntityFinderMission extends HubMissionWithSearch {
 
         @Override
         public boolean marketMatchesRequirement(MarketAPI market) {
-            // TODO: Filter vanilla colony items that is player use only or has demand effects
-            // TODO: Filter modded colony items that is player use only or has demand effects
             for (Industry ind : market.getIndustries()) {
                 SpecialItemData otherData = ind.getSpecialItem();
                 if (otherData == null) {

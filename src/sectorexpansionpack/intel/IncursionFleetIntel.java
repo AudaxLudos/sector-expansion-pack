@@ -162,6 +162,7 @@ public class IncursionFleetIntel extends GenericRaidFGI {
         this.efm.requireMarketFactionNotPlayer();
         this.efm.requireMarketNotHidden();
         this.efm.requireMarketUsesSpecialItems();
+        this.efm.requireMarketNoMemoryFlag(TARGET_KEY);
         this.efm.requireMarketHasCompatibleSpecialItemsWithOther(this.source);
         this.target = this.efm.pickMarket();
         if (this.target == null) {
