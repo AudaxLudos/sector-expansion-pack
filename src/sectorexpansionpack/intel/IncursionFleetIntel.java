@@ -257,7 +257,7 @@ public class IncursionFleetIntel extends GenericRaidFGI {
             fleet.setName("Incursion Command Fleet");
             fleet.getCommander().setRankId(Ranks.SPACE_ADMIRAL);
             setNeverStraggler(fleet);
-            if (isCurrent(TRAVEL_ACTION) && this.raidAction.getSuccessFraction() > 0f && this.raidAction.isActionFinished()) {
+            if (isCurrent(RETURN_ACTION) && this.raidAction.getSuccessFraction() > 0f && this.raidAction.isActionFinished()) {
                 // Ensure fleet is marked properly when it spawns midway
                 Misc.makeImportant(fleet, "hasSpecialItem");
                 Misc.addDefeatTrigger(fleet, "SEPEFGIFleetDefeated");
