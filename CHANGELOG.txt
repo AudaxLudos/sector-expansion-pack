@@ -1,3 +1,16 @@
+### 0.0.124a
+- Add fleet defeat triggers for incursion and expedition fleets
+- Remove target colony item when incursion raid succeeds
+- Fix incursion fleet not getting marked if spawned midway
+- Scale fleets of incursion based on target system
+- Filter colony items that are player use only or has demand effects
+- Include wrecks as expedition targets
+- Scale fleets of expedition based on source market
+- Decrease new ghost types durations
+- Add hyperspace topology event progress when hyperspace anomaly research mission is successful
+- Install colony items when incursion is successful
+- Fix random generators using same seed
+
 ### 0.0.93a
 - Add fleet eater ghost
 - Add hyperspace anomaly research mission
