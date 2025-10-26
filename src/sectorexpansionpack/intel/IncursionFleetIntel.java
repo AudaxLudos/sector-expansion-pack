@@ -4,6 +4,7 @@ import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.campaign.*;
 import com.fs.starfarer.api.campaign.econ.Industry;
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
+import com.fs.starfarer.api.campaign.rules.MemoryAPI;
 import com.fs.starfarer.api.fleet.FleetMemberAPI;
 import com.fs.starfarer.api.impl.campaign.ids.Ranks;
 import com.fs.starfarer.api.impl.campaign.ids.Stats;
@@ -13,6 +14,7 @@ import com.fs.starfarer.api.impl.campaign.intel.group.GenericRaidFGI;
 import com.fs.starfarer.api.impl.campaign.missions.FleetCreatorMission;
 import com.fs.starfarer.api.impl.campaign.missions.hub.BaseHubMission;
 import com.fs.starfarer.api.impl.campaign.missions.hub.HubMissionWithTriggers;
+import com.fs.starfarer.api.impl.campaign.rulecmd.AddRemoveCommodity;
 import com.fs.starfarer.api.impl.campaign.rulecmd.salvage.MarketCMD;
 import com.fs.starfarer.api.ui.Alignment;
 import com.fs.starfarer.api.ui.LabelAPI;
@@ -26,6 +28,7 @@ import sectorexpansionpack.missions.EntityFinderMission;
 
 import java.awt.*;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 public class IncursionFleetIntel extends GenericRaidFGI {
@@ -234,6 +237,7 @@ public class IncursionFleetIntel extends GenericRaidFGI {
 
         if (size == this.maxFleetSize) {
             m.triggerSetFleetFlag(MAIN_FLEET_KEY);
+            m.triggerSetFleetMemoryValue(EVENT_KEY, this);
         }
 
         boolean lightDetachment = size <= 5;
@@ -260,7 +264,7 @@ public class IncursionFleetIntel extends GenericRaidFGI {
             if (isCurrent(RETURN_ACTION) && this.raidAction.getSuccessFraction() > 0f && this.raidAction.isActionFinished()) {
                 // Ensure fleet is marked properly when it spawns midway
                 Misc.makeImportant(fleet, "hasSpecialItem");
-                Misc.addDefeatTrigger(fleet, "SEPEFGIFleetDefeated");
+                Misc.addDefeatTrigger(fleet, "SEPIFGIFleetDefeated");
                 fleet.getMemoryWithoutUpdate().set(HAS_ARTIFACT, true);
             }
         } else if (hasCombatCapital) {
@@ -569,6 +573,7 @@ public class IncursionFleetIntel extends GenericRaidFGI {
                 return;
             }
 
+            // IDEA: Create a courier fleet that transfers the colony item to another faction market if the source market can't use it
             // TODO: Delay installation by a few days
             Industry ind = Utils.pickIndustryToInstallItem(market, this.specialItemData);
             ind.setSpecialItem(this.specialItemData);
@@ -577,18 +582,6 @@ public class IncursionFleetIntel extends GenericRaidFGI {
                     this.specialItemSpec.getName(), ind.getCurrentName(), market.getOnOrAt(),
                     market.getName(), market.getStarSystem().getNameWithLowercaseTypeShort()));
         }
-    }
-
-    public CampaignFleetAPI getMainFleet() {
-        if (isSpawnedFleets()) {
-            for (CampaignFleetAPI fleet : getFleets()) {
-                if (fleet.getMemoryWithoutUpdate().getBoolean(MAIN_FLEET_KEY)) {
-                    return fleet;
-                }
-            }
-        }
-
-        return null;
     }
 
     @Override
@@ -626,6 +619,35 @@ public class IncursionFleetIntel extends GenericRaidFGI {
     @Override
     protected boolean shouldAbort() {
         return isSpawnedFleets() && getMainFleet() == null;
+    }
+
+    @Override
+    public boolean callEvent(String ruleId, InteractionDialogAPI dialog, List<Misc.Token> params, Map<String, MemoryAPI> memoryMap) {
+        String action = params.get(0).getString(memoryMap);
+
+        if ("endEvent".equals(action)) {
+            unsetEventMemoryFlags();
+            finish(true);
+            return true;
+        } else if ("giveArtifact".equals(action)) {
+            Global.getSector().getPlayerFleet().getCargo().addSpecial(this.specialItemData, 1f);
+            AddRemoveCommodity.addItemGainText(this.specialItemData, 1, dialog.getTextPanel());
+            return true;
+        }
+
+        return super.callEvent(ruleId, dialog, params, memoryMap);
+    }
+
+    public CampaignFleetAPI getMainFleet() {
+        if (isSpawnedFleets()) {
+            for (CampaignFleetAPI fleet : getFleets()) {
+                if (fleet.getMemoryWithoutUpdate().getBoolean(MAIN_FLEET_KEY)) {
+                    return fleet;
+                }
+            }
+        }
+
+        return null;
     }
 
     @Override

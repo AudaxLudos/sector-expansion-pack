@@ -435,16 +435,14 @@ public class ExpeditionFleetIntel extends FleetGroupIntel {
     }
 
     protected void configureFleet(int size, FleetCreatorMission m) {
-        m.triggerSetFleetQuality(HubMissionWithTriggers.FleetQuality.DEFAULT);
         m.triggerSetFleetOfficers(HubMissionWithTriggers.OfficerNum.DEFAULT, HubMissionWithTriggers.OfficerQuality.DEFAULT);
+        m.triggerSetFleetQuality(HubMissionWithTriggers.FleetQuality.DEFAULT);
         m.triggerSetFleetFlag(FLEET_KEY);
 
         // IDEA: Scale fleet quality base on source market ship quality
         if (size == this.maxFleetSize) { // Main Fleet
-            m.triggerSetFleetQuality(this.maxFleetQuality);
             m.triggerSetFleetFlag(MAIN_FLEET_KEY);
-        } else {
-            m.triggerSetFleetQuality(this.maxFleetQuality.prev());
+            m.triggerSetFleetMemoryValue(EVENT_KEY, this);
         }
 
         boolean lightDetachment = size <= 5;

@@ -1,4 +1,21 @@
 id,trigger,conditions,script,text,options,notes
+# Incursion Fleet Event START,,,,,,
+sep_ifi_fleetHasArtifact,OpenCommLink,"$entity.sep_ifi_mainFleet score:1000
+$entity.sep_ifi_hasArtifact score:1000","ShowDefaultVisual
+SetStoryOption sep_ifi_persuadeToGive ui_char_spent_story_point ""Persuade the fleet to give the artifact""
+$entity.ignorePlayerCommRequests = true","""Captain,"" $heOrShe says in a clipped tone. ""I’m currently busy and can’t afford distractions. If this isn’t urgent, you’ve got one chance, make it quick.""","sep_ifi_persuadeToGive:Persuade to give cargo
+cutCommLink:Cut the comm link",
+sep_ifi_fleetPersudeToGive,DialogOptionSelected,$option == sep_ifi_persuadeToGive,"Call $entity.sep_ifi_ref giveArtifact
+Call $entity.sep_ifi_ref endEvent
+MakeOtherFleetAllowDisengage sep_ifi true
+MakeOtherFleetNonHostile sep_ifi true","The captain blinks, momentarily taken aback by your request. ""You’re serious about this?"" $heOrShe asks, studying you for a moment before letting out a quiet sigh. ""Fine… you’ve made your point, Captain. I’ll authorize the transfer. Just make sure it’s worth the trouble.""",cutCommLink:Cut the comm link,
+sep_ifi_fleetDefeated,SEPIFGIFleetDefeated,"$sep_ifi_mainFleet score:1000
+$sep_ifi_hasArtifact score:1000
+$someShipsDestroyed","Call $entity.sep_ifi_ref giveArtifact
+Call $entity.sep_ifi_ref endEvent
+MakeOtherFleetAllowDisengage sep_ifi true
+MakeOtherFleetNonHostile sep_ifi true",Your sensors officer detects a unique energy signature among the floating debris. You send your salvage crews to recover it.,,
+# Incursion Fleet Event END,,,,,,
 # Expedition Fleet Intel START,,,,,,
 sep_efi_targetGuarded,OpenInteractionDialog,"$sep_efi_target score:1000
 $sep_efi_targetGuarded score:1000
