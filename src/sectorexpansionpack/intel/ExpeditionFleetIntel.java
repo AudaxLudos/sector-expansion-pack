@@ -247,6 +247,7 @@ public class ExpeditionFleetIntel extends FleetGroupIntel {
                 mainFleet.getMemoryWithoutUpdate().set(HAS_ARTIFACT, true);
             }
         } else if (DOCK_ACTION.equals(action.getId())) {
+            this.efm.resetSearch();
             this.efm.requireMarketFaction(getFaction().getId());
             this.efm.requireMarketNotHidden();
             this.efm.requireMarketNotInHyperspace();

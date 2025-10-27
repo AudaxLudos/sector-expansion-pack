@@ -559,6 +559,7 @@ public class IncursionFleetIntel extends GenericRaidFGI {
                         this.target.getStarSystem().getNameWithLowercaseTypeShort()));
             }
         } else if (RETURN_ACTION.equals(action.getId())) {
+            this.efm.resetSearch();
             this.efm.requireMarketFaction(this.source.getFactionId());
             this.efm.requireMarketNotHidden();
             this.efm.requireMarketNotInHyperspace();
