@@ -278,3 +278,15 @@ Call $sep_harm_ref updateStage","You transmit the completed hyperspace anomaly d
 
 $HeOrShe thanks you for the data before getting lost in its details, even forgeting to cut the comm link.",cutCommLink:Cut the comm link,
 # Ghosts research mission END,,,,,,
+# Fleet escort mission START,,,,,,
+## Contact offer dialogs,,,,,,
+sep_fem_blurb,sep_fem_blurb,,,FEM CONTACT MISSION BLURB,,
+sep_fem_offerOption,sep_fem_option,,,,sep_fem_start:FEM CONTACT MISSION OPTION,
+sep_fem_offerTextContact1,DialogOptionSelected,$option == sep_fem_start,$missionId = sep_fem,FEM CONTACT MISSION OFFER TEXT,"contact_accept:Accept
+contact_decline:Decline",
+## Bar offer dialogs,,,,,,
+sep_fem_blurbBar,sep_fem_blurbBar,,,FEM BAR MISSION BLURB,,
+sep_fem_offerOptionBar,sep_fem_optionBar,,,,sep_fem_startBar:FEM BAR MISSION OPTION,
+sep_fem_offerTextBar1,DialogOptionSelected,$option == sep_fem_startBar,$missionId = sep_fem,FEM BAR MISSION OFFER TEXT,"contact_acceptBar:Accept
+contact_declineBarNoContinue:Decline",
+# Fleet escort mission END,,,,,,

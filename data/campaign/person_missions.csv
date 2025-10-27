@@ -2,4 +2,5 @@ mission id,person id,tagsAll,tagsAny,tagsNotAny,tags,freq,min timeout,max timeou
 sep_sar,,,military,,,3,30,60,NEUTRAL,,,,,,graphics/portraits/portrait_generic.png,sectorexpansionpack.missions.SearchAndRescueMission
 sep_aim,,,"military, underworld",,,3,30,60,NEUTRAL,,,,,,graphics/icons/missions/purchase_artifact.png,sectorexpansionpack.missions.ArtifactIncursionMission
 sep_harm,,,"military, trade",,,10,30,60,INHOSPITABLE,,,,,,graphics/icons/missions/purchase_artifact.png,sectorexpansionpack.missions.HyperspaceAnomalyResearchMission
+#sep_fem,,,"military, trade",,,10,30,60,INHOSPITABLE,,,,,,graphics/icons/missions/purchase_artifact.png,sectorexpansionpack.missions.FleetEscortMission
 ,,,,,,,,,,,,,,,,

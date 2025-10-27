@@ -2,4 +2,5 @@ bar event id,tags,freq,prob,min dur,max dur,min timeout,max timeout,min accepted
 sep_sar,,3,1,30,40,15,20,60,90,sectorexpansionpack.missions.SearchAndRescueMission
 sep_aim,,3,1,30,40,15,20,60,90,sectorexpansionpack.missions.ArtifactIncursionMission
 sep_harm,,10,1,30,40,15,20,60,90,sectorexpansionpack.missions.HyperspaceAnomalyResearchMission
+#sep_fem,,10,1,30,40,15,20,60,90,sectorexpansionpack.missions.FleetEscortMission
 ,,,,,,,,,,
