@@ -8,10 +8,12 @@ import com.fs.starfarer.api.impl.campaign.ids.FleetTypes;
 import com.fs.starfarer.api.impl.campaign.ids.Ranks;
 import com.fs.starfarer.api.impl.campaign.ids.Tags;
 import com.fs.starfarer.api.impl.campaign.missions.hub.HubMissionWithBarEvent;
+import com.fs.starfarer.api.ui.TooltipMakerAPI;
 import com.fs.starfarer.api.util.Misc;
 import org.apache.log4j.Logger;
 import sectorexpansionpack.missions.hub.EscortFleetAssignmentAI;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -120,8 +122,40 @@ public class FleetEscortMission extends HubMissionWithBarEvent {
 
     @Override
     public String getBaseName() {
-        log.info(getGotoEntity().getName() + " : " + getGotoEntity().getStarSystem().getNameWithLowercaseTypeShort());
         return "Fleet Escort";
+    }
+
+    @Override
+    public boolean addNextStepText(TooltipMakerAPI info, Color tc, float pad) {
+        Color h = Misc.getHighlightColor();
+        if (this.currentStage == Stage.GOTO) {
+            info.addPara("Escort the fleet to %s in the %s.", pad, tc, h, this.gotoEntity.getName(),
+                    this.gotoEntity.getStarSystem().getNameWithLowercaseTypeShort());
+        } else if (this.currentStage == Stage.WAIT) {
+            info.addPara("Wait for the fleet to complete its objectives in the %s.", pad, tc, h,
+                    this.gotoEntity.getStarSystem().getNameWithLowercaseTypeShort());
+        } else if (this.currentStage == Stage.RETURN) {
+            info.addPara("Escort the fleet back to %s in the %s.", pad, tc, h,
+                    this.gotoEntity.getName(), this.gotoEntity.getStarSystem().getNameWithLowercaseTypeShort());
+        }
+        return false;
+    }
+
+    @Override
+    public void addDescriptionForNonEndStage(TooltipMakerAPI info, float width, float height) {
+        float oPad = 10f;
+        Color tc = Misc.getTextColor();
+        Color h = Misc.getHighlightColor();
+        if (this.currentStage == Stage.GOTO) {
+            info.addPara("Escort the fleet to %s in the %s.", oPad, tc, h, this.gotoEntity.getName(),
+                    this.gotoEntity.getStarSystem().getNameWithLowercaseTypeShort());
+        } else if (this.currentStage == Stage.WAIT) {
+            info.addPara("Wait for the fleet to complete its objectives in the %s.", oPad, tc, h,
+                    this.gotoEntity.getStarSystem().getNameWithLowercaseTypeShort());
+        } else if (this.currentStage == Stage.RETURN) {
+            info.addPara("Escort the fleet back to %s in the %s.", oPad, tc, h,
+                    this.gotoEntity.getName(), this.gotoEntity.getStarSystem().getNameWithLowercaseTypeShort());
+        }
     }
 
     public SectorEntityToken getGotoEntity() {

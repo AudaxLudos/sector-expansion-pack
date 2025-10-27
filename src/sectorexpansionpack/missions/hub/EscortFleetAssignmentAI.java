@@ -133,11 +133,11 @@ public class EscortFleetAssignmentAI implements EveryFrameScript, Script {
                     if (this.mission.getCurrentStage() == FleetEscortMission.Stage.GOTO) {
                         this.mission.setCurrentStage(FleetEscortMission.Stage.WAIT, null, null);
                         this.fleet.clearAssignments();
-                        this.fleet.addAssignment(FleetAssignment.ORBIT_PASSIVE, entity, 3f + this.mission.getGenRandom().nextFloat() * 7f, "Standing down at " + entity.getName(), this);
+                        this.fleet.addAssignment(FleetAssignment.ORBIT_PASSIVE, entity, 3f + this.mission.getGenRandom().nextFloat() * 7f, "Completing objectives at " + entity.getName(), this);
                     } else if (this.mission.getCurrentStage() == FleetEscortMission.Stage.RETURN) {
                         this.mission.setCurrentStage(FleetEscortMission.Stage.COMPLETED, null, null);
                         this.fleet.clearAssignments();
-                        this.fleet.addAssignment(FleetAssignment.GO_TO_LOCATION_AND_DESPAWN, entity, 999999f, "Standing down at " + entity.getName(), this);
+                        this.fleet.addAssignment(FleetAssignment.GO_TO_LOCATION_AND_DESPAWN, entity, 999999f, "Standing down at " + entity.getName());
                     }
                 }
             }
