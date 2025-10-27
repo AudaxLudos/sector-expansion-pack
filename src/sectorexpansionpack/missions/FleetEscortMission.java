@@ -161,6 +161,22 @@ public class FleetEscortMission extends HubMissionWithBarEvent {
         }
     }
 
+    @Override
+    public List<ArrowData> getArrowData(SectorMapAPI map) {
+        List<ArrowData> result = new ArrayList<>();
+
+        ArrowData arrowFleet = new ArrowData(Global.getSector().getPlayerFleet(), this.fleet);
+        arrowFleet.width = 14f;
+        arrowFleet.color = Misc.getHighlightColor();
+        result.add(arrowFleet);
+
+        ArrowData arrowDestination = new ArrowData(Global.getSector().getPlayerFleet(), getGotoEntity());
+        arrowDestination.width = 14f;
+        result.add(arrowDestination);
+
+        return result;
+    }
+
     public SectorEntityToken getGotoEntity() {
         if (getCurrentStage() == Stage.GOTO) {
             return this.gotoEntity;
