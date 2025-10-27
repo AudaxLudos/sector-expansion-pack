@@ -1,8 +1,7 @@
 package sectorexpansionpack;
 
-import com.fs.starfarer.api.campaign.CustomCampaignEntityAPI;
-import com.fs.starfarer.api.campaign.SectorEntityToken;
-import com.fs.starfarer.api.campaign.SpecialItemData;
+import com.fs.starfarer.api.Global;
+import com.fs.starfarer.api.campaign.*;
 import com.fs.starfarer.api.campaign.econ.Industry;
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
 import com.fs.starfarer.api.util.Misc;
@@ -53,5 +52,30 @@ public class Utils {
             }
         }
         return industryPicker.pick();
+    }
+
+    public static List<JumpPointAPI> getHyperspaceJumpPoints(StarSystemAPI system) {
+        List<JumpPointAPI> results = new ArrayList<>();
+        for (SectorEntityToken entity : Global.getSector().getHyperspace().getJumpPoints()) {
+            JumpPointAPI jumpPoint = (JumpPointAPI) entity;
+            if (jumpPoint.getDestinationStarSystem() == system) {
+                results.add(jumpPoint);
+            }
+        }
+
+        return results;
+    }
+
+    public static SectorEntityToken getClosestJumpPoint(SectorEntityToken from) {
+        SectorEntityToken closest = null;
+        float min = Float.MAX_VALUE;
+        for (SectorEntityToken to : from.getContainingLocation().getJumpPoints()) {
+            float dist = Misc.getDistance(from, to);
+            if (min > dist) {
+                min = dist;
+                closest = to;
+            }
+        }
+        return closest;
     }
 }

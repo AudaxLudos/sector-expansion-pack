@@ -120,14 +120,14 @@ public class FleetEscortMission extends HubMissionWithBarEvent {
 
     @Override
     public String getBaseName() {
+        log.info(getGotoEntity().getName() + " : " + getGotoEntity().getStarSystem().getNameWithLowercaseTypeShort());
         return "Fleet Escort";
     }
 
     public SectorEntityToken getGotoEntity() {
-        return this.gotoEntity;
-    }
-
-    public SectorEntityToken getPersonEntity() {
+        if (getCurrentStage() == Stage.GOTO) {
+            return this.gotoEntity;
+        }
         return getPerson().getMarket().getPrimaryEntity();
     }
 
