@@ -2,12 +2,15 @@ package sectorexpansionpack.missions;
 
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.campaign.CampaignFleetAPI;
+import com.fs.starfarer.api.campaign.InteractionDialogAPI;
 import com.fs.starfarer.api.campaign.SectorEntityToken;
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
+import com.fs.starfarer.api.campaign.rules.MemoryAPI;
 import com.fs.starfarer.api.impl.campaign.ids.FleetTypes;
 import com.fs.starfarer.api.impl.campaign.ids.Ranks;
 import com.fs.starfarer.api.impl.campaign.ids.Tags;
 import com.fs.starfarer.api.impl.campaign.missions.hub.HubMissionWithBarEvent;
+import com.fs.starfarer.api.ui.SectorMapAPI;
 import com.fs.starfarer.api.ui.TooltipMakerAPI;
 import com.fs.starfarer.api.util.Misc;
 import org.apache.log4j.Logger;
@@ -16,8 +19,10 @@ import sectorexpansionpack.missions.hub.EscortFleetAssignmentAI;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class FleetEscortMission extends HubMissionWithBarEvent {
+    public static final float MISSION_DURATION = 120f;
     public static Logger log = Global.getLogger(FleetEscortMission.class);
     protected CampaignFleetAPI fleet;
     protected SectorEntityToken gotoEntity;
@@ -64,33 +69,6 @@ public class FleetEscortMission extends HubMissionWithBarEvent {
             setGiverIsPotentialContactOnSuccess();
         }
 
-        beginStageTrigger(Stage.GOTO);
-        triggerCreateFleet(FleetSize.LARGE, FleetQuality.DEFAULT,
-                getPerson().getMarket().getFactionId(),
-                FleetTypes.TRADE, createdAt.getStarSystem());
-        triggerPickLocationAroundEntity(createdAt.getPrimaryEntity(), 0f, 0f, 0f);
-        triggerSpawnFleetAtPickedLocation();
-        triggerMakeFleetIgnoreOtherFleets();
-        triggerSetFleetMissionRef("$sep_fem_ref");
-        triggerFleetMakeImportant("$sep_fem_fleet", Stage.GOTO, Stage.WAIT, Stage.RETURN);
-        triggerFleetNoAutoDespawn();
-        endTrigger();
-
-        List<CampaignFleetAPI> fleets = runStageTriggersReturnFleets(Stage.GOTO);
-        if (fleets.isEmpty()) {
-            log.info("Failed to create and spawn fleet to escort 1 ");
-            return false;
-        }
-
-        this.fleet = fleets.get(0);
-        if (this.fleet == null || this.fleet.isEmpty() || !this.fleet.isAlive()
-                || this.fleet.getMemoryWithoutUpdate().getBoolean("$sep_fem_fleet")) {
-            log.info("Failed to create and spawn fleet to escort 2");
-            return false;
-        }
-
-        this.fleet.addScript(new EscortFleetAssignmentAI(this.fleet, this));
-
         requireMarketFaction(getPerson().getFaction().getId());
         requireMarketNotHidden();
         requireMarketNotInHyperspace();
@@ -103,6 +81,32 @@ public class FleetEscortMission extends HubMissionWithBarEvent {
 
         makeImportant(this.gotoEntity, "$sep_fem_gotoEntity", Stage.GOTO);
         makeImportant(getPerson(), "$sep_fem_returnPerson", Stage.RETURN);
+
+        beginStageTrigger(Stage.GOTO);
+        triggerCreateFleet(FleetSize.LARGE, FleetQuality.DEFAULT,
+                getPerson().getMarket().getFactionId(),
+                FleetTypes.TRADE, createdAt.getStarSystem());
+        triggerPickLocationAroundEntity(createdAt.getPrimaryEntity(), 0f, 0f, 0f);
+        triggerSpawnFleetAtPickedLocation();
+        triggerMakeFleetIgnoreOtherFleets();
+        triggerSetFleetMissionRef("$sep_fem_ref");
+        triggerFleetMakeImportant("$sep_fem_fleet", Stage.GOTO, Stage.WAIT, Stage.RETURN);
+        triggerFleetNoAutoDespawn();
+        triggerFleetSetName("Special Task Force");
+        endTrigger();
+
+        List<CampaignFleetAPI> fleets = runStageTriggersReturnFleets(Stage.GOTO);
+        if (fleets.isEmpty()) {
+            log.info("Failed to create and spawn fleet to escort 1 ");
+            return false;
+        }
+        this.fleet = fleets.get(0);
+        if (this.fleet == null || this.fleet.isEmpty() || !this.fleet.isAlive()
+                || this.fleet.getMemoryWithoutUpdate().getBoolean("$sep_fem_fleet")) {
+            log.info("Failed to create and spawn fleet to escort 2");
+            return false;
+        }
+        this.fleet.addScript(new EscortFleetAssignmentAI(this.fleet, this));
 
         setStartingStage(Stage.GOTO);
         setSuccessStage(Stage.COMPLETED);
@@ -139,7 +143,7 @@ public class FleetEscortMission extends HubMissionWithBarEvent {
                     this.gotoEntity.getStarSystem().getNameWithLowercaseTypeShort());
         } else if (this.currentStage == Stage.RETURN) {
             info.addPara("Escort the fleet back to %s in the %s.", pad, tc, h,
-                    this.gotoEntity.getName(), this.gotoEntity.getStarSystem().getNameWithLowercaseTypeShort());
+                    getGotoEntity().getName(), getGotoEntity().getStarSystem().getNameWithLowercaseTypeShort());
         }
         return false;
     }
@@ -157,7 +161,7 @@ public class FleetEscortMission extends HubMissionWithBarEvent {
                     this.gotoEntity.getStarSystem().getNameWithLowercaseTypeShort());
         } else if (this.currentStage == Stage.RETURN) {
             info.addPara("Escort the fleet back to %s in the %s.", oPad, tc, h,
-                    this.gotoEntity.getName(), this.gotoEntity.getStarSystem().getNameWithLowercaseTypeShort());
+                    getGotoEntity().getName(), getGotoEntity().getStarSystem().getNameWithLowercaseTypeShort());
         }
     }
 
