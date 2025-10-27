@@ -117,6 +117,9 @@ public class FleetEscortMission extends HubMissionWithBarEvent {
         connectWithMarketDecivilized(Stage.RETURN, Stage.FAILED_DECIV, createdAt);
         setStageOnMarketDecivilized(Stage.FAILED_DECIV, createdAt);
 
+        setTimeLimit(Stage.FAILED, MISSION_DURATION, null);
+        setCreditReward(CreditReward.HIGH);
+
         return true;
     }
 
