@@ -79,14 +79,22 @@ public class Utils {
         return closest;
     }
 
-    public static List<MissionScenarioSpec> getMissionScenarioSpecs(String missionId) {
+    public static List<MissionScenarioSpec> getMissionScenarios(String missionId) {
         List<MissionScenarioSpec> results = new ArrayList<>();
-        List<MissionScenarioSpec> specs = (List<MissionScenarioSpec>) Global.getSettings().getAllSpecs(MissionScenarioSpec.class);
+        List<MissionScenarioSpec> specs = new ArrayList<>(Global.getSettings().getAllSpecs(MissionScenarioSpec.class));
         for (MissionScenarioSpec spec : specs) {
             if (Objects.equals(missionId, spec.getMissionId())) {
                 results.add(spec);
             }
         }
         return results;
+    }
+
+    public static MissionScenarioSpec pickMissionScenario(String missionId, Random random) {
+        WeightedRandomPicker<MissionScenarioSpec> picker = new WeightedRandomPicker<>(random);
+        for (MissionScenarioSpec spec : getMissionScenarios(missionId)) {
+            picker.add(spec, spec.getFrequency());
+        }
+        return picker.pick();
     }
 }

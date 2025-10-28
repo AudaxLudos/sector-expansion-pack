@@ -12,20 +12,30 @@ import com.fs.starfarer.api.ui.SectorMapAPI;
 import com.fs.starfarer.api.ui.TooltipMakerAPI;
 import com.fs.starfarer.api.util.Misc;
 import org.apache.log4j.Logger;
+import sectorexpansionpack.MissionScenarioSpec;
+import sectorexpansionpack.Utils;
 import sectorexpansionpack.missions.hub.EscortFleetAssignmentAI;
 
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class FleetEscortMission extends HubMissionWithBarEvent {
     public static final float MISSION_DURATION = 120f;
     public static Logger log = Global.getLogger(FleetEscortMission.class);
+    protected MissionScenarioSpec scenario;
     protected CampaignFleetAPI fleet;
     protected SectorEntityToken gotoEntity;
 
+    public FleetEscortMission() {
+        super();
+        setGenRandom(new Random(Utils.random.nextLong()));
+    }
+
     @Override
     protected boolean create(MarketAPI createdAt, boolean barEvent) {
+        this.scenario = Utils.pickMissionScenario(getMissionId(), getGenRandom());
         if (barEvent) {
             if (rollProbability(0.5f)) {
                 List<String> posts = new ArrayList<>();
@@ -127,6 +137,11 @@ public class FleetEscortMission extends HubMissionWithBarEvent {
     @Override
     public String getBaseName() {
         return "Fleet Escort";
+    }
+
+    @Override
+    protected void updateInteractionDataImpl() {
+        set("$sep_fem_scenarioId", this.scenario.getScenarioId());
     }
 
     @Override

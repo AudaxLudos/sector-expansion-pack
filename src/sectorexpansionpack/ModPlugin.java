@@ -4,7 +4,6 @@ import com.fs.starfarer.api.BaseModPlugin;
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.campaign.SectorAPI;
 import com.fs.starfarer.api.util.WeightedRandomPicker;
-import com.fs.starfarer.loading.LoadingUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
