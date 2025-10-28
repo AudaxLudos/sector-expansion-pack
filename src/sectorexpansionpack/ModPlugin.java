@@ -4,6 +4,7 @@ import com.fs.starfarer.api.BaseModPlugin;
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.campaign.SectorAPI;
 import com.fs.starfarer.api.util.WeightedRandomPicker;
+import com.fs.starfarer.loading.LoadingUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -14,9 +15,11 @@ import sectorexpansionpack.intel.ExpeditionFleetManager;
 import sectorexpansionpack.intel.IncursionFleetManager;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Random;
 
 public class ModPlugin extends BaseModPlugin {
+    public static List<MissionScenarioSpec> missionScenarioSpecs;
     public static JSONObject MISSION_SCENARIOS;
 
     public static JSONObject getRandomMissionScenario(String missionId, Random random, boolean barEventsOnly) throws JSONException {
@@ -71,6 +74,7 @@ public class ModPlugin extends BaseModPlugin {
     @Override
     public void onApplicationLoad() {
         loadMissionScenarios();
+        loadMissionScenariosV2();
     }
 
     @Override
@@ -88,6 +92,25 @@ public class ModPlugin extends BaseModPlugin {
     public void loadMissionScenarios() {
         try {
             MISSION_SCENARIOS = Global.getSettings().loadJSON("data/campaign/sep_mission_scenarios.json");
+        } catch (IOException | JSONException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void loadMissionScenariosV2() {
+        try {
+            JSONArray rows = Global.getSettings().loadCSV("data/campaign/sep_mission_scenarios.csv");
+            for (int i = 0; i < rows.length(); i++) {
+                JSONObject row = rows.getJSONObject(i);
+                if (row.getString("missionId").isEmpty() || row.getString("scenarioId").isEmpty()) {
+                    continue;
+                }
+                MissionScenarioSpec spec = new MissionScenarioSpec();
+                spec.setMissionId(row.getString("missionId"));
+                spec.setScenarioId(row.getString("scenarioId"));
+                spec.setFrequency((float) row.optDouble("freq", 10f));
+                Global.getSettings().putSpec(MissionScenarioSpec.class, spec.scenarioId, spec);
+            }
         } catch (IOException | JSONException e) {
             throw new RuntimeException(e);
         }

@@ -78,4 +78,15 @@ public class Utils {
         }
         return closest;
     }
+
+    public static List<MissionScenarioSpec> getMissionScenarioSpecs(String missionId) {
+        List<MissionScenarioSpec> results = new ArrayList<>();
+        List<MissionScenarioSpec> specs = (List<MissionScenarioSpec>) Global.getSettings().getAllSpecs(MissionScenarioSpec.class);
+        for (MissionScenarioSpec spec : specs) {
+            if (Objects.equals(missionId, spec.getMissionId())) {
+                results.add(spec);
+            }
+        }
+        return results;
+    }
 }
