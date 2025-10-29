@@ -135,6 +135,18 @@ public class FleetEscortMission extends HubMissionWithBarEvent {
     }
 
     @Override
+    protected void advanceImpl(float amount) {
+        super.advanceImpl(amount);
+
+        if (this.fleetSpawned && getCurrentStage() != Stage.COMPLETED) {
+            // TODO: Track and include fleet points for failure condition
+            if (this.fleet.isExpired() || !this.fleet.isAlive()) {
+                setCurrentStage(Stage.FAILED, null, null);
+            }
+        }
+    }
+
+    @Override
     public String getBaseName() {
         return "Fleet Escort";
     }
