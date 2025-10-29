@@ -305,7 +305,7 @@ sep_fem_s0OfferTextBar,SEPFEMShowOfferBar,,,"""I have a shipment of supplies tha
 
 ""I am worried that they won't make it to there destination, unless a captain with a capable fleet..."" $HeOrShe looks at you, ""...can escort them all the way to there destination.""
 
-""I can cut the delivery profits to around $sep_fem_reward. I just need the right captain for the job."" $HeOrShe says, looking a bit pleading.",,
+""I can give thirty percent of the delivery profits which amounts to $sep_fem_reward. I just need the right captain for the job."" $HeOrShe says, looking a bit pleading.",,
 ## fem1 dialogues,,,,,,
 sep_fem_s1Blurb,SEPFEMShowBlurb,$sep_fem_scenarioId == fem1 score:1000,,SCENARIO 1 FEM CONTACT MISSION BLURB,,
 sep_fem_s1OfferOption,SEPFEMShowOption,$sep_fem_scenarioId == fem1 score:1000,,,sep_fem_start:SCENARIO 1  FEM CONTACT MISSION OPTION,

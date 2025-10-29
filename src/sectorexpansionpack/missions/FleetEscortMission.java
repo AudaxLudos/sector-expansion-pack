@@ -1,10 +1,13 @@
 package sectorexpansionpack.missions;
 
 import com.fs.starfarer.api.Global;
-import com.fs.starfarer.api.campaign.CampaignFleetAPI;
-import com.fs.starfarer.api.campaign.SectorEntityToken;
+import com.fs.starfarer.api.campaign.*;
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
+import com.fs.starfarer.api.campaign.rules.MemoryAPI;
+import com.fs.starfarer.api.impl.campaign.fleets.FleetFactoryV3;
+import com.fs.starfarer.api.impl.campaign.fleets.FleetParamsV3;
 import com.fs.starfarer.api.impl.campaign.ids.FleetTypes;
+import com.fs.starfarer.api.impl.campaign.ids.MemFlags;
 import com.fs.starfarer.api.impl.campaign.ids.Ranks;
 import com.fs.starfarer.api.impl.campaign.ids.Tags;
 import com.fs.starfarer.api.impl.campaign.missions.hub.HubMissionWithBarEvent;
@@ -19,12 +22,14 @@ import sectorexpansionpack.missions.hub.EscortFleetAssignmentAI;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 public class FleetEscortMission extends HubMissionWithBarEvent {
     public static final float MISSION_DURATION = 120f;
     public static Logger log = Global.getLogger(FleetEscortMission.class);
     protected MissionScenarioSpec scenario;
+    protected boolean fleetSpawned = false; // Might not be needed
     protected CampaignFleetAPI fleet;
     protected SectorEntityToken gotoEntity;
 
@@ -76,6 +81,24 @@ public class FleetEscortMission extends HubMissionWithBarEvent {
             setGiverIsPotentialContactOnSuccess();
         }
 
+        float fp = 30f;
+        FleetParamsV3 params = new FleetParamsV3(
+                createdAt,
+                FleetTypes.TASK_FORCE,
+                fp, // combatPts
+                fp, // freighterPts
+                fp, // tankerPts
+                fp, // transportPts
+                0f, // linerPts
+                0f, // utilityPts
+                0f // qualityMod
+        );
+        this.fleet = FleetFactoryV3.createFleet(params);
+        if (!setEntityMissionRef(this.fleet, "$sep_fem_ref")) {
+            log.info("Failed to create fleet to escort 1");
+            return false;
+        }
+
         requireMarketFaction(getPerson().getFaction().getId());
         requireMarketNotHidden();
         requireMarketNotInHyperspace();
@@ -87,33 +110,8 @@ public class FleetEscortMission extends HubMissionWithBarEvent {
         }
 
         makeImportant(this.gotoEntity, "$sep_fem_gotoEntity", Stage.GOTO);
+        makeImportant(this.fleet, "$sep_fem_escortedFleet", Stage.GOTO, Stage.WAIT, Stage.RETURN);
         makeImportant(getPerson(), "$sep_fem_returnPerson", Stage.RETURN);
-
-        beginStageTrigger(Stage.GOTO);
-        triggerCreateFleet(FleetSize.LARGE, FleetQuality.DEFAULT,
-                getPerson().getMarket().getFactionId(),
-                FleetTypes.TRADE, createdAt.getStarSystem());
-        triggerPickLocationAroundEntity(createdAt.getPrimaryEntity(), 0f, 0f, 0f);
-        triggerSpawnFleetAtPickedLocation();
-        triggerMakeFleetIgnoreOtherFleets();
-        triggerSetFleetMissionRef("$sep_fem_ref");
-        triggerFleetMakeImportant("$sep_fem_fleet", Stage.GOTO, Stage.WAIT, Stage.RETURN);
-        triggerFleetNoAutoDespawn();
-        triggerFleetSetName("Special Task Force");
-        endTrigger();
-
-        List<CampaignFleetAPI> fleets = runStageTriggersReturnFleets(Stage.GOTO);
-        if (fleets.isEmpty()) {
-            log.info("Failed to create and spawn fleet to escort 1 ");
-            return false;
-        }
-        this.fleet = fleets.get(0);
-        if (this.fleet == null || this.fleet.isEmpty() || !this.fleet.isAlive()
-                || this.fleet.getMemoryWithoutUpdate().getBoolean("$sep_fem_fleet")) {
-            log.info("Failed to create and spawn fleet to escort 2");
-            return false;
-        }
-        this.fleet.addScript(new EscortFleetAssignmentAI(this.fleet, this));
 
         setStartingStage(Stage.GOTO);
         setSuccessStage(Stage.COMPLETED);
@@ -128,7 +126,9 @@ public class FleetEscortMission extends HubMissionWithBarEvent {
         connectWithMarketDecivilized(Stage.RETURN, Stage.FAILED_DECIV, createdAt);
         setStageOnMarketDecivilized(Stage.FAILED_DECIV, createdAt);
 
+        // TODO: Add setting to change mission duration
         setTimeLimit(Stage.FAILED, MISSION_DURATION, null);
+        // TODO: Add setting to change credit rewards
         setCreditReward(CreditReward.HIGH);
 
         return true;
@@ -142,6 +142,22 @@ public class FleetEscortMission extends HubMissionWithBarEvent {
     @Override
     protected void updateInteractionDataImpl() {
         set("$sep_fem_scenarioId", this.scenario.getScenarioId());
+    }
+
+    @Override
+    public void acceptImpl(InteractionDialogAPI dialog, Map<String, MemoryAPI> memoryMap) {
+        if (!this.fleetSpawned) {
+            this.fleetSpawned = true;
+            MarketAPI market = getPerson().getMarket();
+            SectorEntityToken entity = market.getPrimaryEntity();
+            entity.getContainingLocation().addEntity(this.fleet);
+            this.fleet.setLocation(entity.getLocation().x, entity.getLocation().y);
+            this.fleet.setFacing(getGenRandom().nextFloat() * 360f);
+            this.fleet.addScript(new EscortFleetAssignmentAI(this.fleet, this));
+            this.fleet.getMemoryWithoutUpdate().set("$sourceId", entity.getId());
+            this.fleet.getMemoryWithoutUpdate().set(MemFlags.FLEET_IGNORES_OTHER_FLEETS, true);
+            this.fleet.setName("Special Task Force");
+        }
     }
 
     @Override
