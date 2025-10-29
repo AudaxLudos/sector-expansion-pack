@@ -14,11 +14,9 @@ import sectorexpansionpack.intel.ExpeditionFleetManager;
 import sectorexpansionpack.intel.IncursionFleetManager;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.Random;
 
 public class ModPlugin extends BaseModPlugin {
-    public static List<MissionScenarioSpec> missionScenarioSpecs;
     public static JSONObject MISSION_SCENARIOS;
 
     public static JSONObject getRandomMissionScenario(String missionId, Random random, boolean barEventsOnly) throws JSONException {

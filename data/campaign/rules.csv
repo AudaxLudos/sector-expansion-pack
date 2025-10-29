@@ -279,30 +279,39 @@ Call $sep_harm_ref updateStage","You transmit the completed hyperspace anomaly d
 $HeOrShe thanks you for the data before getting lost in its details, even forgeting to cut the comm link.",cutCommLink:Cut the comm link,
 # Ghosts research mission END,,,,,,
 # Fleet escort mission START,,,,,,
-## Contact offer dialogs,,,,,,
+## Contact offer texts,,,,,,
 sep_fem_blurb,sep_fem_blurb,,FireBest SEPFEMShowBlurb true,,,
 sep_fem_offerOption,sep_fem_option,,FireBest SEPFEMShowOption true,,,
 sep_fem_offerTextContact1,DialogOptionSelected,$option == sep_fem_start,"FireBest SEPFEMShowOffer true
 $missionId = sep_fem",,"contact_accept:Accept
 contact_decline:Decline",
-## Bar offer dialogs,,,,,,
-sep_fem_blurbBar,sep_fem_blurbBar,,,FEM BAR MISSION BLURB,,
-sep_fem_offerOptionBar,sep_fem_optionBar,,,,sep_fem_startBar:FEM BAR MISSION OPTION,
-sep_fem_offerTextBar1,DialogOptionSelected,$option == sep_fem_startBar,$missionId = sep_fem,FEM BAR MISSION OFFER TEXT,"contact_acceptBar:Accept
+## Bar offer texts,,,,,,
+sep_fem_blurbBar,sep_fem_blurbBar,,FireBest SEPFEMShowBlurbBar true,,,
+sep_fem_offerOptionBar,sep_fem_optionBar,,FireBest SEPFEMShowOptionBar true,,,
+sep_fem_offerTextBar1,DialogOptionSelected,$option == sep_fem_startBar,"FireBest SEPFEMShowOfferBar true
+$missionId = sep_fem",,"contact_acceptBar:Accept
 contact_declineBarNoContinue:Decline",
-## Default contact offer texts,,,,,,
-sep_fem_s0Blurb,SEPFEMShowBlurb,,,DEFAULT FEM CONTACT MISSION BLURB,,
-sep_fem_s0OfferOption,SEPFEMShowOption,,,,sep_fem_start:DEFAULT FEM CONTACT MISSION OPTION,
-sep_fem_s0OfferText,SEPFEMShowOffer,,,DEFAULT FEM CONTACT MISSION OFFER TEXT,,
-## scenario 1 contact offer texts,,,,,,
-sep_fem_s1Blurb,SEPFEMShowBlurb,$sep_fem_scenarioId == scenario1 score:1000,,SCENARIO 1 FEM CONTACT MISSION BLURB,,
-sep_fem_s1OfferOption,SEPFEMShowOption,$sep_fem_scenarioId == scenario1 score:1000,,,sep_fem_start:SCENARIO 1  FEM CONTACT MISSION OPTION,
-sep_fem_s1OfferText,SEPFEMShowOffer,$sep_fem_scenarioId == scenario1 score:1000,,SCENARIO 1  FEM CONTACT MISSION OFFER TEXT,,
-## scenario 2 contact offer texts,,,,,,
-sep_fem_s2Blurb,SEPFEMShowBlurb,$sep_fem_scenarioId == scenario2 score:1000,,SCENARIO 2 FEM CONTACT MISSION BLURB,,
-sep_fem_s2OfferOption,SEPFEMShowOption,$sep_fem_scenarioId == scenario2 score:1000,,,sep_fem_start:SCENARIO 2  FEM CONTACT MISSION OPTION,
-sep_fem_s2OfferText,SEPFEMShowOffer,$sep_fem_scenarioId == scenario2 score:1000,,SCENARIO 2 FEM CONTACT MISSION OFFER TEXT,,
-,,,,,,
-,,,,,,
+## Default dialogues,,,,,,
+sep_fem_s0Blurb,SEPFEMShowBlurb,,,"""This one's easy, a fleet needs an escort to and from a colony. They'll be carrying... what looks to be supplies. Can't say much else, but the reward is well worth it.""",,
+sep_fem_s0OfferOption,SEPFEMShowOption,,,,sep_fem_start:Ask about escorting a fleet carrying supplies,
+sep_fem_s0OfferText,SEPFEMShowOffer,,,"""Good choice,"" $heOrShe says while looking at $hisOrHer tripad. ""A fleet carrying supplies needs an escort to $sep_fem_mrktNme in the $sep_fem_sysName. Once there you'll wait for them to complete there delivery then escort them back.""
+
+$HeOrShe continues, ""The fleet will follow you when they can, so try not to lead them anywhere dangerous or leave them behind too long because if they die or $sep_fem_duration days pass with no objectives completed I'll have to mark the mission as a failure.""
+
+""Other than that,"" $heOrShe says, swiping across $hisOrHer tripad. ""The $personFaction has authorized a $sep_fem_reward for the completion of the mission. Interested?""",,
+sep_fem_s0BlurbBar,SEPFEMShowBlurbBar,,,"""You notice a anxious well dressed $manOrWoman sitted across the bar. $HeOrShe seems to be holding papers with a trade union's stamp.""",,
+sep_fem_s0OfferOptionBar,SEPFEMShowOptionBar,,,,sep_fem_start:Talk to the anxious well dressed $manOrWoman holding trade papers,
+sep_fem_s0OfferTextBar,SEPFEMShowOfferBar,,,"""I have a shipment of supplies that needs to arrive at $sep_fem_mrktNme in the $sep_fem_sysName but the fleet I hired aren't combat capable."" $HeOrShe says, while drinking down a glass of alcohol.
+
+""I am worried that they won't make it to there destination, unless a captain with a capable fleet..."" $HeOrShe looks at you, ""...can escort them all the way to there destination.""
+
+""I can cut the delivery profits to around $sep_fem_reward. I just need the right captain for the job."" $HeOrShe says, looking a bit pleading.",,
+## fem1 dialogues,,,,,,
+sep_fem_s1Blurb,SEPFEMShowBlurb,$sep_fem_scenarioId == fem1 score:1000,,SCENARIO 1 FEM CONTACT MISSION BLURB,,
+sep_fem_s1OfferOption,SEPFEMShowOption,$sep_fem_scenarioId == fem1 score:1000,,,sep_fem_start:SCENARIO 1  FEM CONTACT MISSION OPTION,
+sep_fem_s1OfferText,SEPFEMShowOffer,$sep_fem_scenarioId == fem1 score:1000,,SCENARIO 1 FEM CONTACT MISSION OFFER TEXT,,
+sep_fem_s1BlurbBar,SEPFEMShowBlurbBar,$sep_fem_scenarioId == fem1 score:1000,,SCENARIO 1 FEM BAR MISSION BLURB,,
+sep_fem_s1OfferOptionBar,SEPFEMShowOptionBar,$sep_fem_scenarioId == fem1 score:1000,,,sep_fem_start:SCENARIO 1 FEM BAR MISSION OPTION,
+sep_fem_s1OfferTextBar,SEPFEMShowOfferBar,$sep_fem_scenarioId == fem1 score:1000,,SCENARIO 1  FEM BAR MISSION OFFER TEXT,,
 ,,,,,,
 # Fleet escort mission END,,,,,,
