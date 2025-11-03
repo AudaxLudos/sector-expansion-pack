@@ -1,7 +1,9 @@
 package sectorexpansionpack.missions;
 
 import com.fs.starfarer.api.Global;
-import com.fs.starfarer.api.campaign.*;
+import com.fs.starfarer.api.campaign.CampaignFleetAPI;
+import com.fs.starfarer.api.campaign.InteractionDialogAPI;
+import com.fs.starfarer.api.campaign.SectorEntityToken;
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
 import com.fs.starfarer.api.campaign.rules.MemoryAPI;
 import com.fs.starfarer.api.impl.campaign.fleets.FleetFactoryV3;

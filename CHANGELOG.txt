@@ -1,3 +1,7 @@
+### 0.0.138a
+- Add fleet escort mission
+- Fix crash when expedition/incursion event is successful after loading a save
+
 ### 0.0.124a
 - Add fleet defeat triggers for incursion and expedition fleets
 - Remove target colony item when incursion raid succeeds
