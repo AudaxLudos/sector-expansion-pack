@@ -4,8 +4,8 @@ public class MissionScenarioSpec {
     protected String missionId;
     protected String scenarioId;
 
-    protected float duration;
     protected float frequency;
+    protected float duration;
 
     protected Integer minCreditReward;
     protected Integer maxCreditReward;
@@ -32,6 +32,14 @@ public class MissionScenarioSpec {
 
     public void setFrequency(float frequency) {
         this.frequency = frequency;
+    }
+
+    public float getDuration() {
+        return this.duration;
+    }
+
+    public void setDuration(float duration) {
+        this.duration = duration;
     }
 
     public Integer getMinCreditReward() {
