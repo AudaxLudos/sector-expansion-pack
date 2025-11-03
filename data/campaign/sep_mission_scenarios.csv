@@ -1,5 +1,5 @@
-scenarioId,missionId,freq,prob,tags,data1,data2,data3,data4,data5,note
-fem1,sep_fem,3,1,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
+scenarioId,missionId,frequency,duration,tags,minCreditReward,maxCreditReward,notes
+fem1,sep_fem,3,,,,,
+,,,,,,,
+,,,,,,,
+,,,,,,,

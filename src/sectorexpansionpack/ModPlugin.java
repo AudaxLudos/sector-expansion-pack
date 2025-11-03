@@ -105,7 +105,9 @@ public class ModPlugin extends BaseModPlugin {
                 MissionScenarioSpec spec = new MissionScenarioSpec();
                 spec.setMissionId(row.getString("missionId"));
                 spec.setScenarioId(row.getString("scenarioId"));
-                spec.setFrequency((float) row.optDouble("freq", 10f));
+                spec.setFrequency((float) row.optDouble("frequency", 10f));
+                spec.setMinCreditReward(row.optInt("minCreditReward", -1));
+                spec.setMaxCreditReward(row.optInt("minCreditReward", -1));
                 Global.getSettings().putSpec(MissionScenarioSpec.class, spec.scenarioId, spec);
             }
         } catch (IOException | JSONException e) {

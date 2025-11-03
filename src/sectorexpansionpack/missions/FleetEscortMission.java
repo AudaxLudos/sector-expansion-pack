@@ -81,6 +81,7 @@ public class FleetEscortMission extends HubMissionWithBarEvent {
             setGiverIsPotentialContactOnSuccess();
         }
 
+        // TODO: Customize fleet based on mission scenario
         float fp = 30f;
         FleetParamsV3 params = new FleetParamsV3(
                 createdAt,
@@ -126,10 +127,20 @@ public class FleetEscortMission extends HubMissionWithBarEvent {
         connectWithMarketDecivilized(Stage.RETURN, Stage.FAILED_DECIV, createdAt);
         setStageOnMarketDecivilized(Stage.FAILED_DECIV, createdAt);
 
-        // TODO: Add setting to change mission duration
+        // TODO: Customize mission duration based on mission scenario
         setTimeLimit(Stage.FAILED, MISSION_DURATION, null);
-        // TODO: Add setting to change credit rewards
-        setCreditReward(CreditReward.HIGH);
+
+        if (this.scenario.getMinCreditReward() > -1) {
+            if (this.scenario.getMaxCreditReward() < this.scenario.getMinCreditReward()) {
+                setCreditReward(this.scenario.getMinCreditReward());
+            } else {
+                setCreditReward(this.scenario.getMinCreditReward(), this.scenario.getMaxCreditReward());
+            }
+        } else {
+            setCreditReward(CreditReward.HIGH);
+        }
+
+        // TODO: Add fleet complications
 
         return true;
     }
