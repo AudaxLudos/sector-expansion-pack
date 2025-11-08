@@ -83,9 +83,7 @@ public class EscortFleetAssignmentAI implements EveryFrameScript, Script {
                     List<SectorEntityToken> jumpPoints = new ArrayList<>();
                     if (this.fleet.isInHyperspace()) {
                         jumpPoints.addAll(Utils.getHyperspaceJumpPoints(playerFleet.getStarSystem()));
-                        jumpPoints.addAll(playerFleet.getContainingLocation().getJumpPoints());
                     } else {
-                        jumpPoints.addAll(Utils.getHyperspaceJumpPoints(this.fleet.getStarSystem()));
                         jumpPoints.addAll(this.fleet.getContainingLocation().getJumpPoints());
                     }
 
@@ -106,7 +104,7 @@ public class EscortFleetAssignmentAI implements EveryFrameScript, Script {
                     // Find the closest jump point of for the escorted fleet to travel through
                     JumpPointAPI.JumpDestination closestJumpDestination = null;
                     if (!jumpDestinations.isEmpty()) {
-                        float min = Misc.getDistance(playerFleet, jumpDestinations.get(0).getDestination());
+                        float min = Float.MAX_VALUE;
                         for (JumpPointAPI.JumpDestination jd : jumpDestinations) {
                             float dist = Misc.getDistance(playerFleet, jd.getDestination());
                             if (min > dist) {

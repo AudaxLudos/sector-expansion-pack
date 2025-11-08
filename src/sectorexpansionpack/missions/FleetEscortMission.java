@@ -173,7 +173,7 @@ public class FleetEscortMission extends HubMissionWithBarEvent {
         set("$sep_fem_isBarEvent", isBarEvent());
         set("$sep_fem_mrktNme", this.gotoEntity.getName());
         set("$sep_fem_sysName", this.gotoEntity.getStarSystem().getNameWithLowercaseTypeShort());
-        set("$sep_fem_duration", this.scenario.getDuration());
+        set("$sep_fem_duration", Misc.getWithDGS(this.timeLimit.days));
         set("$sep_fem_reward", Misc.getDGSCredits(getCreditsReward()));
     }
 
