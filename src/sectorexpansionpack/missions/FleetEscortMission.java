@@ -170,6 +170,11 @@ public class FleetEscortMission extends HubMissionWithBarEvent {
     @Override
     protected void updateInteractionDataImpl() {
         set("$sep_fem_scenarioId", this.scenario.getScenarioId());
+        set("$sep_fem_isBarEvent", isBarEvent());
+        set("$sep_fem_mrktNme", this.gotoEntity.getName());
+        set("$sep_fem_sysName", this.gotoEntity.getStarSystem().getNameWithLowercaseTypeShort());
+        set("$sep_fem_duration", this.scenario.getDuration());
+        set("$sep_fem_reward", Misc.getDGSCredits(getCreditsReward()));
     }
 
     @Override
