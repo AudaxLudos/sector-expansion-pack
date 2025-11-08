@@ -100,6 +100,9 @@ public class IncursionFleetIntel extends GenericRaidFGI {
         if (totalDifficulty - 10 < 0) {
             this.maxFleetSize = totalDifficulty;
         }
+        if (this.maxFleetSize < 6) {
+            this.maxFleetSize = 6;
+        }
 
         this.params.fleetSizes.add(this.maxFleetSize);
         totalDifficulty -= this.maxFleetSize;
