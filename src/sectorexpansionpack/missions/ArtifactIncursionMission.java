@@ -86,6 +86,7 @@ public class ArtifactIncursionMission extends HubMissionWithBarEvent implements 
         requireMarketNotInHyperspace();
         requireMarketFactionNotPlayer();
         requireMarketHasSpecialItemsInstalled();
+        preferMarketHasCompatibleSpecialItemsWithOther(createdAt);
         preferMarketSizeAtLeast(minMarketSize);
         preferMarketSizeAtMost(maxMarketSize);
         this.market = pickMarket();
@@ -392,19 +393,23 @@ public class ArtifactIncursionMission extends HubMissionWithBarEvent implements 
     }
 
     public void requireMarketHasSpecialItemsInstalled() {
-        this.search.marketReqs.add(new MarketHasSpecialItemsInstalledReq());
+        this.search.marketReqs.add(new EntityFinderMission.MarketUsesSpecialItems());
     }
 
     public void requireMarketCanUseSpecialItem(SpecialItemData specialItemData) {
-        this.search.marketReqs.add(new MarketCanUseSpecialItemReq(specialItemData));
+        this.search.marketReqs.add(new EntityFinderMission.MarketCanUseSpecialItemReq(specialItemData));
+    }
+
+    public void preferMarketHasCompatibleSpecialItemsWithOther(MarketAPI other) {
+        this.search.marketPrefs.add(new EntityFinderMission.MarketHasCompatibleSpecialItemsWithOther(other));
     }
 
     public void connectWithMarketFactionChanged(Object from, Object to, MarketAPI market) {
-        this.connections.add(new StageConnection(from, to, new MarketFactionChangedChecker(market)));
+        this.connections.add(new StageConnection(from, to, new EntityFinderMission.MarketFactionChangedChecker(market)));
     }
 
     public void setStageOnMarketFactionChanged(Object to, MarketAPI market) {
-        this.connections.add(new StageConnection(null, to, new MarketFactionChangedChecker(market)));
+        this.connections.add(new StageConnection(null, to, new EntityFinderMission.MarketFactionChangedChecker(market)));
     }
 
     public enum Stage {
@@ -414,55 +419,5 @@ public class ArtifactIncursionMission extends HubMissionWithBarEvent implements 
         FAILED,
         FAILED_DECIV,
         FAILED_MARKET_FACTION_CHANGED
-    }
-
-    public static class MarketHasSpecialItemsInstalledReq implements MarketRequirement {
-        @Override
-        public boolean marketMatchesRequirement(MarketAPI market) {
-            for (Industry industry : market.getIndustries()) {
-                SpecialItemData itemData = industry.getSpecialItem();
-                // TODO: Add modded colony items that is used by players only or has commodity demand effects
-                if (itemData == null
-                        || itemData.getId().equals(Items.CORONAL_PORTAL)
-                        || itemData.getId().equals(Items.ORBITAL_FUSION_LAMP)) {
-                    continue;
-                }
-                return true;
-            }
-            return false;
-        }
-    }
-
-    public static class MarketCanUseSpecialItemReq implements MarketRequirement {
-        public SpecialItemData specialItemData;
-
-        public MarketCanUseSpecialItemReq(SpecialItemData specialItemData) {
-            this.specialItemData = specialItemData;
-        }
-
-        @Override
-        public boolean marketMatchesRequirement(MarketAPI market) {
-            for (Industry industry : market.getIndustries()) {
-                if (industry.wantsToUseSpecialItem(this.specialItemData)) {
-                    return true;
-                }
-            }
-            return false;
-        }
-    }
-
-    public static class MarketFactionChangedChecker implements ConditionChecker {
-        public String prevFactionId;
-        public MarketAPI market;
-
-        public MarketFactionChangedChecker(MarketAPI market) {
-            this.prevFactionId = market.getFactionId();
-            this.market = market;
-        }
-
-        @Override
-        public boolean conditionsMet() {
-            return !Objects.equals(this.market.getFactionId(), this.prevFactionId);
-        }
     }
 }

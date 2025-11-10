@@ -5,9 +5,9 @@ import com.fs.starfarer.api.campaign.SectorEntityToken;
 import com.fs.starfarer.api.campaign.SpecialItemData;
 import com.fs.starfarer.api.campaign.econ.Industry;
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
-import com.fs.starfarer.api.impl.campaign.ids.Items;
 import com.fs.starfarer.api.impl.campaign.missions.hub.HubMissionWithSearch;
 import com.fs.starfarer.api.util.Misc;
+import sectorexpansionpack.ModPlugin;
 import sectorexpansionpack.Utils;
 
 import java.util.Objects;
@@ -25,7 +25,7 @@ public class EntityFinderMission extends HubMissionWithSearch {
     }
 
     public void requireMarketCanUseSpecialItem(SpecialItemData specialItemData) {
-        this.search.marketReqs.add(new ArtifactIncursionMission.MarketCanUseSpecialItemReq(specialItemData));
+        this.search.marketReqs.add(new MarketCanUseSpecialItemReq(specialItemData));
     }
 
     public void requirePlanetNoSpecialSalvage() {
@@ -112,9 +112,13 @@ public class EntityFinderMission extends HubMissionWithSearch {
         @Override
         public boolean marketMatchesRequirement(MarketAPI market) {
             for (Industry i : market.getIndustries()) {
-                if (i.getSpecialItem() != null) {
-                    return true;
+                if (i.getSpecialItem() == null) {
+                    continue;
                 }
+                if (!ModPlugin.COLONY_ITEM_WHITELIST.contains(i.getSpecialItem().getId())) {
+                    continue;
+                }
+                return true;
             }
             return false;
         }
@@ -134,8 +138,7 @@ public class EntityFinderMission extends HubMissionWithSearch {
                 if (otherData == null) {
                     continue;
                 }
-                // TODO: Filter modded colony items that is player use only or has demand effects
-                if (Objects.equals(otherData.getId(), Items.CORONAL_PORTAL) || Objects.equals(otherData.getId(), Items.ORBITAL_FUSION_LAMP)) {
+                if (!ModPlugin.COLONY_ITEM_WHITELIST.contains(otherData.getId())) {
                     continue;
                 }
                 for (Industry otherInd : this.other.getIndustries()) {
@@ -145,6 +148,39 @@ public class EntityFinderMission extends HubMissionWithSearch {
                 }
             }
             return false;
+        }
+    }
+
+    public static class MarketCanUseSpecialItemReq implements MarketRequirement {
+        public SpecialItemData specialItemData;
+
+        public MarketCanUseSpecialItemReq(SpecialItemData specialItemData) {
+            this.specialItemData = specialItemData;
+        }
+
+        @Override
+        public boolean marketMatchesRequirement(MarketAPI market) {
+            for (Industry industry : market.getIndustries()) {
+                if (industry.wantsToUseSpecialItem(this.specialItemData)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+    }
+
+    public static class MarketFactionChangedChecker implements ConditionChecker {
+        public String prevFactionId;
+        public MarketAPI market;
+
+        public MarketFactionChangedChecker(MarketAPI market) {
+            this.prevFactionId = market.getFactionId();
+            this.market = market;
+        }
+
+        @Override
+        public boolean conditionsMet() {
+            return !Objects.equals(this.market.getFactionId(), this.prevFactionId);
         }
     }
 

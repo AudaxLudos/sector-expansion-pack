@@ -14,9 +14,12 @@ import sectorexpansionpack.intel.ExpeditionFleetManager;
 import sectorexpansionpack.intel.IncursionFleetManager;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 public class ModPlugin extends BaseModPlugin {
+    public static List<String> COLONY_ITEM_WHITELIST = new ArrayList<>();
     public static JSONObject MISSION_SCENARIOS;
 
     public static JSONObject getRandomMissionScenario(String missionId, Random random, boolean barEventsOnly) throws JSONException {
@@ -78,12 +81,32 @@ public class ModPlugin extends BaseModPlugin {
     public void onGameLoad(boolean newGame) {
         Utils.setRandom(new Random(Long.parseLong(Global.getSector().getSeedString().replaceAll("\\D", ""))));
 
+        loadColonyItemWhitelist();
         loadMissionScenarios();
         loadNeededScripts();
 
         StormPacifierGhostCreator.register();
         StormInducerGhostCreator.register();
         FleetEaterGhostCreator.register();
+    }
+
+    public void loadColonyItemWhitelist() {
+        List<String> whitelist = new ArrayList<>();
+
+        try {
+            JSONArray spreadsheet = Global.getSettings().getMergedSpreadsheetDataForMod("id", "data/config/sep_colony_item_whitelist.csv", "sectorexpansionpack");
+
+            for (int i = 0; i < spreadsheet.length(); i++) {
+                JSONObject row = spreadsheet.getJSONObject(i);
+                String specialItemId = row.getString("id");
+
+                whitelist.add(specialItemId);
+            }
+        } catch (JSONException | IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        COLONY_ITEM_WHITELIST = whitelist;
     }
 
     public void loadMissionScenarios() {

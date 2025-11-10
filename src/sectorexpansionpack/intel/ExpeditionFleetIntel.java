@@ -16,6 +16,7 @@ import com.fs.starfarer.api.util.Misc;
 import com.fs.starfarer.api.util.WeightedRandomPicker;
 import org.apache.log4j.Logger;
 import org.lwjgl.util.vector.Vector2f;
+import sectorexpansionpack.ModPlugin;
 import sectorexpansionpack.Utils;
 import sectorexpansionpack.intel.misc.ArtifactInstallationIntel;
 import sectorexpansionpack.intel.misc.ExpeditionFleetDepartureIntel;
@@ -25,7 +26,6 @@ import sectorexpansionpack.missions.EntityFinderMission;
 import java.awt.*;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Random;
 
 // IDEA: Create a base expedition class then create a generic expedition intel
@@ -161,9 +161,7 @@ public class ExpeditionFleetIntel extends FleetGroupIntel {
     public void pickSpecialItem() {
         WeightedRandomPicker<SpecialItemSpecAPI> specialItemPicker = new WeightedRandomPicker<>(getRandom());
         for (SpecialItemSpecAPI spec : Global.getSettings().getAllSpecialItemSpecs()) {
-            // TODO: Filter modded colony items that is player use only or has demand effects
-            if (Objects.equals(spec.getId(), Items.CORONAL_PORTAL)
-                    || Objects.equals(spec.getId(), Items.ORBITAL_FUSION_LAMP)) {
+            if (!ModPlugin.COLONY_ITEM_WHITELIST.contains(spec.getId())) {
                 continue;
             }
             specialItemPicker.add(spec);
