@@ -1,4 +1,7 @@
-### 0.0.146a
+### 0.0.150a
+- Add colony item whitelist for events and missions
+- Remove hostile market target requirement for artifact incursion mission
+- Fix crash when incursion fleet size is too low
 - Fix unable to decline fleet escort missions
 
 ### 0.0.139a
