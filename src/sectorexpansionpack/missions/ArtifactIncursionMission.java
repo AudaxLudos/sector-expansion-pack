@@ -82,7 +82,6 @@ public class ArtifactIncursionMission extends HubMissionWithBarEvent implements 
         };
 
         requireMarketFactionNot(getPerson().getFaction().getId());
-        requireMarketFactionHostileTo(getPerson().getFaction().getId());
         requireMarketNotHidden();
         requireMarketNotInHyperspace();
         requireMarketFactionNotPlayer();
