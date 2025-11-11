@@ -2,6 +2,7 @@ package sectorexpansionpack.missions;
 
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.campaign.CampaignFleetAPI;
+import com.fs.starfarer.api.campaign.FactionAPI;
 import com.fs.starfarer.api.campaign.InteractionDialogAPI;
 import com.fs.starfarer.api.campaign.SectorEntityToken;
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
@@ -132,6 +133,12 @@ public class FleetEscortMission extends HubMissionWithBarEvent {
         connectWithMarketDecivilized(Stage.RETURN, Stage.FAILED_DECIV, createdAt);
         setStageOnMarketDecivilized(Stage.FAILED_DECIV, createdAt);
 
+        addNoPenaltyFailureStages(Stage.FAILED_GIVER_HOSTILE);
+        connectWithFactionTurnedHostile(Stage.GOTO, Stage.FAILED_GIVER_HOSTILE, getPerson().getFaction());
+        connectWithFactionTurnedHostile(Stage.WAIT, Stage.FAILED_GIVER_HOSTILE, getPerson().getFaction());
+        connectWithFactionTurnedHostile(Stage.RETURN, Stage.FAILED_GIVER_HOSTILE, getPerson().getFaction());
+        setStageOnFactionTurnedHostile(Stage.FAILED_GIVER_HOSTILE, getPerson().getFaction());
+
         if (this.scenario.getDuration() > -1) {
             setTimeLimit(Stage.FAILED, this.scenario.getDuration(), null);
         } else {
@@ -252,12 +259,21 @@ public class FleetEscortMission extends HubMissionWithBarEvent {
         return getPerson().getMarket().getPrimaryEntity();
     }
 
+    public void connectWithFactionTurnedHostile(Object from, Object to, FactionAPI faction) {
+        this.connections.add(new StageConnection(from, to, new EntityFinderMission.FactionTurnedHostileChecker(faction)));
+    }
+
+    public void setStageOnFactionTurnedHostile(Object to, FactionAPI faction) {
+        this.connections.add(new StageConnection(null, to, new EntityFinderMission.FactionTurnedHostileChecker(faction)));
+    }
+
     public enum Stage {
         GOTO,
         WAIT,
         RETURN,
         COMPLETED,
         FAILED,
-        FAILED_DECIV
+        FAILED_DECIV,
+        FAILED_GIVER_HOSTILE
     }
 }
