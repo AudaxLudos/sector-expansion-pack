@@ -1,5 +1,6 @@
 package sectorexpansionpack.missions;
 
+import com.fs.starfarer.api.campaign.FactionAPI;
 import com.fs.starfarer.api.campaign.PlanetAPI;
 import com.fs.starfarer.api.campaign.SectorEntityToken;
 import com.fs.starfarer.api.campaign.SpecialItemData;
@@ -181,6 +182,19 @@ public class EntityFinderMission extends HubMissionWithSearch {
         @Override
         public boolean conditionsMet() {
             return !Objects.equals(this.market.getFactionId(), this.prevFactionId);
+        }
+    }
+
+    public static class FactionTurnedHostileChecker implements ConditionChecker {
+        public FactionAPI faction;
+
+        public FactionTurnedHostileChecker(FactionAPI faction) {
+            this.faction = faction;
+        }
+
+        @Override
+        public boolean conditionsMet() {
+            return this.faction.getRelToPlayer().isHostile();
         }
     }
 

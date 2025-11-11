@@ -68,7 +68,7 @@ public class ArtifactIncursionMission extends HubMissionWithBarEvent implements 
         }
 
         if (!setPersonMissionRef(getPerson(), "$sep_aim_ref")) {
-            log.info("Failed find or create mission giver");
+            log.info("Failed to find or create mission giver");
             return false;
         }
 

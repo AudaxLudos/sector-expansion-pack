@@ -87,6 +87,9 @@ public class FleetEscortMission extends HubMissionWithBarEvent {
         float fp = 30f;
         FleetParamsV3 params = new FleetParamsV3(
                 createdAt,
+                createdAt.getLocationInHyperspace(),
+                getPerson().getFaction().getId(),
+                null,
                 FleetTypes.TASK_FORCE,
                 fp, // combatPts
                 fp, // freighterPts
@@ -98,7 +101,7 @@ public class FleetEscortMission extends HubMissionWithBarEvent {
         );
         this.fleet = FleetFactoryV3.createFleet(params);
         if (!setEntityMissionRef(this.fleet, "$sep_fem_ref")) {
-            log.info("Failed to create fleet to escort 1");
+            log.info("Failed to create fleet to escort");
             return false;
         }
 
