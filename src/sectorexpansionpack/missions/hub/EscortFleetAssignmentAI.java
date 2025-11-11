@@ -7,6 +7,7 @@ import com.fs.starfarer.api.campaign.CampaignFleetAPI;
 import com.fs.starfarer.api.campaign.FleetAssignment;
 import com.fs.starfarer.api.campaign.JumpPointAPI;
 import com.fs.starfarer.api.campaign.SectorEntityToken;
+import com.fs.starfarer.api.impl.campaign.ids.MemFlags;
 import com.fs.starfarer.api.util.IntervalUtil;
 import com.fs.starfarer.api.util.Misc;
 import org.apache.log4j.Logger;
@@ -22,6 +23,7 @@ public class EscortFleetAssignmentAI implements EveryFrameScript, Script {
     public static final float JUMP_FOLLOW_DISTANCE = 2000f;
     public static Logger log = Global.getLogger(EscortFleetAssignmentAI.class);
 
+    protected boolean isDone = false;
     protected CampaignFleetAPI fleet;
     protected FleetEscortMission mission;
     protected IntervalUtil timer = new IntervalUtil(0.2f, 0.4f);
@@ -35,7 +37,7 @@ public class EscortFleetAssignmentAI implements EveryFrameScript, Script {
 
     @Override
     public boolean isDone() {
-        return this.mission.isDone();
+        return this.isDone;
     }
 
     @Override
@@ -132,12 +134,15 @@ public class EscortFleetAssignmentAI implements EveryFrameScript, Script {
                         this.fleet.clearAssignments();
                         this.fleet.addAssignment(FleetAssignment.ORBIT_PASSIVE, entity, 3f + this.mission.getGenRandom().nextFloat() * 7f, "Completing objectives at " + entity.getName(), this);
                     } else if (this.mission.getCurrentStage() == FleetEscortMission.Stage.RETURN) {
-                        this.mission.setCurrentStage(FleetEscortMission.Stage.COMPLETED, null, null);
-                        this.fleet.clearAssignments();
-                        this.fleet.addAssignment(FleetAssignment.GO_TO_LOCATION_AND_DESPAWN, entity, 999999f, "Standing down at " + entity.getName());
-                    }
+                        this.mission.setCurrentStage(FleetEscortMission.Stage.COMPLETED, null, null);}
                 }
             }
+        }
+
+        if (this.mission.isEnding()) {
+            this.fleet.clearAssignments();
+            this.fleet.addAssignment(FleetAssignment.GO_TO_LOCATION_AND_DESPAWN, entity, 999999f);
+            this.isDone = true;
         }
     }
 
