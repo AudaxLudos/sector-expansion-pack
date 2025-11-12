@@ -110,9 +110,14 @@ public class FleetEscortMission extends HubMissionWithBarEvent {
         requireMarketNotHidden();
         requireMarketNotInHyperspace();
         requireMarketLocationNot(createdAt.getContainingLocation());
-        this.gotoEntity = pickMarket().getPrimaryEntity();
+        MarketAPI market = pickMarket();
+        if (market == null) {
+            log.info("Failed to find market");
+            return false;
+        }
+        this.gotoEntity = market.getPrimaryEntity();
         if (this.gotoEntity == null) {
-            log.info("Failed to find entity to go to");
+            log.info("Failed to find market's entity");
             return false;
         }
 
