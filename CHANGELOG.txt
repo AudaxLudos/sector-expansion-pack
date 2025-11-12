@@ -1,3 +1,10 @@
+### 0.0.157a
+- Fix crash if no market was picked for escort mission
+- Fail the mission if escorted fleet turns hostile
+- Properly despawn escorted fleet when mission ends
+- Ensure escorted fleet belongs to the contact's faction
+- Fix colony item installation even when incursion fails
+
 ### 0.0.150a
 - Add colony item whitelist for events and missions
 - Remove hostile market target requirement for artifact incursion mission
