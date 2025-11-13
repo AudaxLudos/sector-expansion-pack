@@ -1,3 +1,7 @@
+### 0.0.161a
+- Fix artifact incursion raid target not getting marked
+- Fix crash when abandoning artifact incursion mission
+
 ### 0.0.157a
 - Fix crash if no market was picked for escort mission
 - Fail the mission if escorted fleet turns hostile
