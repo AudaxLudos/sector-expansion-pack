@@ -226,9 +226,13 @@ public class ArtifactIncursionMission extends HubMissionWithBarEvent implements 
     }
 
     @Override
-    protected void endSuccessImpl(InteractionDialogAPI dialog, Map<String, MemoryAPI> memoryMap) {
+    protected void notifyEnding() {
         Global.getSector().getListenerManager().removeListener(this);
+        super.notifyEnding();
+    }
 
+    @Override
+    protected void endSuccessImpl(InteractionDialogAPI dialog, Map<String, MemoryAPI> memoryMap) {
         if (this.result != null && this.result.reward <= 0) {
             return;
         }
@@ -255,16 +259,6 @@ public class ArtifactIncursionMission extends HubMissionWithBarEvent implements 
         log.info(String.format("Installing %s to %s facility %s %s in the %s",
                 this.specialItemSpec.getName(), ind.getCurrentName(), market.getOnOrAt(),
                 market.getName(), market.getStarSystem().getNameWithLowercaseTypeShort()));
-    }
-
-    @Override
-    protected void endFailureImpl(InteractionDialogAPI dialog, Map<String, MemoryAPI> memoryMap) {
-        Global.getSector().getListenerManager().removeListener(this);
-    }
-
-    @Override
-    protected void endAbandonImpl() {
-        Global.getSector().getListenerManager().removeListener(this);
     }
 
     @Override
@@ -367,7 +361,7 @@ public class ArtifactIncursionMission extends HubMissionWithBarEvent implements 
         if (market == this.market && entity == this.market.getPrimaryEntity()) {
             for (GroundRaidObjectivePlugin obj : objectives) {
                 if (obj instanceof SpecialItemRaidObjectivePluginImpl plugin) {
-                    if (plugin.getItemSpec() == this.specialItemSpec && plugin.getSource() == this.industry) {
+                    if (Objects.equals(plugin.getItemSpec().getId(), this.specialItemSpec.getId()) && plugin.getSource() == this.industry) {
                         this.objectivePlugin = plugin;
                         plugin.setNameOverride("Take " + plugin.getItemSpec().getName() + " for " + getPerson().getNameString());
                         return;
