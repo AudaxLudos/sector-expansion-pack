@@ -10,6 +10,12 @@ public class MissionScenarioSpec {
     protected Integer minCreditReward;
     protected Integer maxCreditReward;
 
+    protected String data1;
+    protected String data2;
+    protected String data3;
+    protected String data4;
+    protected String data5;
+
     public String getMissionId() {
         return this.missionId;
     }
@@ -56,5 +62,45 @@ public class MissionScenarioSpec {
 
     public void setMaxCreditReward(Integer maxCreditReward) {
         this.maxCreditReward = maxCreditReward;
+    }
+
+    public String getData1() {
+        return this.data1;
+    }
+
+    public void setData1(String data1) {
+        this.data1 = data1;
+    }
+
+    public String getData2() {
+        return this.data2;
+    }
+
+    public void setData2(String data2) {
+        this.data2 = data2;
+    }
+
+    public String getData3() {
+        return this.data3;
+    }
+
+    public void setData3(String data3) {
+        this.data3 = data3;
+    }
+
+    public String getData4() {
+        return this.data4;
+    }
+
+    public void setData4(String data4) {
+        this.data4 = data4;
+    }
+
+    public String getData5() {
+        return this.data5;
+    }
+
+    public void setData5(String data5) {
+        this.data5 = data5;
     }
 }

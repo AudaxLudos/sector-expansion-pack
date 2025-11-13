@@ -45,7 +45,7 @@ public class FleetEscortMission extends HubMissionWithBarEvent {
     protected boolean create(MarketAPI createdAt, boolean barEvent) {
         this.scenario = Utils.pickMissionScenario(getMissionId(), getGenRandom());
         if (barEvent) {
-            if (rollProbability(0.5f)) {
+            if (rollProbability(0.5f)) { // TODO: Make this a constant (chance for contact to be military)
                 List<String> posts = new ArrayList<>();
                 posts.add(Ranks.POST_AGENT);
                 if (Misc.isMilitary(createdAt)) {

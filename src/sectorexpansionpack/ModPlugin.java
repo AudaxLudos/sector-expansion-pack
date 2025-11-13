@@ -126,12 +126,20 @@ public class ModPlugin extends BaseModPlugin {
                     continue;
                 }
                 MissionScenarioSpec spec = new MissionScenarioSpec();
-                spec.setMissionId(row.getString("missionId"));
+                if (row.getString("scenarioId").contains("#")) {
+                    continue;
+                }
                 spec.setScenarioId(row.getString("scenarioId"));
+                spec.setMissionId(row.getString("missionId"));
                 spec.setFrequency((float) row.optDouble("frequency", 10f));
                 spec.setDuration((float) row.optDouble("duration", -1f));
                 spec.setMinCreditReward(row.optInt("minCreditReward", -1));
                 spec.setMaxCreditReward(row.optInt("minCreditReward", -1));
+                spec.setData1(row.optString("data1", null));
+                spec.setData1(row.optString("data2", null));
+                spec.setData1(row.optString("data3", null));
+                spec.setData1(row.optString("data4", null));
+                spec.setData1(row.optString("data5", null));
                 Global.getSettings().putSpec(MissionScenarioSpec.class, spec.scenarioId, spec);
             }
         } catch (IOException | JSONException e) {
