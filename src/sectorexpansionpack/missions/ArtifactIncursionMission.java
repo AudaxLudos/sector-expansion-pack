@@ -410,6 +410,21 @@ public class ArtifactIncursionMission extends HubMissionWithBarEvent implements 
         this.connections.add(new StageConnection(null, to, new EntityFinderMission.MarketFactionChangedChecker(market)));
     }
 
+    public static class MarketFactionChangedChecker implements ConditionChecker {
+        public String prevFactionId;
+        public MarketAPI market;
+
+        public MarketFactionChangedChecker(MarketAPI market) {
+            this.prevFactionId = market.getFactionId();
+            this.market = market;
+        }
+
+
+        public boolean conditionsMet() {
+            return !java.util.Objects.equals(this.market.getFactionId(), this.prevFactionId);
+        }
+    }
+
     public enum Stage {
         RAID_ARTIFACT,
         DELIVER_ARTIFACT,
