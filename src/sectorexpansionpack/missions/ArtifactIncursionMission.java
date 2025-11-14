@@ -237,6 +237,7 @@ public class ArtifactIncursionMission extends HubMissionWithBarEvent implements 
             return;
         }
 
+        resetSearch();
         requireMarketFaction(getPerson().getFaction().getId());
         requireMarketNotHidden();
         requireMarketNotInHyperspace();
