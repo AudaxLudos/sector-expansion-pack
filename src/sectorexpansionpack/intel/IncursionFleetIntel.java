@@ -6,6 +6,8 @@ import com.fs.starfarer.api.campaign.econ.Industry;
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
 import com.fs.starfarer.api.campaign.rules.MemoryAPI;
 import com.fs.starfarer.api.fleet.FleetMemberAPI;
+import com.fs.starfarer.api.impl.campaign.ids.Factions;
+import com.fs.starfarer.api.impl.campaign.ids.Items;
 import com.fs.starfarer.api.impl.campaign.ids.Ranks;
 import com.fs.starfarer.api.impl.campaign.ids.Stats;
 import com.fs.starfarer.api.impl.campaign.intel.group.FGAction;
@@ -21,6 +23,7 @@ import com.fs.starfarer.api.ui.LabelAPI;
 import com.fs.starfarer.api.ui.TooltipMakerAPI;
 import com.fs.starfarer.api.util.Misc;
 import com.fs.starfarer.api.util.WeightedRandomPicker;
+import com.fs.starfarer.campaign.econ.Market;
 import org.apache.log4j.Logger;
 import sectorexpansionpack.ModPlugin;
 import sectorexpansionpack.Utils;
@@ -30,6 +33,7 @@ import sectorexpansionpack.missions.EntityFinderMission;
 import java.awt.*;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Random;
 
 public class IncursionFleetIntel extends GenericRaidFGI {
@@ -47,6 +51,110 @@ public class IncursionFleetIntel extends GenericRaidFGI {
     protected MarketAPI target;
     protected SpecialItemSpecAPI specialItemSpec;
     protected SpecialItemData specialItemData;
+
+    public IncursionFleetIntel(String sourceMarketName, String targetMarketName, String colonyItemId) {
+        super(null);
+        this.efm = new EntityFinderMission();
+
+        List<MarketAPI> markets = Global.getSector().getEconomy().getMarketsCopy();
+        MarketAPI source = null;
+        for (MarketAPI market : markets) {
+            if (Objects.equals(market.getName().toLowerCase(), sourceMarketName)) {
+                source = market;
+                break;
+            }
+        }
+        this.source = source;
+        if (this.source == null) {
+            log.info("Failed to find source market");
+            endImmediately();
+            return;
+        }
+
+        setFaction(this.source.getFactionId());
+
+        MarketAPI target = null;
+        for (MarketAPI market : markets) {
+            if (Objects.equals(market.getName().toLowerCase(), targetMarketName)) {
+                target = market;
+                break;
+            }
+        }
+        this.target = target;
+        if (target == null) {
+            log.info("Failed to find target market");
+            endImmediately();
+            return;
+        }
+
+        this.specialItemSpec = Global.getSettings().getSpecialItemSpec(colonyItemId);
+        if (this.specialItemSpec == null) {
+            log.info("Failed to find colony item to take");
+            endImmediately();
+            return;
+        }
+        this.specialItemData = new SpecialItemData(colonyItemId, null);
+
+        this.params = new GenericRaidParams(getRandom(), true);
+        this.params.makeFleetsHostile = false; // will be made hostile when they arrive, not before
+        this.params.source = this.source;
+        this.params.prepDays = 21f + getRandom().nextFloat() * 7f;
+        this.params.payloadDays = 27f + 7f * getRandom().nextFloat();
+
+        this.params.raidParams.where = this.target.getStarSystem();
+        this.params.raidParams.type = FGRaidAction.FGRaidType.SEQUENTIAL;
+        this.params.raidParams.tryToCaptureObjectives = false;
+        this.params.raidParams.raidsPerColony = 3;
+        this.params.raidParams.allowedTargets.add(this.target);
+
+        this.params.factionId = this.source.getFactionId();
+        this.params.style = FleetCreatorMission.FleetStyle.QUALITY;
+        this.params.repImpact = HubMissionWithTriggers.ComplicationRepImpact.FULL;
+        this.params.noun = "incursion";
+        this.params.forcesNoun = "incursion forces";
+
+        // here might be a better way of scaling difficulty like using fleet points instead but this works for now
+        float baseDifficulty = getMarketPresenceDifficulty(this.target.getStarSystem(), this.target.getFactionId());
+        // A bit of variance so that fleets aren't always strong against target market
+        float variance = 0.5f + (getRandom().nextFloat() * 0.75f);
+        int totalDifficulty = Math.round(baseDifficulty * variance);
+        log.info(String.format("Total fleet difficulty spawned at %s is %s", this.source.getName(), totalDifficulty));
+
+        if (totalDifficulty - 10 < 0) {
+            this.maxFleetSize = totalDifficulty;
+        }
+        if (this.maxFleetSize < 6) {
+            this.maxFleetSize = 6;
+        }
+
+        this.params.fleetSizes.add(this.maxFleetSize);
+        totalDifficulty -= this.maxFleetSize;
+
+        while (totalDifficulty > 0 && this.params.fleetSizes.size() < 9) {
+            int min = 3;
+            int max = this.maxFleetSize - 2;
+            int diff = min + getRandom().nextInt(max - min + 1);
+
+            this.params.fleetSizes.add(diff);
+            totalDifficulty -= diff;
+        }
+
+        initActions();
+
+        // Mark source faction so it won't be reselected for future expeditions
+        this.source.getFaction().getMemoryWithoutUpdate().set(FACTION_KEY, true);
+
+        // Mark target so it won't be reselected for future expeditions
+        this.target.getMemoryWithoutUpdate().set(TARGET_KEY, true);
+        this.target.getMemoryWithoutUpdate().set(EVENT_KEY, this);
+
+        Global.getSector().getIntelManager().queueIntel(this);
+
+        log.info(String.format("Starting %s incursion at %s in the %s, targeting %s in the %s",
+                this.source.getFaction().getDisplayName(),
+                this.source.getName(), this.source.getStarSystem().getNameWithLowercaseTypeShort(),
+                this.target.getName(), this.target.getStarSystem().getNameWithLowercaseTypeShort()));
+    }
 
     public IncursionFleetIntel() {
         super(null);
@@ -108,7 +216,7 @@ public class IncursionFleetIntel extends GenericRaidFGI {
         this.params.fleetSizes.add(this.maxFleetSize);
         totalDifficulty -= this.maxFleetSize;
 
-        while (totalDifficulty > 0 || this.params.fleetSizes.size() < 9) {
+        while (totalDifficulty > 0 && this.params.fleetSizes.size() < 9) {
             int min = 3;
             int max = this.maxFleetSize - 2;
             int diff = min + getRandom().nextInt(max - min + 1);
