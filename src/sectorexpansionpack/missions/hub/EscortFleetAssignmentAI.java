@@ -7,7 +7,6 @@ import com.fs.starfarer.api.campaign.CampaignFleetAPI;
 import com.fs.starfarer.api.campaign.FleetAssignment;
 import com.fs.starfarer.api.campaign.JumpPointAPI;
 import com.fs.starfarer.api.campaign.SectorEntityToken;
-import com.fs.starfarer.api.impl.campaign.ids.MemFlags;
 import com.fs.starfarer.api.util.IntervalUtil;
 import com.fs.starfarer.api.util.Misc;
 import org.apache.log4j.Logger;
@@ -134,7 +133,8 @@ public class EscortFleetAssignmentAI implements EveryFrameScript, Script {
                         this.fleet.clearAssignments();
                         this.fleet.addAssignment(FleetAssignment.ORBIT_PASSIVE, entity, 3f + this.mission.getGenRandom().nextFloat() * 7f, "Completing objectives at " + entity.getName(), this);
                     } else if (this.mission.getCurrentStage() == FleetEscortMission.Stage.RETURN) {
-                        this.mission.setCurrentStage(FleetEscortMission.Stage.COMPLETED, null, null);}
+                        this.mission.setCurrentStage(FleetEscortMission.Stage.COMPLETED, null, null);
+                    }
                 }
             }
         }

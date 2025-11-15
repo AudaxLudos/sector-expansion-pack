@@ -358,9 +358,8 @@ public class SearchAndRescueMissionV2 extends HubMissionWithBarEvent {
         CAPTURED_IN_FLEET,
         CAPTURED_IN_PLANET;
 
-        public static boolean contains(String s)
-        {
-            for (ScenarioType type:values()) {
+        public static boolean contains(String s) {
+            for (ScenarioType type : values()) {
                 if (Objects.equals(type.name(), s)) {
                     return true;
                 }
