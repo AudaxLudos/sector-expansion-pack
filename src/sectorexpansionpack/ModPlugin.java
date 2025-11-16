@@ -136,10 +136,10 @@ public class ModPlugin extends BaseModPlugin {
                 spec.setMinCreditReward(row.optInt("minCreditReward", -1));
                 spec.setMaxCreditReward(row.optInt("minCreditReward", -1));
                 spec.setData1(row.optString("data1", null));
-                spec.setData1(row.optString("data2", null));
-                spec.setData1(row.optString("data3", null));
-                spec.setData1(row.optString("data4", null));
-                spec.setData1(row.optString("data5", null));
+                spec.setData2(row.optString("data2", null));
+                spec.setData3(row.optString("data3", null));
+                spec.setData4(row.optString("data4", null));
+                spec.setData5(row.optString("data5", null));
                 Global.getSettings().putSpec(MissionScenarioSpec.class, spec.scenarioId, spec);
             }
         } catch (IOException | JSONException e) {
