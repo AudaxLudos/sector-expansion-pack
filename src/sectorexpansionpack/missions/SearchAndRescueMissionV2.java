@@ -32,6 +32,7 @@ public class SearchAndRescueMissionV2 extends HubMissionWithBarEvent {
     protected boolean survivorAlive = true;
     protected ScenarioType scenarioType;
     protected SectorEntityToken entity;
+    protected float ransomAmount;
 
     public SearchAndRescueMissionV2() {
         super();
@@ -125,9 +126,11 @@ public class SearchAndRescueMissionV2 extends HubMissionWithBarEvent {
             setCreditReward(CreditReward.HIGH);
         }
 
+        this.ransomAmount = getCreditsReward() * (0.4f + 0.2f * getGenRandom().nextFloat());
+
         // TODO: Add fleet complications
 
-        return false;
+        return true;
     }
 
     public PersonPostType pickSurvivorPostType() {
@@ -247,7 +250,7 @@ public class SearchAndRescueMissionV2 extends HubMissionWithBarEvent {
                 triggerMakeFleetIgnoredByOtherFleets();
                 triggerMakeFleetNotIgnorePlayer();
                 triggerOrderFleetPatrol(planet);
-                triggerFleetAddDefeatTrigger("SEPSARFleetDefeated");
+                triggerFleetAddDefeatTrigger("SEPSARV2FleetDefeated");
                 triggerFleetSetName("Kidnapper's Fleet");
 
                 endTrigger();
@@ -282,6 +285,7 @@ public class SearchAndRescueMissionV2 extends HubMissionWithBarEvent {
         set("$sep_sarV2_scenarioType", this.scenarioType);
         set("$sep_sarV2_survivorPostType", this.survivorPostType);
         set("$sep_sarV2_survivorAlive", this.survivorAlive);
+        set("$sep_sarV2_creditRansom", Misc.getDGSCredits(this.ransomAmount));
     }
 
     @Override

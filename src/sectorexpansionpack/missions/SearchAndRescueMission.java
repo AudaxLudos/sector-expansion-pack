@@ -176,7 +176,7 @@ public class SearchAndRescueMission extends HubMissionWithBarEvent {
                 endTrigger();
             }
 
-            return true;
+            return false;
         } catch (JSONException e) {
             log.error(e);
             return false;
