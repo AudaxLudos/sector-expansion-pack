@@ -6,4 +6,4 @@ sarDefault1,sep_sarV2,10,,,,,STRANDED_IN_WRECK,,,,,
 sarDefault2,sep_sarV2,10,,,,,STRANDED_IN_PLANET,,,,,
 sarDefault3,sep_sarV2,10,,,,,CAPTURED_IN_FLEET,,,,,
 sarDefault4,sep_sarV2,100,,,,,CAPTURED_IN_PLANET,,,,,
-#sarDefault5,sep_sarV2,10,,,,,CAPTURED_IN_MARKET,,,,,
+#sarDefault5,sep_sarV2,10,,,,,CAPTURED_IN_MARKET,,,,,Not implemented

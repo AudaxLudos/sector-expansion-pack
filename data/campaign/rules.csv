@@ -351,7 +351,7 @@ AddCredits -$sep_sarV2_creditRansom
 $sep_sarV2_returnToContact = true
 Call $sep_sarV2_ref updateStage",,defaultLeave:Leave,
 sep_sarV2_planetPersuadeToFree,DialogOptionSelected,"$option == sep_sarV2_persuadeToFree
-$sep_sarV2_scenarioType == CAPTURED_IN_PLANET score:1000","FireBest SEPSARV2ShowFightText true
+$sep_sarV2_scenarioType == CAPTURED_IN_PLANET score:1000","FireBest SEPSARV2ShowPersuadeText true
 $sep_sarV2_returnToContact = true
 Call $sep_sarV2_ref updateStage",,defaultLeave:Leave,
 sep_sarV2_capturedInEntityRaidFinished,SEPSARV2RaidFinished,Call $sep_sarV2_ref updateData,"FireBest SEPSARV2ShowRaidFinishedText true
@@ -416,15 +416,25 @@ SetTextHighlightColors h
 SetTextHighlights $sep_sarV2_survivorFullName",,contact_pickAnotherGreeting:Continue,
 ,,,,,,
 ## Scenario defaults (sd),,,,,,
-sep_sarV2_sd0Blurb,SEPSARV2ShowBlurb,$sep_sarV2_scenarioType == STRANDED_IN_WRECK,,STRANDED IN WRECK DEFAULT BLURB,,
-sep_sarV2_sd0Option,SEPSARV2ShowOption,$sep_sarV2_scenarioType == STRANDED_IN_WRECK,,,sep_sarV2_start:STRANDED IN WRECK DEFAULT OPTION,
-sep_sarV2_sd0OfferText,SEPSARV2ShowOffer,$sep_sarV2_scenarioType == STRANDED_IN_WRECK,,STRANDED IN WRECK DEFAULT OFFER TEXT,,
-sep_sarV2_sd0BlurbBar,SEPSARV2ShowBlurbBar,$sep_sarV2_scenarioType == STRANDED_IN_WRECK,,STRANDED IN WRECK DEFAULT BLURB BAR,,
-sep_sarV2_sd0OptionBar,SEPSARV2ShowOptionBar,$sep_sarV2_scenarioType == STRANDED_IN_WRECK,,,sep_sarV2_startBar:STRANDED IN WRECK DEFAULT OPTION BAR,
-sep_sarV2_sd0OfferTextBar,SEPSARV2ShowOfferBar,$sep_sarV2_scenarioType == STRANDED_IN_WRECK,,STRANDED IN WRECK DEFAULT OFFER TEXT BAR,,
-sep_sarV2_sd0EntityText,SEPSARV2ShowEntityText,$sep_sarV2_scenarioType == STRANDED_IN_WRECK,,STRANDED IN WRECK DEFAULT ENTITY TEXT,,
-sep_sarV2_sd0AliveText,SEPSARV2ShowAliveText,$sep_sarV2_scenarioType == STRANDED_IN_WRECK,,STRANDED IN WRECK DEFAULT SURVIVOR ALIVE TEXT,,
-sep_sarV2_sd0DeadText,SEPSARV2ShowDeadText,$sep_sarV2_scenarioType == STRANDED_IN_WRECK,,STRANDED IN WRECK DEFAULT SURVIVOR DEAD TEXT,,
+sep_sarV2_sd0Blurb,SEPSARV2ShowBlurb,$sep_sarV2_scenarioType == STRANDED_IN_WRECK,,"""A ranking official has filed a search-and-rescue mission. It's a top priority, and they're offering a substantial credit reward.""",,
+sep_sarV2_sd0Option,SEPSARV2ShowOption,$sep_sarV2_scenarioType == STRANDED_IN_WRECK,,,sep_sarV2_start:Ask about the search and rescue mission,
+sep_sarV2_sd0OfferText,SEPSARV2ShowOffer,$sep_sarV2_scenarioType == STRANDED_IN_WRECK,,"""$sep_sar_survivorFullName, a close relative of a ranking official, was part of a fleet that was due to return over a week ago, but the fleet never arrived. Fleet intel has marked the fleet as 'lost,' but the official refuses to accept that and insists $sep_sar_survivorLastName is still alive.""
+
+$HeOrShe swipes upward on $hisOrHer tripad, sending a shared intel briefing to you. ""The fleet's last known heading was toward $sep_sar_possibleLoc, after which all contact was lost.""
+
+$HeOrShe leans back slightly. ""Your task is to search the area and recover $sep_sar_survivorFullName, dead or alive. If successful, the official is offering $sep_sar_creditReward. Interested?""",,
+sep_sarV2_sd0BlurbBar,SEPSARV2ShowBlurbBar,$sep_sarV2_scenarioType == STRANDED_IN_WRECK,,"A gloomy $manOrWoman sits hunched over the bar, clutching a faded photo in $hisOrHer hands. $HisOrHer expression heavy with grief and stubborn hope.",,
+sep_sarV2_sd0OptionBar,SEPSARV2ShowOptionBar,$sep_sarV2_scenarioType == STRANDED_IN_WRECK,,,sep_sarV2_startBar:Approach the gloomy $manOrWoman and ask if $heOrShe's alright,
+sep_sarV2_sd0OfferTextBar,SEPSARV2ShowOfferBar,$sep_sarV2_scenarioType == STRANDED_IN_WRECK,,"$HeOrShe glances at you, suspicious at first, then looks back at the photo with a heavy sigh. ""$sep_sar_survivorFullName, my close relative, was part of a fleet that was due to return over a week ago, but the fleet never arrived. Fleet intel has already marked the fleet as 'lost,' but I can't accept that. I know $sep_sar_survivorFirstName is still alive.""
+
+$HeOrShe grips the photo and continues. ""When I last spoke to $sep_sar_survivorHimOrHer, $sep_sar_survivorHeOrShe mentioned going toward $sep_sar_possibleLoc, after which all contact was lost.""
+
+$HeOrShe sets the photo down on the table and meets your gaze. ""You look like a capable captain, if you're willing to take the risk, I'll pay $sep_sar_creditReward for $sep_sar_survivorFirstName's safe return.""",,
+sep_sarV2_sd0EntityText,SEPSARV2ShowEntityText,$sep_sarV2_scenarioType == STRANDED_IN_WRECK,,"While searching empty space and drifting wreckage, your sensor officer detects a weak life signature aboard a derelict ship and promptly sends a rescue signal across all frequencies but receives no response.
+
+Without hesitation, you direct your chief salvage operator and chief medical officer to plan and conduct a rescue mission.",,
+sep_sarV2_sd0AliveText,SEPSARV2ShowAliveText,$sep_sarV2_scenarioType == STRANDED_IN_WRECK,,"A short time later, your officers find the survivor and recognize him as our rescue target, $sep_sar_survivorFullName. Luckily $sep_sar_survivorHeOrShe is alive, and according to your chief medical officer, $sep_sar_survivorHeOrShe is comatose and exhibits obvious symptoms of malnutrition, but he will survive.",,
+sep_sarV2_sd0DeadText,SEPSARV2ShowDeadText,$sep_sarV2_scenarioType == STRANDED_IN_WRECK,,"A short time later, your officers find the survivor and recognize him as our rescue target, $sep_sar_survivorFullName. Unfortunately, $sep_sar_survivorHeOrShe is dead, and according to your chief medical officer, $sep_sar_survivorHeOrShe died of extreme malnutrition and oxygen deprivation.",,
 ,,,,,,
 sep_sarV2_sd1Blurb,SEPSARV2ShowBlurb,$sep_sarV2_scenarioType == STRANDED_IN_PLANET,,STRANDED IN PLANET DEFAULT BLURB,,
 sep_sarV2_sd1Option,SEPSARV2ShowOption,$sep_sarV2_scenarioType == STRANDED_IN_PLANET,,,sep_sarV2_start:STRANDED IN PLANET DEFAULT OPTION,
@@ -436,17 +446,35 @@ sep_sarV2_sd1EntityText,SEPSARV2ShowEntityText,$sep_sarV2_scenarioType == STRAND
 sep_sarV2_sd1AliveText,SEPSARV2ShowAliveText,$sep_sarV2_scenarioType == STRANDED_IN_PLANET,,STRANDED IN PLANET DEFAULT SURVIVOR ALIVE TEXT,,
 sep_sarV2_sd1DeadText,SEPSARV2ShowDeadText,$sep_sarV2_scenarioType == STRANDED_IN_PLANET,,STRANDED IN PLANET DEFAULT SURVIVOR DEAD TEXT,,
 ,,,,,,
-sep_sarV2_sd2Blurb,SEPSARV2ShowBlurb,$sep_sarV2_scenarioType == CAPTURED_IN_FLEET,,CAPTURED IN FLEET DEFAULT BLURB,,
-sep_sarV2_sd2Option,SEPSARV2ShowOption,$sep_sarV2_scenarioType == CAPTURED_IN_FLEET,,,sep_sarV2_start:CAPTURED IN FLEET DEFAULT OPTION,
-sep_sarV2_sd2OfferText,SEPSARV2ShowOffer,$sep_sarV2_scenarioType == CAPTURED_IN_FLEET,,CAPTURED IN FLEET DEFAULT OFFER TEXT,,
-sep_sarV2_sd2BlurbBar,SEPSARV2ShowBlurbBar,$sep_sarV2_scenarioType == CAPTURED_IN_FLEET,,CAPTURED IN FLEET DEFAULT BLURB BAR,,
-sep_sarV2_sd2OptionBar,SEPSARV2ShowOptionBar,$sep_sarV2_scenarioType == CAPTURED_IN_FLEET,,,sep_sarV2_startBar:CAPTURED IN FLEET DEFAULT OPTION BAR,
-sep_sarV2_sd2OfferTextBar,SEPSARV2ShowOfferBar,$sep_sarV2_scenarioType == CAPTURED_IN_FLEET,,CAPTURED IN FLEET DEFAULT OFFER TEXT BAR,,
-sep_sarV2_sd2EntityText,SEPSARV2ShowEntityText,$sep_sarV2_scenarioType == CAPTURED_IN_FLEET,,CAPTURED IN FLEET DEFAULT ENTITY TEXT,,
-sep_sarV2_sd2PayRansomText,SEPSARV2ShowPayRansomText,$sep_sarV2_scenarioType == CAPTURED_IN_FLEET,,CAPTURED IN FLEET PAY RANSOM TEXT,,
-sep_sarV2_sd2FightText,SEPSARV2ShowFightText,$sep_sarV2_scenarioType == CAPTURED_IN_FLEET,,CAPTURED IN FLEET FIGHT TEXT,,
-sep_sarV2_sd2PersuadeText,SEPSARV2ShowPersuadeText,$sep_sarV2_scenarioType == CAPTURED_IN_FLEET,,CAPTURED IN FLEET PERSUADE TEXT,,
-sep_sarV2_sd2FleetDefeatedText,SEPSARV2FleetDefeated,$sep_sarV2_scenarioType == CAPTURED_IN_FLEET,,CAPTURED IN FLEET FLEET DEFEATED TEXT,,
+sep_sarV2_sd2Blurb,SEPSARV2ShowBlurb,$sep_sarV2_scenarioType == CAPTURED_IN_FLEET,,"A ranking official has been kidnapped. I can't spare the resources to mount a rescue, but I trust you enough to offer this mission to you if you're willing.",,
+sep_sarV2_sd2Option,SEPSARV2ShowOption,$sep_sarV2_scenarioType == CAPTURED_IN_FLEET,,,sep_sarV2_start:Ask about the kidnapped ranking official,
+sep_sarV2_sd2OfferText,SEPSARV2ShowOffer,$sep_sarV2_scenarioType == CAPTURED_IN_FLEET,,"""$sep_sar_survivorFullName was abducted shortly after leaving a bar. Soon after, the kidnappers contacted $sep_sar_survivorHisOrHer family, demanding a ransom of $sep_sar_creditRansom in exchange for $sep_sar_survivorLastName's release.""
+
+$heOrShe pauses, transmitting a shared intel briefing from $hisOrHer tripad. ""The kidnappers have been identified as a $sep_sar_entityFaction terrorist group, claiming retribution for past actions taken against them. They've ordered the ransom to be delivered to a fleet waiting in $sep_sar_possibleLoc.""
+
+$HeOrShe continues, ""The family of $sep_sar_survivorLastName is offering a reward of $sep_sar_creditReward for $sep_sar_survivorHisOrHer safe return and the resolution of this matter.""",,
+sep_sarV2_sd2BlurbBar,SEPSARV2ShowBlurbBar,$sep_sarV2_scenarioType == CAPTURED_IN_FLEET,,You notice a troubled $manOrWoman going from table to table asking for help only to be rejected or told to go away.,,
+sep_sarV2_sd2OptionBar,SEPSARV2ShowOptionBar,$sep_sarV2_scenarioType == CAPTURED_IN_FLEET,,,sep_sarV2_startBar:Ask the troubled $manOrWoman what sort of help $heOrShe needs,
+sep_sarV2_sd2OfferTextBar,SEPSARV2ShowOfferBar,$sep_sarV2_scenarioType == CAPTURED_IN_FLEET,,"The $manOrWoman looks at you, eyes worn and unfocused from stress. ""You actually asked,"" $heOrShe says quietly.
+
+""My nephew, $sep_sar_survivorFullName, has been kidnapped. They took $sep_sar_survivorHimOrHer off the shuttle concourse during what should have been a routine cargo transfer. I've reported this to the authorities but their process is so slow that $sep_sar_survivorFirstName might not survive long enough for them to act.""
+
+$HeOrShe pulls out a small datapad. ""The kidnappers already sent a message. They want $sep_sar_creditRansom, demanded that only a single fleet approach them and If they detect anything suspicous, they'll kill $sep_sar_survivorFirstName. They are waiting in $sep_sar_possibleLoc.""
+
+$HeOrShe looks at you with a mix of fear and hope. ""If you can find them and bring $sep_sar_survivorFirstName back alive, I will pay you $sep_sar_creditReward. Please, I am begging you. You might be the only one who can save him.""",,
+sep_sarV2_sd2EntityText,SEPSARV2ShowEntityText,$sep_sarV2_scenarioType == CAPTURED_IN_FLEET,,"""So... you must be the ones carrying the ransom. Hmph. Not much to look at, but I suppose credits don't need much of an escort."" 
+
+$HeOrShe narrows his eyes and continues, ""We made it clear. $sep_sar_creditRansom credits, transferred clean and quiet. No tricks, no games. Hand it over, and $sep_sar_survivorFullName walks away alive.""",,
+sep_sarV2_sd2PayRansomText,SEPSARV2ShowPayRansomText,$sep_sarV2_scenarioType == CAPTURED_IN_FLEET,,"""Payment confirmed. $sep_sar_creditRansom credits received and cleared. We are dispatching a single shuttle carrying the hostage. It will intercept your position in approximately fifteen minutes. Keep your fleet at a safe distance. Any attempt to approach or interfere and we will shoot the shuttle down."" 
+
+The shuttle appears on your sensors. A quick scan returns no traps or issues and a single life sign aboard. You authorize the shuttle to dock and find $sep_sar_survivorFullName, alive but shaken.",,
+sep_sarV2_sd2FightText,SEPSARV2ShowFightText,$sep_sarV2_scenarioType == CAPTURED_IN_FLEET,,"""So that's your choice? I thought you'd have the brains to settle this clean, but I see I was wrong. Fine, if it's a fight you want, then it's a fight you'll get.""",,
+sep_sarV2_sd2PersuadeText,SEPSARV2ShowPersuadeText,$sep_sarV2_scenarioType == CAPTURED_IN_FLEET,,"You begin to persuade the kidnappers. After a tense back-and-forth, they finally relent. Their demands falter as hesitation takes hold, and they choose to release the hostage.
+
+A lone shuttle is launched, carrying $sep_sar_survivorFullName toward your fleet. The hostage is alive but shaken, spared without a single shot fired.",,
+sep_sarV2_sd2FleetDefeatedText,SEPSARV2FleetDefeated,$sep_sarV2_scenarioType == CAPTURED_IN_FLEET,,"Your sensors officer scans through the debris field, searching for any trace of the hostage. Among the wreckage, they discover a lone shuttle adrift.
+
+Inside, $sep_sar_survivorFullName is found alive, shaken but stable, and quickly transferred to your sickbay for treatment.",,
 ,,,,,,
 sep_sarV2_sd3Blurb,SEPSARV2ShowBlurb,$sep_sarV2_scenarioType == CAPTURED_IN_PLANET,,CAPTURED IN PLANET DEFAULT BLURB,,
 sep_sarV2_sd3Option,SEPSARV2ShowOption,$sep_sarV2_scenarioType == CAPTURED_IN_PLANET,,,sep_sarV2_start:CAPTURED IN PLANET DEFAULT OPTION,

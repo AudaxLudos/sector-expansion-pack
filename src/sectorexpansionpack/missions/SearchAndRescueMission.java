@@ -421,7 +421,7 @@ public class SearchAndRescueMission extends HubMissionWithBarEvent {
         String prefix = "";
         String subjectName = this.survivor.getNameString();
         if (!this.subjectName.isEmpty()) {
-            prefix = "the ";
+            prefix = "the";
             subjectName = this.subjectName;
         }
         if (this.currentStage == Stage.FIND) {

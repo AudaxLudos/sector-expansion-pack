@@ -14,15 +14,19 @@ import com.fs.starfarer.api.impl.campaign.missions.hub.HubMissionWithBarEvent;
 import com.fs.starfarer.api.impl.campaign.missions.hub.ReqMode;
 import com.fs.starfarer.api.impl.campaign.procgen.Constellation;
 import com.fs.starfarer.api.impl.campaign.rulecmd.salvage.MarketCMD;
+import com.fs.starfarer.api.impl.campaign.rulecmd.salvage.special.BreadcrumbSpecial;
 import com.fs.starfarer.api.impl.campaign.rulecmd.salvage.special.CryopodOfficerGen;
 import com.fs.starfarer.api.ui.SectorMapAPI;
+import com.fs.starfarer.api.ui.TooltipMakerAPI;
 import com.fs.starfarer.api.util.Misc;
 import com.fs.starfarer.api.util.WeightedRandomPicker;
 import org.apache.log4j.Logger;
 import sectorexpansionpack.MissionScenarioSpec;
 import sectorexpansionpack.Utils;
 
+import java.awt.*;
 import java.util.*;
+import java.util.List;
 
 public class SearchAndRescueMissionV2 extends HubMissionWithBarEvent {
     public static final float MISSION_DURATION = 120f;
@@ -34,6 +38,7 @@ public class SearchAndRescueMissionV2 extends HubMissionWithBarEvent {
     protected ScenarioType scenarioType;
     protected SectorEntityToken entity;
     protected float ransomAmount;
+    protected String subjectName = null;
 
     public SearchAndRescueMissionV2() {
         super();
@@ -293,9 +298,18 @@ public class SearchAndRescueMissionV2 extends HubMissionWithBarEvent {
         set("$sep_sarV2_scenarioType", this.scenarioType);
         set("$sep_sarV2_survivorPostType", this.survivorPostType);
         set("$sep_sarV2_survivorAlive", this.survivorAlive);
+        set("$sep_sar_creditReward", Misc.getDGSCredits(getCreditsReward()));
         set("$sep_sarV2_creditRansom", Misc.getDGSCredits(this.ransomAmount));
         set("$sep_sarV2_raidDangerLevel", MarketCMD.RaidDangerLevel.MEDIUM); // TODO: Randomize or customize this value
         set("$sep_sarV2_marineAmount", 300f); // TODO: Randomize or customize this value
+        set("$sep_sar_possibleLoc", BreadcrumbSpecial.getLocationDescription(this.entity, false));
+        set("$sep_sar_survivorFullName", this.survivor.getNameString());
+        set("$sep_sar_survivorFirstName", this.survivor.getName().getFirst());
+        set("$sep_sar_survivorLastName", this.survivor.getName().getLast());
+        set("$sep_sar_survivorHeOrShe", this.survivor.getHeOrShe());
+        set("$sep_sar_survivorHisOrHer", this.survivor.getHisOrHer());
+        set("$sep_sar_survivorHimOrHer", this.survivor.getHimOrHer());
+        set("$sep_sar_survivorManOrWoman", this.survivor.getManOrWoman());
     }
 
     @Override
