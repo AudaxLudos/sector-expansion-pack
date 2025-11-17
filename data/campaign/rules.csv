@@ -335,32 +335,56 @@ sep_sarV2_entityInitialDialog,SEPSARV2EntityOptions,,"FireBest SEPSARV2ShowEntit
 Call $sep_sarV2_ref checkSurvivorStatus",,,
 sep_sarV2_strandedInWreckOptions,SEPSARV2EntityOptions,$sep_sarV2_scenarioType == STRANDED_IN_WRECK score:1000,,,sep_sarV2_checkSurvivorStatus:Continue,
 sep_sarV2_strandedInPlanetOptions,SEPSARV2EntityOptions,$sep_sarV2_scenarioType == STRANDED_IN_PLANET score:1000,,,sep_sarV2_checkSurvivorStatus:Continue,
+sep_sarV2_capturedInEntityRaidBegin,SEPSARV2EntityOptions,$sep_sarV2_scenarioType == CAPTURED_IN_PLANET score:1000,FireBest SEPSARV2RaidBegin,,,
+sep_sarV2_capturedInPlanetRaidOptions,SEPSARV2RaidBegin,$sep_sarV2_scenarioType == CAPTURED_IN_PLANET score:1000,"$raidDifficulty = $sep_sarV2_marineAmount
+$raidGoBackTrigger = SEPSARV2RaidBegin
+$raidRestrictToTrigger = SEPSARV2RaidFinished
+AddRaidObjective genericIcon ""Rescue $sep_sarV2_survivorFullName"" $sep_sarV2_raidDangerLevel 5000 SEPSARV2RaidFinished true
+DoCanAffordCheck $sep_sarV2_creditRansom sep_sarV2_payRansom
+SetStoryOption sep_sarV2_persuadeToFree ui_char_spent_story_point ""Persuade the kidnappers to free the hostage""",,"mktRaidNonMarket:Rescue $sep_sarV2_survivorFullName
+sep_sarV2_payRansom:Pay the ransom
+sep_sarV2_persuadeToFree:Persuade to free the hostage
+defaultLeave:Leave",
+sep_sarV2_planetAcceptRansom,DialogOptionSelected,"$option == sep_sarV2_payRansom
+$sep_sarV2_scenarioType == CAPTURED_IN_PLANET score:1000","FireBest SEPSARV2ShowPayRansomText true
+AddCredits -$sep_sarV2_creditRansom
+$sep_sarV2_returnToContact = true
+Call $sep_sarV2_ref updateStage",,defaultLeave:Leave,
+sep_sarV2_planetPersuadeToFree,DialogOptionSelected,"$option == sep_sarV2_persuadeToFree
+$sep_sarV2_scenarioType == CAPTURED_IN_PLANET score:1000","FireBest SEPSARV2ShowFightText true
+$sep_sarV2_returnToContact = true
+Call $sep_sarV2_ref updateStage",,defaultLeave:Leave,
+sep_sarV2_capturedInEntityRaidFinished,SEPSARV2RaidFinished,Call $sep_sarV2_ref updateData,"FireBest SEPSARV2ShowRaidFinishedText true
+$sep_sarV2_returnToContact = true
+Call $sep_sarV2_ref updateStage",,,
 sep_sarV2_capturedInFleetOptions,SEPSARV2EntityOptions,$sep_sarV2_scenarioType == CAPTURED_IN_FLEET score:1000,"DoCanAffordCheck $sep_sarV2_creditRansom sep_sarV2_payRansom
 SetStoryOption sep_sarV2_persuadeToFree ui_char_spent_story_point ""Persuade the kidnappers to free the hostage""",,"sep_sarV2_payRansom:Pay the ransom
 sep_sarV2_beginFight:Engage the fleet
 sep_sarV2_persuadeToFree:Persuade to free the hostage
 ",
-sep_sarV2_fleetAcceptRansom,DialogOptionSelected,$option == sep_sarV2_payRansom,"FireAll SEPSARV2ShowPayRansomText true
+sep_sarV2_fleetAcceptRansom,DialogOptionSelected,"$option == sep_sarV2_payRansom
+$sep_sarV2_scenarioType == CAPTURED_IN_FLEET score:1000","FireBest SEPSARV2ShowPayRansomText true
 AddCredits -$sep_sarV2_creditRansom
 $entity.sep_sarV2_returnToContact = true
 Call $entity.sep_sarV2_ref updateStage
 MakeOtherFleetAllowDisengage sep_sar true
 MakeOtherFleetNonHostile sep_sar true
 $entity.ignorePlayerCommRequests = true",,cutCommLinkNoText:Cut the comm link,
-sep_sarV2_fleetBeginFight,DialogOptionSelected,$option == sep_sarV2_beginFight,"FireAll SEPSARV2ShowFightText true
+sep_sarV2_fleetBeginFight,DialogOptionSelected,$option == sep_sarV2_beginFight,"FireBest SEPSARV2ShowFightText true
 MakeOtherFleetHostile sep_sar true
 MakeOtherFleetAggressive sep_sar true
 MakeOtherFleetPreventDisengage sep_sar true
 $entity.ignorePlayerCommRequests = true
 ",,cutCommLinkNoText:Cut the comm link,
-sep_sarV2_fleetPersuadeToFree,DialogOptionSelected,$option == sep_sarV2_persuadeToFree,"FireAll SEPSARV2ShowPersuadeText true
+sep_sarV2_fleetPersuadeToFree,DialogOptionSelected,"$option == sep_sarV2_persuadeToFree
+$sep_sarV2_scenarioType == CAPTURED_IN_FLEET score:1000","FireBest SEPSARV2ShowPersuadeText true
 $entity.sep_sarV2_returnToContact = true
 Call $entity.sep_sarV2_ref updateStage
 MakeOtherFleetAllowDisengage sep_sar true
 MakeOtherFleetNonHostile sep_sar true
 $entity.ignorePlayerCommRequests = true",,cutCommLinkNoText:Cut the comm link,
 sep_sarV2_fleetDefeated,SEPSARV2FleetDefeated,"$someShipsDestroyed
-Call $sep_sar_ref updateData","FireAll SEPSARV2ShowEntityDefeatedText true
+Call $sep_sar_ref updateData","FireBest SEPSARV2ShowEntityDefeatedText true
 $sep_sar_returnToContact = true
 Call $sep_sar_ref updateStage",,,
 sep_sarV2_entitySurvivorDead,DialogOptionSelected,"$sep_sarV2_survivorAlive score:1000
@@ -423,6 +447,17 @@ sep_sarV2_sd2PayRansomText,SEPSARV2ShowPayRansomText,$sep_sarV2_scenarioType == 
 sep_sarV2_sd2FightText,SEPSARV2ShowFightText,$sep_sarV2_scenarioType == CAPTURED_IN_FLEET,,CAPTURED IN FLEET FIGHT TEXT,,
 sep_sarV2_sd2PersuadeText,SEPSARV2ShowPersuadeText,$sep_sarV2_scenarioType == CAPTURED_IN_FLEET,,CAPTURED IN FLEET PERSUADE TEXT,,
 sep_sarV2_sd2FleetDefeatedText,SEPSARV2FleetDefeated,$sep_sarV2_scenarioType == CAPTURED_IN_FLEET,,CAPTURED IN FLEET FLEET DEFEATED TEXT,,
+,,,,,,
+sep_sarV2_sd3Blurb,SEPSARV2ShowBlurb,$sep_sarV2_scenarioType == CAPTURED_IN_PLANET,,CAPTURED IN PLANET DEFAULT BLURB,,
+sep_sarV2_sd3Option,SEPSARV2ShowOption,$sep_sarV2_scenarioType == CAPTURED_IN_PLANET,,,sep_sarV2_start:CAPTURED IN PLANET DEFAULT OPTION,
+sep_sarV2_sd3OfferText,SEPSARV2ShowOffer,$sep_sarV2_scenarioType == CAPTURED_IN_PLANET,,CAPTURED IN PLANET DEFAULT OFFER TEXT,,
+sep_sarV2_sd3BlurbBar,SEPSARV2ShowBlurbBar,$sep_sarV2_scenarioType == CAPTURED_IN_PLANET,,CAPTURED IN PLANET DEFAULT BLURB BAR,,
+sep_sarV2_sd3OptionBar,SEPSARV2ShowOptionBar,$sep_sarV2_scenarioType == CAPTURED_IN_PLANET,,,sep_sarV2_startBar:CAPTURED IN PLANET DEFAULT OPTION BAR,
+sep_sarV2_sd3OfferTextBar,SEPSARV2ShowOfferBar,$sep_sarV2_scenarioType == CAPTURED_IN_PLANET,,CAPTURED IN PLANET DEFAULT OFFER TEXT BAR,,
+sep_sarV2_sd3EntityText,SEPSARV2ShowEntityText,$sep_sarV2_scenarioType == CAPTURED_IN_PLANET,,CAPTURED IN PLANET DEFAULT ENTITY TEXT,,
+sep_sarV2_sd3PayRansomText,SEPSARV2ShowPayRansomText,$sep_sarV2_scenarioType == CAPTURED_IN_PLANET,,CAPTURED IN PLANET PAY RANSOM TEXT,,
+sep_sarV2_sd3PersuadeText,SEPSARV2ShowPersuadeText,$sep_sarV2_scenarioType == CAPTURED_IN_PLANET,,CAPTURED IN PLANET PERSUADE TEXT,,
+sep_sarV2_sd3FleetDefeatedText,SEPSARV2ShowRaidFinishedText,$sep_sarV2_scenarioType == CAPTURED_IN_PLANET,,CAPTURED IN PLANET RAID FINISHED TEXT,,
 ,,,,,,
 ## Default return dialogues,,,,,,
 sep_sarV2_sdReturnSurvivorAlive,SEPSARV2ShowAliveReturnText,,,GENERIC RETURN SURVIVOR ALIVE TEXT,,

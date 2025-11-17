@@ -13,6 +13,7 @@ import com.fs.starfarer.api.impl.campaign.ids.*;
 import com.fs.starfarer.api.impl.campaign.missions.hub.HubMissionWithBarEvent;
 import com.fs.starfarer.api.impl.campaign.missions.hub.ReqMode;
 import com.fs.starfarer.api.impl.campaign.procgen.Constellation;
+import com.fs.starfarer.api.impl.campaign.rulecmd.salvage.MarketCMD;
 import com.fs.starfarer.api.impl.campaign.rulecmd.salvage.special.CryopodOfficerGen;
 import com.fs.starfarer.api.ui.SectorMapAPI;
 import com.fs.starfarer.api.util.Misc;
@@ -293,6 +294,8 @@ public class SearchAndRescueMissionV2 extends HubMissionWithBarEvent {
         set("$sep_sarV2_survivorPostType", this.survivorPostType);
         set("$sep_sarV2_survivorAlive", this.survivorAlive);
         set("$sep_sarV2_creditRansom", Misc.getDGSCredits(this.ransomAmount));
+        set("$sep_sarV2_raidDangerLevel", MarketCMD.RaidDangerLevel.MEDIUM); // TODO: Randomize or customize this value
+        set("$sep_sarV2_marineAmount", 300f); // TODO: Randomize or customize this value
     }
 
     @Override
