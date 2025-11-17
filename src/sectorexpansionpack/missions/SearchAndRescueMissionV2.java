@@ -299,6 +299,44 @@ public class SearchAndRescueMissionV2 extends HubMissionWithBarEvent {
     }
 
     @Override
+    public boolean addNextStepText(TooltipMakerAPI info, Color tc, float pad) {
+        Color h = Misc.getHighlightColor();
+        String prefix = "";
+        if (this.subjectName != null && !this.subjectName.isEmpty() && !this.subjectName.isBlank()) {
+            prefix = "the ";
+        }
+        if (this.currentStage == Stage.FIND) {
+            String loc = BreadcrumbSpecial.getLocationDescription(this.entity, false);
+            info.addPara("Search for " + prefix + " %s in " + loc, 3f, tc, h, this.subjectName);
+            return true;
+        } else if (this.currentStage == Stage.RETURN) {
+            info.addPara("Return to " + getPerson().getMarket().getName() + " in the " +
+                    getPerson().getMarket().getStarSystem().getNameWithLowercaseTypeShort()
+                    + " and talk to " + getPerson().getNameString() + ".", 3f, tc, h);
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public void addDescriptionForNonEndStage(TooltipMakerAPI info, float width, float height) {
+        Color h = Misc.getHighlightColor();
+        Color tc = Misc.getTextColor();
+        String prefix = "";
+        if (this.subjectName != null && !this.subjectName.isEmpty() && !this.subjectName.isBlank()) {
+            prefix = "the";
+        }
+        if (this.currentStage == Stage.FIND) {
+            String loc = BreadcrumbSpecial.getLocationDescription(this.entity, false);
+            info.addPara("Search for " + prefix + " %s in " + loc, 3f, tc, h, this.subjectName);
+        } else if (this.currentStage == Stage.RETURN) {
+            info.addPara("Return with " + prefix + "%s to " + getPerson().getMarket().getName() + " in the " +
+                    getPerson().getMarket().getStarSystem().getNameWithLowercaseTypeShort()
+                    + " and talk to " + getPerson().getNameString() + ".", 3f, tc, h);
+        }
+    }
+
+    @Override
     public boolean callEvent(String ruleId, InteractionDialogAPI dialog, List<Misc.Token> params, Map<String, MemoryAPI> memoryMap) {
         String action = params.get(0).getString(memoryMap);
 
