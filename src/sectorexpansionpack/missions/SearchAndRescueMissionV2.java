@@ -209,7 +209,7 @@ public class SearchAndRescueMissionV2 extends HubMissionWithBarEvent {
     }
 
     public SectorEntityToken pickSurvivorEntity() {
-        SectorEntityToken entity;
+        SectorEntityToken entity = null;
 
         preferSystemInInnerSector();
         preferSystemInDirectionOfOtherMissions();
@@ -267,8 +267,15 @@ public class SearchAndRescueMissionV2 extends HubMissionWithBarEvent {
                 preferPlanetUnpopulated();
                 entity = pickPlanet();
                 break;
+            case CAPTURED_IN_MARKET:
+                requireMarketFaction(Factions.PIRATES);
+                requireMarketNotHidden();
+                requireMarketStabilityAtLeast(7);
+                MarketAPI market = pickMarket();
+                if (market != null) {
+                    entity = market.getPrimaryEntity();
+                }
             default:
-                entity = null;
                 break;
         }
 
@@ -360,7 +367,8 @@ public class SearchAndRescueMissionV2 extends HubMissionWithBarEvent {
         STRANDED_IN_WRECK,
         STRANDED_IN_PLANET,
         CAPTURED_IN_FLEET,
-        CAPTURED_IN_PLANET;
+        CAPTURED_IN_PLANET,
+        CAPTURED_IN_MARKET;
 
         public static boolean contains(String s) {
             for (ScenarioType type : values()) {
