@@ -2,10 +2,7 @@ package sectorexpansionpack.missions;
 
 import com.fs.starfarer.api.EveryFrameScript;
 import com.fs.starfarer.api.Global;
-import com.fs.starfarer.api.campaign.CampaignFleetAPI;
-import com.fs.starfarer.api.campaign.FleetAssignment;
-import com.fs.starfarer.api.campaign.InteractionDialogAPI;
-import com.fs.starfarer.api.campaign.SectorEntityToken;
+import com.fs.starfarer.api.campaign.*;
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
 import com.fs.starfarer.api.campaign.rules.MemoryAPI;
 import com.fs.starfarer.api.characters.PersonAPI;
@@ -25,6 +22,7 @@ import com.fs.starfarer.api.ui.TooltipMakerAPI;
 import com.fs.starfarer.api.util.Misc;
 import com.fs.starfarer.api.util.WeightedRandomPicker;
 import org.apache.log4j.Logger;
+import org.lwjgl.util.vector.Vector2f;
 import sectorexpansionpack.MissionScenarioSpec;
 import sectorexpansionpack.Utils;
 
@@ -58,8 +56,8 @@ public class SearchAndRescueMissionV2 extends HubMissionWithBarEvent {
     @Override
     protected boolean create(MarketAPI createdAt, boolean barEvent) {
         this.scenario = Utils.pickMissionScenario(getMissionId(), getGenRandom());
-        if (ScenarioType.contains(this.scenario.getData1())) {
-            this.scenarioType = ScenarioType.valueOf(this.scenario.getData1());
+        if (ScenarioType.contains(this.scenario.getType())) {
+            this.scenarioType = ScenarioType.valueOf(this.scenario.getType());
         } else {
             log.error("Scenario has no type");
             return false;
@@ -172,8 +170,53 @@ public class SearchAndRescueMissionV2 extends HubMissionWithBarEvent {
         setCreditReward(getCreditsReward() + bonus);
         this.ransomAmount = Math.round(getCreditsReward() * (0.8f + 0.4f * getGenRandom().nextFloat())/1000f) * 1000f;
 
-        // TODO: Add fleet complications
+        Vector2f locInHyper;
+        SectorEntityToken target;
+        if (this.hideout != null) {
+            locInHyper = this.hideout.getLocationInHyperspace();
+            target = this.hideout;
+        } else {
+            locInHyper = this.entity.getLocationInHyperspace();
+            target = this.entity;
+        }
+        for (String complication : this.scenario.getComplications()) {
+            List<String> tags = List.of(complication.split(","));
 
+            if (!Stage.contains(tags.get(0))) {
+                log.info("Stage does not exist skipping complication");
+                continue;
+            }
+            if (Global.getSector().getFaction(tags.get(1)) == null) {
+                log.info("Faction does not exist skipping complication");
+                continue;
+            }
+
+            Stage stage = Stage.valueOf(tags.get(0));
+            String faction = tags.get(1);
+            int difficulty = Integer.parseInt(tags.get(2));
+
+            beginWithinHyperspaceRangeTrigger(this.entity, 3f, false, stage);
+            triggerCreateStandardFleet(difficulty, faction, locInHyper);
+            if (tags.contains("hostile")) {
+                triggerSetFleetFlagsWithReason(MemFlags.MEMORY_KEY_MAKE_HOSTILE);
+            }
+            if (tags.contains("aggressive")) {
+                triggerSetFleetFlagsWithReason(MemFlags.MEMORY_KEY_MAKE_AGGRESSIVE);
+            }
+            if (tags.contains("longpursuit")) {
+                triggerSetFleetFlagPermanent(MemFlags.MEMORY_KEY_ALLOW_LONG_PURSUIT);
+            }
+            if (tags.contains("alwayspursuit")) {
+                triggerSetFleetFlag(MemFlags.MEMORY_KEY_MAKE_ALWAYS_PURSUE);
+            }
+            if (tags.contains("lowrep")) {
+                triggerMakeLowRepImpact();
+            }
+            triggerPickLocationAroundEntity(target, 90f);
+            triggerSpawnFleetAtPickedLocation();
+            triggerOrderFleetPatrol(target);
+            endTrigger();
+        }
         return true;
     }
 
@@ -506,12 +549,101 @@ public class SearchAndRescueMissionV2 extends HubMissionWithBarEvent {
         return result;
     }
 
+    public void triggerCreateStandardFleet(int difficulty, String factionId, Vector2f locInHyper) {
+        FleetSize size;
+        FleetQuality quality;
+        String type;
+        OfficerQuality oQuality;
+        OfficerNum oNum;
+
+        if (difficulty <= 0) {
+            size = FleetSize.TINY;
+            quality = FleetQuality.VERY_LOW;
+            oQuality = OfficerQuality.LOWER;
+            oNum = OfficerNum.FC_ONLY;
+            type = FleetTypes.PATROL_SMALL;
+        } else if (difficulty == 1) {
+            size = FleetSize.VERY_SMALL;
+            quality = FleetQuality.VERY_LOW;
+            oQuality = OfficerQuality.LOWER;
+            oNum = OfficerNum.FC_ONLY;
+            type = FleetTypes.PATROL_SMALL;
+        } else if (difficulty == 2) {
+            size = FleetSize.SMALL;
+            quality = FleetQuality.DEFAULT;
+            oQuality = OfficerQuality.LOWER;
+            oNum = OfficerNum.FEWER;
+            type = FleetTypes.PATROL_SMALL;
+        } else if (difficulty == 3) {
+            size = FleetSize.SMALL;
+            quality = FleetQuality.DEFAULT;
+            oQuality = OfficerQuality.DEFAULT;
+            oNum = OfficerNum.DEFAULT;
+            type = FleetTypes.PATROL_MEDIUM;
+        } else if (difficulty == 4) {
+            size = FleetSize.MEDIUM;
+            quality = FleetQuality.DEFAULT;
+            oQuality = OfficerQuality.DEFAULT;
+            oNum = OfficerNum.DEFAULT;
+            type = FleetTypes.PATROL_MEDIUM;
+        } else if (difficulty == 5) {
+            size = FleetSize.LARGE;
+            quality = FleetQuality.DEFAULT;
+            oQuality = OfficerQuality.DEFAULT;
+            oNum = OfficerNum.DEFAULT;
+            type = FleetTypes.PATROL_LARGE;
+        } else if (difficulty == 6) {
+            size = FleetSize.LARGE;
+            quality = FleetQuality.HIGHER;
+            oQuality = OfficerQuality.DEFAULT;
+            oNum = OfficerNum.MORE;
+            type = FleetTypes.PATROL_LARGE;
+        } else if (difficulty == 7) {
+            size = FleetSize.LARGER;
+            quality = FleetQuality.HIGHER;
+            oQuality = OfficerQuality.DEFAULT;
+            oNum = OfficerNum.MORE;
+            type = FleetTypes.PATROL_LARGE;
+        } else if (difficulty == 8) {
+            size = FleetSize.VERY_LARGE;
+            quality = FleetQuality.HIGHER;
+            oQuality = OfficerQuality.DEFAULT;
+            oNum = OfficerNum.MORE;
+            type = FleetTypes.PATROL_LARGE;
+        } else if (difficulty == 9) {
+            size = FleetSize.VERY_LARGE;
+            quality = FleetQuality.HIGHER;
+            oQuality = OfficerQuality.HIGHER;
+            oNum = OfficerNum.MORE;
+            type = FleetTypes.PATROL_LARGE;
+        } else { // difficulty >= 10
+            size = FleetSize.HUGE;
+            quality = FleetQuality.HIGHER;
+            oQuality = OfficerQuality.HIGHER;
+            oNum = OfficerNum.MORE;
+            //oNum = OfficerNum.ALL_SHIPS;
+            type = FleetTypes.PATROL_LARGE;
+        }
+
+        triggerCreateFleet(size, quality, factionId, type, locInHyper);
+        triggerSetFleetOfficers(oNum, oQuality);
+    }
+
     public enum Stage {
         FIND,
         RETURN,
         COMPLETED,
         FAILED,
-        FAILED_DECIV
+        FAILED_DECIV;
+
+        public static boolean contains(String s) {
+            for (Stage stage : values()) {
+                if (Objects.equals(stage.name(), s)) {
+                    return true;
+                }
+            }
+            return false;
+        }
     }
 
     public enum PersonPostType {

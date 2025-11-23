@@ -1,5 +1,8 @@
 package sectorexpansionpack;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class MissionScenarioSpec {
     protected String missionId;
     protected String scenarioId;
@@ -10,11 +13,14 @@ public class MissionScenarioSpec {
     protected Integer minCreditReward;
     protected Integer maxCreditReward;
 
+    protected String type;
+
+    protected List<String> complications;
+    protected List<String> tags;
+
     protected String data1;
     protected String data2;
     protected String data3;
-    protected String data4;
-    protected String data5;
 
     public String getMissionId() {
         return this.missionId;
@@ -64,6 +70,30 @@ public class MissionScenarioSpec {
         this.maxCreditReward = maxCreditReward;
     }
 
+    public String getType() {
+        return this.type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public List<String> getComplications() {
+        return new ArrayList<>(this.complications);
+    }
+
+    public void setComplications(List<String> complications) {
+        this.complications = complications;
+    }
+
+    public List<String> getTags() {
+        return new ArrayList<>(this.tags);
+    }
+
+    public void setTags(List<String> tags) {
+        this.tags = tags;
+    }
+
     public String getData1() {
         return this.data1;
     }
@@ -86,21 +116,5 @@ public class MissionScenarioSpec {
 
     public void setData3(String data3) {
         this.data3 = data3;
-    }
-
-    public String getData4() {
-        return this.data4;
-    }
-
-    public void setData4(String data4) {
-        this.data4 = data4;
-    }
-
-    public String getData5() {
-        return this.data5;
-    }
-
-    public void setData5(String data5) {
-        this.data5 = data5;
     }
 }

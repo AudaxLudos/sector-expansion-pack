@@ -135,11 +135,20 @@ public class ModPlugin extends BaseModPlugin {
                 spec.setDuration((float) row.optDouble("duration", -1f));
                 spec.setMinCreditReward(row.optInt("minCreditReward", -1));
                 spec.setMaxCreditReward(row.optInt("minCreditReward", -1));
+                spec.setType(row.optString("type", null));
+                String rawComplications = row.getString("complications");
+                if (rawComplications != null && !rawComplications.isBlank()) {
+                    List<String> complications = List.of(rawComplications.split("\\|"));
+                    spec.setComplications(complications);
+                }
+                String rawTags = row.getString("tags");
+                if (rawTags != null && !rawTags.isBlank()) {
+                    List<String> tags = List.of(rawTags.split(","));
+                    spec.setTags(tags);
+                }
                 spec.setData1(row.optString("data1", null));
                 spec.setData2(row.optString("data2", null));
                 spec.setData3(row.optString("data3", null));
-                spec.setData4(row.optString("data4", null));
-                spec.setData5(row.optString("data5", null));
                 Global.getSettings().putSpec(MissionScenarioSpec.class, spec.scenarioId, spec);
             }
         } catch (IOException | JSONException e) {
