@@ -34,17 +34,20 @@ import java.util.List;
 
 public class SearchAndRescueMissionV2 extends HubMissionWithBarEvent {
     public static final float MISSION_DURATION = 120f;
+    public static float OFFICER_EXCEPTIONAL_CHANCE = 0.05f;
+    public static float OFFICER_MENTORED_CHANCE = 0.5f;
+    public static float CONTACT_MILITARY_CHANCE = 0.25f;
     public static Logger log = Global.getLogger(SearchAndRescueMissionV2.class);
     protected MissionScenarioSpec scenario;
     protected PersonPostType survivorPostType;
     protected PersonAPI survivor;
     protected boolean survivorAlive = true;
-    protected ScenarioType scenarioType = ScenarioType.STRANDED_IN_WRECK;
+    protected ScenarioType scenarioType;
     protected SectorEntityToken hideout;
     protected SectorEntityToken entity;
     protected float ransomAmount;
     protected int marineAmount;
-    protected MarketCMD.RaidDangerLevel dangerLevel = MarketCMD.RaidDangerLevel.MEDIUM;
+    protected MarketCMD.RaidDangerLevel raidDangerLevel;
     protected String subjectName = null;
 
     public SearchAndRescueMissionV2() {
@@ -57,6 +60,9 @@ public class SearchAndRescueMissionV2 extends HubMissionWithBarEvent {
         this.scenario = Utils.pickMissionScenario(getMissionId(), getGenRandom());
         if (ScenarioType.contains(this.scenario.getData1())) {
             this.scenarioType = ScenarioType.valueOf(this.scenario.getData1());
+        } else {
+            log.error("Scenario has no type");
+            return false;
         }
 
         if (barEvent) {
@@ -151,17 +157,17 @@ public class SearchAndRescueMissionV2 extends HubMissionWithBarEvent {
 
         int defenderStr = Math.max(50, Math.round(getCreditsReward()/250f/100f) * 100);
         if (defenderStr == 50) {
-            this.dangerLevel = MarketCMD.RaidDangerLevel.MINIMAL;
+            this.raidDangerLevel = MarketCMD.RaidDangerLevel.MINIMAL;
         } else if (defenderStr <= 100) {
-            this.dangerLevel = MarketCMD.RaidDangerLevel.LOW;
-        } else if (defenderStr <= 200) {
-            this.dangerLevel = MarketCMD.RaidDangerLevel.MEDIUM;
-        } else if (defenderStr <= 400) {
-            this.dangerLevel = MarketCMD.RaidDangerLevel.HIGH;
+            this.raidDangerLevel = MarketCMD.RaidDangerLevel.LOW;
+        } else if (defenderStr <= 300) {
+            this.raidDangerLevel = MarketCMD.RaidDangerLevel.MEDIUM;
+        } else if (defenderStr <= 500) {
+            this.raidDangerLevel = MarketCMD.RaidDangerLevel.HIGH;
         } else {
-            this.dangerLevel = MarketCMD.RaidDangerLevel.EXTREME;
+            this.raidDangerLevel = MarketCMD.RaidDangerLevel.EXTREME;
         }
-        this.marineAmount = getMarinesRequiredForCustomDefenderStrength(defenderStr, this.dangerLevel);
+        this.marineAmount = getMarinesRequiredForCustomDefenderStrength(defenderStr, this.raidDangerLevel);
         int bonus = getRewardBonusForMarines(this.marineAmount);
         setCreditReward(getCreditsReward() + bonus);
         this.ransomAmount = Math.round(getCreditsReward() * (0.8f + 0.4f * getGenRandom().nextFloat())/1000f) * 1000f;
@@ -206,11 +212,11 @@ public class SearchAndRescueMissionV2 extends HubMissionWithBarEvent {
                 }
             } else {
                 person = OfficerManagerEvent.createOfficer(getPerson().getFaction(), level, OfficerManagerEvent.SkillPickPreference.ANY, getGenRandom());
-                if (rollProbability(0.05f)) { // TODO: Make this a constant (chance for officer to become exceptional)
+                if (rollProbability(OFFICER_EXCEPTIONAL_CHANCE)) {
                     person.getMemoryWithoutUpdate().set(MemFlags.OFFICER_MAX_LEVEL, 7);
                     person.getMemoryWithoutUpdate().set(MemFlags.OFFICER_MAX_ELITE_SKILLS, 5);
                 }
-                if (rollProbability(0.5f)) { // TODO: Make this a constant (chance for officer to be mentored)
+                if (rollProbability(OFFICER_MENTORED_CHANCE)) {
                     person.getMemoryWithoutUpdate().set("$mentored", true);
                 }
             }
@@ -222,7 +228,7 @@ public class SearchAndRescueMissionV2 extends HubMissionWithBarEvent {
             person = OfficerManagerEvent.createAdmin(getPerson().getFaction(), tierPicker.pick(), getGenRandom());
         } else if (this.survivorPostType == PersonPostType.CONTACT) {
             person.setImportance(pickHighImportance());
-            if (rollProbability(0.25f)) { // TODO: Make this a constant (chance for contact to be military)
+            if (rollProbability(CONTACT_MILITARY_CHANCE)) {
                 if (person.getImportance().ordinal() > 2) {
                     person.setRankId(pickOne(Ranks.SPACE_COMMANDER, Ranks.SPACE_CAPTAIN, Ranks.SPACE_ADMIRAL));
                     person.setPostId(pickOne(Ranks.POST_AGENT, Ranks.POST_FLEET_COMMANDER, Ranks.POST_PATROL_COMMANDER));
@@ -340,7 +346,7 @@ public class SearchAndRescueMissionV2 extends HubMissionWithBarEvent {
         set("$sep_sarV2_survivorAlive", this.survivorAlive);
         set("$sep_sarV2_creditReward", Misc.getDGSCredits(getCreditsReward()));
         set("$sep_sarV2_creditRansom", Misc.getDGSCredits(this.ransomAmount));
-        set("$sep_sarV2_raidDangerLevel", this.dangerLevel);
+        set("$sep_sarV2_raidDangerLevel", this.raidDangerLevel);
         set("$sep_sarV2_marineAmount", Misc.getWithDGS(this.marineAmount));
         if (this.hideout != null) {
             set("$sep_sarV2_possibleLoc", BreadcrumbSpecial.getLocationDescription(this.hideout, false));

@@ -6,6 +6,6 @@ fem1,sep_fem,3,,,,,,,,,
 sar1,sep_sarV2,10,,,,STRANDED_IN_WRECK,,,,,
 sar2,sep_sarV2,10,,,,STRANDED_IN_PLANET,,,,,
 sar3,sep_sarV2,10,,,,CAPTURED_IN_FLEET,,,,,
-sar4,sep_sarV2,10,,,,CAPTURED_IN_PLANET,,,,,
+sar4,sep_sarV2,100,,,,CAPTURED_IN_PLANET,,,,,
 #sar5,sep_sarV2,10,,,,CAPTURED_IN_MARKET,,,,,Not implemented
 ,,,,,,,,,,,
