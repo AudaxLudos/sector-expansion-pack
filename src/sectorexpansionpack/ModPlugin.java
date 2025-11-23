@@ -138,12 +138,12 @@ public class ModPlugin extends BaseModPlugin {
                 spec.setType(row.optString("type", null));
                 String rawComplications = row.getString("complications");
                 if (rawComplications != null && !rawComplications.isBlank()) {
-                    List<String> complications = List.of(rawComplications.split("\\|"));
+                    List<String> complications = List.of(rawComplications.replaceAll("\\s+", "").split("\\|"));
                     spec.setComplications(complications);
                 }
                 String rawTags = row.getString("tags");
                 if (rawTags != null && !rawTags.isBlank()) {
-                    List<String> tags = List.of(rawTags.split(","));
+                    List<String> tags = List.of(rawTags.replaceAll("\\s+", "").split(","));
                     spec.setTags(tags);
                 }
                 spec.setData1(row.optString("data1", null));
