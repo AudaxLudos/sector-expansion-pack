@@ -334,10 +334,9 @@ FireAll SEPSARV2EntityOptions",,,
 sep_sarV2_rescueSurvivorInFleet,OpenCommLink,"$entity.sep_sarV2_survivorEntity score:1000
 Call $entity.sep_sarV2_ref updateData","ShowDefaultVisual
 FireAll SEPSARV2EntityOptions", ,,
-sep_sarV2_entityInitialDialog,SEPSARV2EntityOptions,,"FireBest SEPSARV2ShowEntityText true
-Call $sep_sarV2_ref checkSurvivorStatus",,,
-sep_sarV2_strandedInWreckOptions,SEPSARV2EntityOptions,$sep_sarV2_scenarioType == STRANDED_IN_WRECK score:1000,,,sep_sarV2_checkSurvivorStatus:Continue,
-sep_sarV2_strandedInPlanetOptions,SEPSARV2EntityOptions,$sep_sarV2_scenarioType == STRANDED_IN_PLANET score:1000,,,sep_sarV2_checkSurvivorStatus:Continue,
+sep_sarV2_entityInitialDialog,SEPSARV2EntityOptions,,FireBest SEPSARV2ShowEntityText true,,,
+sep_sarV2_strandedInWreckOptions,SEPSARV2EntityOptions,$sep_sarV2_scenarioType == STRANDED_IN_WRECK score:1000,Call $sep_sarV2_ref checkSurvivorStatus,,sep_sarV2_checkSurvivorStatus:Continue,
+sep_sarV2_strandedInPlanetOptions,SEPSARV2EntityOptions,$sep_sarV2_scenarioType == STRANDED_IN_PLANET score:1000,Call $sep_sarV2_ref checkSurvivorStatus,,sep_sarV2_checkSurvivorStatus:Continue,
 sep_sarV2_capturedInEntityRaidBegin,SEPSARV2EntityOptions,$sep_sarV2_scenarioType == CAPTURED_IN_PLANET score:1000,FireBest SEPSARV2RaidBegin,,,
 sep_sarV2_capturedInPlanetRaidOptions,SEPSARV2RaidBegin,$sep_sarV2_scenarioType == CAPTURED_IN_PLANET score:1000,"$raidDifficulty = $sep_sarV2_marineAmount
 $raidGoBackTrigger = SEPSARV2RaidBegin

@@ -325,6 +325,7 @@ public class SearchAndRescueMissionV2 extends HubMissionWithBarEvent {
                 entity = pickEntity();
                 break;
             case CAPTURED_IN_FLEET:
+                // TODO: Add a way to customize fleet
                 beginStageTrigger(Stage.FIND);
                 triggerCreateStandardFleet(10, Factions.PIRATES, this.hideout.getLocationInHyperspace());
                 triggerMakeLowRepImpact();

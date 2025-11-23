@@ -1,35 +1,38 @@
 package sectorexpansionpack.missions;
 
 import com.fs.starfarer.api.Global;
-import com.fs.starfarer.api.campaign.CampaignFleetAPI;
-import com.fs.starfarer.api.campaign.FactionAPI;
-import com.fs.starfarer.api.campaign.InteractionDialogAPI;
-import com.fs.starfarer.api.campaign.SectorEntityToken;
+import com.fs.starfarer.api.campaign.*;
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
 import com.fs.starfarer.api.campaign.rules.MemoryAPI;
+import com.fs.starfarer.api.impl.campaign.fleets.DefaultFleetInflater;
+import com.fs.starfarer.api.impl.campaign.fleets.DefaultFleetInflaterParams;
 import com.fs.starfarer.api.impl.campaign.fleets.FleetFactoryV3;
-import com.fs.starfarer.api.impl.campaign.fleets.FleetParamsV3;
 import com.fs.starfarer.api.impl.campaign.ids.FleetTypes;
 import com.fs.starfarer.api.impl.campaign.ids.MemFlags;
 import com.fs.starfarer.api.impl.campaign.ids.Ranks;
 import com.fs.starfarer.api.impl.campaign.ids.Tags;
+import com.fs.starfarer.api.impl.campaign.missions.hub.BaseHubMission;
 import com.fs.starfarer.api.impl.campaign.missions.hub.HubMissionWithBarEvent;
+import com.fs.starfarer.api.impl.campaign.missions.hub.MissionFleetAutoDespawn;
+import com.fs.starfarer.api.impl.campaign.missions.hub.MissionTrigger;
+import com.fs.starfarer.api.impl.campaign.procgen.themes.SalvageSpecialAssigner;
+import com.fs.starfarer.api.impl.campaign.skills.OfficerTraining;
 import com.fs.starfarer.api.ui.SectorMapAPI;
 import com.fs.starfarer.api.ui.TooltipMakerAPI;
 import com.fs.starfarer.api.util.Misc;
 import org.apache.log4j.Logger;
+import org.lwjgl.util.vector.Vector2f;
 import sectorexpansionpack.MissionScenarioSpec;
 import sectorexpansionpack.Utils;
 import sectorexpansionpack.missions.hub.EscortFleetAssignmentAI;
 
 import java.awt.*;
-import java.util.ArrayList;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
-import java.util.Random;
 
 public class FleetEscortMission extends HubMissionWithBarEvent {
     public static final float MISSION_DURATION = 120f;
+    public static float BAR_MILITARY_CHANCE = 0.4f;
     public static Logger log = Global.getLogger(FleetEscortMission.class);
     protected MissionScenarioSpec scenario;
     protected boolean fleetSpawned = false; // Might not be needed
@@ -45,7 +48,7 @@ public class FleetEscortMission extends HubMissionWithBarEvent {
     protected boolean create(MarketAPI createdAt, boolean barEvent) {
         this.scenario = Utils.pickMissionScenario(getMissionId(), getGenRandom());
         if (barEvent) {
-            if (rollProbability(0.5f)) { // TODO: Make this a constant (chance for contact to be military)
+            if (rollProbability(BAR_MILITARY_CHANCE)) {
                 List<String> posts = new ArrayList<>();
                 posts.add(Ranks.POST_AGENT);
                 if (Misc.isMilitary(createdAt)) {
@@ -84,23 +87,16 @@ public class FleetEscortMission extends HubMissionWithBarEvent {
             setGiverIsPotentialContactOnSuccess();
         }
 
-        // TODO: Customize fleet based on mission scenario
-        float fp = 30f;
-        FleetParamsV3 params = new FleetParamsV3(
-                createdAt,
-                createdAt.getLocationInHyperspace(),
-                getPerson().getFaction().getId(),
-                null,
-                FleetTypes.TASK_FORCE,
-                fp, // combatPts
-                fp, // freighterPts
-                fp, // tankerPts
-                fp, // transportPts
-                0f, // linerPts
-                0f, // utilityPts
-                0f // qualityMod
-        );
-        this.fleet = FleetFactoryV3.createFleet(params);
+        // TODO: Add a way to customize fleet
+        beginStageTrigger(Stage.GOTO);
+        triggerCreateStandardFleet(5, getPerson().getFaction().getId(), createdAt.getLocationInHyperspace());
+        triggerMakeFleetIgnoreOtherFleets();
+        triggerFleetSetName("Special Task Force");
+        endTrigger();
+        List<CampaignFleetAPI> fleets = runStageTriggersReturnFleets(Stage.GOTO);
+        if (!fleets.isEmpty()) {
+            this.fleet = fleets.get(0);
+        }
         if (!setEntityMissionRef(this.fleet, "$sep_fem_ref")) {
             log.info("Failed to create fleet to escort");
             return false;
@@ -160,8 +156,6 @@ public class FleetEscortMission extends HubMissionWithBarEvent {
             setCreditReward(CreditReward.HIGH);
         }
 
-        // TODO: Add fleet complications
-
         return true;
     }
 
@@ -169,7 +163,8 @@ public class FleetEscortMission extends HubMissionWithBarEvent {
     protected void advanceImpl(float amount) {
         super.advanceImpl(amount);
 
-        if (this.fleetSpawned && getCurrentStage() != Stage.COMPLETED) {
+        if (this.fleet != null && !this.fleet.isEmpty() && this.fleet.isAlive() && !this.fleet.isExpired()
+                && getCurrentStage() != Stage.COMPLETED) {
             // TODO: Track and include fleet points for failure condition
             if (this.fleet.isExpired() || !this.fleet.isAlive()) {
                 setCurrentStage(Stage.FAILED, null, null);
@@ -194,17 +189,13 @@ public class FleetEscortMission extends HubMissionWithBarEvent {
 
     @Override
     public void acceptImpl(InteractionDialogAPI dialog, Map<String, MemoryAPI> memoryMap) {
-        if (!this.fleetSpawned) {
-            this.fleetSpawned = true;
+        if (this.fleet != null && !this.fleet.isEmpty()) {
             MarketAPI market = getPerson().getMarket();
             SectorEntityToken entity = market.getPrimaryEntity();
             entity.getContainingLocation().addEntity(this.fleet);
             this.fleet.setLocation(entity.getLocation().x, entity.getLocation().y);
             this.fleet.setFacing(getGenRandom().nextFloat() * 360f);
             this.fleet.addScript(new EscortFleetAssignmentAI(this.fleet, this));
-            this.fleet.getMemoryWithoutUpdate().set("$sourceId", entity.getId());
-            this.fleet.getMemoryWithoutUpdate().set(MemFlags.FLEET_IGNORES_OTHER_FLEETS, true);
-            this.fleet.setName("Special Task Force");
         }
     }
 
@@ -264,6 +255,90 @@ public class FleetEscortMission extends HubMissionWithBarEvent {
         return getPerson().getMarket().getPrimaryEntity();
     }
 
+    public void triggerCreateStandardFleet(int difficulty, String factionId, Vector2f locInHyper) {
+        FleetSize size;
+        FleetQuality quality;
+        String type;
+        OfficerQuality oQuality;
+        OfficerNum oNum;
+
+        if (difficulty <= 0) {
+            size = FleetSize.TINY;
+            quality = FleetQuality.VERY_LOW;
+            oQuality = OfficerQuality.LOWER;
+            oNum = OfficerNum.FC_ONLY;
+            type = FleetTypes.PATROL_SMALL;
+        } else if (difficulty == 1) {
+            size = FleetSize.VERY_SMALL;
+            quality = FleetQuality.VERY_LOW;
+            oQuality = OfficerQuality.LOWER;
+            oNum = OfficerNum.FC_ONLY;
+            type = FleetTypes.PATROL_SMALL;
+        } else if (difficulty == 2) {
+            size = FleetSize.SMALL;
+            quality = FleetQuality.DEFAULT;
+            oQuality = OfficerQuality.LOWER;
+            oNum = OfficerNum.FEWER;
+            type = FleetTypes.PATROL_SMALL;
+        } else if (difficulty == 3) {
+            size = FleetSize.SMALL;
+            quality = FleetQuality.DEFAULT;
+            oQuality = OfficerQuality.DEFAULT;
+            oNum = OfficerNum.DEFAULT;
+            type = FleetTypes.PATROL_MEDIUM;
+        } else if (difficulty == 4) {
+            size = FleetSize.MEDIUM;
+            quality = FleetQuality.DEFAULT;
+            oQuality = OfficerQuality.DEFAULT;
+            oNum = OfficerNum.DEFAULT;
+            type = FleetTypes.PATROL_MEDIUM;
+        } else if (difficulty == 5) {
+            size = FleetSize.LARGE;
+            quality = FleetQuality.DEFAULT;
+            oQuality = OfficerQuality.DEFAULT;
+            oNum = OfficerNum.DEFAULT;
+            type = FleetTypes.PATROL_LARGE;
+        } else if (difficulty == 6) {
+            size = FleetSize.LARGE;
+            quality = FleetQuality.HIGHER;
+            oQuality = OfficerQuality.DEFAULT;
+            oNum = OfficerNum.MORE;
+            type = FleetTypes.PATROL_LARGE;
+        } else if (difficulty == 7) {
+            size = FleetSize.LARGER;
+            quality = FleetQuality.HIGHER;
+            oQuality = OfficerQuality.DEFAULT;
+            oNum = OfficerNum.MORE;
+            type = FleetTypes.PATROL_LARGE;
+        } else if (difficulty == 8) {
+            size = FleetSize.VERY_LARGE;
+            quality = FleetQuality.HIGHER;
+            oQuality = OfficerQuality.DEFAULT;
+            oNum = OfficerNum.MORE;
+            type = FleetTypes.PATROL_LARGE;
+        } else if (difficulty == 9) {
+            size = FleetSize.VERY_LARGE;
+            quality = FleetQuality.HIGHER;
+            oQuality = OfficerQuality.HIGHER;
+            oNum = OfficerNum.MORE;
+            type = FleetTypes.PATROL_LARGE;
+        } else { // difficulty >= 10
+            size = FleetSize.HUGE;
+            quality = FleetQuality.HIGHER;
+            oQuality = OfficerQuality.HIGHER;
+            oNum = OfficerNum.MORE;
+            //oNum = OfficerNum.ALL_SHIPS;
+            type = FleetTypes.PATROL_LARGE;
+        }
+
+        triggerSEPCreateFleet(size, quality, factionId, type, locInHyper);
+        triggerSetFleetOfficers(oNum, oQuality);
+    }
+
+    public void triggerSEPCreateFleet(FleetSize size, FleetQuality quality, String factionId, String type, Vector2f locInHyper) {
+        triggerCustomAction(new SEPCreateFleetAction(type, locInHyper, size, quality, factionId));
+    }
+
     public void connectWithFactionTurnedHostile(Object from, Object to, FactionAPI faction) {
         this.connections.add(new StageConnection(from, to, new EntityFinderMission.FactionTurnedHostileChecker(faction)));
     }
@@ -280,5 +355,280 @@ public class FleetEscortMission extends HubMissionWithBarEvent {
         FAILED,
         FAILED_DECIV,
         FAILED_GIVER_HOSTILE
+    }
+
+    public enum ScenarioType {
+        DRUG_SMUGGLING,
+        VIP_ESCORT,
+        REBELLION_SUPPORT,
+        ARTIFACT_DELIVERY,
+        COMMODITY_DELIVERY;
+
+        public static boolean contains(String s) {
+            for (ScenarioType type : values()) {
+                if (Objects.equals(type.name(), s)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+    }
+
+    public static class SEPCreateFleetAction extends CreateFleetAction {
+        public Float freighterPts = null;
+        public boolean freighterIncludeCombatPts = false;
+        public Float tankerPts = null;
+        public boolean tankerIncludeCombatPts = false;
+        public Float linerPts = null;
+        public boolean linerIncludeCombatPts = false;
+        public Float transportPts = null;
+        public boolean transportIncludeCombatPts = false;
+        public Float utilityPts = null;
+        public boolean utilityIncludeCombatPts = false;
+
+        public SEPCreateFleetAction(String type, Vector2f locInHyper, FleetSize fSize, FleetQuality fQuality, String factionId) {
+            super(type, locInHyper, fSize, fQuality, factionId);
+        }
+
+        @Override
+        public void doAction(MissionTrigger.TriggerActionContext context) {
+            Random random;
+            if (context.mission != null) {
+                random = ((BaseHubMission) context.mission).getGenRandom();
+            } else {
+                random = Misc.random;
+            }
+            FactionAPI faction = Global.getSector().getFaction(this.params.factionId);
+            float maxPoints = faction.getApproximateMaxFPPerFleet(FactionAPI.ShipPickMode.PRIORITY_THEN_ALL);
+            float min = this.fSize.maxFPFraction - (this.fSize.maxFPFraction - this.fSize.prev().maxFPFraction) / 2f;
+            float max = this.fSize.maxFPFraction + (this.fSize.next().maxFPFraction - this.fSize.maxFPFraction) / 2f;
+            float fraction = min + (max - min) * random.nextFloat();
+            float excess = 0;
+
+            if (this.fSizeOverride != null) {
+                fraction = this.fSizeOverride * (0.95f + random.nextFloat() * 0.1f);
+            } else {
+                int numShipsDoctrine = 1;
+                if (this.params.doctrineOverride != null) {
+                    numShipsDoctrine = this.params.doctrineOverride.getNumShips();
+                } else {
+                    numShipsDoctrine = faction.getDoctrine().getNumShips();
+                }
+                float doctrineMult = FleetFactoryV3.getDoctrineNumShipsMult(numShipsDoctrine);
+                fraction *= 0.75f * doctrineMult;
+                if (fraction > FleetSize.MAXIMUM.maxFPFraction) {
+                    excess = fraction - FleetSize.MAXIMUM.maxFPFraction;
+                    fraction = FleetSize.MAXIMUM.maxFPFraction;
+                }
+            }
+
+            float combatPoints = fraction * maxPoints;
+            if (this.combatFleetPointsOverride != null) {
+                combatPoints = this.combatFleetPointsOverride;
+            }
+
+            FactionDoctrineAPI doctrine = this.params.doctrineOverride;
+            if (excess > 0) {
+                if (doctrine == null) {
+                    doctrine = faction.getDoctrine().clone();
+                }
+                int added = Math.round(excess / 0.1f);
+                if (added > 0) {
+                    doctrine.setOfficerQuality(Math.min(5, doctrine.getOfficerQuality() + added));
+                    doctrine.setShipQuality(doctrine.getShipQuality() + added);
+                }
+            }
+
+            if (this.freighterPts == null) {
+                this.freighterPts = 0f;
+            }
+            if (this.tankerPts == null) {
+                this.tankerPts = 0f;
+            }
+            if (this.transportPts == null) {
+                this.transportPts = 0f;
+            }
+            if (this.linerPts == null) {
+                this.linerPts = 0f;
+            }
+            if (this.utilityPts == null) {
+                this.utilityPts = 0f;
+            }
+
+            if (this.freighterIncludeCombatPts) {
+                this.freighterPts += combatPoints;
+            }
+            if (this.tankerIncludeCombatPts) {
+                this.tankerPts += combatPoints;
+            }
+            if (this.transportIncludeCombatPts) {
+                this.transportPts += combatPoints;
+            }
+            if (this.linerIncludeCombatPts) {
+                this.linerPts += combatPoints;
+            }
+            if (this.utilityIncludeCombatPts) {
+                this.utilityPts += combatPoints;
+            }
+
+            if (this.freighterMult == null) {
+                this.freighterMult = 0f;
+            }
+            if (this.tankerMult == null) {
+                this.tankerMult = 0f;
+            }
+            if (this.linerMult == null) {
+                this.linerMult = 0f;
+            }
+            if (this.transportMult == null) {
+                this.transportMult = 0f;
+            }
+            if (this.utilityMult == null) {
+                this.utilityMult = 0f;
+            }
+            if (this.qualityMod == null) {
+                this.qualityMod = 0f;
+            }
+
+            this.params.combatPts = combatPoints;
+            this.params.freighterPts = this.freighterPts * this.freighterMult;
+            this.params.tankerPts = this.tankerPts * this.tankerMult;
+            this.params.transportPts = this.transportPts * this.transportMult;
+            this.params.linerPts = this.linerPts * this.linerMult;
+            this.params.utilityPts = this.utilityPts * this.utilityMult;
+            this.params.qualityMod = this.qualityMod;
+            this.params.doctrineOverride = doctrine;
+            this.params.random = random;
+
+
+            if (this.fQuality != null) {
+                switch (this.fQuality) {
+                    case VERY_LOW:
+                        if (this.fQualityMod != null) {
+                            this.params.qualityMod += this.fQuality.qualityMod;
+                        } else {
+                            this.params.qualityOverride = 0f;
+                        }
+                        break;
+                    case LOWER, HIGHER, DEFAULT, VERY_HIGH:
+                        this.params.qualityMod += this.fQuality.qualityMod;
+                        break;
+                    case SMOD_1, SMOD_2, SMOD_3:
+                        this.params.qualityMod += this.fQuality.qualityMod;
+                        this.params.averageSMods = this.fQuality.numSMods;
+                        break;
+                }
+            }
+            if (this.fQualityMod != null) {
+                this.params.qualityMod += this.fQualityMod;
+            }
+            if (this.fQualitySMods != null) {
+                this.params.averageSMods = this.fQualitySMods;
+            }
+
+            if (this.oNum != null) {
+                switch (this.oNum) {
+                    case NONE:
+                        this.params.withOfficers = false;
+                        break;
+                    case FC_ONLY:
+                        this.params.officerNumberMult = 0f;
+                        break;
+                    case FEWER:
+                        this.params.officerNumberMult = 0.5f;
+                        break;
+                    case DEFAULT:
+                        break;
+                    case MORE:
+                        this.params.officerNumberMult = 1.5f;
+                        break;
+                    case ALL_SHIPS:
+                        this.params.officerNumberBonus = Global.getSettings().getInt("maxShipsInAIFleet");
+                        break;
+                }
+            }
+
+            if (this.oQuality != null) {
+                switch (this.oQuality) {
+                    case LOWER:
+                        this.params.officerLevelBonus = -3;
+                        this.params.officerLevelLimit = Global.getSettings().getInt("officerMaxLevel") - 1;
+                        this.params.commanderLevelLimit = Global.getSettings().getInt("maxAIFleetCommanderLevel") - 2;
+                        if (this.params.commanderLevelLimit < this.params.officerLevelLimit) {
+                            this.params.commanderLevelLimit = this.params.officerLevelLimit;
+                        }
+                        break;
+                    case DEFAULT:
+                        break;
+                    case HIGHER:
+                        this.params.officerLevelBonus = 2;
+                        this.params.officerLevelLimit = Global.getSettings().getInt("officerMaxLevel") + (int) OfficerTraining.MAX_LEVEL_BONUS;
+                        break;
+                    case UNUSUALLY_HIGH:
+                        this.params.officerLevelBonus = 4;
+                        this.params.officerLevelLimit = SalvageSpecialAssigner.EXCEPTIONAL_PODS_OFFICER_LEVEL;
+                        break;
+                    case AI_GAMMA:
+                    case AI_BETA:
+                    case AI_BETA_OR_GAMMA:
+                    case AI_ALPHA:
+                    case AI_MIXED:
+                    case AI_OMEGA:
+                        this.params.aiCores = this.oQuality;
+                        break;
+                }
+                if (this.doNotIntegrateAICores != null) {
+                    this.params.doNotIntegrateAICores = this.doNotIntegrateAICores;
+                }
+            }
+
+            if (this.shipPickMode != null) {
+                this.params.modeOverride = this.shipPickMode;
+            }
+
+            this.params.updateQualityAndProducerFromSourceMarket();
+            if (this.qualityOverride != null) {
+                this.params.qualityOverride = this.qualityOverride + this.params.qualityMod;
+            }
+            context.fleet = FleetFactoryV3.createFleet(this.params);
+            context.fleet.setFacing(random.nextFloat() * 360f);
+
+            if (this.faction != null) {
+                context.fleet.setFaction(this.faction, true);
+            }
+
+            if (this.nameOverride != null) {
+                context.fleet.setName(this.nameOverride);
+            }
+            if (this.noFactionInName != null && this.noFactionInName) {
+                context.fleet.setNoFactionInName(this.noFactionInName);
+            }
+
+            if (this.removeInflater != null && this.removeInflater) {
+                context.fleet.setInflater(null);
+            } else {
+                if (context.fleet.getInflater() instanceof DefaultFleetInflater inflater) {
+                    if (inflater.getParams() instanceof DefaultFleetInflaterParams p) {
+                        if (this.allWeapons != null) {
+                            p.allWeapons = this.allWeapons;
+                        }
+                        if (this.shipPickMode != null) {
+                            p.mode = this.shipPickMode;
+                        }
+                    }
+                }
+            }
+
+            context.fleet.getMemoryWithoutUpdate().set(MemFlags.FLEET_BUSY, true);
+            context.allFleets.add(context.fleet);
+
+            if (!context.fleet.hasScriptOfClass(MissionFleetAutoDespawn.class)) {
+                context.fleet.addScript(new MissionFleetAutoDespawn(context.mission, context.fleet));
+            }
+
+            if (this.damage != null) {
+                FleetFactoryV3.applyDamageToFleet(context.fleet, this.damage, false, random);
+            }
+        }
     }
 }
