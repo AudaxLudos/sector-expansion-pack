@@ -2,13 +2,14 @@ package sectorexpansionpack.missions;
 
 import com.fs.starfarer.api.EveryFrameScript;
 import com.fs.starfarer.api.Global;
-import com.fs.starfarer.api.campaign.*;
+import com.fs.starfarer.api.campaign.CampaignFleetAPI;
+import com.fs.starfarer.api.campaign.FleetAssignment;
+import com.fs.starfarer.api.campaign.InteractionDialogAPI;
+import com.fs.starfarer.api.campaign.SectorEntityToken;
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
 import com.fs.starfarer.api.campaign.rules.MemoryAPI;
 import com.fs.starfarer.api.characters.PersonAPI;
 import com.fs.starfarer.api.impl.campaign.events.OfficerManagerEvent;
-import com.fs.starfarer.api.impl.campaign.fleets.FleetFactoryV3;
-import com.fs.starfarer.api.impl.campaign.fleets.FleetParamsV3;
 import com.fs.starfarer.api.impl.campaign.ids.*;
 import com.fs.starfarer.api.impl.campaign.intel.contacts.ContactIntel;
 import com.fs.starfarer.api.impl.campaign.missions.hub.HubMissionWithBarEvent;
@@ -36,6 +37,7 @@ public class SearchAndRescueMissionV2 extends HubMissionWithBarEvent {
     public static float OFFICER_MENTORED_CHANCE = 0.5f;
     public static float CONTACT_MILITARY_CHANCE = 0.25f;
     public static Logger log = Global.getLogger(SearchAndRescueMissionV2.class);
+    protected static Object STAGE = new Object();
     protected MissionScenarioSpec scenario;
     protected PersonPostType survivorPostType;
     protected PersonAPI survivor;
@@ -153,7 +155,7 @@ public class SearchAndRescueMissionV2 extends HubMissionWithBarEvent {
             setCreditReward(CreditReward.HIGH);
         }
 
-        int defenderStr = Math.max(50, Math.round(getCreditsReward()/250f/100f) * 100);
+        int defenderStr = Math.max(50, Math.round(getCreditsReward() / 250f / 100f) * 100);
         if (defenderStr == 50) {
             this.raidDangerLevel = MarketCMD.RaidDangerLevel.MINIMAL;
         } else if (defenderStr <= 100) {
@@ -168,7 +170,7 @@ public class SearchAndRescueMissionV2 extends HubMissionWithBarEvent {
         this.marineAmount = getMarinesRequiredForCustomDefenderStrength(defenderStr, this.raidDangerLevel);
         int bonus = getRewardBonusForMarines(this.marineAmount);
         setCreditReward(getCreditsReward() + bonus);
-        this.ransomAmount = Math.round(getCreditsReward() * (0.8f + 0.4f * getGenRandom().nextFloat())/1000f) * 1000f;
+        this.ransomAmount = Math.round(getCreditsReward() * (0.8f + 0.4f * getGenRandom().nextFloat()) / 1000f) * 1000f;
 
         Vector2f locInHyper;
         SectorEntityToken target;
@@ -323,34 +325,22 @@ public class SearchAndRescueMissionV2 extends HubMissionWithBarEvent {
                 entity = pickEntity();
                 break;
             case CAPTURED_IN_FLEET:
-                requireMarketFaction(Factions.PIRATES);
-                requireMarketNotHidden();
-                MarketAPI source = pickMarket();
-
-                // TODO: Customize fleet based on mission scenario
-                float fp = 30f;
-                FleetParamsV3 params = new FleetParamsV3(
-                        source,
-                        source.getLocationInHyperspace(),
-                        Factions.PIRATES,
-                        null,
-                        FleetTypes.PATROL_LARGE,
-                        fp, // combatPts
-                        0f, // freighterPts
-                        0f, // tankerPts
-                        0f, // transportPts
-                        0f, // linerPts
-                        0f, // utilityPts
-                        0f // qualityMod
-                );
-                CampaignFleetAPI fleet = FleetFactoryV3.createFleet(params);
-                fleet.getMemoryWithoutUpdate().set("$sourceId", source.getId());
-                fleet.getMemoryWithoutUpdate().set(MemFlags.FLEET_IGNORES_OTHER_FLEETS, true);
-                fleet.getMemoryWithoutUpdate().set(MemFlags.FLEET_IGNORED_BY_OTHER_FLEETS, true);
-                fleet.clearAssignments();
-                fleet.addAssignment(FleetAssignment.ORBIT_AGGRESSIVE, this.hideout, 999999f);
-                fleet.setName("Terrorist Group");
-                entity = fleet;
+                beginStageTrigger(STAGE);
+                triggerCreateStandardFleet(10, Factions.PIRATES, this.hideout.getLocationInHyperspace());
+                triggerMakeLowRepImpact();
+                triggerMakeFleetIgnoreOtherFleets();
+                triggerMakeFleetIgnoredByOtherFleets();
+                triggerMakeFleetNotIgnorePlayer();
+                triggerMakeLowRepImpact();
+                triggerOrderFleetPatrol(this.hideout);
+                triggerFleetAddDefeatTrigger("SEPSARV2FleetDefeated");
+                triggerFleetSetNoFactionInName();
+                triggerFleetSetName("Terrorist Group");
+                endTrigger();
+                List<CampaignFleetAPI> fleets = runStageTriggersReturnFleets(STAGE);
+                if (!fleets.isEmpty()) {
+                    entity = fleets.get(0);
+                }
                 break;
             case CAPTURED_IN_PLANET:
             case STRANDED_IN_PLANET:
@@ -447,11 +437,11 @@ public class SearchAndRescueMissionV2 extends HubMissionWithBarEvent {
             } else {
                 loc = BreadcrumbSpecial.getLocationDescription(this.entity, false);
             }
-            info.addPara("Search for %s in " + loc, 3f, tc, h, this.subjectName);
+            info.addPara("Search for %s in " + loc, 10f, tc, h, this.subjectName);
         } else if (this.currentStage == Stage.RETURN) {
-            info.addPara("Return with %s to " + getPerson().getMarket().getName() + " in the " +
+            info.addPara("Bring %s to " + getPerson().getMarket().getName() + " in the " +
                     getPerson().getMarket().getStarSystem().getNameWithLowercaseTypeShort()
-                    + " and talk to " + getPerson().getNameString() + ".", 3f, tc, h, this.subjectName);
+                    + " and talk to " + getPerson().getNameString() + ".", 10f, tc, h, this.subjectName);
         }
     }
 
