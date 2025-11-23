@@ -36,8 +36,8 @@ public class SearchAndRescueMissionV2 extends HubMissionWithBarEvent {
     public static float OFFICER_EXCEPTIONAL_CHANCE = 0.05f;
     public static float OFFICER_MENTORED_CHANCE = 0.5f;
     public static float CONTACT_MILITARY_CHANCE = 0.25f;
+    public static float BAR_MILITARY_CHANCE = 0.4f;
     public static Logger log = Global.getLogger(SearchAndRescueMissionV2.class);
-    protected static Object STAGE = new Object();
     protected MissionScenarioSpec scenario;
     protected PersonPostType survivorPostType;
     protected PersonAPI survivor;
@@ -66,7 +66,7 @@ public class SearchAndRescueMissionV2 extends HubMissionWithBarEvent {
         }
 
         if (barEvent) {
-            if (rollProbability(0.5f)) { // TODO: Make this a constant (chance for contact to be military)
+            if (rollProbability(BAR_MILITARY_CHANCE)) {
                 List<String> posts = new ArrayList<>();
                 posts.add(Ranks.POST_AGENT);
                 if (Misc.isMilitary(createdAt)) {
@@ -325,19 +325,18 @@ public class SearchAndRescueMissionV2 extends HubMissionWithBarEvent {
                 entity = pickEntity();
                 break;
             case CAPTURED_IN_FLEET:
-                beginStageTrigger(STAGE);
+                beginStageTrigger(Stage.FIND);
                 triggerCreateStandardFleet(10, Factions.PIRATES, this.hideout.getLocationInHyperspace());
                 triggerMakeLowRepImpact();
                 triggerMakeFleetIgnoreOtherFleets();
                 triggerMakeFleetIgnoredByOtherFleets();
-                triggerMakeFleetNotIgnorePlayer();
                 triggerMakeLowRepImpact();
                 triggerOrderFleetPatrol(this.hideout);
                 triggerFleetAddDefeatTrigger("SEPSARV2FleetDefeated");
                 triggerFleetSetNoFactionInName();
                 triggerFleetSetName("Terrorist Group");
                 endTrigger();
-                List<CampaignFleetAPI> fleets = runStageTriggersReturnFleets(STAGE);
+                List<CampaignFleetAPI> fleets = runStageTriggersReturnFleets(Stage.FIND);
                 if (!fleets.isEmpty()) {
                     entity = fleets.get(0);
                 }
@@ -464,6 +463,12 @@ public class SearchAndRescueMissionV2 extends HubMissionWithBarEvent {
             case "addBonusCreditReward" -> {
                 int bonusCreditReward = (int) (getCreditsReward() * 0.2f);
                 setCreditReward(getCreditsReward() + bonusCreditReward);
+                return true;
+            }
+            case "removeDefeatTrigger" -> {
+                if (dialog.getInteractionTarget() instanceof CampaignFleetAPI fleet) {
+                    Misc.removeDefeatTrigger(fleet, "SEPSARV2FleetDefeated");
+                }
                 return true;
             }
         }

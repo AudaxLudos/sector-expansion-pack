@@ -5,8 +5,8 @@ fem1,sep_fem,3,,,,,,,,,
 ,,,,,,,,,,,
 sar1,sep_sarV2,10,,,STRANDED_IN_WRECK,"FIND,pirates,6,hostile,aggressive,lowrep",,,,,
 sar2,sep_sarV2,10,,,STRANDED_IN_PLANET,"FIND,pirates,6,hostile,aggressive,lowrep",,,,,
-sar3,sep_sarV2,10,,,CAPTURED_IN_FLEET,,,,,,
-sar4,sep_sarV2,1000,,,CAPTURED_IN_PLANET,"FIND,pirates,6,hostile,aggressive,lowrep|
+sar3,sep_sarV2,1000,,,CAPTURED_IN_FLEET,"FIND,pirates,6,hostile,aggressive,lowrep",,,,,
+sar4,sep_sarV2,10,,,CAPTURED_IN_PLANET,"FIND,pirates,6,hostile,aggressive,lowrep|
 FIND,pirates,6,hostile,aggressive,lowrep",,,,,
 #sar5,sep_sarV2,10,,,CAPTURED_IN_MARKET,,,,,,Not implemented
 ,,,,,,,,,,,

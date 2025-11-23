@@ -324,6 +324,9 @@ sep_sarV2_offerTextBar1,DialogOptionSelected,$option == sep_sarV2_startBar,"Fire
 $missionId = sep_sarV2",,"contact_acceptBar:Accept
 contact_declineBarNoContinue:Decline",
 ## Rescue survivor in entity,,,,,,
+sep_sarV2_rescueSurvivorHostiles,OpenInteractionDialog,"$sep_sarV2_survivorEntity score:1000
+Call $sep_sarV2_ref updateData
+IsSeenByAnyFleet",ShowDefaultVisual,"Your $shipOrFleet was recently detected - or is currently being tracked by - a nearby fleet, making it impossible to interact with the entity.",defaultLeave:Leave,
 sep_sarV2_rescueSurvivor,OpenInteractionDialog,"$sep_sarV2_survivorEntity score:1000
 Call $sep_sarV2_ref updateData
 !$sep_sarV2_addedRaidObjective","ShowDefaultVisual
@@ -366,6 +369,7 @@ sep_sarV2_fleetAcceptRansom,DialogOptionSelected,"$option == sep_sarV2_payRansom
 $sep_sarV2_scenarioType == CAPTURED_IN_FLEET score:1000","FireBest SEPSARV2ShowPayRansomText true
 AddCredits -$sep_sarV2_creditRansom
 $entity.sep_sarV2_returnToContact = true
+Call $entity.sep_sarV2_ref removeDefeatTrigger
 Call $entity.sep_sarV2_ref updateStage
 MakeOtherFleetAllowDisengage sep_sar true
 MakeOtherFleetNonHostile sep_sar true
@@ -379,6 +383,7 @@ $entity.ignorePlayerCommRequests = true
 sep_sarV2_fleetPersuadeToFree,DialogOptionSelected,"$option == sep_sarV2_persuadeToFree
 $sep_sarV2_scenarioType == CAPTURED_IN_FLEET score:1000","FireBest SEPSARV2ShowPersuadeText true
 $entity.sep_sarV2_returnToContact = true
+Call $entity.sep_sarV2_ref removeDefeatTrigger
 Call $entity.sep_sarV2_ref updateStage
 MakeOtherFleetAllowDisengage sep_sar true
 MakeOtherFleetNonHostile sep_sar true
