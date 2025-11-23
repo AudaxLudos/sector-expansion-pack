@@ -1,11 +1,11 @@
-scenarioId,missionId,frequency,duration,tags,minCreditReward,maxCreditReward,data1,data2,data3,data4,data5,notes
-femDefault1,sep_fem,10,,,,,,,,,,
-femDefault2,sep_fem,10,,,,,,,,,,
-fem1,sep_fem,3,,,,,,,,,,
-,,,,,,,,,,,,
-sar1,sep_sarV2,10,,,,,STRANDED_IN_WRECK,,,,,
-sar2,sep_sarV2,10,,,,,STRANDED_IN_PLANET,,,,,
-sar3,sep_sarV2,10,,,,,CAPTURED_IN_FLEET,,,,,
-sar4,sep_sarV2,100,,,,,CAPTURED_IN_PLANET,,,,,
-#sarDefault5,sep_sarV2,10,,,,,CAPTURED_IN_MARKET,,,,,Not implemented
-,,,,,,,,,,,,
+scenarioId,missionId,frequency,duration,tags,maxCreditReward,data1,data2,data3,data4,data5,notes
+femDefault1,sep_fem,10,,,,,,,,,
+femDefault2,sep_fem,10,,,,,,,,,
+fem1,sep_fem,3,,,,,,,,,
+,,,,,,,,,,,
+sar1,sep_sarV2,10,,,,STRANDED_IN_WRECK,,,,,
+sar2,sep_sarV2,10,,,,STRANDED_IN_PLANET,,,,,
+sar3,sep_sarV2,10,,,,CAPTURED_IN_FLEET,,,,,
+sar4,sep_sarV2,10,,,,CAPTURED_IN_PLANET,,,,,
+#sar5,sep_sarV2,10,,,,CAPTURED_IN_MARKET,,,,,Not implemented
+,,,,,,,,,,,

@@ -43,6 +43,8 @@ public class SearchAndRescueMissionV2 extends HubMissionWithBarEvent {
     protected SectorEntityToken hideout;
     protected SectorEntityToken entity;
     protected float ransomAmount;
+    protected int marineAmount;
+    protected MarketCMD.RaidDangerLevel dangerLevel = MarketCMD.RaidDangerLevel.MEDIUM;
     protected String subjectName = null;
 
     public SearchAndRescueMissionV2() {
@@ -147,7 +149,22 @@ public class SearchAndRescueMissionV2 extends HubMissionWithBarEvent {
             setCreditReward(CreditReward.HIGH);
         }
 
-        this.ransomAmount = getCreditsReward() * (0.4f + 0.2f * getGenRandom().nextFloat());
+        int defenderStr = Math.max(50, Math.round(getCreditsReward()/250f/100f) * 100);
+        if (defenderStr == 50) {
+            this.dangerLevel = MarketCMD.RaidDangerLevel.MINIMAL;
+        } else if (defenderStr <= 100) {
+            this.dangerLevel = MarketCMD.RaidDangerLevel.LOW;
+        } else if (defenderStr <= 200) {
+            this.dangerLevel = MarketCMD.RaidDangerLevel.MEDIUM;
+        } else if (defenderStr <= 400) {
+            this.dangerLevel = MarketCMD.RaidDangerLevel.HIGH;
+        } else {
+            this.dangerLevel = MarketCMD.RaidDangerLevel.EXTREME;
+        }
+        this.marineAmount = getMarinesRequiredForCustomDefenderStrength(defenderStr, this.dangerLevel);
+        int bonus = getRewardBonusForMarines(this.marineAmount);
+        setCreditReward(getCreditsReward() + bonus);
+        this.ransomAmount = Math.round(getCreditsReward() * (0.8f + 0.4f * getGenRandom().nextFloat())/1000f) * 1000f;
 
         // TODO: Add fleet complications
 
@@ -231,17 +248,14 @@ public class SearchAndRescueMissionV2 extends HubMissionWithBarEvent {
 
     public SectorEntityToken pickHideoutForFleet() {
         SectorEntityToken hideout;
-        switch (this.scenarioType) {
-            case CAPTURED_IN_FLEET:
-                requireSystemHasSafeStars();
-                preferPlanetNotFullySurveyed();
-                preferPlanetUnpopulated();
-                preferPlanetWithRuins();
-                hideout = pickPlanet();
-                break;
-            default:
-                hideout = null;
-                break;
+        if (this.scenarioType == ScenarioType.CAPTURED_IN_FLEET) {
+            requireSystemHasSafeStars();
+            preferPlanetNotFullySurveyed();
+            preferPlanetUnpopulated();
+            preferPlanetWithRuins();
+            hideout = pickPlanet();
+        } else {
+            hideout = null;
         }
 
         return hideout;
@@ -326,8 +340,8 @@ public class SearchAndRescueMissionV2 extends HubMissionWithBarEvent {
         set("$sep_sarV2_survivorAlive", this.survivorAlive);
         set("$sep_sarV2_creditReward", Misc.getDGSCredits(getCreditsReward()));
         set("$sep_sarV2_creditRansom", Misc.getDGSCredits(this.ransomAmount));
-        set("$sep_sarV2_raidDangerLevel", MarketCMD.RaidDangerLevel.MEDIUM); // TODO: Randomize or customize this value
-        set("$sep_sarV2_marineAmount", (int) 300f); // TODO: Randomize or customize this value
+        set("$sep_sarV2_raidDangerLevel", this.dangerLevel);
+        set("$sep_sarV2_marineAmount", Misc.getWithDGS(this.marineAmount));
         if (this.hideout != null) {
             set("$sep_sarV2_possibleLoc", BreadcrumbSpecial.getLocationDescription(this.hideout, false));
         } else {
