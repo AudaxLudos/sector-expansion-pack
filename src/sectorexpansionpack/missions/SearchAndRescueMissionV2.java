@@ -1,15 +1,19 @@
 package sectorexpansionpack.missions;
 
+import com.fs.starfarer.api.EveryFrameScript;
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.campaign.CampaignFleetAPI;
+import com.fs.starfarer.api.campaign.FleetAssignment;
 import com.fs.starfarer.api.campaign.InteractionDialogAPI;
-import com.fs.starfarer.api.campaign.PlanetAPI;
 import com.fs.starfarer.api.campaign.SectorEntityToken;
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
 import com.fs.starfarer.api.campaign.rules.MemoryAPI;
 import com.fs.starfarer.api.characters.PersonAPI;
 import com.fs.starfarer.api.impl.campaign.events.OfficerManagerEvent;
+import com.fs.starfarer.api.impl.campaign.fleets.FleetFactoryV3;
+import com.fs.starfarer.api.impl.campaign.fleets.FleetParamsV3;
 import com.fs.starfarer.api.impl.campaign.ids.*;
+import com.fs.starfarer.api.impl.campaign.intel.contacts.ContactIntel;
 import com.fs.starfarer.api.impl.campaign.missions.hub.HubMissionWithBarEvent;
 import com.fs.starfarer.api.impl.campaign.missions.hub.ReqMode;
 import com.fs.starfarer.api.impl.campaign.procgen.Constellation;
@@ -35,7 +39,8 @@ public class SearchAndRescueMissionV2 extends HubMissionWithBarEvent {
     protected PersonPostType survivorPostType;
     protected PersonAPI survivor;
     protected boolean survivorAlive = true;
-    protected ScenarioType scenarioType;
+    protected ScenarioType scenarioType = ScenarioType.STRANDED_IN_WRECK;
+    protected SectorEntityToken hideout;
     protected SectorEntityToken entity;
     protected float ransomAmount;
     protected String subjectName = null;
@@ -48,6 +53,9 @@ public class SearchAndRescueMissionV2 extends HubMissionWithBarEvent {
     @Override
     protected boolean create(MarketAPI createdAt, boolean barEvent) {
         this.scenario = Utils.pickMissionScenario(getMissionId(), getGenRandom());
+        if (ScenarioType.contains(this.scenario.getData1())) {
+            this.scenarioType = ScenarioType.valueOf(this.scenario.getData1());
+        }
 
         if (barEvent) {
             if (rollProbability(0.5f)) { // TODO: Make this a constant (chance for contact to be military)
@@ -93,6 +101,13 @@ public class SearchAndRescueMissionV2 extends HubMissionWithBarEvent {
         this.survivor = createSurvivor();
         if (this.survivor == null) {
             log.info("Failed to create survivor");
+            return false;
+        }
+        this.subjectName = this.survivor.getNameString();
+
+        this.hideout = pickHideoutForFleet();
+        if (this.hideout == null && this.scenarioType == ScenarioType.CAPTURED_IN_FLEET) {
+            log.info("Failed to find hideout for fleet");
             return false;
         }
 
@@ -214,16 +229,30 @@ public class SearchAndRescueMissionV2 extends HubMissionWithBarEvent {
         return person;
     }
 
+    public SectorEntityToken pickHideoutForFleet() {
+        SectorEntityToken hideout;
+        switch (this.scenarioType) {
+            case CAPTURED_IN_FLEET:
+                requireSystemHasSafeStars();
+                preferPlanetNotFullySurveyed();
+                preferPlanetUnpopulated();
+                preferPlanetWithRuins();
+                hideout = pickPlanet();
+                break;
+            default:
+                hideout = null;
+                break;
+        }
+
+        return hideout;
+    }
+
     public SectorEntityToken pickSurvivorEntity() {
         SectorEntityToken entity = null;
 
         preferSystemInInnerSector();
         preferSystemInDirectionOfOtherMissions();
 
-        this.scenarioType = ScenarioType.STRANDED_IN_WRECK;
-        if (ScenarioType.contains(this.scenario.getData1())) {
-            this.scenarioType = ScenarioType.valueOf(this.scenario.getData1());
-        }
         switch (this.scenarioType) {
             case STRANDED_IN_WRECK:
                 requireEntityTags(ReqMode.ALL, Tags.SALVAGEABLE);
@@ -231,38 +260,34 @@ public class SearchAndRescueMissionV2 extends HubMissionWithBarEvent {
                 entity = pickEntity();
                 break;
             case CAPTURED_IN_FLEET:
-                requireSystemHasSafeStars();
-                requireSystemTags(ReqMode.NOT_ALL, Tags.THEME_UNSAFE);
-                preferPlanetNotFullySurveyed();
-                preferPlanetUnpopulated();
-                preferPlanetWithRuins();
-                PlanetAPI planet = pickPlanet();
+                requireMarketFaction(Factions.PIRATES);
+                requireMarketNotHidden();
+                MarketAPI source = pickMarket();
 
-                beginStageTrigger(SearchAndRescueMission.Stage.FIND);
-                triggerCreateFleet(
-                        FleetSize.LARGE,
-                        FleetQuality.DEFAULT,
+                // TODO: Customize fleet based on mission scenario
+                float fp = 30f;
+                FleetParamsV3 params = new FleetParamsV3(
+                        source,
+                        source.getLocationInHyperspace(),
                         Factions.PIRATES,
+                        null,
                         FleetTypes.PATROL_LARGE,
-                        planet.getStarSystem());
-
-                // TODO: Scale fleet based on player fleet
-
-                triggerPickLocationAroundEntity(planet, 1000f);
-                triggerSpawnFleetAtPickedLocation();
-
-                triggerMakeLowRepImpact();
-                triggerMakeFleetIgnoreOtherFleets();
-                triggerMakeFleetIgnoredByOtherFleets();
-                triggerMakeFleetNotIgnorePlayer();
-                triggerOrderFleetPatrol(planet);
-                triggerFleetAddDefeatTrigger("SEPSARV2FleetDefeated");
-                triggerFleetSetName("Kidnapper's Fleet");
-
-                endTrigger();
-
-                List<CampaignFleetAPI> fleets = runStageTriggersReturnFleets(SearchAndRescueMission.Stage.FIND);
-                entity = fleets.get(0);
+                        fp, // combatPts
+                        0f, // freighterPts
+                        0f, // tankerPts
+                        0f, // transportPts
+                        0f, // linerPts
+                        0f, // utilityPts
+                        0f // qualityMod
+                );
+                CampaignFleetAPI fleet = FleetFactoryV3.createFleet(params);
+                fleet.getMemoryWithoutUpdate().set("$sourceId", source.getId());
+                fleet.getMemoryWithoutUpdate().set(MemFlags.FLEET_IGNORES_OTHER_FLEETS, true);
+                fleet.getMemoryWithoutUpdate().set(MemFlags.FLEET_IGNORED_BY_OTHER_FLEETS, true);
+                fleet.clearAssignments();
+                fleet.addAssignment(FleetAssignment.ORBIT_AGGRESSIVE, this.hideout, 999999f);
+                fleet.setName("Terrorist Group");
+                entity = fleet;
                 break;
             case CAPTURED_IN_PLANET:
             case STRANDED_IN_PLANET:
@@ -295,33 +320,49 @@ public class SearchAndRescueMissionV2 extends HubMissionWithBarEvent {
 
     @Override
     protected void updateInteractionDataImpl() {
+        set("$sep_sarV2_scenarioId", this.scenario.getScenarioId());
         set("$sep_sarV2_scenarioType", this.scenarioType);
         set("$sep_sarV2_survivorPostType", this.survivorPostType);
         set("$sep_sarV2_survivorAlive", this.survivorAlive);
-        set("$sep_sar_creditReward", Misc.getDGSCredits(getCreditsReward()));
+        set("$sep_sarV2_creditReward", Misc.getDGSCredits(getCreditsReward()));
         set("$sep_sarV2_creditRansom", Misc.getDGSCredits(this.ransomAmount));
         set("$sep_sarV2_raidDangerLevel", MarketCMD.RaidDangerLevel.MEDIUM); // TODO: Randomize or customize this value
-        set("$sep_sarV2_marineAmount", 300f); // TODO: Randomize or customize this value
-        set("$sep_sar_possibleLoc", BreadcrumbSpecial.getLocationDescription(this.entity, false));
-        set("$sep_sar_survivorFullName", this.survivor.getNameString());
-        set("$sep_sar_survivorFirstName", this.survivor.getName().getFirst());
-        set("$sep_sar_survivorLastName", this.survivor.getName().getLast());
-        set("$sep_sar_survivorHeOrShe", this.survivor.getHeOrShe());
-        set("$sep_sar_survivorHisOrHer", this.survivor.getHisOrHer());
-        set("$sep_sar_survivorHimOrHer", this.survivor.getHimOrHer());
-        set("$sep_sar_survivorManOrWoman", this.survivor.getManOrWoman());
+        set("$sep_sarV2_marineAmount", (int) 300f); // TODO: Randomize or customize this value
+        if (this.hideout != null) {
+            set("$sep_sarV2_possibleLoc", BreadcrumbSpecial.getLocationDescription(this.hideout, false));
+        } else {
+            set("$sep_sarV2_possibleLoc", BreadcrumbSpecial.getLocationDescription(this.entity, false));
+        }
+        set("$sep_sarV2_survivorFullName", this.survivor.getNameString());
+        set("$sep_sarV2_survivorFirstName", this.survivor.getName().getFirst());
+        set("$sep_sarV2_survivorLastName", this.survivor.getName().getLast());
+        set("$sep_sarV2_survivorHeOrShe", this.survivor.getHeOrShe());
+        set("$sep_sarV2_SurvivorHeOrShe", Misc.ucFirst(this.survivor.getHeOrShe()));
+        set("$sep_sarV2_survivorHisOrHer", this.survivor.getHisOrHer());
+        set("$sep_sarV2_survivorHimOrHer", this.survivor.getHimOrHer());
+        set("$sep_sarV2_survivorManOrWoman", this.survivor.getManOrWoman());
+    }
+
+    @Override
+    public void acceptImpl(InteractionDialogAPI dialog, Map<String, MemoryAPI> memoryMap) {
+        if (this.entity instanceof CampaignFleetAPI fleet) {
+            this.hideout.getContainingLocation().addEntity(this.entity);
+            fleet.setLocation(this.hideout.getLocation().x, this.hideout.getLocation().y);
+            fleet.setFacing(getGenRandom().nextFloat() * 360f);
+        }
     }
 
     @Override
     public boolean addNextStepText(TooltipMakerAPI info, Color tc, float pad) {
         Color h = Misc.getHighlightColor();
-        String prefix = "";
-        if (this.subjectName != null && !this.subjectName.isEmpty() && !this.subjectName.isBlank()) {
-            prefix = "the ";
-        }
         if (this.currentStage == Stage.FIND) {
-            String loc = BreadcrumbSpecial.getLocationDescription(this.entity, false);
-            info.addPara("Search for " + prefix + " %s in " + loc, 3f, tc, h, this.subjectName);
+            String loc;
+            if (this.hideout != null) {
+                loc = BreadcrumbSpecial.getLocationDescription(this.hideout, false);
+            } else {
+                loc = BreadcrumbSpecial.getLocationDescription(this.entity, false);
+            }
+            info.addPara("Search for %s in " + loc, 3f, tc, h, this.subjectName);
             return true;
         } else if (this.currentStage == Stage.RETURN) {
             info.addPara("Return to " + getPerson().getMarket().getName() + " in the " +
@@ -336,17 +377,18 @@ public class SearchAndRescueMissionV2 extends HubMissionWithBarEvent {
     public void addDescriptionForNonEndStage(TooltipMakerAPI info, float width, float height) {
         Color h = Misc.getHighlightColor();
         Color tc = Misc.getTextColor();
-        String prefix = "";
-        if (this.subjectName != null && !this.subjectName.isEmpty() && !this.subjectName.isBlank()) {
-            prefix = "the";
-        }
         if (this.currentStage == Stage.FIND) {
-            String loc = BreadcrumbSpecial.getLocationDescription(this.entity, false);
-            info.addPara("Search for " + prefix + " %s in " + loc, 3f, tc, h, this.subjectName);
+            String loc;
+            if (this.hideout != null) {
+                loc = BreadcrumbSpecial.getLocationDescription(this.hideout, false);
+            } else {
+                loc = BreadcrumbSpecial.getLocationDescription(this.entity, false);
+            }
+            info.addPara("Search for %s in " + loc, 3f, tc, h, this.subjectName);
         } else if (this.currentStage == Stage.RETURN) {
-            info.addPara("Return with " + prefix + "%s to " + getPerson().getMarket().getName() + " in the " +
+            info.addPara("Return with %s to " + getPerson().getMarket().getName() + " in the " +
                     getPerson().getMarket().getStarSystem().getNameWithLowercaseTypeShort()
-                    + " and talk to " + getPerson().getNameString() + ".", 3f, tc, h);
+                    + " and talk to " + getPerson().getNameString() + ".", 3f, tc, h, this.subjectName);
         }
     }
 
@@ -374,6 +416,47 @@ public class SearchAndRescueMissionV2 extends HubMissionWithBarEvent {
         }
 
         return super.callEvent(ruleId, dialog, params, memoryMap);
+    }
+
+    @Override
+    protected void endSuccessImpl(InteractionDialogAPI dialog, Map<String, MemoryAPI> memoryMap) {
+        if (!this.survivorAlive || this.survivorPostType == PersonPostType.CIVILIAN) {
+            return;
+        }
+
+        for (EveryFrameScript script : Global.getSector().getScripts()) {
+            if (script instanceof OfficerManagerEvent manager) {
+                float salary = (this.survivorPostType == PersonPostType.OFFICER ?
+                        Misc.getOfficerSalary(this.survivor) : Misc.getAdminSalary(this.survivor)) * 0.5f;
+                OfficerManagerEvent.AvailableOfficer officer = new OfficerManagerEvent.AvailableOfficer(
+                        this.survivor, getPerson().getMarket().getId(), 0, Math.round(salary));
+
+                if (this.survivorPostType == PersonPostType.OFFICER) {
+                    manager.addAvailable(officer);
+                } else if (this.survivorPostType == PersonPostType.ADMINISTRATOR) {
+                    manager.addAvailableAdmin(officer);
+                } else if (this.survivorPostType == PersonPostType.CONTACT) {
+                    ContactIntel.addPotentialContact(this.survivor, getPerson().getMarket(), dialog.getTextPanel());
+                }
+
+                officer.person.getMemoryWithoutUpdate().set("$sep_survivor", true);
+                break;
+            }
+        }
+    }
+
+    @Override
+    protected void notifyEnding() {
+        super.notifyEnding();
+
+        if (this.entity instanceof CampaignFleetAPI fleet) {
+            fleet.clearAssignments();
+            if (this.hideout != null) {
+                fleet.getAI().addAssignment(FleetAssignment.GO_TO_LOCATION_AND_DESPAWN, this.hideout, 1000000f, null);
+            } else {
+                fleet.despawn();
+            }
+        }
     }
 
     @Override
