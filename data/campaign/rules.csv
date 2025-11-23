@@ -309,8 +309,8 @@ SetTextHighlights $sep_fem_mrktNme $sep_fem_sysName $sep_fem_reward","""I have a
 
 ""I can give thirty percent of the delivery profits which amounts to $sep_fem_reward. I just need the right captain for the job."" $HeOrShe says, looking a bit pleading.",,
 ## fem1 dialogues,,,,,,
-,,,,,,
 # Fleet escort mission END,,,,,,
+,,,,,,
 # Search and Rescue V2 START,,,,,,
 sep_sarV2_blurb,sep_sarV2_blurb,,FireBest SEPSARV2ShowBlurb true,,,
 sep_sarV2_offerOption,sep_sarV2_option,,FireBest SEPSARV2ShowOption true,,,
@@ -384,9 +384,9 @@ MakeOtherFleetAllowDisengage sep_sar true
 MakeOtherFleetNonHostile sep_sar true
 $entity.ignorePlayerCommRequests = true",,cutCommLinkNoText:Cut the comm link,
 sep_sarV2_fleetDefeated,SEPSARV2FleetDefeated,"$someShipsDestroyed
-Call $sep_sar_ref updateData","FireBest SEPSARV2ShowEntityDefeatedText true
-$sep_sar_returnToContact = true
-Call $sep_sar_ref updateStage",,,
+Call $sep_sarV2_ref updateData","FireBest SEPSARV2ShowEntityDefeatedText true
+$sep_sarV2_returnToContact = true
+Call $sep_sarV2_ref updateStage",,,
 sep_sarV2_entitySurvivorDead,DialogOptionSelected,"$sep_sarV2_survivorAlive score:1000
 $option == sep_sarV2_checkSurvivorStatus","FireBest SEPSARV2ShowAliveText true
 $sep_sarV2_returnToContact = true
@@ -400,98 +400,175 @@ sep_sarV2_returnGreeting,PickGreeting,"$sep_sarV2_contactPerson score:1000
 Call $sep_sarV2_ref updateData
 FireBest GenericMissionReturn","ShowPersonVisual
 FireAll SEPSARV2ContactOptions",,,
-sep_sarV2_returnSurvivorAlive,SEPSARV2ContactOptions,$sep_sarV2_survivorAlive score:1000,"FireBest SEPSARV2ShowAliveReturnText true
-SetTextHighlightColors h
-SetTextHighlights $sep_sarV2_survivorFullName
-Call $sep_sarV2_ref addBonusCreditReward",,,
-sep_sarV2_returnSurvivorAliveA,SEPSARV2ContactOptions,$sep_sarV2_survivorPostType == CIVILIAN score:1000,"$sep_sarV2_completed = true
+sep_sarV2_returnSurvivorAlive,SEPSARV2ContactOptions,$sep_sarV2_survivorAlive score:1000,FireBest SEPSARV2ShowAliveReturnText true,,,
+sep_sarV2_returnSurvivorAliveA,SEPSARV2ContactOptions,"$sep_sarV2_survivorAlive score:1000
+$sep_sarV2_survivorPostType == CIVILIAN score:1000","$sep_sarV2_completed = true
 Call $sep_sarV2_ref updateStage",,contact_pickAnotherGreeting:Continue,
-sep_sarV2_returnSurvivorAliveB,SEPSARV2ContactOptions,$sep_sarV2_survivorPostType != CIVILIAN score:1000,,,sep_sarV2_talkToSurvivor:Continue,
+sep_sarV2_returnSurvivorAliveB,SEPSARV2ContactOptions,"$sep_sarV2_survivorAlive score:1000
+$sep_sarV2_survivorPostType != CIVILIAN score:1000",,"Before you could continue speaking with $personName, $sep_sarV2_survivorFullName contacts you.",sep_sarV2_talkToSurvivor:Continue,
 sep_sarV2_returnSurvivorAliveB1,DialogOptionSelected,$option == sep_sarV2_talkToSurvivor,"FireBest SEPSARV2ShowSurvivorText true
 Call $sep_sarV2_ref showSurvivorVisual
 $sep_sarV2_completed = true
 Call $sep_sarV2_ref updateStage",,contact_pickAnotherGreeting:Continue,
 sep_sarV2_returnSurvivorDead,SEPSARV2ContactOptions,!$sep_sarV2_survivorAlive score:1000,"FireBest SEPSARV2ShowDeadReturnText true
-SetTextHighlightColors h
-SetTextHighlights $sep_sarV2_survivorFullName",,contact_pickAnotherGreeting:Continue,
-,,,,,,
-## Scenario defaults (sd),,,,,,
-sep_sarV2_sd0Blurb,SEPSARV2ShowBlurb,$sep_sarV2_scenarioType == STRANDED_IN_WRECK,,"""A ranking official has filed a search-and-rescue mission. It's a top priority, and they're offering a substantial credit reward.""",,
-sep_sarV2_sd0Option,SEPSARV2ShowOption,$sep_sarV2_scenarioType == STRANDED_IN_WRECK,,,sep_sarV2_start:Ask about the search and rescue mission,
-sep_sarV2_sd0OfferText,SEPSARV2ShowOffer,$sep_sarV2_scenarioType == STRANDED_IN_WRECK,,"""$sep_sar_survivorFullName, a close relative of a ranking official, was part of a fleet that was due to return over a week ago, but the fleet never arrived. Fleet intel has marked the fleet as 'lost,' but the official refuses to accept that and insists $sep_sar_survivorLastName is still alive.""
+$sep_sarV2_completed = true
+Call $sep_sarV2_ref updateStage",,contact_pickAnotherGreeting:Continue,
+## Custom scenario texts,,,,,,
+## SAR1 dialogues,,,,,,
+sep_sarV2_s1Blurb,SEPSARV2ShowBlurb,$sep_sarV2_scenarioId == sar1 score:10,,"""A ranking official has lost someone important and is offering a substantial credit reward for their rescue or recovery.""",,
+sep_sarV2_s1Option,SEPSARV2ShowOption,$sep_sarV2_scenarioId == sar1 score:10,,,sep_sarV2_start:Ask about rescuing or recovering someone important,
+sep_sarV2_s1Offer,SEPSARV2ShowOffer,$sep_sarV2_scenarioId == sar1 score:10,"SetTextHighlightColors h h h
+SetTextHighlights $sep_sarV2_survivorFullName $sep_sarV2_possibleLoc $sep_sarV2_creditReward","""$sep_sarV2_survivorFullName, a close relative of the official, was part of a patrol fleet that was due to return over a week ago, but the fleet never arrived. Fleet intel has marked the fleet as 'lost,' but the official refuses to accept that and insists their relative is still alive.""
 
-$HeOrShe swipes upward on $hisOrHer tripad, sending a shared intel briefing to you. ""The fleet's last known heading was toward $sep_sar_possibleLoc, after which all contact was lost.""
+$HeOrShe swipes upward on $hisOrHer tripad, sending a shared intel briefing to you. ""The fleet's last known heading was toward $sep_sarV2_possibleLoc, after which they never returned.""
 
-$HeOrShe leans back slightly. ""Your task is to search the area and recover $sep_sar_survivorFullName, dead or alive. If successful, the official is offering $sep_sar_creditReward. Interested?""",,
-sep_sarV2_sd0BlurbBar,SEPSARV2ShowBlurbBar,$sep_sarV2_scenarioType == STRANDED_IN_WRECK,,"A gloomy $manOrWoman sits hunched over the bar, clutching a faded photo in $hisOrHer hands. $HisOrHer expression heavy with grief and stubborn hope.",,
-sep_sarV2_sd0OptionBar,SEPSARV2ShowOptionBar,$sep_sarV2_scenarioType == STRANDED_IN_WRECK,,,sep_sarV2_startBar:Approach the gloomy $manOrWoman and ask if $heOrShe's alright,
-sep_sarV2_sd0OfferTextBar,SEPSARV2ShowOfferBar,$sep_sarV2_scenarioType == STRANDED_IN_WRECK,,"$HeOrShe glances at you, suspicious at first, then looks back at the photo with a heavy sigh. ""$sep_sar_survivorFullName, my close relative, was part of a fleet that was due to return over a week ago, but the fleet never arrived. Fleet intel has already marked the fleet as 'lost,' but I can't accept that. I know $sep_sar_survivorFirstName is still alive.""
+$HeOrShe leans back slightly. ""Your task is to search the area and recover the relative, dead or alive. If successful, the official is offering $sep_sarV2_creditReward. Interested?""",,
+sep_sarV2_s1BlurbBar,SEPSARV2ShowBlurbBar,$sep_sarV2_scenarioId == sar1 score:10,,"A gloomy $manOrWoman sits hunched over the bar, clutching a faded photo in $hisOrHer hands. $HisOrHer expression heavy with grief and stubborn hope.",,
+sep_sarV2_s1OptionBar,SEPSARV2ShowOptionBar,$sep_sarV2_scenarioId == sar1 score:10,,,sep_sarV2_startBar:Approach the gloomy $manOrWoman and ask if $heOrShe's alright,
+sep_sarV2_s1OfferBar,SEPSARV2ShowOfferBar,$sep_sarV2_scenarioId == sar1 score:10,"SetTextHighlightColors h h h
+SetTextHighlights $sep_sarV2_survivorFullName $sep_sarV2_possibleLoc $sep_sarV2_creditReward","$HeOrShe glances at you, suspicious at first, then looks back at the photo with a heavy sigh. ""$sep_sarV2_survivorFullName, my close relative, was part of a patrol fleet that was due to return over a week ago, but the fleet never arrived. Fleet intel has marked the fleet as 'lost,' but I can't accept that.""
 
-$HeOrShe grips the photo and continues. ""When I last spoke to $sep_sar_survivorHimOrHer, $sep_sar_survivorHeOrShe mentioned going toward $sep_sar_possibleLoc, after which all contact was lost.""
+$HeOrShe grips the photo and continues. ""When I last spoke to $sep_sarV2_survivorFirstName, $sep_sarV2_survivorHeOrShe mentioned going toward $sep_sarV2_possibleLoc, after which $sep_sarV2_survivorHeOrShe never returned."" 
 
-$HeOrShe sets the photo down on the table and meets your gaze. ""You look like a capable captain, if you're willing to take the risk, I'll pay $sep_sar_creditReward for $sep_sar_survivorFirstName's safe return.""",,
-sep_sarV2_sd0EntityText,SEPSARV2ShowEntityText,$sep_sarV2_scenarioType == STRANDED_IN_WRECK,,"While searching empty space and drifting wreckage, your sensor officer detects a weak life signature aboard a derelict ship and promptly sends a rescue signal across all frequencies but receives no response.
+$HeOrShe sets the photo down on the table and meets your gaze. ""You look like a capable captain, if you're willing to take the risk, I'll pay $sep_sarV2_creditReward for $sep_sarV2_survivorFirstName's safe return.""",,
+sep_sarV2_s1EntityText,SEPSARV2ShowEntityText,$sep_sarV2_scenarioId == sar1 score:10,,"Your $shipOrFleet approaches $aOrAn $nameInText.
 
-Without hesitation, you direct your chief salvage operator and chief medical officer to plan and conduct a rescue mission.",,
-sep_sarV2_sd0AliveText,SEPSARV2ShowAliveText,$sep_sarV2_scenarioType == STRANDED_IN_WRECK,,"A short time later, your officers find the survivor and recognize him as our rescue target, $sep_sar_survivorFullName. Luckily $sep_sar_survivorHeOrShe is alive, and according to your chief medical officer, $sep_sar_survivorHeOrShe is comatose and exhibits obvious symptoms of malnutrition, but he will survive.",,
-sep_sarV2_sd0DeadText,SEPSARV2ShowDeadText,$sep_sarV2_scenarioType == STRANDED_IN_WRECK,,"A short time later, your officers find the survivor and recognize him as our rescue target, $sep_sar_survivorFullName. Unfortunately, $sep_sar_survivorHeOrShe is dead, and according to your chief medical officer, $sep_sar_survivorHeOrShe died of extreme malnutrition and oxygen deprivation.",,
-,,,,,,
-sep_sarV2_sd1Blurb,SEPSARV2ShowBlurb,$sep_sarV2_scenarioType == STRANDED_IN_PLANET,,STRANDED IN PLANET DEFAULT BLURB,,
-sep_sarV2_sd1Option,SEPSARV2ShowOption,$sep_sarV2_scenarioType == STRANDED_IN_PLANET,,,sep_sarV2_start:STRANDED IN PLANET DEFAULT OPTION,
-sep_sarV2_sd1OfferText,SEPSARV2ShowOffer,$sep_sarV2_scenarioType == STRANDED_IN_PLANET,,STRANDED IN PLANET DEFAULT OFFER TEXT,,
-sep_sarV2_sd1BlurbBar,SEPSARV2ShowBlurbBar,$sep_sarV2_scenarioType == STRANDED_IN_PLANET,,STRANDED IN PLANET DEFAULT BLURB BAR,,
-sep_sarV2_sd1OptionBar,SEPSARV2ShowOptionBar,$sep_sarV2_scenarioType == STRANDED_IN_PLANET,,,sep_sarV2_startBar:STRANDED IN PLANET DEFAULT OPTION BAR,
-sep_sarV2_sd1OfferTextBar,SEPSARV2ShowOfferBar,$sep_sarV2_scenarioType == STRANDED_IN_PLANET,,STRANDED IN PLANET DEFAULT OFFER TEXT BAR,,
-sep_sarV2_sd1EntityText,SEPSARV2ShowEntityText,$sep_sarV2_scenarioType == STRANDED_IN_PLANET,,STRANDED IN PLANET DEFAULT ENTITY TEXT,,
-sep_sarV2_sd1AliveText,SEPSARV2ShowAliveText,$sep_sarV2_scenarioType == STRANDED_IN_PLANET,,STRANDED IN PLANET DEFAULT SURVIVOR ALIVE TEXT,,
-sep_sarV2_sd1DeadText,SEPSARV2ShowDeadText,$sep_sarV2_scenarioType == STRANDED_IN_PLANET,,STRANDED IN PLANET DEFAULT SURVIVOR DEAD TEXT,,
-,,,,,,
-sep_sarV2_sd2Blurb,SEPSARV2ShowBlurb,$sep_sarV2_scenarioType == CAPTURED_IN_FLEET,,"A ranking official has been kidnapped. I can't spare the resources to mount a rescue, but I trust you enough to offer this mission to you if you're willing.",,
-sep_sarV2_sd2Option,SEPSARV2ShowOption,$sep_sarV2_scenarioType == CAPTURED_IN_FLEET,,,sep_sarV2_start:Ask about the kidnapped ranking official,
-sep_sarV2_sd2OfferText,SEPSARV2ShowOffer,$sep_sarV2_scenarioType == CAPTURED_IN_FLEET,,"""$sep_sar_survivorFullName was abducted shortly after leaving a bar. Soon after, the kidnappers contacted $sep_sar_survivorHisOrHer family, demanding a ransom of $sep_sar_creditRansom in exchange for $sep_sar_survivorLastName's release.""
+A preliminary scan detects faint bio-signatures scattered throughout the hull.
 
-$heOrShe pauses, transmitting a shared intel briefing from $hisOrHer tripad. ""The kidnappers have been identified as a $sep_sar_entityFaction terrorist group, claiming retribution for past actions taken against them. They've ordered the ransom to be delivered to a fleet waiting in $sep_sar_possibleLoc.""
+Your comms officer promptly broadcasts an emergency hail but receives no response. Without hesitation, you direct your chief salvage operator and chief medical officer to initiate a rescue operation.",,
+sep_sarV2_s1AliveText,SEPSARV2ShowAliveText,$sep_sarV2_scenarioId == sar1 score:10,"SetTextHighlightColors h
+SetTextHighlights $sep_sarV2_survivorFullName","A moment later, your officers find survivors scattered throughout the hull, including your rescue target, $sep_sarV2_survivorFullName. Luckily, you arrived before they ran out of oxygen. Most are alive, including the rescue target.
 
-$HeOrShe continues, ""The family of $sep_sar_survivorLastName is offering a reward of $sep_sar_creditReward for $sep_sar_survivorHisOrHer safe return and the resolution of this matter.""",,
-sep_sarV2_sd2BlurbBar,SEPSARV2ShowBlurbBar,$sep_sarV2_scenarioType == CAPTURED_IN_FLEET,,You notice a troubled $manOrWoman going from table to table asking for help only to be rejected or told to go away.,,
-sep_sarV2_sd2OptionBar,SEPSARV2ShowOptionBar,$sep_sarV2_scenarioType == CAPTURED_IN_FLEET,,,sep_sarV2_startBar:Ask the troubled $manOrWoman what sort of help $heOrShe needs,
-sep_sarV2_sd2OfferTextBar,SEPSARV2ShowOfferBar,$sep_sarV2_scenarioType == CAPTURED_IN_FLEET,,"The $manOrWoman looks at you, eyes worn and unfocused from stress. ""You actually asked,"" $heOrShe says quietly.
+According to the survivors, their fleet was ambushed after responding to a distress signal. Their ship managed to escape but was disabled, lowering its sensor profile and rendering it undetectable.
 
-""My nephew, $sep_sar_survivorFullName, has been kidnapped. They took $sep_sar_survivorHimOrHer off the shuttle concourse during what should have been a routine cargo transfer. I've reported this to the authorities but their process is so slow that $sep_sar_survivorFirstName might not survive long enough for them to act.""
+Shortly after, your officers return and escort the injured survivors to the infirmary.",,
+sep_sarV2_s1DeadText,SEPSARV2ShowDeadText,$sep_sarV2_scenarioId == sar1 score:10,"SetTextHighlightColors h
+SetTextHighlights $sep_sarV2_survivorFullName","A moment later, your officers find survivors scattered throughout the hull, including your rescue target, $sep_sarV2_survivorFullName. Unfortunately, they ran out of oxygen, and all have died, including the rescue target.
 
-$HeOrShe pulls out a small datapad. ""The kidnappers already sent a message. They want $sep_sar_creditRansom, demanded that only a single fleet approach them and If they detect anything suspicous, they'll kill $sep_sar_survivorFirstName. They are waiting in $sep_sar_possibleLoc.""
+Recovered logs reveal that the ship's fleet was ambushed after responding to a distress signal. The ship managed to escape but was disabled, lowering its sensor profile and rendering it undetectable.
 
-$HeOrShe looks at you with a mix of fear and hope. ""If you can find them and bring $sep_sar_survivorFirstName back alive, I will pay you $sep_sar_creditReward. Please, I am begging you. You might be the only one who can save him.""",,
-sep_sarV2_sd2EntityText,SEPSARV2ShowEntityText,$sep_sarV2_scenarioType == CAPTURED_IN_FLEET,,"""So... you must be the ones carrying the ransom. Hmph. Not much to look at, but I suppose credits don't need much of an escort."" 
+Shortly after, your officers return and store the remains in your cargo holds.",,
+## SAR2 dialogues,,,,,,
+sep_sarV2_s2Blurb,SEPSARV2ShowBlurb,$sep_sarV2_scenarioId == sar2 score:10,,"""A concerned official is worried about a close friend. They want you to find this person and bring them back if possible.""",,
+sep_sarV2_s2Option,SEPSARV2ShowOption,$sep_sarV2_scenarioId == sar2 score:10,,,sep_sarV2_start:Ask about the offical worried about a friend,
+sep_sarV2_s2Offer,SEPSARV2ShowOffer,$sep_sarV2_scenarioId == sar2 score:10,"SetTextHighlightColors h h h
+SetTextHighlights $sep_sarV2_survivorFullName $sep_sarV2_possibleLoc $sep_sarV2_creditReward","""$sep_sarV2_survivorFullName, a close friend of the official, was sent to survey $sep_sarV2_possibleLoc,"" $heOrShe says. ""So far, the mission hasn’t reported any problems, and the estimated return is still nearly three weeks away. But the official is worried that something might have gone wrong.""
 
-$HeOrShe narrows his eyes and continues, ""We made it clear. $sep_sar_creditRansom credits, transferred clean and quiet. No tricks, no games. Hand it over, and $sep_sar_survivorFullName walks away alive.""",,
-sep_sarV2_sd2PayRansomText,SEPSARV2ShowPayRansomText,$sep_sarV2_scenarioType == CAPTURED_IN_FLEET,,"""Payment confirmed. $sep_sar_creditRansom credits received and cleared. We are dispatching a single shuttle carrying the hostage. It will intercept your position in approximately fifteen minutes. Keep your fleet at a safe distance. Any attempt to approach or interfere and we will shoot the shuttle down."" 
+$HeOrShe pauses, lowering $hisOrHer datapad. ""Normally, we’d just wait, but the official is adamant about sending someone to find or assist their friend,"" $heOrShe continues. ""They’re even offering $sep_sarV2_creditReward to anyone willing to go. So... are you interested?""",,
+sep_sarV2_s2BlurbBar,SEPSARV2ShowBlurbBar,$sep_sarV2_scenarioId == sar2 score:10,,You notice a worried $manOrWoman tapping $hisOrHer glass of alchohol while looking at a mission manifest.,,
+sep_sarV2_s2OptionBar,SEPSARV2ShowOptionBar,$sep_sarV2_scenarioId == sar2 score:10,,,sep_sarV2_startBar:Ask the worried $manOrWoman what's wrong,
+sep_sarV2_s2OfferBar,SEPSARV2ShowOfferBar,$sep_sarV2_scenarioId == sar2 score:10,"SetTextHighlightColors h h h
+SetTextHighlights $sep_sarV2_survivorFullName $sep_sarV2_possibleLoc $sep_sarV2_creditReward","The worried $manOrWoman looks up, giving you a quick assessing glance before deciding to speak.
 
-The shuttle appears on your sensors. A quick scan returns no traps or issues and a single life sign aboard. You authorize the shuttle to dock and find $sep_sar_survivorFullName, alive but shaken.",,
-sep_sarV2_sd2FightText,SEPSARV2ShowFightText,$sep_sarV2_scenarioType == CAPTURED_IN_FLEET,,"""So that's your choice? I thought you'd have the brains to settle this clean, but I see I was wrong. Fine, if it's a fight you want, then it's a fight you'll get.""",,
-sep_sarV2_sd2PersuadeText,SEPSARV2ShowPersuadeText,$sep_sarV2_scenarioType == CAPTURED_IN_FLEET,,"You begin to persuade the kidnappers. After a tense back-and-forth, they finally relent. Their demands falter as hesitation takes hold, and they choose to release the hostage.
+""$sep_sarV2_survivorFullName, a close friend of mine,"" $heOrShe says while giving you a mission manifest, ""was sent to survey $sep_sarV2_possibleLoc. It's a simple job, but a few days ago I had this dreadful feeling, and it has only grown since.""
 
-A lone shuttle is launched, carrying $sep_sar_survivorFullName toward your fleet. The hostage is alive but shaken, spared without a single shot fired.",,
-sep_sarV2_sd2FleetDefeatedText,SEPSARV2FleetDefeated,$sep_sarV2_scenarioType == CAPTURED_IN_FLEET,,"Your sensors officer scans through the debris field, searching for any trace of the hostage. Among the wreckage, they discover a lone shuttle adrift.
+$HeOrShe continues, ""I know the mission is still far from its return date, but I can't ignore this any longer."" $HeOrShe looks to you with quiet urgency. ""Please, Captain. Rescue my friend, and I'll pay you $sep_sarV2_creditReward for your help.""",,
+sep_sarV2_s2EntityText,SEPSARV2ShowEntityText,$sep_sarV2_scenarioId == sar2 score:10,,"Your $shipOrFleet approaches $entityName.
+
+A preliminary scan detects a makeshift outpost with faint bio-signatures inside.
+
+Your comms officer promptly broadcasts emergency hails and stands by for any response.",,
+sep_sarV2_s2AliveText,SEPSARV2ShowAliveText,$sep_sarV2_scenarioId == sar2 score:10,"SetTextHighlightColors h
+SetTextHighlights $sep_sarV2_survivorFullName","Your comms crackle to life, and a weak voice breaks through. ""Thank God,"" they whisper, the voice trailing off before a heavy thud echoes over the channel. Your comms officer tries to respond, but silence follows. You waste no time and order your medical and military teams to initiate a rescue operation.
+
+As the operation unfolds, one of your officers reports the cause of the group’s predicament. Their fleet had been attacked in orbit, leaving the group on the surface stranded without support.
+
+Afterward, the survivors are brought aboard. Shaken and exhausted, they express deep relief, especially $sep_sarV2_survivorFullName, who cannot believe help arrived so quickly.",,
+sep_sarV2_s2DeadText,SEPSARV2ShowDeadText,$sep_sarV2_scenarioId == sar2 score:10,"SetTextHighlightColors h
+SetTextHighlights $sep_sarV2_survivorFullName","Your comms pick up only static as repeated emergency hails go unanswered. With no response from the outpost, you deploy your medical and military teams to investigate.
+
+The teams soon report a grim scene. Inside the outpost, they find only malnourished and oxygen-deprived bodies, among them $sep_sarV2_survivorFullName, slumped over a console, still hoping for help. Recovered logs reveal that a survey fleet had been attacked in orbit, leaving the group on the surface stranded without support.
+
+Afterward, the remains are brought aboard. Though none survived, your crew ensures every fallen explorer is prepared to be returned home for proper honors.",,
+## SAR3 dialogues,,,,,,
+sep_sarV2_s3Blurb,SEPSARV2ShowBlurb,$sep_sarV2_scenarioId == sar3 score:10,,"""An associate of a ranking official was kidnapped and has filed a formal request to rescue said individual.""",,
+sep_sarV2_s3Option,SEPSARV2ShowOption,$sep_sarV2_scenarioId == sar3 score:10,,,sep_sarV2_start:Ask about rescuing an associate of ranking offical,
+sep_sarV2_s3Offer,SEPSARV2ShowOffer,$sep_sarV2_scenarioId == sar3 score:10,,"""A pirate terror group raided one of our cargo stations,"" $heOrShe begins. ""They took several hostages, including our associate, $sep_sarV2_survivorFullName.""
+
+$HeOrShe slides a datapad across the table. ""They’re demanding $sep_sarV2_creditRansom and want the exchange to happen in $sep_sarV2_possibleLoc.""
+
+$HeOrShe leans back slightly. ""Your task is to negotiate with them if you can, and return with the hostages.""
+
+Then, with a calm nod, $heOrShe adds, ""Once the job is done, I’m authorized to award you $sep_sarV2_creditReward. Interested?""",,
+sep_sarV2_s3BlurbBar,SEPSARV2ShowBlurbBar,$sep_sarV2_scenarioId == sar3 score:10,,"A reserve $manOrWoman sits alone, quiet and distant, carrying a subtle air of concern.",,
+sep_sarV2_s3OptionBar,SEPSARV2ShowOptionBar,$sep_sarV2_scenarioId == sar3 score:10,,,sep_sarV2_startBar:Approach the reserve $manOrWoman carrying a subtle air of concern,
+sep_sarV2_s3OfferBar,SEPSARV2ShowOfferBar,$sep_sarV2_scenarioId == sar3 score:10,"SetTextHighlightColors h h h h
+SetTextHighlights $sep_sarV2_survivorFullName $sep_sarV2_creditRansom $sep_sarV2_possibleLoc $sep_sarV2_creditReward","The $manOrWoman glances you over, eyes briefly scanning your attire and ship insignia. After a quick tap at their datapad, they lean forward.
+
+""An associate of mine, $sep_sarV2_survivorFullName, was taken hostage during a routine cargo transfer. Soon after, the kidnappers demanded $sep_sarV2_creditRansom,"" $heOrShe explains, sliding a datapad toward you.
+
+""The kidnappers want the exchange to happen somewhere in $sep_sarV2_possibleLoc,"" $heOrShe points at a map on the datapad. ""You can negotiate or use force. What matters is that my associate is... safe,"" $heOrShe implies.
+
+""Once my associate is back at my side, I'll award you $sep_sarV2_creditReward,"" $heOrShe meets your gaze. ""What do you think?""",,
+sep_sarV2_s3EntityText,SEPSARV2ShowEntityText,$sep_sarV2_scenarioId == sar3 score:10,"SetTextHighlightColors h
+SetTextHighlights $sep_sarV2_creditRansom","Your screen crackles to life, a grainy image of a hard-eyed officer fills the screen.
+
+""So... you must be the ones carrying the ransom."" $HisOrHer voice drips with suspicion as $heOrShe sizes up your $shipOrFleet.
+
+""We made it clear. $sep_sarV2_creditRansom credits, transferred clean and quiet. No tricks, no games. Hand it over, and maybe we all can walk away alive."" The channel hangs open, the kidnappers clearly waiting for your next move.",,
+## SAR4 dialogues,,,,,,
+sep_sarV2_s4Blurb,SEPSARV2ShowBlurb,$sep_sarV2_scenarioId == sar4 score:10,,"""An associate's nephew is currently being held in a pirate hideout and wants to personally fund a rescue mission. I am currently the appointed liason, so if your hearing this, you're my first choice.""",,
+sep_sarV2_s4Option,SEPSARV2ShowOption,$sep_sarV2_scenarioId == sar4 score:10,,,sep_sarV2_start:Ask about rescuing a nephew of an associate,
+sep_sarV2_s4Offer,SEPSARV2ShowOffer,$sep_sarV2_scenarioId == sar4 score:10,"SetTextHighlightColors h h h h h
+SetTextHighlights $sep_sarV2_survivorFullName $sep_sarV2_creditRansom $sep_sarV2_possibleLoc  $sep_sarV2_marineAmount $sep_sarV2_creditReward","""A group of researchers were captured during a ground expedition, including the associate's nephew, $sep_sarV2_survivorFullName,"" $heOrShe says. ""The survey fleet tried to rescue them, but the pirates won. Now, the kidnappers want $sep_sarV2_creditRansom in exchange.""
+
+$HeOrShe taps a datapad. ""Mission logs point to $sep_sarV2_possibleLoc, and intercepted chatter suggests you'll need at least $sep_sarV2_marineAmount marines to hit their hideout.""
+
+$HeOrShe looks up. ""If successful, the associate is willing to award you with $sep_sarV2_creditReward. Interested?""",,
+sep_sarV2_s4BlurbBar,SEPSARV2ShowBlurbBar,$sep_sarV2_scenarioId == sar4 score:10,,"A well-dressed $manOrWoman sits alone, $hisOrHer eyes dotting around, as if looking for someone.",,
+sep_sarV2_s4OptionBar,SEPSARV2ShowOptionBar,$sep_sarV2_scenarioId == sar4 score:10,,,sep_sarV2_startBar:Approach the well dressed man looking for someone,
+sep_sarV2_s4OfferBar,SEPSARV2ShowOfferBar,$sep_sarV2_scenarioId == sar4 score:10,"SetTextHighlightColors h h h h h
+SetTextHighlights $sep_sarV2_survivorFullName $sep_sarV2_possibleLoc  $sep_sarV2_marineAmount $sep_sarV2_creditRansom $sep_sarV2_creditReward","The $manOrWoman glances you over, eyes briefly scanning your attire and ship insignia. After a quick tap at their datapad, they lean forward.
+
+""My nephew, $sep_sarV2_survivorFullName, was captured during a survey mission and is now being held in a pirate hideout somewhere in $sep_sarV2_possibleLoc,"" $heOrShe says, voice tense.
+
+""Intercepted chatter suggests, you'll need at least $sep_sarV2_marineAmount marines to storm the hideout, or you can pay the pirates $sep_sarV2_creditRansom.""
+
+$HeOrShe meets your gaze. ""Just bring back my newphew and I'll reward you $sep_sarV2_creditReward.""",,
+sep_sarV2_s4EntityText,SEPSARV2ShowEntityText,$sep_sarV2_scenarioId == sar4 score:10,"SetTextHighlightColors h
+SetTextHighlights $sep_sarV2_creditRansom","Your $shipOrFleet approaches $entityName.
+
+A preliminary scan detects a large underground outpost with multiple bio-signatures scattered inside it.",,
+## SAR0 dialogues,,,,,,
+sep_sarV2_s0Blurb,SEPSARV2ShowBlurb,,,SAMPLE CONTACT BLURB,,
+sep_sarV2_s0Option,SEPSARV2ShowOption,,,,sep_sarV2_start:SAMPLE CONTACT OPTION,
+sep_sarV2_s0Offer,SEPSARV2ShowOffer,,,SAMPLE CONTACT OFFER TEXT,,
+sep_sarV2_s0BlurbBar,SEPSARV2ShowBlurbBar,,,SAMPLE BAR BLURB,,
+sep_sarV2_s0OptionBar,SEPSARV2ShowOptionBar,,,,sep_sarV2_startBar:SAMPLE BAR OPTION,
+sep_sarV2_s0OfferBar,SEPSARV2ShowOfferBar,,,SAMPLE BAR OFFER TEXT,,
+sep_sarV2_s0EntityText,SEPSARV2ShowEntityText,,,SAMPLE ENTITY TEXT,,
+sep_sarV2_s0PayRansomText,SEPSARV2ShowPayRansomText,,"SetTextHighlightColors h
+SetTextHighlights $sep_sarV2_survivorFullName","The channel flickers. The hard-eyed officer returns. ""Payment confirmed. Credits received and cleared.""
+
+""We are dispatching a single shuttle carrying the hostage. It will intercept your position in approximately fifteen minutes. Keep your fleet at a safe distance. Any attempt to approach and we will shoot the shuttle down.""
+
+The shuttle appears on your sensors. A quick scan returns a single life sign aboard. You authorize the shuttle to dock and find $sep_sarV2_survivorFullName, alive but shaken.",,
+sep_sarV2_s0PersuadeText,SEPSARV2ShowPersuadeText,,"SetTextHighlightColors h
+SetTextHighlights $sep_sarV2_survivorFullName","You open comms and begin to persuade the kidnappers. After a tense back-and-forth, they finally relent. Their demands falter as hesitation takes hold, and they choose to release the hostage.
+
+A lone shuttle is launched, carrying $sep_sarV2_survivorFullName toward your fleet. The hostage is alive but shaken, spared without a single shot fired.",,
+sep_sarV2_s0FightText,SEPSARV2ShowFightText,,,"The feed crackles back on. The kidnapper sneers, his voice dripping with disappointment. ""So that's your choice? I thought you'd have the brains to settle this clean, but I see I was wrong. Fine, if it's a fight you want, then it's a fight you'll get.""",,
+sep_sarV2_s0RaidFinishedText,SEPSARV2ShowRaidFinishedText,,"SetTextHighlightColors h
+SetTextHighlights $sep_sarV2_survivorFullName","Your marines advance into the pirate hideout with practiced precision, clearing the compound room by room. A few hostages are lost in the crossfire, but the assault is controlled and decisive, preventing further casualties.
+
+During the operation, $sep_sar_survivorFullName, steps forward and directs your raid leader to the remaining survivors. They are secured and extracted back to your fleet for treatment.",,
+sep_sarV2_s0EntityDefeatedText,SEPSARV2ShowEntityDefeatedText,,"SetTextHighlightColors h
+SetTextHighlights $sep_sarV2_survivorFullName","Your sensors officer scans through the debris field, searching for any trace of the hostage. Among the wreckage, they discover a lone shuttle adrift.
 
 Inside, $sep_sar_survivorFullName is found alive, shaken but stable, and quickly transferred to your sickbay for treatment.",,
-,,,,,,
-sep_sarV2_sd3Blurb,SEPSARV2ShowBlurb,$sep_sarV2_scenarioType == CAPTURED_IN_PLANET,,CAPTURED IN PLANET DEFAULT BLURB,,
-sep_sarV2_sd3Option,SEPSARV2ShowOption,$sep_sarV2_scenarioType == CAPTURED_IN_PLANET,,,sep_sarV2_start:CAPTURED IN PLANET DEFAULT OPTION,
-sep_sarV2_sd3OfferText,SEPSARV2ShowOffer,$sep_sarV2_scenarioType == CAPTURED_IN_PLANET,,CAPTURED IN PLANET DEFAULT OFFER TEXT,,
-sep_sarV2_sd3BlurbBar,SEPSARV2ShowBlurbBar,$sep_sarV2_scenarioType == CAPTURED_IN_PLANET,,CAPTURED IN PLANET DEFAULT BLURB BAR,,
-sep_sarV2_sd3OptionBar,SEPSARV2ShowOptionBar,$sep_sarV2_scenarioType == CAPTURED_IN_PLANET,,,sep_sarV2_startBar:CAPTURED IN PLANET DEFAULT OPTION BAR,
-sep_sarV2_sd3OfferTextBar,SEPSARV2ShowOfferBar,$sep_sarV2_scenarioType == CAPTURED_IN_PLANET,,CAPTURED IN PLANET DEFAULT OFFER TEXT BAR,,
-sep_sarV2_sd3EntityText,SEPSARV2ShowEntityText,$sep_sarV2_scenarioType == CAPTURED_IN_PLANET,,CAPTURED IN PLANET DEFAULT ENTITY TEXT,,
-sep_sarV2_sd3PayRansomText,SEPSARV2ShowPayRansomText,$sep_sarV2_scenarioType == CAPTURED_IN_PLANET,,CAPTURED IN PLANET PAY RANSOM TEXT,,
-sep_sarV2_sd3PersuadeText,SEPSARV2ShowPersuadeText,$sep_sarV2_scenarioType == CAPTURED_IN_PLANET,,CAPTURED IN PLANET PERSUADE TEXT,,
-sep_sarV2_sd3FleetDefeatedText,SEPSARV2ShowRaidFinishedText,$sep_sarV2_scenarioType == CAPTURED_IN_PLANET,,CAPTURED IN PLANET RAID FINISHED TEXT,,
-,,,,,,
-## Default return dialogues,,,,,,
-sep_sarV2_sdReturnSurvivorAlive,SEPSARV2ShowAliveReturnText,,,GENERIC RETURN SURVIVOR ALIVE TEXT,,
-sep_sarV2_sdReturnSurvivorAlive2,SEPSARV2ShowSurvivorText,,,GENERIC SURVIVOR TEXT,,
-sep_sarV2_sdReturnSurvivorDead,SEPSARV2ShowDeadReturnText,,,GENERIC RETURN SURVIVOR DEAD TEXT,,
-,,,,,,
-,,,,,,
-,,,,,,
+sep_sarV2_s0AliveText,SEPSARV2ShowAliveText,,,SAMPLE SURVIVOR ALIVE TEXT,,
+sep_sarV2_s0DeadText,SEPSARV2ShowDeadText,,,SAMPLE SURVIVOR DEAD TEXT,,
+sep_sarV2_s0AliveReturnText,SEPSARV2ShowAliveReturnText,,"SetTextHighlightColors h
+SetTextHighlights $sep_sarV2_survivorFullName","You report to $PersonPost $personLastName about the success of your mission, bringing the good news that $sep_sarV2_survivorFullName was found alive and well.
+
+Afterward, you order your chief security officer to escort $sep_sarV2_survivorFullName to a safe location, while you provide a full report detailing the mission before receiving your reward.",,Generic dialogue can be replaced
+sep_sarV2_s0SurvivorText,SEPSARV2ShowSurvivorText,,,"The survivor appears on your screen, still recovering from the ordeal. ""Thank you, Captain. If you hadn't reached me, I wouldn't be here.""
+
+$sep_sarV2_SurvivorHeOrShe pauses, choosing $sep_sarV2_survivorHisOrHer words. ""I want to repay the favor and work for you. I need to file some paperwork, but once everything is settled, my contact info will be in your directory."" 
+
+$sep_sarV2_SurvivorHeOrShe thanks you once more before ending the call.",,Generic dialogue can be replaced
+sep_sarV2_s0DeadReturnText,SEPSARV2ShowDeadReturnText,,"SetTextHighlightColors h
+SetTextHighlights $sep_sarV2_survivorFullName","You report to $PersonPost $personLastName about the success of your mission, bringing the grim news that $sep_sarV2_survivorFullName had died by the time you reached $sep_sarV2_survivorHimOrHer.
+
+Afterward, you order your chief security officer to escort the recovered remains to a safe location, while you provide a full report detailing the mission before receiving your reward.",,Generic dialogue can be replaced
 # Search and Rescue V2 END,,,,,,
