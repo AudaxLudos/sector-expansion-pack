@@ -2,6 +2,8 @@ package sectorexpansionpack.missions;
 
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.campaign.*;
+import com.fs.starfarer.api.campaign.ai.FleetAIFlags;
+import com.fs.starfarer.api.campaign.ai.ModularFleetAIAPI;
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
 import com.fs.starfarer.api.campaign.rules.MemoryAPI;
 import com.fs.starfarer.api.impl.campaign.fleets.DefaultFleetInflater;
@@ -41,6 +43,21 @@ public class FleetEscortMission extends HubMissionWithBarEvent {
     public FleetEscortMission() {
         super();
         setGenRandom(new Random(Utils.random.nextLong()));
+    }
+
+    public static void makeFleetInterceptOther(CampaignFleetAPI fleet, SectorEntityToken other, float interceptDays) {
+        if (fleet.getAI() == null) {
+            fleet.setAI(Global.getFactory().createFleetAI(fleet));
+            fleet.setLocation(fleet.getLocation().x, fleet.getLocation().y);
+        }
+
+        fleet.getMemoryWithoutUpdate().set(FleetAIFlags.PLACE_TO_LOOK_FOR_TARGET, new Vector2f(other.getLocation()), interceptDays);
+
+        if (fleet.getAI() instanceof ModularFleetAIAPI) {
+            ((ModularFleetAIAPI) fleet.getAI()).getTacticalModule().setTarget(other);
+        }
+
+        fleet.addAssignmentAtStart(FleetAssignment.INTERCEPT, other, interceptDays, null);
     }
 
     @Override
@@ -196,7 +213,88 @@ public class FleetEscortMission extends HubMissionWithBarEvent {
 
         setRepChanges(0.05f, 0.1f, 0.05f, 0.1f);
 
+        // TODO: Add fleet complications
+        for (String complication : this.scenario.getComplications()) {
+            List<String> tags = List.of(complication.split(","));
+
+            if (!Stage.contains(tags.get(0))) {
+                log.info("Stage does not exist skipping complication");
+                continue;
+            }
+            if (Global.getSector().getFaction(tags.get(1)) == null) {
+                log.info("Faction does not exist skipping complication");
+                continue;
+            }
+
+            Stage stage = Stage.valueOf(tags.get(0));
+            String faction = tags.get(1);
+            int difficulty = Integer.parseInt(tags.get(2));
+            boolean inHyperspace = tags.contains("inHyperspace");
+
+            beginWithinHyperspaceRangeTrigger(this.gotoEntity, 5f, inHyperspace, stage);
+            triggerCreateStandardFleet(difficulty, faction, this.gotoEntity.getLocationInHyperspace());
+            if (tags.contains("hostile")) {
+                triggerSetFleetFlagsWithReason(MemFlags.MEMORY_KEY_MAKE_HOSTILE);
+            }
+            if (tags.contains("aggressive")) {
+                triggerSetFleetFlagsWithReason(MemFlags.MEMORY_KEY_MAKE_AGGRESSIVE);
+            }
+            if (tags.contains("longPursuit")) {
+                triggerSetFleetFlagPermanent(MemFlags.MEMORY_KEY_ALLOW_LONG_PURSUIT);
+            }
+            if (tags.contains("alwaysPursuit")) {
+                triggerSetFleetFlag(MemFlags.MEMORY_KEY_MAKE_ALWAYS_PURSUE);
+            }
+            if (tags.contains("lowRep")) {
+                triggerMakeLowRepImpact();
+            } else {
+                triggerMakeNoRepImpact();
+            }
+            // Pick spawn location
+            if (tags.contains("nearPlayer")) {
+                triggerPickLocationAroundPlayer(1000f);
+            } else {
+                triggerPickLocationAroundEntity(this.gotoEntity, 90f);
+            }
+            // AI Actions
+            if (tags.contains("interceptEscort")) {
+                triggerOrderFleetInterceptOther(this.fleet);
+            }
+            triggerSpawnFleetAtPickedLocation();
+            endTrigger();
+        }
+
         return true;
+    }
+
+    public float calculateCombatPoints(CreateFleetAction action) {
+        return calculateCombatPoints(action.params.factionId, action.fSize, action.fSizeOverride, action.params.doctrineOverride);
+    }
+
+    public float calculateCombatPoints(String factionId, FleetSize fSize, Float fSizeOverride, FactionDoctrineAPI doctrineOverride) {
+        FactionAPI faction = Global.getSector().getFaction(factionId);
+        float maxPoints = faction.getApproximateMaxFPPerFleet(FactionAPI.ShipPickMode.PRIORITY_THEN_ALL);
+        float min = fSize.maxFPFraction - (fSize.maxFPFraction - fSize.prev().maxFPFraction) / 2f;
+        float max = fSize.maxFPFraction + (fSize.next().maxFPFraction - fSize.maxFPFraction) / 2f;
+        float fraction = min + (max - min) * getGenRandom().nextFloat();
+
+        if (fSizeOverride != null) {
+            fraction = fSizeOverride * (0.95f + getGenRandom().nextFloat() * 0.1f);
+        } else {
+            int numShipsDoctrine = 1;
+            if (doctrineOverride != null) {
+                numShipsDoctrine = doctrineOverride.getNumShips();
+            } else {
+                numShipsDoctrine = faction.getDoctrine().getNumShips();
+            }
+            float doctrineMult = FleetFactoryV3.getDoctrineNumShipsMult(numShipsDoctrine);
+            fraction *= 0.75f * doctrineMult;
+            if (fraction > FleetSize.MAXIMUM.maxFPFraction) {
+                fraction = FleetSize.MAXIMUM.maxFPFraction;
+            }
+        }
+
+        return fraction * maxPoints;
     }
 
     @Override
@@ -358,7 +456,7 @@ public class FleetEscortMission extends HubMissionWithBarEvent {
             quality = FleetQuality.HIGHER;
             oQuality = OfficerQuality.HIGHER;
             oNum = OfficerNum.MORE;
-            //oNum = OfficerNum.ALL_SHIPS;
+            // oNum = OfficerNum.ALL_SHIPS;
             type = FleetTypes.PATROL_LARGE;
         }
 
@@ -388,6 +486,10 @@ public class FleetEscortMission extends HubMissionWithBarEvent {
         }
     }
 
+    public void triggerOrderFleetInterceptOther(SectorEntityToken other) {
+        triggerCustomAction(new OrderFleetInterceptOtherAction(other));
+    }
+
     public void connectWithFactionTurnedHostile(Object from, Object to, FactionAPI faction) {
         this.connections.add(new StageConnection(from, to, new EntityFinderMission.FactionTurnedHostileChecker(faction)));
     }
@@ -407,7 +509,16 @@ public class FleetEscortMission extends HubMissionWithBarEvent {
         COMPLETED,
         FAILED,
         FAILED_DECIV,
-        FAILED_GIVER_HOSTILE
+        FAILED_GIVER_HOSTILE;
+
+        public static boolean contains(String s) {
+            for (Stage stage : values()) {
+                if (Objects.equals(stage.name(), s)) {
+                    return true;
+                }
+            }
+            return false;
+        }
     }
 
     public enum ScenarioType {
@@ -427,34 +538,19 @@ public class FleetEscortMission extends HubMissionWithBarEvent {
         }
     }
 
-    public float calculateCombatPoints(CreateFleetAction action) {
-        return calculateCombatPoints(action.params.factionId, action.fSize, action.fSizeOverride, action.params.doctrineOverride);
-    }
+    public static class OrderFleetInterceptOtherAction implements MissionTrigger.TriggerAction {
+        protected SectorEntityToken other;
 
-    public float calculateCombatPoints(String factionId, FleetSize fSize, Float fSizeOverride, FactionDoctrineAPI doctrineOverride) {
-        FactionAPI faction = Global.getSector().getFaction(factionId);
-        float maxPoints = faction.getApproximateMaxFPPerFleet(FactionAPI.ShipPickMode.PRIORITY_THEN_ALL);
-        float min = fSize.maxFPFraction - (fSize.maxFPFraction - fSize.prev().maxFPFraction) / 2f;
-        float max = fSize.maxFPFraction + (fSize.next().maxFPFraction - fSize.maxFPFraction) / 2f;
-        float fraction = min + (max - min) * getGenRandom().nextFloat();
-
-        if (fSizeOverride != null) {
-            fraction = fSizeOverride * (0.95f + getGenRandom().nextFloat() * 0.1f);
-        } else {
-            int numShipsDoctrine = 1;
-            if (doctrineOverride != null) {
-                numShipsDoctrine = doctrineOverride.getNumShips();
-            } else {
-                numShipsDoctrine = faction.getDoctrine().getNumShips();
-            }
-            float doctrineMult = FleetFactoryV3.getDoctrineNumShipsMult(numShipsDoctrine);
-            fraction *= 0.75f * doctrineMult;
-            if (fraction > FleetSize.MAXIMUM.maxFPFraction) {
-                fraction = FleetSize.MAXIMUM.maxFPFraction;
-            }
+        public OrderFleetInterceptOtherAction(SectorEntityToken other) {
+            this.other = other;
         }
 
-        return fraction * maxPoints;
+        public void doAction(MissionTrigger.TriggerActionContext context) {
+            makeFleetInterceptOther(context.fleet, this.other, 1000f);
+            if (!context.fleet.hasScriptOfClass(MissionFleetAutoDespawn.class)) {
+                context.fleet.addScript(new MissionFleetAutoDespawn(context.mission, context.fleet));
+            }
+        }
     }
 
     public static class FleetWeakenedChecker implements ConditionChecker {
@@ -464,7 +560,8 @@ public class FleetEscortMission extends HubMissionWithBarEvent {
 
         /**
          * @param damageThreshold from 0.1f to 0.8f only
-         * */
+         *
+         */
         public FleetWeakenedChecker(CampaignFleetAPI fleet, float damageThreshold) {
             this.fleet = fleet;
             this.fleetPoints = fleet.getFleetPoints();

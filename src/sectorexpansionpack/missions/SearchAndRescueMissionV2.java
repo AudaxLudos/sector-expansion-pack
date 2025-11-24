@@ -617,7 +617,7 @@ public class SearchAndRescueMissionV2 extends HubMissionWithBarEvent {
             quality = FleetQuality.HIGHER;
             oQuality = OfficerQuality.HIGHER;
             oNum = OfficerNum.MORE;
-            //oNum = OfficerNum.ALL_SHIPS;
+            // oNum = OfficerNum.ALL_SHIPS;
             type = FleetTypes.PATROL_LARGE;
         }
 

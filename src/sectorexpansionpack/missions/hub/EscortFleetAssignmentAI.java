@@ -31,6 +31,7 @@ public class EscortFleetAssignmentAI implements EveryFrameScript, Script {
         this.fleet = fleet;
         this.mission = mission;
 
+        this.fleet.clearAssignments();
         this.fleet.addAssignment(FleetAssignment.ORBIT_PASSIVE, mission.getPerson().getMarket().getPrimaryEntity(), 999999f);
     }
 
@@ -47,7 +48,9 @@ public class EscortFleetAssignmentAI implements EveryFrameScript, Script {
     // IDEA: This implementation sucks update it to a better one if possible
     @Override
     public void advance(float amount) {
-        if (this.fleet.isInHyperspaceTransition()) {
+        CampaignFleetAPI playerFleet = Global.getSector().getPlayerFleet();
+
+        if (this.fleet.isInHyperspaceTransition() || playerFleet.isInHyperspaceTransition()) {
             return;
         }
 
@@ -57,7 +60,6 @@ public class EscortFleetAssignmentAI implements EveryFrameScript, Script {
             return;
         }
 
-        CampaignFleetAPI playerFleet = Global.getSector().getPlayerFleet();
         SectorEntityToken entity = this.mission.getGotoEntity();
 
         if (!this.fleet.isInHyperspace()) {
@@ -77,9 +79,6 @@ public class EscortFleetAssignmentAI implements EveryFrameScript, Script {
                 }
             } else if (playerFleet.getContainingLocation() != this.fleet.getContainingLocation()) {
                 if (Misc.getDistance(playerFleet.getLocationInHyperspace(), this.fleet.getLocationInHyperspace()) < JUMP_FOLLOW_DISTANCE) {
-                    if (this.fleet.isInHyperspaceTransition() || playerFleet.isInHyperspaceTransition()) {
-                        return;
-                    }
                     // Hyperspace jump points are different from system jump points
                     List<SectorEntityToken> jumpPoints = new ArrayList<>();
                     if (this.fleet.isInHyperspace()) {
