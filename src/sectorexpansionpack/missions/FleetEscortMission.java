@@ -27,8 +27,6 @@ import java.awt.*;
 import java.util.*;
 import java.util.List;
 
-// TODO: Reduce reputation when escorted fleet dies
-// TODO: Track and include fleet points for failure condition
 // TODO: Remove fleet loot when passing WAIT stage
 public class FleetEscortMission extends HubMissionWithBarEvent {
     public static final float MISSION_DURATION = 120f;
@@ -170,14 +168,14 @@ public class FleetEscortMission extends HubMissionWithBarEvent {
         // If mission ends when arriving at location
         setStageOnMemoryFlag(Stage.COMPLETED, this.gotoEntity, "$sep_fem_completed");
 
+        setStageOnEntityNotAlive(Stage.FAILED, this.fleet);
+        setStageOnFleetWeakened(Stage.FAILED, this.fleet, 0.4f);
+
         addNoPenaltyFailureStages(Stage.FAILED_DECIV);
         connectWithMarketDecivilized(Stage.RETURN, Stage.FAILED_DECIV, createdAt);
         setStageOnMarketDecivilized(Stage.FAILED_DECIV, createdAt);
 
         addNoPenaltyFailureStages(Stage.FAILED_GIVER_HOSTILE);
-        connectWithFactionTurnedHostile(Stage.GOTO, Stage.FAILED_GIVER_HOSTILE, getPerson().getFaction());
-        connectWithFactionTurnedHostile(Stage.WAIT, Stage.FAILED_GIVER_HOSTILE, getPerson().getFaction());
-        connectWithFactionTurnedHostile(Stage.RETURN, Stage.FAILED_GIVER_HOSTILE, getPerson().getFaction());
         setStageOnFactionTurnedHostile(Stage.FAILED_GIVER_HOSTILE, getPerson().getFaction());
 
         if (this.scenario.getDuration() > -1) {
@@ -199,18 +197,6 @@ public class FleetEscortMission extends HubMissionWithBarEvent {
         setRepChanges(0.05f, 0.1f, 0.05f, 0.1f);
 
         return true;
-    }
-
-    @Override
-    protected void advanceImpl(float amount) {
-        super.advanceImpl(amount);
-
-        if (this.fleet != null && !this.fleet.isEmpty() && this.fleet.isAlive() && !this.fleet.isExpired()
-                && getCurrentStage() != Stage.COMPLETED) {
-            if (this.fleet.isExpired() || !this.fleet.isAlive()) {
-                setCurrentStage(Stage.FAILED, null, null);
-            }
-        }
     }
 
     @Override
@@ -410,6 +396,10 @@ public class FleetEscortMission extends HubMissionWithBarEvent {
         this.connections.add(new StageConnection(null, to, new EntityFinderMission.FactionTurnedHostileChecker(faction)));
     }
 
+    public void setStageOnFleetWeakened(Object to, CampaignFleetAPI fleet, float damageThreshold) {
+        this.connections.add(new StageConnection(null, to, new FleetWeakenedChecker(fleet, damageThreshold)));
+    }
+
     public enum Stage {
         GOTO,
         WAIT,
@@ -465,6 +455,25 @@ public class FleetEscortMission extends HubMissionWithBarEvent {
         }
 
         return fraction * maxPoints;
+    }
+
+    public static class FleetWeakenedChecker implements ConditionChecker {
+        public CampaignFleetAPI fleet;
+        public float fleetPoints;
+        public float damageThreshold;
+
+        /**
+         * @param damageThreshold from 0.1f to 0.8f only
+         * */
+        public FleetWeakenedChecker(CampaignFleetAPI fleet, float damageThreshold) {
+            this.fleet = fleet;
+            this.fleetPoints = fleet.getFleetPoints();
+            this.damageThreshold = Math.max(0.1f, Math.min(damageThreshold, 0.8f));
+        }
+
+        public boolean conditionsMet() {
+            return this.fleetPoints * this.damageThreshold > this.fleet.getFleetPoints();
+        }
     }
 
     public static class SEPCreateFleetAction extends CreateFleetAction {
