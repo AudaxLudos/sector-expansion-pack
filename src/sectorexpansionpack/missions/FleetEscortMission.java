@@ -7,10 +7,7 @@ import com.fs.starfarer.api.campaign.rules.MemoryAPI;
 import com.fs.starfarer.api.impl.campaign.fleets.DefaultFleetInflater;
 import com.fs.starfarer.api.impl.campaign.fleets.DefaultFleetInflaterParams;
 import com.fs.starfarer.api.impl.campaign.fleets.FleetFactoryV3;
-import com.fs.starfarer.api.impl.campaign.ids.FleetTypes;
-import com.fs.starfarer.api.impl.campaign.ids.MemFlags;
-import com.fs.starfarer.api.impl.campaign.ids.Ranks;
-import com.fs.starfarer.api.impl.campaign.ids.Tags;
+import com.fs.starfarer.api.impl.campaign.ids.*;
 import com.fs.starfarer.api.impl.campaign.missions.hub.BaseHubMission;
 import com.fs.starfarer.api.impl.campaign.missions.hub.HubMissionWithBarEvent;
 import com.fs.starfarer.api.impl.campaign.missions.hub.MissionFleetAutoDespawn;
@@ -35,6 +32,7 @@ public class FleetEscortMission extends HubMissionWithBarEvent {
     public static float BAR_MILITARY_CHANCE = 0.4f;
     public static Logger log = Global.getLogger(FleetEscortMission.class);
     protected MissionScenarioSpec scenario;
+    protected ScenarioType scenarioType;
     protected boolean fleetSpawned = false; // Might not be needed
     protected CampaignFleetAPI fleet;
     protected SectorEntityToken gotoEntity;
@@ -47,6 +45,13 @@ public class FleetEscortMission extends HubMissionWithBarEvent {
     @Override
     protected boolean create(MarketAPI createdAt, boolean barEvent) {
         this.scenario = Utils.pickMissionScenario(getMissionId(), getGenRandom());
+        if (ScenarioType.contains(this.scenario.getType())) {
+            this.scenarioType = ScenarioType.valueOf(this.scenario.getType());
+        } else {
+            log.error("Scenario has no type");
+            return false;
+        }
+
         if (barEvent) {
             if (rollProbability(BAR_MILITARY_CHANCE)) {
                 List<String> posts = new ArrayList<>();
@@ -89,7 +94,40 @@ public class FleetEscortMission extends HubMissionWithBarEvent {
 
         // TODO: Add a way to customize fleet
         beginStageTrigger(Stage.GOTO);
-        triggerCreateStandardFleet(5, getPerson().getFaction().getId(), createdAt.getLocationInHyperspace());
+        triggerCreateStandardFleet(3, getPerson().getFaction().getId(), createdAt.getLocationInHyperspace());
+        switch (this.scenarioType) {
+            case DRUG_SMUGGLING:
+                triggerSetFleetCombatFleetPoints(30f);
+                triggerFleetSetFreighterData(calculateCombatPoints(getPreviousCreateFleetAction()), 1f, false);
+                triggerFleetSetTankerData(calculateCombatPoints(getPreviousCreateFleetAction()), 0.1f, false);
+                triggerAddCommodityFractionDrop(Commodities.DRUGS, 0.4f + 0.4f * getGenRandom().nextFloat());
+                break;
+            case COMMODITY_DELIVERY:
+                triggerSetFleetCombatFleetPoints(30f);
+                triggerFleetSetFreighterData(calculateCombatPoints(getPreviousCreateFleetAction()), 1f, false);
+                triggerFleetSetTankerData(calculateCombatPoints(getPreviousCreateFleetAction()), 0.1f, false);
+                triggerAddCommodityFractionDrop(Commodities.SUPPLIES, 0.4f + 0.4f * getGenRandom().nextFloat());
+                break;
+            case VIP_ESCORT:
+                triggerSetFleetCombatFleetPoints(30f);
+                triggerFleetSetFreighterData(0f, 0.1f, true);
+                triggerFleetSetTankerData(0f, 0.1f, true);
+                break;
+            case REBELLION_SUPPORT:
+                triggerSetFleetCombatFleetPoints(30f);
+                triggerFleetSetFreighterData(0f, 1f, true);
+                triggerFleetSetTankerData(0f, 1f, true);
+                triggerAddCommodityFractionDrop(Commodities.MARINES, 0.4f);
+                triggerAddCommodityFractionDrop(Commodities.HAND_WEAPONS, 0.1f);
+                triggerAddCommodityFractionDrop(Commodities.FUEL, 0.3f);
+                break;
+            case ARTIFACT_DELIVERY:
+                triggerSetFleetCombatFleetPoints(30f);
+                triggerFleetSetFreighterData(0f, 0.1f, true);
+                triggerFleetSetTankerData(0f, 0.1f, true);
+                triggerAddSpecialItemDrop(Items.PRISTINE_NANOFORGE, null);
+                break;
+        }
         triggerMakeFleetIgnoreOtherFleets();
         triggerFleetSetName("Special Task Force");
         endTrigger();
@@ -180,11 +218,10 @@ public class FleetEscortMission extends HubMissionWithBarEvent {
     @Override
     protected void updateInteractionDataImpl() {
         set("$sep_fem_scenarioId", this.scenario.getScenarioId());
-        set("$sep_fem_isBarEvent", isBarEvent());
         set("$sep_fem_mrktNme", this.gotoEntity.getName());
         set("$sep_fem_sysName", this.gotoEntity.getStarSystem().getNameWithLowercaseTypeShort());
         set("$sep_fem_duration", Misc.getWithDGS(this.timeLimit.days));
-        set("$sep_fem_reward", Misc.getDGSCredits(getCreditsReward()));
+        set("$sep_fem_creditReward", Misc.getDGSCredits(getCreditsReward()));
     }
 
     @Override
@@ -339,6 +376,24 @@ public class FleetEscortMission extends HubMissionWithBarEvent {
         triggerCustomAction(new SEPCreateFleetAction(type, locInHyper, size, quality, factionId));
     }
 
+    public void triggerFleetSetFreighterData(float points, float mult, boolean includeCombatPoints) {
+        CreateFleetAction cfa = getPreviousCreateFleetAction();
+        cfa.freighterMult = mult;
+        if (getPreviousCreateFleetAction() instanceof SEPCreateFleetAction cfa1) {
+            cfa1.transportIncludeCombatPts = includeCombatPoints;
+            cfa1.freighterPts = points;
+        }
+    }
+
+    public void triggerFleetSetTankerData(float points, float mult, boolean includeCombatPoints) {
+        CreateFleetAction cfa = getPreviousCreateFleetAction();
+        cfa.tankerMult = mult;
+        if (getPreviousCreateFleetAction() instanceof SEPCreateFleetAction cfa1) {
+            cfa1.tankerIncludeCombatPts = includeCombatPoints;
+            cfa1.tankerPts = points;
+        }
+    }
+
     public void connectWithFactionTurnedHostile(Object from, Object to, FactionAPI faction) {
         this.connections.add(new StageConnection(from, to, new EntityFinderMission.FactionTurnedHostileChecker(faction)));
     }
@@ -372,6 +427,36 @@ public class FleetEscortMission extends HubMissionWithBarEvent {
             }
             return false;
         }
+    }
+
+    public float calculateCombatPoints(CreateFleetAction action) {
+        return calculateCombatPoints(action.params.factionId, action.fSize, action.fSizeOverride, action.params.doctrineOverride);
+    }
+
+    public float calculateCombatPoints(String factionId, FleetSize fSize, Float fSizeOverride, FactionDoctrineAPI doctrineOverride) {
+        FactionAPI faction = Global.getSector().getFaction(factionId);
+        float maxPoints = faction.getApproximateMaxFPPerFleet(FactionAPI.ShipPickMode.PRIORITY_THEN_ALL);
+        float min = fSize.maxFPFraction - (fSize.maxFPFraction - fSize.prev().maxFPFraction) / 2f;
+        float max = fSize.maxFPFraction + (fSize.next().maxFPFraction - fSize.maxFPFraction) / 2f;
+        float fraction = min + (max - min) * getGenRandom().nextFloat();
+
+        if (fSizeOverride != null) {
+            fraction = fSizeOverride * (0.95f + getGenRandom().nextFloat() * 0.1f);
+        } else {
+            int numShipsDoctrine = 1;
+            if (doctrineOverride != null) {
+                numShipsDoctrine = doctrineOverride.getNumShips();
+            } else {
+                numShipsDoctrine = faction.getDoctrine().getNumShips();
+            }
+            float doctrineMult = FleetFactoryV3.getDoctrineNumShipsMult(numShipsDoctrine);
+            fraction *= 0.75f * doctrineMult;
+            if (fraction > FleetSize.MAXIMUM.maxFPFraction) {
+                fraction = FleetSize.MAXIMUM.maxFPFraction;
+            }
+        }
+
+        return fraction * maxPoints;
     }
 
     public static class SEPCreateFleetAction extends CreateFleetAction {
@@ -601,7 +686,7 @@ public class FleetEscortMission extends HubMissionWithBarEvent {
                 context.fleet.setName(this.nameOverride);
             }
             if (this.noFactionInName != null && this.noFactionInName) {
-                context.fleet.setNoFactionInName(this.noFactionInName);
+                context.fleet.setNoFactionInName(true);
             }
 
             if (this.removeInflater != null && this.removeInflater) {

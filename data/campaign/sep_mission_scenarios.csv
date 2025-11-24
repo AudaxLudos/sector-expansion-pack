@@ -1,6 +1,5 @@
 scenarioId,missionId,frequency,duration,maxCreditReward,type,complications,tags,data1,data2,data3,notes
-fem1,sep_fem,10,,,,"FIND,pirates,6,hostile,aggressive,lowrep",oneway,,,,
-fem2,sep_fem,10,,,,,,,,,
+fem1,sep_fem,10,,,DRUG_SMUGGLING,"FIND,pirates,6,hostile,aggressive,lowrep",oneway,,,,
 ,,,,,,,,,,,
 sar1,sep_sarV2,10,,,STRANDED_IN_WRECK,"FIND,pirates,6,hostile,aggressive,lowrep",,,,,
 sar2,sep_sarV2,10,,,STRANDED_IN_PLANET,"FIND,pirates,6,hostile,aggressive,lowrep",,,,,
