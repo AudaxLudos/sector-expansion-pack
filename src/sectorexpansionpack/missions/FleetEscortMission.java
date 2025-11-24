@@ -27,6 +27,9 @@ import java.awt.*;
 import java.util.*;
 import java.util.List;
 
+// TODO: Reduce reputation when escorted fleet dies
+// TODO: Track and include fleet points for failure condition
+// TODO: Remove fleet loot when passing WAIT stage
 public class FleetEscortMission extends HubMissionWithBarEvent {
     public static final float MISSION_DURATION = 120f;
     public static float BAR_MILITARY_CHANCE = 0.4f;
@@ -92,7 +95,6 @@ public class FleetEscortMission extends HubMissionWithBarEvent {
             setGiverIsPotentialContactOnSuccess();
         }
 
-        // TODO: Add a way to customize fleet
         beginStageTrigger(Stage.GOTO);
         triggerCreateStandardFleet(3, getPerson().getFaction().getId(), createdAt.getLocationInHyperspace());
         switch (this.scenarioType) {
@@ -194,6 +196,8 @@ public class FleetEscortMission extends HubMissionWithBarEvent {
             setCreditReward(CreditReward.HIGH);
         }
 
+        setRepChanges(0.05f, 0.1f, 0.05f, 0.1f);
+
         return true;
     }
 
@@ -203,7 +207,6 @@ public class FleetEscortMission extends HubMissionWithBarEvent {
 
         if (this.fleet != null && !this.fleet.isEmpty() && this.fleet.isAlive() && !this.fleet.isExpired()
                 && getCurrentStage() != Stage.COMPLETED) {
-            // TODO: Track and include fleet points for failure condition
             if (this.fleet.isExpired() || !this.fleet.isAlive()) {
                 setCurrentStage(Stage.FAILED, null, null);
             }
@@ -234,6 +237,11 @@ public class FleetEscortMission extends HubMissionWithBarEvent {
             this.fleet.setFacing(getGenRandom().nextFloat() * 360f);
             this.fleet.addScript(new EscortFleetAssignmentAI(this.fleet, this));
         }
+    }
+
+    @Override
+    public boolean canAbandonWithoutPenalty() {
+        return this.currentStage == Stage.RETURN;
     }
 
     @Override
