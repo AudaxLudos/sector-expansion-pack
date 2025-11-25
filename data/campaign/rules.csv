@@ -292,9 +292,15 @@ sep_fem_offerTextBar1,DialogOptionSelected,$option == sep_fem_startBar,"FireBest
 $missionId = sep_fem",,"contact_acceptBar:Accept
 contact_declineBarNoContinue:Decline",
 ## FEM2 dialogues,,,,,,
-sep_fem_s1Blurb,SEPFEMShowBlurb,$sep_fem_scenarioId == fem1,,FEM1 CONTACT BLURB,,
-sep_fem_s1OfferOption,SEPFEMShowOption,$sep_fem_scenarioId == fem1,,,sep_fem_start:FEM1 CONTACT OPTION,
-sep_fem_s1OfferText,SEPFEMShowOffer,$sep_fem_scenarioId == fem1,,FEM1 CONTACT OFFER,,
+sep_fem_s1Blurb,SEPFEMShowBlurb,$sep_fem_scenarioId == fem1,,"""A trader spent all their credits on commodities and forgot to hire protection, now they are looking for a quick hired gun to escort their trade fleet.""",,
+sep_fem_s1OfferOption,SEPFEMShowOption,$sep_fem_scenarioId == fem1,,,sep_fem_start:Ask about the trader looking for a quick hired gun,
+sep_fem_s1OfferText,SEPFEMShowOffer,$sep_fem_scenarioId == fem1,"SetTextHighlightColors h h h h
+SetTextHighlights $sep_fem_itemName $sep_fem_mrktNme $sep_fem_sysName $sep_fem_creditReward
+Call $sep_fem_ref showMap ""Target: $sep_fem_sysName""","""A trader bought a supply of $sep_fem_itemName and forgot to hire combat ships to protect their shipment,"" $heOrShe explains. ""They need a combat capable fleet, to escort them all the way to $sep_fem_mrktNme in the $sep_fem_sysName.""
+
+$HeOrShe adds, ""It's a one way trip. You go there, wait for the delivery to finish, and your job is done.""
+
+$HeOrShe continues. ""In exchange, the trader is willing to split the profits seventy thirty, which comes out to $sep_fem_creditReward. Interested?""",,
 sep_fem_s1BlurbBar,SEPFEMShowBlurbBar,$sep_fem_scenarioId == fem1,,FEM1 BAR BLURB,,
 sep_fem_s1OfferOptionBar,SEPFEMShowOptionBar,$sep_fem_scenarioId == fem1,,,sep_fem_startBar:FEM1 BAR OPTION,
 sep_fem_s1OfferTextBar,SEPFEMShowOfferBar,$sep_fem_scenarioId == fem1,,FEM1 BAR OFFER,,
