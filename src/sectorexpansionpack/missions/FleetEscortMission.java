@@ -4,6 +4,8 @@ import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.campaign.*;
 import com.fs.starfarer.api.campaign.ai.FleetAIFlags;
 import com.fs.starfarer.api.campaign.ai.ModularFleetAIAPI;
+import com.fs.starfarer.api.campaign.econ.CommodityOnMarketAPI;
+import com.fs.starfarer.api.campaign.econ.CommoditySpecAPI;
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
 import com.fs.starfarer.api.campaign.rules.MemoryAPI;
 import com.fs.starfarer.api.impl.campaign.fleets.DefaultFleetInflater;
@@ -15,13 +17,16 @@ import com.fs.starfarer.api.impl.campaign.missions.hub.HubMissionWithBarEvent;
 import com.fs.starfarer.api.impl.campaign.missions.hub.MissionFleetAutoDespawn;
 import com.fs.starfarer.api.impl.campaign.missions.hub.MissionTrigger;
 import com.fs.starfarer.api.impl.campaign.procgen.themes.SalvageSpecialAssigner;
+import com.fs.starfarer.api.impl.campaign.rulecmd.salvage.special.BaseSalvageSpecial;
 import com.fs.starfarer.api.impl.campaign.skills.OfficerTraining;
 import com.fs.starfarer.api.ui.SectorMapAPI;
 import com.fs.starfarer.api.ui.TooltipMakerAPI;
 import com.fs.starfarer.api.util.Misc;
+import com.fs.starfarer.api.util.WeightedRandomPicker;
 import org.apache.log4j.Logger;
 import org.lwjgl.util.vector.Vector2f;
 import sectorexpansionpack.MissionScenarioSpec;
+import sectorexpansionpack.ModPlugin;
 import sectorexpansionpack.Utils;
 import sectorexpansionpack.missions.hub.MissionFleetFollowPlayerIfNearby;
 
@@ -39,6 +44,7 @@ public class FleetEscortMission extends HubMissionWithBarEvent {
     protected boolean fleetSpawned = false; // Might not be needed
     protected CampaignFleetAPI fleet;
     protected SectorEntityToken gotoEntity;
+    protected String itemId;
 
     public FleetEscortMission() {
         super();
@@ -113,22 +119,18 @@ public class FleetEscortMission extends HubMissionWithBarEvent {
         beginStageTrigger(Stage.GOTO);
         triggerCreateStandardFleet(3, getPerson().getFaction().getId(), createdAt.getLocationInHyperspace());
         switch (this.scenarioType) {
+            case COMMODITY_DELIVERY:
+                triggerSetFleetCombatFleetPoints(30f);
+                triggerFleetSetFreighterData(calculateCombatPoints(getPreviousCreateFleetAction()), 1f, false);
+                triggerFleetSetTankerData(calculateCombatPoints(getPreviousCreateFleetAction()), 0.1f, false);
+                this.itemId = pickItemId(false);
+                triggerAddCommodityFractionDrop(this.itemId, 0.4f + 0.4f * getGenRandom().nextFloat());
+                break;
             case DRUG_SMUGGLING:
                 triggerSetFleetCombatFleetPoints(30f);
                 triggerFleetSetFreighterData(calculateCombatPoints(getPreviousCreateFleetAction()), 1f, false);
                 triggerFleetSetTankerData(calculateCombatPoints(getPreviousCreateFleetAction()), 0.1f, false);
                 triggerAddCommodityFractionDrop(Commodities.DRUGS, 0.4f + 0.4f * getGenRandom().nextFloat());
-                break;
-            case COMMODITY_DELIVERY:
-                triggerSetFleetCombatFleetPoints(30f);
-                triggerFleetSetFreighterData(calculateCombatPoints(getPreviousCreateFleetAction()), 1f, false);
-                triggerFleetSetTankerData(calculateCombatPoints(getPreviousCreateFleetAction()), 0.1f, false);
-                triggerAddCommodityFractionDrop(Commodities.SUPPLIES, 0.4f + 0.4f * getGenRandom().nextFloat());
-                break;
-            case VIP_ESCORT:
-                triggerSetFleetCombatFleetPoints(30f);
-                triggerFleetSetFreighterData(0f, 0.1f, true);
-                triggerFleetSetTankerData(0f, 0.1f, true);
                 break;
             case REBELLION_SUPPORT:
                 triggerSetFleetCombatFleetPoints(30f);
@@ -142,7 +144,13 @@ public class FleetEscortMission extends HubMissionWithBarEvent {
                 triggerSetFleetCombatFleetPoints(30f);
                 triggerFleetSetFreighterData(0f, 0.1f, true);
                 triggerFleetSetTankerData(0f, 0.1f, true);
-                triggerAddSpecialItemDrop(Items.PRISTINE_NANOFORGE, null);
+                this.itemId = pickItemId(true);
+                triggerAddSpecialItemDrop(this.itemId, null);
+                break;
+            case VIP_ESCORT:
+                triggerSetFleetCombatFleetPoints(30f);
+                triggerFleetSetFreighterData(0f, 0.1f, true);
+                triggerFleetSetTankerData(0f, 0.1f, true);
                 break;
         }
         triggerMakeFleetIgnoreOtherFleets();
@@ -303,6 +311,33 @@ public class FleetEscortMission extends HubMissionWithBarEvent {
         return fraction * maxPoints;
     }
 
+    public String pickItemId(boolean colonyItem) {
+        WeightedRandomPicker<String> picker = new WeightedRandomPicker<>(getGenRandom());
+
+        if (!colonyItem) {
+            for (CommodityOnMarketAPI commodityOnMarket : getPerson().getMarket().getCommoditiesCopy()) {
+                picker.add(commodityOnMarket.getCommodity().getId());
+            }
+        } else {
+            for (SpecialItemSpecAPI spec : Global.getSettings().getAllSpecialItemSpecs()) {
+                if (!ModPlugin.COLONY_ITEM_WHITELIST.contains(spec.getId())) {
+                    continue;
+                }
+                picker.add(spec.getId());
+            }
+        }
+
+        return picker.pick();
+    }
+
+    public void removeCommodityFraction(CampaignFleetAPI fleet, String commodityId, float fraction) {
+        float quantity = fleet.getCargo().getCommodityQuantity(commodityId);
+        float toRemove = quantity * fraction;
+        if (quantity > 0) {
+            fleet.getCargo().removeCommodity(commodityId, toRemove);
+        }
+    }
+
     @Override
     public String getBaseName() {
         return "Fleet Escort";
@@ -315,6 +350,20 @@ public class FleetEscortMission extends HubMissionWithBarEvent {
         set("$sep_fem_sysName", this.gotoEntity.getStarSystem().getNameWithLowercaseTypeShort());
         set("$sep_fem_duration", Misc.getWithDGS(this.timeLimit.days));
         set("$sep_fem_creditReward", Misc.getDGSCredits(getCreditsReward()));
+        switch (this.scenarioType) {
+            case COMMODITY_DELIVERY:
+                CommoditySpecAPI commoditySpec = Global.getSettings().getCommoditySpec(this.itemId);
+                if (commoditySpec != null) {
+                    set("$sep_fem_itemName", commoditySpec.getName());
+                }
+                break;
+            case ARTIFACT_DELIVERY:
+                SpecialItemSpecAPI itemSpec = Global.getSettings().getSpecialItemSpec(this.itemId);
+                if (itemSpec != null) {
+                    set("$sep_fem_itemName", itemSpec.getName());
+                }
+                break;
+        }
     }
 
     @Override
@@ -543,11 +592,11 @@ public class FleetEscortMission extends HubMissionWithBarEvent {
     }
 
     public enum ScenarioType {
+        COMMODITY_DELIVERY,
         DRUG_SMUGGLING,
-        VIP_ESCORT,
         REBELLION_SUPPORT,
         ARTIFACT_DELIVERY,
-        COMMODITY_DELIVERY;
+        VIP_ESCORT;
 
         public static boolean contains(String s) {
             for (ScenarioType type : values()) {
