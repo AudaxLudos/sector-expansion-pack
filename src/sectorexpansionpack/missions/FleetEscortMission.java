@@ -159,6 +159,13 @@ public class FleetEscortMission extends HubMissionWithBarEvent {
             return false;
         }
 
+        beginStageTrigger(Stage.WAIT);
+        triggerRunScriptAfterDelay(0f, () -> {
+            this.fleet.clearAssignments();
+            this.fleet.addAssignmentAtStart(FleetAssignment.ORBIT_PASSIVE, this.gotoEntity, 999999f, "Completing objectives at " + this.gotoEntity.getName(), null);
+        });
+        endTrigger();
+
         requireMarketFaction(getPerson().getFaction().getId());
         requireMarketNotHidden();
         requireMarketNotInHyperspace();
@@ -182,16 +189,14 @@ public class FleetEscortMission extends HubMissionWithBarEvent {
         setSuccessStage(Stage.COMPLETED);
         addFailureStages(Stage.FAILED);
 
-        // If mission ends by returning to contact
-        setStageOnMemoryFlag(Stage.COMPLETED, getPerson(), "$sep_fem_completed");
-        // If mission ends when arriving at location
-        setStageOnMemoryFlag(Stage.COMPLETED, this.gotoEntity, "$sep_fem_completed");
+        connectWithEntityNearbyOther(Stage.GOTO, Stage.WAIT, this.fleet, this.gotoEntity, 1000f, false);
+        connectWithDaysElapsed(Stage.WAIT, Stage.RETURN, 7f);
+        connectWithEntityNearbyOther(Stage.RETURN, Stage.COMPLETED, this.fleet, getPerson().getMarket().getPrimaryEntity(), 1000f, false);
 
         setStageOnEntityNotAlive(Stage.FAILED, this.fleet);
         setStageOnFleetWeakened(Stage.FAILED, this.fleet, 0.4f);
 
         addNoPenaltyFailureStages(Stage.FAILED_DECIV);
-        connectWithMarketDecivilized(Stage.RETURN, Stage.FAILED_DECIV, createdAt);
         setStageOnMarketDecivilized(Stage.FAILED_DECIV, createdAt);
 
         addNoPenaltyFailureStages(Stage.FAILED_GIVER_HOSTILE);
@@ -494,6 +499,18 @@ public class FleetEscortMission extends HubMissionWithBarEvent {
         triggerCustomAction(new OrderFleetInterceptOtherAction(other));
     }
 
+    public void connectWithOnDaysElapsed(Stage from, Stage to, float days) {
+        this.connections.add(new StageConnection(from, to, new DaysElapsedChecker(days, this)));
+    }
+
+    public void connectWithEntityNearbyOther(Object from, Object to, SectorEntityToken entity, SectorEntityToken other, float maxRange, boolean checkInHyperspace) {
+        this.connections.add(new StageConnection(from, to, new EntityNearbyOtherChecker(entity, other, maxRange, checkInHyperspace)));
+    }
+
+    public void setStageOnEntityNearbyOther(Object to, SectorEntityToken entity, SectorEntityToken other, float maxRange, boolean checkInHyperspace) {
+        this.connections.add(new StageConnection(null, to, new EntityNearbyOtherChecker(entity, other, maxRange, checkInHyperspace)));
+    }
+
     public void connectWithFactionTurnedHostile(Object from, Object to, FactionAPI faction) {
         this.connections.add(new StageConnection(from, to, new EntityFinderMission.FactionTurnedHostileChecker(faction)));
     }
@@ -570,6 +587,28 @@ public class FleetEscortMission extends HubMissionWithBarEvent {
 
         public void doAction(MissionTrigger.TriggerActionContext context) {
             context.fleet.addScript(new MissionFleetFollowPlayerIfNearby(context.fleet, this.mission, this.maxRange, this.stages));
+        }
+    }
+
+    public static class EntityNearbyOtherChecker implements ConditionChecker {
+        protected SectorEntityToken entity;
+        protected SectorEntityToken other;
+        protected float maxRange;
+        protected boolean checkInHyperspace;
+
+        public EntityNearbyOtherChecker(SectorEntityToken entity, SectorEntityToken other, float maxRange, boolean checkInHyperspace) {
+            this.entity = entity;
+            this.other = other;
+            this.maxRange = maxRange;
+            this.checkInHyperspace = checkInHyperspace;
+        }
+
+        @Override
+        public boolean conditionsMet() {
+            if (this.checkInHyperspace && (this.entity.isInHyperspace() || this.other.isInHyperspace())) {
+                return Misc.getDistance(this.entity.getLocationInHyperspace(), this.other.getLocationInHyperspace()) < this.maxRange;
+            }
+            return Misc.getDistance(this.entity, this.other) < this.maxRange;
         }
     }
 
