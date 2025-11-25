@@ -34,7 +34,6 @@ import java.awt.*;
 import java.util.*;
 import java.util.List;
 
-// TODO: Remove fleet loot when passing WAIT stage
 public class FleetEscortMission extends HubMissionWithBarEvent {
     public static final float MISSION_DURATION = 120f;
     public static float BAR_MILITARY_CHANCE = 0.4f;
@@ -171,6 +170,29 @@ public class FleetEscortMission extends HubMissionWithBarEvent {
         triggerRunScriptAfterDelay(0f, () -> {
             this.fleet.clearAssignments();
             this.fleet.addAssignmentAtStart(FleetAssignment.ORBIT_PASSIVE, this.gotoEntity, 999999f, "Completing objectives at " + this.gotoEntity.getName(), null);
+        });
+        endTrigger();
+
+        beginStageTrigger(Stage.RETURN, Stage.COMPLETED);
+        triggerRunScriptAfterDelay(0f, () -> {
+            switch (this.scenarioType) {
+                case DRUG_SMUGGLING:
+                    removeCommodityFraction(this.fleet, Commodities.DRUGS, 0.75f + getGenRandom().nextFloat() * 0.2f);
+                    break;
+                case COMMODITY_DELIVERY:
+                    removeCommodityFraction(this.fleet, this.itemId, 0.75f + getGenRandom().nextFloat() * 0.2f);
+                    break;
+                case VIP_ESCORT:
+                    break;
+                case REBELLION_SUPPORT:
+                    removeCommodityFraction(this.fleet, Commodities.MARINES, 0.75f + getGenRandom().nextFloat() * 0.2f);
+                    removeCommodityFraction(this.fleet, Commodities.HAND_WEAPONS, 0.75f + getGenRandom().nextFloat() * 0.2f);
+                    removeCommodityFraction(this.fleet, Commodities.FUEL, 0.75f + getGenRandom().nextFloat() * 0.1f);
+                    break;
+                case ARTIFACT_DELIVERY:
+                    BaseSalvageSpecial.clearExtraSalvage(this.fleet);
+                    break;
+            }
         });
         endTrigger();
 
