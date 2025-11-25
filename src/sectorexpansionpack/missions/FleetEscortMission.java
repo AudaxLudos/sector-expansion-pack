@@ -219,9 +219,14 @@ public class FleetEscortMission extends HubMissionWithBarEvent {
         setSuccessStage(Stage.COMPLETED);
         addFailureStages(Stage.FAILED);
 
-        connectWithEntityNearbyOther(Stage.GOTO, Stage.WAIT, this.fleet, this.gotoEntity, 1000f, false);
-        connectWithDaysElapsed(Stage.WAIT, Stage.RETURN, 7f);
-        connectWithEntityNearbyOther(Stage.RETURN, Stage.COMPLETED, this.fleet, getPerson().getMarket().getPrimaryEntity(), 1000f, false);
+        if (this.scenario.getTags().contains("oneWay")) {
+            connectWithEntityNearbyOther(Stage.GOTO, Stage.WAIT, this.fleet, this.gotoEntity, 1000f, false);
+            connectWithDaysElapsed(Stage.WAIT, Stage.COMPLETED, 7f);
+        } else {
+            connectWithEntityNearbyOther(Stage.GOTO, Stage.WAIT, this.fleet, this.gotoEntity, 1000f, false);
+            connectWithDaysElapsed(Stage.WAIT, Stage.RETURN, 7f);
+            connectWithEntityNearbyOther(Stage.RETURN, Stage.COMPLETED, this.fleet, getPerson().getMarket().getPrimaryEntity(), 1000f, false);
+        }
 
         setStageOnEntityNotAlive(Stage.FAILED, this.fleet);
         setStageOnFleetWeakened(Stage.FAILED, this.fleet, 0.4f);
