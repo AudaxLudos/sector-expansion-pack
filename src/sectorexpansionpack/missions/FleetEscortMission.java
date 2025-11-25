@@ -23,7 +23,7 @@ import org.apache.log4j.Logger;
 import org.lwjgl.util.vector.Vector2f;
 import sectorexpansionpack.MissionScenarioSpec;
 import sectorexpansionpack.Utils;
-import sectorexpansionpack.missions.hub.EscortFleetAssignmentAI;
+import sectorexpansionpack.missions.hub.MissionFleetFollowPlayerIfNearby;
 
 import java.awt.*;
 import java.util.*;
@@ -146,7 +146,9 @@ public class FleetEscortMission extends HubMissionWithBarEvent {
                 break;
         }
         triggerMakeFleetIgnoreOtherFleets();
-        triggerFleetSetName("Special Task Force");
+        triggerFleetSetName("Special Courier Fleet");
+        triggerFleetFollowPlayerWithinRange(2000f, Stage.GOTO, Stage.RETURN);
+        triggerFleetNoAutoDespawn();
         endTrigger();
         List<CampaignFleetAPI> fleets = runStageTriggersReturnFleets(Stage.GOTO);
         if (!fleets.isEmpty()) {
@@ -213,7 +215,6 @@ public class FleetEscortMission extends HubMissionWithBarEvent {
 
         setRepChanges(0.05f, 0.1f, 0.05f, 0.1f);
 
-        // TODO: Add fleet complications
         for (String complication : this.scenario.getComplications()) {
             List<String> tags = List.of(complication.split(","));
 
@@ -319,7 +320,6 @@ public class FleetEscortMission extends HubMissionWithBarEvent {
             entity.getContainingLocation().addEntity(this.fleet);
             this.fleet.setLocation(entity.getLocation().x, entity.getLocation().y);
             this.fleet.setFacing(getGenRandom().nextFloat() * 360f);
-            this.fleet.addScript(new EscortFleetAssignmentAI(this.fleet, this));
         }
     }
 
@@ -486,6 +486,10 @@ public class FleetEscortMission extends HubMissionWithBarEvent {
         }
     }
 
+    public void triggerFleetFollowPlayerWithinRange(float maxRange, Object... stages) {
+        triggerCustomAction(new OrderFleetFollowNearbyPlayerInStage(this, maxRange, stages));
+    }
+
     public void triggerOrderFleetInterceptOther(SectorEntityToken other) {
         triggerCustomAction(new OrderFleetInterceptOtherAction(other));
     }
@@ -550,6 +554,22 @@ public class FleetEscortMission extends HubMissionWithBarEvent {
             if (!context.fleet.hasScriptOfClass(MissionFleetAutoDespawn.class)) {
                 context.fleet.addScript(new MissionFleetAutoDespawn(context.mission, context.fleet));
             }
+        }
+    }
+
+    public static class OrderFleetFollowNearbyPlayerInStage implements MissionTrigger.TriggerAction {
+        protected List<Object> stages;
+        protected BaseHubMission mission;
+        protected float maxRange;
+
+        public OrderFleetFollowNearbyPlayerInStage(BaseHubMission mission, float maxRange, Object... stages) {
+            this.mission = mission;
+            this.maxRange = maxRange;
+            this.stages = Arrays.asList(stages);
+        }
+
+        public void doAction(MissionTrigger.TriggerActionContext context) {
+            context.fleet.addScript(new MissionFleetFollowPlayerIfNearby(context.fleet, this.mission, this.maxRange, this.stages));
         }
     }
 

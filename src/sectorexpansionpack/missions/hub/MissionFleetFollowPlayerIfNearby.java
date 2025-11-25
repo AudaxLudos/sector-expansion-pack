@@ -1,0 +1,122 @@
+package sectorexpansionpack.missions.hub;
+
+import com.fs.starfarer.api.EveryFrameScript;
+import com.fs.starfarer.api.Global;
+import com.fs.starfarer.api.campaign.CampaignFleetAPI;
+import com.fs.starfarer.api.campaign.FleetAssignment;
+import com.fs.starfarer.api.campaign.SectorEntityToken;
+import com.fs.starfarer.api.campaign.ai.FleetAssignmentDataAPI;
+import com.fs.starfarer.api.impl.campaign.missions.hub.BaseHubMission;
+import com.fs.starfarer.api.util.IntervalUtil;
+import com.fs.starfarer.api.util.Misc;
+import org.apache.log4j.Logger;
+import sectorexpansionpack.Utils;
+import sectorexpansionpack.missions.FleetEscortMission;
+
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+public class MissionFleetFollowPlayerIfNearby implements EveryFrameScript {
+    public static Logger log = Global.getLogger(MissionFleetFollowPlayerIfNearby.class);
+    protected CampaignFleetAPI fleet;
+    protected BaseHubMission mission;
+    protected Set<Object> stages = new HashSet<>();
+    protected boolean done = false;
+    protected float maxRange;
+    protected IntervalUtil timer = new IntervalUtil(0.2f, 0.4f);
+
+    public MissionFleetFollowPlayerIfNearby(CampaignFleetAPI fleet, BaseHubMission mission, float maxRange, List<Object> stages) {
+        this.fleet = fleet;
+        this.mission = mission;
+        this.maxRange = maxRange;
+        this.stages.addAll(stages);
+    }
+
+    @Override
+    public boolean isDone() {
+        return this.done;
+    }
+
+    @Override
+    public boolean runWhilePaused() {
+        return false;
+    }
+
+    @Override
+    public void advance(float amount) {
+        if (this.done) {
+            return;
+        }
+        if (this.mission.isEnding()) {
+            Misc.giveStandardReturnToSourceAssignments(this.fleet);
+            this.done = true;
+            return;
+        }
+
+        float days = Misc.getDays(amount);
+        this.timer.advance(days);
+        if (!this.timer.intervalElapsed()) {
+            return;
+        }
+
+        CampaignFleetAPI playerFleet = Global.getSector().getPlayerFleet();
+
+        if (playerFleet.isInHyperspaceTransition() || this.fleet.isInHyperspaceTransition()) {
+            return;
+        }
+
+        FleetEscortMission.Stage currStage = (FleetEscortMission.Stage) this.mission.getCurrentStage();
+
+        boolean currStageRelevant = this.stages.contains(currStage);
+        boolean sameLocAsPlayer = this.fleet.isInCurrentLocation();
+        float distance = sameLocAsPlayer
+                ? Misc.getDistance(playerFleet, this.fleet)
+                : Misc.getDistance(playerFleet.getLocationInHyperspace(), this.fleet.getLocationInHyperspace());
+        boolean canFollowOrJump = distance < this.maxRange;
+
+        FleetAssignmentDataAPI currAssignment = this.fleet.getCurrentAssignment();
+
+        if (currAssignment != null && currStageRelevant) {
+            boolean targetIsPlayer = currAssignment.getTarget() == playerFleet;
+            boolean willJump = currAssignment.getAssignment() == FleetAssignment.GO_TO_LOCATION;
+            boolean shouldClear = ((sameLocAsPlayer && ((canFollowOrJump && !targetIsPlayer) || (!canFollowOrJump && targetIsPlayer) || (willJump && !targetIsPlayer))))
+                    || (!sameLocAsPlayer && ((canFollowOrJump && !willJump) || (!canFollowOrJump && targetIsPlayer)));
+
+            if (shouldClear) {
+                this.fleet.clearAssignments();
+                currAssignment = null;
+            }
+        }
+
+        if (currAssignment == null && currStageRelevant) {
+            FleetAssignment assignmentType;
+            SectorEntityToken target;
+            String assignmentText;
+
+            if (sameLocAsPlayer) {
+                if (canFollowOrJump) {
+                    assignmentType = FleetAssignment.ORBIT_PASSIVE;
+                    target = playerFleet;
+                    assignmentText = "following your fleet";
+                } else {
+                    assignmentType = FleetAssignment.ORBIT_PASSIVE;
+                    target = Utils.getClosestJumpPoint(this.fleet);
+                    assignmentText = "holding current location";
+                }
+            } else {
+                if (canFollowOrJump) {
+                    assignmentType = FleetAssignment.GO_TO_LOCATION;
+                    target = playerFleet.getContainingLocation().createToken(playerFleet.getLocation());
+                    assignmentText = "following your fleet";
+                } else {
+                    assignmentType = FleetAssignment.ORBIT_PASSIVE;
+                    target = Utils.getClosestJumpPoint(this.fleet);
+                    assignmentText = "holding current location";
+                }
+            }
+
+            this.fleet.addAssignmentAtStart(assignmentType, target, 999999f, assignmentText, null);
+        }
+    }
+}
