@@ -15,8 +15,8 @@ public class MissionScenarioSpec {
 
     protected String type;
 
-    protected List<String> complications;
-    protected List<String> tags;
+    protected List<String> complications = new ArrayList<>();
+    protected List<String> tags = new ArrayList<>();
 
     protected String data1;
     protected String data2;
