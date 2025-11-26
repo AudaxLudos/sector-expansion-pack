@@ -28,8 +28,10 @@ import sectorexpansionpack.MissionScenarioSpec;
 import sectorexpansionpack.Utils;
 
 import java.awt.*;
-import java.util.*;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Random;
 
 public class SearchAndRescueMissionV2 extends HubMissionWithBarEvent {
     public static final float MISSION_DURATION = 120f;
@@ -58,7 +60,7 @@ public class SearchAndRescueMissionV2 extends HubMissionWithBarEvent {
     @Override
     protected boolean create(MarketAPI createdAt, boolean barEvent) {
         this.scenario = Utils.pickMissionScenario(getMissionId(), getGenRandom());
-        if (ScenarioType.contains(this.scenario.getType())) {
+        if (Utils.isInEnum(this.scenario.getType(), ScenarioType.class)) {
             this.scenarioType = ScenarioType.valueOf(this.scenario.getType());
         } else {
             log.error("Scenario has no type");
@@ -145,12 +147,8 @@ public class SearchAndRescueMissionV2 extends HubMissionWithBarEvent {
             setTimeLimit(FleetEscortMission.Stage.FAILED, MISSION_DURATION, null);
         }
 
-        if (this.scenario.getMinCreditReward() > -1) {
-            if (this.scenario.getMaxCreditReward() < this.scenario.getMinCreditReward()) {
-                setCreditReward(this.scenario.getMinCreditReward());
-            } else {
-                setCreditReward(this.scenario.getMinCreditReward(), this.scenario.getMaxCreditReward());
-            }
+        if (Utils.isInEnum(this.scenario.getCreditReward(), CreditReward.class)) {
+            setCreditReward(CreditReward.valueOf(this.scenario.getCreditReward()));
         } else {
             setCreditReward(CreditReward.HIGH);
         }
@@ -184,7 +182,7 @@ public class SearchAndRescueMissionV2 extends HubMissionWithBarEvent {
         for (String complication : this.scenario.getComplications()) {
             List<String> tags = List.of(complication.split(","));
 
-            if (!Stage.contains(tags.get(0))) {
+            if (Utils.isInEnum(this.scenario.getCreditReward(), CreditReward.class)) {
                 log.info("Stage does not exist skipping complication");
                 continue;
             }
@@ -630,16 +628,7 @@ public class SearchAndRescueMissionV2 extends HubMissionWithBarEvent {
         RETURN,
         COMPLETED,
         FAILED,
-        FAILED_DECIV;
-
-        public static boolean contains(String s) {
-            for (Stage stage : values()) {
-                if (Objects.equals(stage.name(), s)) {
-                    return true;
-                }
-            }
-            return false;
-        }
+        FAILED_DECIV
     }
 
     public enum PersonPostType {
@@ -654,15 +643,6 @@ public class SearchAndRescueMissionV2 extends HubMissionWithBarEvent {
         STRANDED_IN_PLANET,
         CAPTURED_IN_FLEET,
         CAPTURED_IN_PLANET,
-        CAPTURED_IN_MARKET;
-
-        public static boolean contains(String s) {
-            for (ScenarioType type : values()) {
-                if (Objects.equals(type.name(), s)) {
-                    return true;
-                }
-            }
-            return false;
-        }
+        CAPTURED_IN_MARKET
     }
 }

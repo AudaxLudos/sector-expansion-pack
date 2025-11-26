@@ -1,4 +1,4 @@
-scenarioId,missionId,frequency,duration,maxCreditReward,type,complications,tags,data1,data2,data3,notes
+scenarioId,missionId,frequency,duration,creditReward,type,complications,tags,data1,data2,data3,notes
 fem1,sep_fem,1000,,,COMMODITY_DELIVERY,"GOTO,pirates,6,hostile,aggressive,lowRep,nearPlayer,interceptEscort",oneWay,,,,
 fem2,sep_fem,5,,,DRUG_SMUGGLING,"GOTO,pirates,6,hostile,aggressive,lowRep,nearPlayer,interceptEscort",,,,,
 fem3,sep_fem,5,,,REBELLION_SUPPORT,"GOTO,pirates,6,hostile,aggressive,lowRep,nearPlayer,interceptEscort",oneWay,,,,

@@ -68,7 +68,7 @@ public class FleetEscortMission extends HubMissionWithBarEvent {
     @Override
     protected boolean create(MarketAPI createdAt, boolean barEvent) {
         this.scenario = Utils.pickMissionScenario(getMissionId(), getGenRandom());
-        if (ScenarioType.contains(this.scenario.getType())) {
+        if (Utils.isInEnum(this.scenario.getType(), ScenarioType.class)) {
             this.scenarioType = ScenarioType.valueOf(this.scenario.getType());
         } else {
             log.error("Scenario has no type");
@@ -243,12 +243,8 @@ public class FleetEscortMission extends HubMissionWithBarEvent {
             setTimeLimit(Stage.FAILED, MISSION_DURATION, null);
         }
 
-        if (this.scenario.getMinCreditReward() > -1) {
-            if (this.scenario.getMaxCreditReward() < this.scenario.getMinCreditReward()) {
-                setCreditReward(this.scenario.getMinCreditReward());
-            } else {
-                setCreditReward(this.scenario.getMinCreditReward(), this.scenario.getMaxCreditReward());
-            }
+        if (Utils.isInEnum(this.scenario.getCreditReward(), CreditReward.class)) {
+            setCreditReward(CreditReward.valueOf(this.scenario.getCreditReward()));
         } else {
             setCreditReward(CreditReward.HIGH);
         }
@@ -258,7 +254,7 @@ public class FleetEscortMission extends HubMissionWithBarEvent {
         for (String complication : this.scenario.getComplications()) {
             List<String> tags = List.of(complication.split(","));
 
-            if (!Stage.contains(tags.get(0))) {
+            if (!Utils.isInEnum(tags.get(0), Stage.class)) {
                 log.info("Stage does not exist skipping complication");
                 continue;
             }
@@ -606,16 +602,7 @@ public class FleetEscortMission extends HubMissionWithBarEvent {
         COMPLETED,
         FAILED,
         FAILED_DECIV,
-        FAILED_GIVER_HOSTILE;
-
-        public static boolean contains(String s) {
-            for (Stage stage : values()) {
-                if (Objects.equals(stage.name(), s)) {
-                    return true;
-                }
-            }
-            return false;
-        }
+        FAILED_GIVER_HOSTILE
     }
 
     public enum ScenarioType {
@@ -623,16 +610,7 @@ public class FleetEscortMission extends HubMissionWithBarEvent {
         DRUG_SMUGGLING,
         REBELLION_SUPPORT,
         ARTIFACT_DELIVERY,
-        VIP_ESCORT;
-
-        public static boolean contains(String s) {
-            for (ScenarioType type : values()) {
-                if (Objects.equals(type.name(), s)) {
-                    return true;
-                }
-            }
-            return false;
-        }
+        VIP_ESCORT
     }
 
     public static class OrderFleetInterceptOtherAction implements MissionTrigger.TriggerAction {

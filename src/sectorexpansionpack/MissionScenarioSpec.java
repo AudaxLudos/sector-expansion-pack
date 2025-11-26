@@ -10,8 +10,7 @@ public class MissionScenarioSpec {
     protected float frequency;
     protected float duration;
 
-    protected Integer minCreditReward;
-    protected Integer maxCreditReward;
+    protected String creditReward;
 
     protected String type;
 
@@ -54,20 +53,12 @@ public class MissionScenarioSpec {
         this.duration = duration;
     }
 
-    public Integer getMinCreditReward() {
-        return this.minCreditReward;
+    public String getCreditReward() {
+        return this.creditReward;
     }
 
-    public void setMinCreditReward(Integer minCreditReward) {
-        this.minCreditReward = minCreditReward;
-    }
-
-    public Integer getMaxCreditReward() {
-        return this.maxCreditReward;
-    }
-
-    public void setMaxCreditReward(Integer maxCreditReward) {
-        this.maxCreditReward = maxCreditReward;
+    public void setCreditReward(String creditReward) {
+        this.creditReward = creditReward;
     }
 
     public String getType() {
