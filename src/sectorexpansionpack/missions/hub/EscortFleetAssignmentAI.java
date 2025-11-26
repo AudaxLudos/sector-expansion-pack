@@ -60,7 +60,7 @@ public class EscortFleetAssignmentAI implements EveryFrameScript, Script {
             return;
         }
 
-        SectorEntityToken entity = this.mission.getGotoEntity();
+        SectorEntityToken entity = this.mission.getGotoEntity(this.mission.getCurrentStage());
 
         if (!this.fleet.isInHyperspace()) {
             log.info(String.format("The escorted fleet is currently in the %s [%s]", this.fleet.getStarSystem().getName(), this.fleet.getLocation()));

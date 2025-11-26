@@ -18,6 +18,8 @@ import com.fs.starfarer.api.impl.campaign.missions.hub.MissionFleetAutoDespawn;
 import com.fs.starfarer.api.impl.campaign.missions.hub.MissionTrigger;
 import com.fs.starfarer.api.impl.campaign.procgen.themes.SalvageSpecialAssigner;
 import com.fs.starfarer.api.impl.campaign.rulecmd.salvage.special.BaseSalvageSpecial;
+import com.fs.starfarer.api.impl.campaign.shared.PersonBountyEventData;
+import com.fs.starfarer.api.impl.campaign.shared.SharedData;
 import com.fs.starfarer.api.impl.campaign.skills.OfficerTraining;
 import com.fs.starfarer.api.ui.SectorMapAPI;
 import com.fs.starfarer.api.ui.TooltipMakerAPI;
@@ -250,56 +252,7 @@ public class FleetEscortMission extends HubMissionWithBarEvent {
         }
 
         setRepChanges(0.05f, 0.1f, 0.05f, 0.1f);
-
-        for (String complication : this.scenario.getComplications()) {
-            List<String> tags = List.of(complication.split(","));
-
-            if (!Utils.isInEnum(tags.get(0), Stage.class)) {
-                log.info("Stage does not exist skipping complication");
-                continue;
-            }
-            if (Global.getSector().getFaction(tags.get(1)) == null) {
-                log.info("Faction does not exist skipping complication");
-                continue;
-            }
-
-            Stage stage = Stage.valueOf(tags.get(0));
-            String faction = tags.get(1);
-            int difficulty = Integer.parseInt(tags.get(2));
-            boolean inHyperspace = tags.contains("inHyperspace");
-
-            beginWithinHyperspaceRangeTrigger(this.gotoEntity, 5f, inHyperspace, stage);
-            triggerCreateStandardFleet(difficulty, faction, this.gotoEntity.getLocationInHyperspace());
-            if (tags.contains("hostile")) {
-                triggerSetFleetFlagsWithReason(MemFlags.MEMORY_KEY_MAKE_HOSTILE);
-            }
-            if (tags.contains("aggressive")) {
-                triggerSetFleetFlagsWithReason(MemFlags.MEMORY_KEY_MAKE_AGGRESSIVE);
-            }
-            if (tags.contains("longPursuit")) {
-                triggerSetFleetFlagPermanent(MemFlags.MEMORY_KEY_ALLOW_LONG_PURSUIT);
-            }
-            if (tags.contains("alwaysPursuit")) {
-                triggerSetFleetFlag(MemFlags.MEMORY_KEY_MAKE_ALWAYS_PURSUE);
-            }
-            if (tags.contains("lowRep")) {
-                triggerMakeLowRepImpact();
-            } else {
-                triggerMakeNoRepImpact();
-            }
-            // Pick spawn location
-            if (tags.contains("nearPlayer")) {
-                triggerPickLocationAroundPlayer(1000f);
-            } else {
-                triggerPickLocationAroundEntity(this.gotoEntity, 90f);
-            }
-            // AI Actions
-            if (tags.contains("interceptEscort")) {
-                triggerOrderFleetInterceptOther(this.fleet);
-            }
-            triggerSpawnFleetAtPickedLocation();
-            endTrigger();
-        }
+        setScenarioComplications();
 
         return true;
     }
@@ -361,6 +314,120 @@ public class FleetEscortMission extends HubMissionWithBarEvent {
         }
     }
 
+    public void setScenarioComplications() {
+        for (String complication : this.scenario.getComplications()) {
+            List<String> tags = List.of(complication.split(","));
+
+            float chance = 1f;
+            if (tags.contains("chanceLOW")) {
+                chance = 0.25f;
+            } else if (tags.contains("chanceMID")) {
+                chance = 0.5f;
+            } else if (tags.contains("chanceHIGH")) {
+                chance = 0.75f;
+            }
+
+            if (!rollProbability(chance)) {
+                continue;
+            }
+
+            if (!Utils.isInEnum(tags.get(0), Stage.class)) {
+                log.info("Stage does not exist skipping complication");
+                continue;
+            }
+            if (Global.getSector().getFaction(tags.get(1)) == null) {
+                log.info("Faction does not exist skipping complication");
+                continue;
+            }
+
+            Stage stage = Stage.valueOf(tags.get(0));
+            String faction = tags.get(1);
+            boolean hyperspaceOnly = tags.contains("hyperspaceOnly");
+
+            SectorEntityToken gotoEntity = getGotoEntity(stage);
+            if (gotoEntity == null) {
+                continue;
+            }
+
+            int difficulty = getDifficulty(tags);
+
+            float rangeLY = 3f;
+            if (tags.contains("LY1")) {
+                rangeLY = 1f;
+            } else if (tags.contains("LY2")) {
+                rangeLY = 2f;
+            } else if (tags.contains("LY4")) {
+                rangeLY = 4f;
+            } else if (tags.contains("LY5")) {
+                rangeLY = 5f;
+            }
+
+            beginWithinHyperspaceRangeTrigger(gotoEntity, rangeLY, hyperspaceOnly, stage);
+            triggerCreateStandardFleet(difficulty, faction, gotoEntity.getLocationInHyperspace());
+            if (tags.contains("hostile")) {
+                triggerSetFleetFlagsWithReason(MemFlags.MEMORY_KEY_MAKE_HOSTILE);
+            }
+            if (tags.contains("aggressive")) {
+                triggerSetFleetFlagsWithReason(MemFlags.MEMORY_KEY_MAKE_AGGRESSIVE);
+            }
+            if (tags.contains("longPursuit")) {
+                triggerSetFleetFlagPermanent(MemFlags.MEMORY_KEY_ALLOW_LONG_PURSUIT);
+            }
+            if (tags.contains("alwaysPursuit")) {
+                triggerSetFleetFlag(MemFlags.MEMORY_KEY_MAKE_ALWAYS_PURSUE);
+            }
+            if (tags.contains("lowRep")) {
+                triggerMakeLowRepImpact();
+            } else {
+                triggerMakeNoRepImpact();
+            }
+            if (tags.contains("nearPlayer")) {
+                triggerPickLocationAroundPlayer(1000f);
+            } else {
+                triggerPickLocationAroundEntity(gotoEntity, 90f);
+            }
+            setCustomTagTriggers(tags);
+            triggerSpawnFleetAtPickedLocation();
+            endTrigger();
+        }
+    }
+
+    public int getDifficulty(List<String> tags) {
+        int difficulty = 5;
+        SharedData sharedData = SharedData.getData();
+        if (sharedData != null) {
+            PersonBountyEventData bountyData = sharedData.getPersonBountyEventData();
+            if (bountyData != null) {
+                difficulty = getGenRandom().nextInt(bountyData.getLevel(), bountyData.getLevel() + getGenRandom().nextInt(1, 3));
+            }
+        }
+        if (tags.contains("strLOW")) {
+            difficulty = getGenRandom().nextInt(1, 3);
+        } else if (tags.contains("strMID")) {
+            difficulty = getGenRandom().nextInt(4, 6);
+        } else if (tags.contains("strHIGH")) {
+            difficulty = getGenRandom().nextInt(7, 9);
+        } else if (tags.contains("strMAX")) {
+            difficulty = 10;
+        }
+        return difficulty;
+    }
+
+    public void setCustomTagTriggers(List<String> tags) {
+        if (tags.contains("interceptEscort")) {
+            triggerOrderFleetInterceptOther(this.fleet);
+        }
+    }
+
+    public SectorEntityToken getGotoEntity(Object stage) {
+        if (stage == Stage.GOTO) {
+            return this.gotoEntity;
+        } else if (stage == Stage.WAIT) {
+            return this.gotoEntity;
+        }
+        return getPerson().getMarket().getPrimaryEntity();
+    }
+
     @Override
     public String getBaseName() {
         return "Fleet Escort";
@@ -416,7 +483,7 @@ public class FleetEscortMission extends HubMissionWithBarEvent {
                     this.gotoEntity.getStarSystem().getNameWithLowercaseTypeShort());
         } else if (this.currentStage == Stage.RETURN) {
             info.addPara("Escort the fleet back to %s in the %s.", pad, tc, h,
-                    getGotoEntity().getName(), getGotoEntity().getStarSystem().getNameWithLowercaseTypeShort());
+                    getPerson().getMarket().getName(), getPerson().getMarket().getStarSystem().getNameWithLowercaseTypeShort());
         }
         return false;
     }
@@ -434,7 +501,7 @@ public class FleetEscortMission extends HubMissionWithBarEvent {
                     this.gotoEntity.getStarSystem().getNameWithLowercaseTypeShort());
         } else if (this.currentStage == Stage.RETURN) {
             info.addPara("Escort the fleet back to %s in the %s.", oPad, tc, h,
-                    getGotoEntity().getName(), getGotoEntity().getStarSystem().getNameWithLowercaseTypeShort());
+                    getPerson().getMarket().getName(), getPerson().getMarket().getStarSystem().getNameWithLowercaseTypeShort());
         }
     }
 
@@ -447,18 +514,17 @@ public class FleetEscortMission extends HubMissionWithBarEvent {
         arrowFleet.color = Misc.getHighlightColor();
         result.add(arrowFleet);
 
-        ArrowData arrowDestination = new ArrowData(Global.getSector().getPlayerFleet(), getGotoEntity());
-        arrowDestination.width = 14f;
-        result.add(arrowDestination);
+        if (this.getCurrentStage() == Stage.GOTO) {
+            ArrowData arrowDestination = new ArrowData(Global.getSector().getPlayerFleet(), this.gotoEntity);
+            arrowDestination.width = 14f;
+            result.add(arrowDestination);
+        } else if (this.getCurrentStage() == Stage.RETURN) {
+            ArrowData arrowDestination = new ArrowData(Global.getSector().getPlayerFleet(), getPerson().getMarket().getPrimaryEntity());
+            arrowDestination.width = 14f;
+            result.add(arrowDestination);
+        }
 
         return result;
-    }
-
-    public SectorEntityToken getGotoEntity() {
-        if (getCurrentStage() == Stage.GOTO) {
-            return this.gotoEntity;
-        }
-        return getPerson().getMarket().getPrimaryEntity();
     }
 
     public void triggerCreateStandardFleet(int difficulty, String factionId, Vector2f locInHyper) {
