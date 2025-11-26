@@ -1,9 +1,11 @@
 scenarioId,missionId,frequency,duration,creditReward,type,complications,tags,data1,data2,data3,notes
-fem1,sep_fem,1000,,,COMMODITY_DELIVERY,"GOTO,pirates,6,hostile,aggressive,lowRep,nearPlayer,interceptEscort",oneWay,,,,
-fem2,sep_fem,5,,,DRUG_SMUGGLING,"GOTO,pirates,6,hostile,aggressive,lowRep,nearPlayer,interceptEscort",,,,,
-fem3,sep_fem,5,,,REBELLION_SUPPORT,"GOTO,pirates,6,hostile,aggressive,lowRep,nearPlayer,interceptEscort",oneWay,,,,
-fem4,sep_fem,3,,,ARTIFACT_DELIVERY,"GOTO,pirates,6,hostile,aggressive,lowRep,nearPlayer,interceptEscort",oneWay,,,,
-fem5,sep_fem,10,,,VIP_ESCORT,"GOTO,pirates,6,hostile,aggressive,lowRep,nearPlayer,interceptEscort",,,,,
+fem1,sep_fem,10,,,COMMODITY_DELIVERY,"GOTO,pirates,hostile,aggressive,lowRep,nearPlayer,interceptEscort",oneWay,,,,
+fem2,sep_fem,5,,VERY_HIGH,DRUG_SMUGGLING,"GOTO,pirates,chanceHIGH,hostile,aggressive,lowRep,nearPlayer,interceptEscort,hyperspaceOnly|
+RETURN,pirates,chanceHIGH,hostile,aggressive,lowRep,nearPlayer,interceptEscort,hyperspaceOnly
+",,,,,
+fem3,sep_fem,5,,VERY_HIGH,REBELLION_SUPPORT,"GOTO,pirates,hostile,aggressive,lowRep,nearPlayer,interceptEscort",oneWay,,,,
+fem4,sep_fem,3,,,ARTIFACT_DELIVERY,"GOTO,pirates,hostile,aggressive,lowRep,nearPlayer,interceptEscort",oneWay,,,,
+fem5,sep_fem,10,,,VIP_ESCORT,"GOTO,pirates,hostile,aggressive,lowRep,nearPlayer,interceptEscort",,,,,
 ,,,,,,,,,,,
 sar1,sep_sarV2,10,,,STRANDED_IN_WRECK,"FIND,pirates,6,hostile,aggressive,lowrep",,,,,
 sar2,sep_sarV2,10,,,STRANDED_IN_PLANET,"FIND,pirates,6,hostile,aggressive,lowrep",,,,,

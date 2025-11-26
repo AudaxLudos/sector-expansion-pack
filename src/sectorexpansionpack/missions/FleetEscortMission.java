@@ -134,9 +134,8 @@ public class FleetEscortMission extends HubMissionWithBarEvent {
                 triggerAddCommodityFractionDrop(Commodities.DRUGS, 0.4f + 0.4f * getGenRandom().nextFloat());
                 break;
             case REBELLION_SUPPORT:
-                triggerSetFleetCombatFleetPoints(30f);
-                triggerFleetSetFreighterData(0f, 1f, true);
-                triggerFleetSetTankerData(0f, 1f, true);
+                triggerFleetSetFreighterData(0f, 2f, true);
+                triggerFleetSetTankerData(0f, 2f, true);
                 triggerAddCommodityFractionDrop(Commodities.MARINES, 0.4f);
                 triggerAddCommodityFractionDrop(Commodities.HAND_WEAPONS, 0.1f);
                 triggerAddCommodityFractionDrop(Commodities.FUEL, 0.3f);
