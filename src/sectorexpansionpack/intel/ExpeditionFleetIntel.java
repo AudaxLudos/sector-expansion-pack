@@ -26,6 +26,7 @@ import sectorexpansionpack.missions.EntityFinderMission;
 import java.awt.*;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Random;
 
 // IDEA: Create a base expedition class then create a generic expedition intel
@@ -59,6 +60,93 @@ public class ExpeditionFleetIntel extends FleetGroupIntel {
     protected SpecialItemData specialItemData;
     protected MarketAPI source;
     protected SectorEntityToken target;
+
+    public ExpeditionFleetIntel(String colonyItemId, String sourceMarketName) {
+        setRandom(new Random(Utils.random.nextLong()));
+        this.efm = new EntityFinderMission();
+        this.specialItemSpec = Global.getSettings().getSpecialItemSpec(colonyItemId);
+        if (this.specialItemSpec == null) {
+            log.info("Failed to find colony item to take");
+            endImmediately();
+            return;
+        }
+        this.specialItemData = new SpecialItemData(this.specialItemSpec.getId(), this.specialItemSpec.getParams());
+        List<MarketAPI> markets = Global.getSector().getEconomy().getMarketsCopy();
+        MarketAPI source = null;
+        for (MarketAPI market : markets) {
+            if (Objects.equals(market.getName().toLowerCase(), sourceMarketName.toLowerCase())) {
+                source = market;
+                break;
+            }
+        }
+        this.source = source;
+        if (this.source == null) {
+            log.info("Failed to source market");
+            endImmediately();
+            return;
+        }
+        pickTarget();
+        if (isDone()) {
+            log.info("Failed to find target entity");
+            return;
+        }
+
+        this.params = new GenericRaidFGI.GenericRaidParams(getRandom(), false);
+        this.params.factionId = this.source.getFactionId();
+        this.params.source = this.source;
+
+        float baseDifficulty = 6f;
+        if (this.source.getSize() <= 4) {
+            this.maxFleetSize = 6;
+        } else if (this.source.getSize() <= 6) {
+            baseDifficulty = 8f;
+            this.maxFleetSize = 8;
+        } else {
+            baseDifficulty = 12f;
+            this.maxFleetSize = 10;
+        }
+
+        float difficultyMult = this.source.getStats().getDynamic().getMod(Stats.COMBAT_FLEET_SIZE_MULT).computeEffective(0f);
+        if (difficultyMult < 1f) {
+            difficultyMult = 1f;
+        }
+
+        float totalDifficulty = baseDifficulty * difficultyMult;
+
+        this.params.fleetSizes.add(this.maxFleetSize);
+        totalDifficulty -= this.maxFleetSize;
+
+        while (totalDifficulty > 0 && this.params.fleetSizes.size() < 9) {
+            int min = 3;
+            int max = this.maxFleetSize - 2;
+            int diff = getRandom().nextInt(min, max);
+
+            this.params.fleetSizes.add(diff);
+            totalDifficulty -= diff;
+        }
+
+        initActions();
+
+        // Mark source faction so it won't be reselected for future expeditions
+        this.source.getFaction().getMemoryWithoutUpdate().set(FACTION_KEY, true);
+
+        // Mark target so it won't be reselected for future expeditions
+        Misc.makeImportant(this.target, "specialItemLocation");
+        this.target.getMemoryWithoutUpdate().set(TARGET_KEY, true);
+        this.target.getMemoryWithoutUpdate().set(EVENT_KEY, this);
+        Misc.setSalvageSpecial(this.target, new SEPHiddenItemSpecial.HiddenSpecialItemSpecialData(this.specialItemSpec.getId()));
+
+        if (Utils.rollProbability(this.revealChance)) {
+            new ExpeditionFleetDepartureIntel(getRoute(), this.source);
+        } else {
+            this.revealChance += 0.2f;
+        }
+
+        log.info(String.format("Starting %s expedition at %s in the %s, targeting %s in the %s",
+                this.source.getFaction().getDisplayName(),
+                this.source.getName(), this.source.getStarSystem().getNameWithLowercaseTypeShort(),
+                this.target.getName(), this.target.getStarSystem().getNameWithLowercaseTypeShort()));
+    }
 
     public ExpeditionFleetIntel() {
         setRandom(new Random(Utils.random.nextLong()));

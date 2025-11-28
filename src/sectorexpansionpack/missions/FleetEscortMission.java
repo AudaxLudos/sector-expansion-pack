@@ -7,6 +7,7 @@ import com.fs.starfarer.api.campaign.ai.ModularFleetAIAPI;
 import com.fs.starfarer.api.campaign.econ.CommodityOnMarketAPI;
 import com.fs.starfarer.api.campaign.econ.CommoditySpecAPI;
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
+import com.fs.starfarer.api.campaign.econ.MarketDemandAPI;
 import com.fs.starfarer.api.campaign.rules.MemoryAPI;
 import com.fs.starfarer.api.impl.campaign.fleets.DefaultFleetInflater;
 import com.fs.starfarer.api.impl.campaign.fleets.DefaultFleetInflaterParams;
@@ -117,6 +118,35 @@ public class FleetEscortMission extends HubMissionWithBarEvent {
             setGiverIsPotentialContactOnSuccess();
         }
 
+        requireMarketLocationNot(createdAt.getContainingLocation());
+        requireMarketNotHidden();
+        requireMarketNotInHyperspace();
+        switch (this.scenarioType) {
+            case COMMODITY_DELIVERY:
+                preferMarketHasCommodityDemands();
+                break;
+            case DRUG_SMUGGLING:
+                break;
+            case REBELLION_SUPPORT:
+                requireMarketFactionNot(getPerson().getFaction().getId());
+                break;
+            case ARTIFACT_DELIVERY:
+                requireMarketFaction(getPerson().getFaction().getId());
+                break;
+            case VIP_ESCORT:
+                break;
+        }
+        MarketAPI market = pickMarket();
+        if (market == null) {
+            log.info("Failed to find market");
+            return false;
+        }
+        this.gotoEntity = market.getPrimaryEntity();
+        if (this.gotoEntity == null) {
+            log.info("Failed to find market's entity");
+            return false;
+        }
+
         beginStageTrigger(Stage.GOTO);
         triggerCreateStandardFleet(3, getPerson().getFaction().getId(), createdAt.getLocationInHyperspace());
         switch (this.scenarioType) {
@@ -124,7 +154,7 @@ public class FleetEscortMission extends HubMissionWithBarEvent {
                 triggerSetFleetCombatFleetPoints(30f);
                 triggerFleetSetFreighterData(calculateCombatPoints(getPreviousCreateFleetAction()), 1f, false);
                 triggerFleetSetTankerData(calculateCombatPoints(getPreviousCreateFleetAction()), 0.1f, false);
-                this.itemId = pickItemId(false);
+                this.itemId = pickCommodityIdMarketDemand(market);
                 triggerAddCommodityFractionDrop(this.itemId, 0.4f + 0.4f * getGenRandom().nextFloat());
                 break;
             case DRUG_SMUGGLING:
@@ -144,7 +174,7 @@ public class FleetEscortMission extends HubMissionWithBarEvent {
                 triggerSetFleetCombatFleetPoints(30f);
                 triggerFleetSetFreighterData(0f, 0.1f, true);
                 triggerFleetSetTankerData(0f, 0.1f, true);
-                this.itemId = pickItemId(true);
+                this.itemId = pickSpecialItemId();
                 triggerAddSpecialItemDrop(this.itemId, null);
                 break;
             case VIP_ESCORT:
@@ -177,13 +207,11 @@ public class FleetEscortMission extends HubMissionWithBarEvent {
         beginStageTrigger(Stage.RETURN, Stage.COMPLETED);
         triggerRunScriptAfterDelay(0f, () -> {
             switch (this.scenarioType) {
-                case DRUG_SMUGGLING:
-                    removeCommodityFraction(this.fleet, Commodities.DRUGS, 0.75f + getGenRandom().nextFloat() * 0.2f);
-                    break;
                 case COMMODITY_DELIVERY:
                     removeCommodityFraction(this.fleet, this.itemId, 0.75f + getGenRandom().nextFloat() * 0.2f);
                     break;
-                case VIP_ESCORT:
+                case DRUG_SMUGGLING:
+                    removeCommodityFraction(this.fleet, Commodities.DRUGS, 0.75f + getGenRandom().nextFloat() * 0.2f);
                     break;
                 case REBELLION_SUPPORT:
                     removeCommodityFraction(this.fleet, Commodities.MARINES, 0.75f + getGenRandom().nextFloat() * 0.2f);
@@ -193,24 +221,11 @@ public class FleetEscortMission extends HubMissionWithBarEvent {
                 case ARTIFACT_DELIVERY:
                     BaseSalvageSpecial.clearExtraSalvage(this.fleet);
                     break;
+                case VIP_ESCORT:
+                    break;
             }
         });
         endTrigger();
-
-        requireMarketFaction(getPerson().getFaction().getId());
-        requireMarketNotHidden();
-        requireMarketNotInHyperspace();
-        requireMarketLocationNot(createdAt.getContainingLocation());
-        MarketAPI market = pickMarket();
-        if (market == null) {
-            log.info("Failed to find market");
-            return false;
-        }
-        this.gotoEntity = market.getPrimaryEntity();
-        if (this.gotoEntity == null) {
-            log.info("Failed to find market's entity");
-            return false;
-        }
 
         makeImportant(this.gotoEntity, "$sep_fem_gotoEntity", Stage.GOTO);
         makeImportant(this.fleet, "$sep_fem_escortedFleet", Stage.GOTO, Stage.WAIT, Stage.RETURN);
@@ -286,20 +301,23 @@ public class FleetEscortMission extends HubMissionWithBarEvent {
         return fraction * maxPoints;
     }
 
-    public String pickItemId(boolean colonyItem) {
+    public String pickCommodityIdMarketDemand(MarketAPI market) {
+        WeightedRandomPicker<String> picker = new WeightedRandomPicker<>(getGenRandom());
+        for (MarketDemandAPI demand : market.getDemandData().getDemandList()) {
+            picker.add(demand.getBaseCommodity().getId());
+        }
+
+        return picker.pick();
+    }
+
+    public String pickSpecialItemId() {
         WeightedRandomPicker<String> picker = new WeightedRandomPicker<>(getGenRandom());
 
-        if (!colonyItem) {
-            for (CommodityOnMarketAPI commodityOnMarket : getPerson().getMarket().getCommoditiesCopy()) {
-                picker.add(commodityOnMarket.getCommodity().getId());
+        for (SpecialItemSpecAPI spec : Global.getSettings().getAllSpecialItemSpecs()) {
+            if (!ModPlugin.COLONY_ITEM_WHITELIST.contains(spec.getId())) {
+                continue;
             }
-        } else {
-            for (SpecialItemSpecAPI spec : Global.getSettings().getAllSpecialItemSpecs()) {
-                if (!ModPlugin.COLONY_ITEM_WHITELIST.contains(spec.getId())) {
-                    continue;
-                }
-                picker.add(spec.getId());
-            }
+            picker.add(spec.getId());
         }
 
         return picker.pick();
@@ -526,6 +544,10 @@ public class FleetEscortMission extends HubMissionWithBarEvent {
         return result;
     }
 
+    public void preferMarketHasCommodityDemands() {
+        this.search.marketPrefs.add(new MarketHasCommodityDemands());
+    }
+
     public void triggerCreateStandardFleet(int difficulty, String factionId, Vector2f locInHyper) {
         FleetSize size;
         FleetQuality quality;
@@ -748,6 +770,13 @@ public class FleetEscortMission extends HubMissionWithBarEvent {
 
         public boolean conditionsMet() {
             return this.fleetPoints * this.damageThreshold > this.fleet.getFleetPoints();
+        }
+    }
+
+    public static class MarketHasCommodityDemands implements MarketRequirement {
+        @Override
+        public boolean marketMatchesRequirement(MarketAPI market) {
+            return market != null && market.getDemandData() != null && !market.getDemandData().getDemandList().isEmpty();
         }
     }
 
