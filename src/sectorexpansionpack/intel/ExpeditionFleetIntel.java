@@ -109,10 +109,10 @@ public class ExpeditionFleetIntel extends FleetGroupIntel {
         this.params.fleetSizes.add(this.maxFleetSize);
         totalDifficulty -= this.maxFleetSize;
 
-        while (totalDifficulty > 0 || this.params.fleetSizes.size() < 9) {
+        while (totalDifficulty > 0 && this.params.fleetSizes.size() < 9) {
             int min = 3;
             int max = this.maxFleetSize - 2;
-            int diff = min + getRandom().nextInt(max - min + 1);
+            int diff = getRandom().nextInt(min, max);
 
             this.params.fleetSizes.add(diff);
             totalDifficulty -= diff;
