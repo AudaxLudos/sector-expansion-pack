@@ -4,10 +4,10 @@ import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.campaign.*;
 import com.fs.starfarer.api.campaign.econ.Industry;
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
-import com.fs.starfarer.api.impl.campaign.ids.Items;
+import com.fs.starfarer.api.impl.campaign.econ.impl.InstallableItemEffect;
+import com.fs.starfarer.api.impl.campaign.econ.impl.ItemEffectsRepo;
 import com.fs.starfarer.api.util.Misc;
 import com.fs.starfarer.api.util.WeightedRandomPicker;
-import sectorexpansionpack.intel.ExpeditionFleetIntel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,7 +49,10 @@ public class Utils {
     public static Industry pickIndustryToInstallItem(MarketAPI market, SpecialItemData specialItemData) {
         WeightedRandomPicker<Industry> industryPicker = new WeightedRandomPicker<>();
         for (Industry industry : market.getIndustries()) {
-            if (industry.wantsToUseSpecialItem(specialItemData)) {
+            if (!industry.wantsToUseSpecialItem(specialItemData)) {
+                continue;
+            }
+            if (Utils.canSpecialItemBeInstalled(specialItemData.getId(), industry)) {
                 industryPicker.add(industry);
             }
         }
@@ -109,9 +112,12 @@ public class Utils {
         return false;
     }
 
-    public void RunScript() {
-        // import sectorexpansionpack.intel.ExpeditionFleetIntel;
-        // import sectorexpansionpack.intel.misc.ExpeditionFleetDepartureIntel;
-        // new ExpeditionFleetIntel(Items.CRYOARITHMETIC_ENGINE, "Cruor");
+    public static boolean canSpecialItemBeInstalled(String specialItemId, Industry industry) {
+        InstallableItemEffect effect = ItemEffectsRepo.ITEM_EFFECTS.get(specialItemId);
+        if (effect != null) {
+            List<String> unmet = effect.getUnmetRequirements(industry);
+            return unmet == null || unmet.isEmpty();
+        }
+        return true;
     }
 }

@@ -143,7 +143,10 @@ public class EntityFinderMission extends HubMissionWithSearch {
                     continue;
                 }
                 for (Industry otherInd : this.other.getIndustries()) {
-                    if (otherInd.wantsToUseSpecialItem(otherData)) {
+                    if (!otherInd.wantsToUseSpecialItem(otherData)) {
+                        continue;
+                    }
+                    if (Utils.canSpecialItemBeInstalled(otherData.getId(), otherInd)) {
                         return true;
                     }
                 }
@@ -162,7 +165,10 @@ public class EntityFinderMission extends HubMissionWithSearch {
         @Override
         public boolean marketMatchesRequirement(MarketAPI market) {
             for (Industry industry : market.getIndustries()) {
-                if (industry.wantsToUseSpecialItem(this.specialItemData)) {
+                if (!industry.wantsToUseSpecialItem(this.specialItemData)) {
+                    continue;
+                }
+                if (Utils.canSpecialItemBeInstalled(this.specialItemData.getId(), industry)) {
                     return true;
                 }
             }

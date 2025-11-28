@@ -61,16 +61,9 @@ public class ExpeditionFleetIntel extends FleetGroupIntel {
     protected MarketAPI source;
     protected SectorEntityToken target;
 
-    public ExpeditionFleetIntel(String colonyItemId, String sourceMarketName) {
+    public ExpeditionFleetIntel(String sourceMarketName) {
         setRandom(new Random(Utils.random.nextLong()));
         this.efm = new EntityFinderMission();
-        this.specialItemSpec = Global.getSettings().getSpecialItemSpec(colonyItemId);
-        if (this.specialItemSpec == null) {
-            log.info("Failed to find colony item to take");
-            endImmediately();
-            return;
-        }
-        this.specialItemData = new SpecialItemData(this.specialItemSpec.getId(), this.specialItemSpec.getParams());
         List<MarketAPI> markets = Global.getSector().getEconomy().getMarketsCopy();
         MarketAPI source = null;
         for (MarketAPI market : markets) {
@@ -83,6 +76,11 @@ public class ExpeditionFleetIntel extends FleetGroupIntel {
         if (this.source == null) {
             log.info("Failed to source market");
             endImmediately();
+            return;
+        }
+        pickSpecialItem();
+        if (isDone()) {
+            log.info("Failed to find special item");
             return;
         }
         pickTarget();
@@ -142,20 +140,16 @@ public class ExpeditionFleetIntel extends FleetGroupIntel {
             this.revealChance += 0.2f;
         }
 
-        log.info(String.format("Starting %s expedition at %s in the %s, targeting %s in the %s",
+        log.info(String.format("Starting %s expedition at %s in the %s, targeting %s with a %s in the %s",
                 this.source.getFaction().getDisplayName(),
                 this.source.getName(), this.source.getStarSystem().getNameWithLowercaseTypeShort(),
-                this.target.getName(), this.target.getStarSystem().getNameWithLowercaseTypeShort()));
+                this.target.getName(), this.specialItemSpec.getName(),
+                this.target.getStarSystem().getNameWithLowercaseTypeShort()));
     }
 
     public ExpeditionFleetIntel() {
         setRandom(new Random(Utils.random.nextLong()));
         this.efm = new EntityFinderMission();
-        pickSpecialItem();
-        if (isDone()) {
-            log.info("Failed to get special item");
-            return;
-        }
         pickFaction();
         if (isDone()) {
             log.info("Failed to find faction");
@@ -164,6 +158,11 @@ public class ExpeditionFleetIntel extends FleetGroupIntel {
         pickMarket();
         if (isDone()) {
             log.info("Failed to find source market");
+            return;
+        }
+        pickSpecialItem();
+        if (isDone()) {
+            log.info("Failed to get special item");
             return;
         }
         pickTarget();
@@ -252,14 +251,27 @@ public class ExpeditionFleetIntel extends FleetGroupIntel {
             if (!ModPlugin.COLONY_ITEM_WHITELIST.contains(spec.getId())) {
                 continue;
             }
-            specialItemPicker.add(spec);
+            if (spec.getParams() == null || spec.getParams().isEmpty()) {
+                continue;
+            }
+            float weight = 1f;
+            for (Industry industry : this.source.getIndustries()) {
+                if (!industry.wantsToUseSpecialItem(new SpecialItemData(spec.getId(), spec.getParams()))) {
+                    continue;
+                }
+                if (Utils.canSpecialItemBeInstalled(spec.getId(), industry)) {
+                    weight = 3f;
+                }
+            }
+            System.out.println(spec.getId() + " : " + weight);
+            specialItemPicker.add(spec, weight);
         }
 
         this.specialItemSpec = specialItemPicker.pick();
         if (this.specialItemSpec == null) {
             endImmediately();
         }
-        this.specialItemData = new SpecialItemData(this.specialItemSpec.getId(), null);
+        this.specialItemData = new SpecialItemData(this.specialItemSpec.getId(), this.specialItemSpec.getParams());
     }
 
     public void pickFaction() {
@@ -285,7 +297,6 @@ public class ExpeditionFleetIntel extends FleetGroupIntel {
         this.efm.requireMarketNotHidden();
         this.efm.requireMarketFactionNotPlayer();
         this.efm.requireMarketStabilityAtLeast(8);
-        this.efm.requireMarketCanUseSpecialItem(this.specialItemData);
         this.source = this.efm.pickMarket();
         if (this.source == null) {
             endImmediately();
