@@ -120,20 +120,16 @@ public class FleetEscortMission extends HubMissionWithBarEvent {
         requireMarketLocationNot(createdAt.getContainingLocation());
         requireMarketNotHidden();
         requireMarketNotInHyperspace();
-        switch (this.scenarioType) {
-            case COMMODITY_DELIVERY:
-                preferMarketHasCommodityDemands();
-                break;
-            case DRUG_SMUGGLING:
-                break;
-            case REBELLION_SUPPORT:
-                requireMarketFactionNot(getPerson().getFaction().getId());
-                break;
-            case ARTIFACT_DELIVERY:
-                requireMarketFaction(getPerson().getFaction().getId());
-                break;
-            case VIP_ESCORT:
-                break;
+        if (this.scenarioType == ScenarioType.COMMODITY_DELIVERY) {
+            preferMarketHasCommodityDemands();
+        } else if (this.scenarioType == ScenarioType.DRUG_SMUGGLING) {
+            preferMarketFaction(Factions.LUDDIC_PATH, Factions.PIRATES);
+        } else if (this.scenarioType == ScenarioType.REBELLION_SUPPORT) {
+            requireMarketFactionNot(getPerson().getFaction().getId());
+        } else if (this.scenarioType == ScenarioType.ARTIFACT_DELIVERY) {
+            requireMarketFaction(getPerson().getFaction().getId());
+        } else if (this.scenarioType == ScenarioType.VIP_ESCORT) {
+            requireMarketFactionNotHostileTo(getPerson().getFaction().getId());
         }
         MarketAPI market = pickMarket();
         if (market == null) {
