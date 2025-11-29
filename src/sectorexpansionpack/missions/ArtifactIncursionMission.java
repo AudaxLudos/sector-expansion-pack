@@ -9,7 +9,6 @@ import com.fs.starfarer.api.campaign.rules.MemoryAPI;
 import com.fs.starfarer.api.impl.campaign.graid.GroundRaidObjectivePlugin;
 import com.fs.starfarer.api.impl.campaign.graid.SpecialItemRaidObjectivePluginImpl;
 import com.fs.starfarer.api.impl.campaign.ids.*;
-import com.fs.starfarer.api.impl.campaign.missions.hub.HubMissionWithBarEvent;
 import com.fs.starfarer.api.impl.campaign.rulecmd.FireAll;
 import com.fs.starfarer.api.impl.campaign.rulecmd.salvage.MarketCMD;
 import com.fs.starfarer.api.ui.SectorMapAPI;
@@ -19,13 +18,14 @@ import com.fs.starfarer.api.util.WeightedRandomPicker;
 import org.apache.log4j.Logger;
 import sectorexpansionpack.Utils;
 import sectorexpansionpack.intel.misc.ArtifactInstallationIntel;
+import sectorexpansionpack.missions.hub.SEPHubMissionWithBarEvent;
 
 import java.awt.*;
 import java.util.*;
 import java.util.List;
 
 // TODO: Add custom dialogs to quick reaction force fleet
-public class ArtifactIncursionMission extends HubMissionWithBarEvent implements GroundRaidObjectivesListener {
+public class ArtifactIncursionMission extends SEPHubMissionWithBarEvent implements GroundRaidObjectivesListener {
     public static Logger log = Global.getLogger(ArtifactIncursionMission.class);
     public static float MILITARY_CONTACT_CHANCE = 0.5f;
     public static float MISSION_DURATION = 120f;
@@ -391,26 +391,6 @@ public class ArtifactIncursionMission extends HubMissionWithBarEvent implements 
         }
     }
 
-    public void requireMarketHasSpecialItemsInstalled() {
-        this.search.marketReqs.add(new EntityFinderMission.MarketUsesSpecialItems());
-    }
-
-    public void requireMarketCanUseSpecialItem(SpecialItemData specialItemData) {
-        this.search.marketReqs.add(new EntityFinderMission.MarketCanUseSpecialItemReq(specialItemData));
-    }
-
-    public void preferMarketHasCompatibleSpecialItemsWithOther(MarketAPI other) {
-        this.search.marketPrefs.add(new EntityFinderMission.MarketHasCompatibleSpecialItemsWithOther(other));
-    }
-
-    public void connectWithMarketFactionChanged(Object from, Object to, MarketAPI market) {
-        this.connections.add(new StageConnection(from, to, new EntityFinderMission.MarketFactionChangedChecker(market)));
-    }
-
-    public void setStageOnMarketFactionChanged(Object to, MarketAPI market) {
-        this.connections.add(new StageConnection(null, to, new EntityFinderMission.MarketFactionChangedChecker(market)));
-    }
-
     public enum Stage {
         RAID_ARTIFACT,
         DELIVER_ARTIFACT,
@@ -418,20 +398,5 @@ public class ArtifactIncursionMission extends HubMissionWithBarEvent implements 
         FAILED,
         FAILED_DECIV,
         FAILED_MARKET_FACTION_CHANGED
-    }
-
-    public static class MarketFactionChangedChecker implements ConditionChecker {
-        public String prevFactionId;
-        public MarketAPI market;
-
-        public MarketFactionChangedChecker(MarketAPI market) {
-            this.prevFactionId = market.getFactionId();
-            this.market = market;
-        }
-
-
-        public boolean conditionsMet() {
-            return !java.util.Objects.equals(this.market.getFactionId(), this.prevFactionId);
-        }
     }
 }

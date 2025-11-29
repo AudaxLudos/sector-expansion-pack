@@ -12,7 +12,6 @@ import com.fs.starfarer.api.characters.PersonAPI;
 import com.fs.starfarer.api.impl.campaign.events.OfficerManagerEvent;
 import com.fs.starfarer.api.impl.campaign.ids.*;
 import com.fs.starfarer.api.impl.campaign.intel.contacts.ContactIntel;
-import com.fs.starfarer.api.impl.campaign.missions.hub.HubMissionWithBarEvent;
 import com.fs.starfarer.api.impl.campaign.missions.hub.ReqMode;
 import com.fs.starfarer.api.impl.campaign.procgen.Constellation;
 import com.fs.starfarer.api.impl.campaign.rulecmd.salvage.MarketCMD;
@@ -24,8 +23,8 @@ import com.fs.starfarer.api.util.Misc;
 import com.fs.starfarer.api.util.WeightedRandomPicker;
 import org.apache.log4j.Logger;
 import org.lwjgl.util.vector.Vector2f;
-import sectorexpansionpack.MissionScenarioSpec;
 import sectorexpansionpack.Utils;
+import sectorexpansionpack.missions.hub.SEPHubMissionWithScenario;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -33,18 +32,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-public class SearchAndRescueMissionV2 extends HubMissionWithBarEvent {
+public class SearchAndRescueMissionV2 extends SEPHubMissionWithScenario {
     public static final float MISSION_DURATION = 120f;
     public static float OFFICER_EXCEPTIONAL_CHANCE = 0.05f;
     public static float OFFICER_MENTORED_CHANCE = 0.5f;
     public static float CONTACT_MILITARY_CHANCE = 0.25f;
     public static float BAR_MILITARY_CHANCE = 0.4f;
     public static Logger log = Global.getLogger(SearchAndRescueMissionV2.class);
-    protected MissionScenarioSpec scenario;
     protected PersonPostType survivorPostType;
     protected PersonAPI survivor;
     protected boolean survivorAlive = true;
-    protected ScenarioType scenarioType;
     protected SectorEntityToken hideout;
     protected SectorEntityToken entity;
     protected float ransomAmount;
@@ -59,11 +56,12 @@ public class SearchAndRescueMissionV2 extends HubMissionWithBarEvent {
 
     @Override
     protected boolean create(MarketAPI createdAt, boolean barEvent) {
-        this.scenario = Utils.pickMissionScenario(getMissionId(), getGenRandom());
-        if (Utils.isInEnum(this.scenario.getType(), ScenarioType.class)) {
-            this.scenarioType = ScenarioType.valueOf(this.scenario.getType());
-        } else {
-            log.error("Scenario has no type");
+        if (!getScenario()) {
+            log.info("Failed to pick a scenario");
+            return false;
+        }
+        if (!getScenarioType(ScenarioType.class)) {
+            log.info("Failed to find scenario type");
             return false;
         }
 
@@ -170,53 +168,8 @@ public class SearchAndRescueMissionV2 extends HubMissionWithBarEvent {
         setCreditReward(getCreditsReward() + bonus);
         this.ransomAmount = Math.round(getCreditsReward() * (0.8f + 0.4f * getGenRandom().nextFloat()) / 1000f) * 1000f;
 
-        Vector2f locInHyper;
-        SectorEntityToken target;
-        if (this.hideout != null) {
-            locInHyper = this.hideout.getLocationInHyperspace();
-            target = this.hideout;
-        } else {
-            locInHyper = this.entity.getLocationInHyperspace();
-            target = this.entity;
-        }
-        for (String complication : this.scenario.getComplications()) {
-            List<String> tags = List.of(complication.split(","));
+        setScenarioComplications(Stage.class, log);
 
-            if (Utils.isInEnum(this.scenario.getCreditReward(), CreditReward.class)) {
-                log.info("Stage does not exist skipping complication");
-                continue;
-            }
-            if (Global.getSector().getFaction(tags.get(1)) == null) {
-                log.info("Faction does not exist skipping complication");
-                continue;
-            }
-
-            Stage stage = Stage.valueOf(tags.get(0));
-            String faction = tags.get(1);
-            int difficulty = Integer.parseInt(tags.get(2));
-
-            beginWithinHyperspaceRangeTrigger(this.entity, 3f, false, stage);
-            triggerCreateStandardFleet(difficulty, faction, locInHyper);
-            if (tags.contains("hostile")) {
-                triggerSetFleetFlagsWithReason(MemFlags.MEMORY_KEY_MAKE_HOSTILE);
-            }
-            if (tags.contains("aggressive")) {
-                triggerSetFleetFlagsWithReason(MemFlags.MEMORY_KEY_MAKE_AGGRESSIVE);
-            }
-            if (tags.contains("longpursuit")) {
-                triggerSetFleetFlagPermanent(MemFlags.MEMORY_KEY_ALLOW_LONG_PURSUIT);
-            }
-            if (tags.contains("alwayspursuit")) {
-                triggerSetFleetFlag(MemFlags.MEMORY_KEY_MAKE_ALWAYS_PURSUE);
-            }
-            if (tags.contains("lowrep")) {
-                triggerMakeLowRepImpact();
-            }
-            triggerPickLocationAroundEntity(target, 90f);
-            triggerSpawnFleetAtPickedLocation();
-            triggerOrderFleetPatrol(target);
-            endTrigger();
-        }
         return true;
     }
 
@@ -316,52 +269,53 @@ public class SearchAndRescueMissionV2 extends HubMissionWithBarEvent {
         preferSystemInInnerSector();
         preferSystemInDirectionOfOtherMissions();
 
-        switch (this.scenarioType) {
-            case STRANDED_IN_WRECK:
-                requireEntityTags(ReqMode.ALL, Tags.SALVAGEABLE);
-                requireEntityType(Entities.WRECK);
-                entity = pickEntity();
-                break;
-            case CAPTURED_IN_FLEET:
-                // TODO: Add a way to customize fleet
-                beginStageTrigger(Stage.FIND);
-                triggerCreateStandardFleet(10, Factions.PIRATES, this.hideout.getLocationInHyperspace());
-                triggerMakeLowRepImpact();
-                triggerMakeFleetIgnoreOtherFleets();
-                triggerMakeFleetIgnoredByOtherFleets();
-                triggerMakeLowRepImpact();
-                triggerOrderFleetPatrol(this.hideout);
-                triggerFleetAddDefeatTrigger("SEPSARV2FleetDefeated");
-                triggerFleetSetNoFactionInName();
-                triggerFleetSetName("Terrorist Group");
-                endTrigger();
-                List<CampaignFleetAPI> fleets = runStageTriggersReturnFleets(Stage.FIND);
-                if (!fleets.isEmpty()) {
-                    entity = fleets.get(0);
-                }
-                break;
-            case CAPTURED_IN_PLANET:
-            case STRANDED_IN_PLANET:
-                requireSystemInterestingAndNotCore();
-                requirePlanetNotGasGiant();
-                requirePlanetNotStar();
-                preferPlanetNotFullySurveyed();
-                preferPlanetUnpopulated();
-                entity = pickPlanet();
-                break;
-            case CAPTURED_IN_MARKET:
-                requireMarketFaction(Factions.PIRATES);
-                requireMarketNotHidden();
-                requireMarketStabilityAtLeast(7);
-                MarketAPI market = pickMarket();
-                if (market != null) {
-                    entity = market.getPrimaryEntity();
-                }
-            default:
-                break;
+        if (this.scenarioType == ScenarioType.STRANDED_IN_WRECK) {
+            requireEntityTags(ReqMode.ALL, Tags.SALVAGEABLE);
+            requireEntityType(Entities.WRECK);
+            entity = pickEntity();
+        } else if (this.scenarioType == ScenarioType.CAPTURED_IN_FLEET) {
+            // TODO: Add a way to customize fleet
+            beginStageTrigger(Stage.FIND);
+            triggerCreateStandardFleet(10, Factions.PIRATES, this.hideout.getLocationInHyperspace());
+            triggerMakeLowRepImpact();
+            triggerMakeFleetIgnoreOtherFleets();
+            triggerMakeFleetIgnoredByOtherFleets();
+            triggerMakeLowRepImpact();
+            triggerOrderFleetPatrol(this.hideout);
+            triggerFleetAddDefeatTrigger("SEPSARV2FleetDefeated");
+            triggerFleetSetNoFactionInName();
+            triggerFleetSetName("Terrorist Group");
+            endTrigger();
+            List<CampaignFleetAPI> fleets = runStageTriggersReturnFleets(Stage.FIND);
+            if (!fleets.isEmpty()) {
+                entity = fleets.get(0);
+            }
+        } else if (this.scenarioType == ScenarioType.STRANDED_IN_PLANET || this.scenarioType == ScenarioType.CAPTURED_IN_PLANET) {
+            requireSystemInterestingAndNotCore();
+            requirePlanetNotGasGiant();
+            requirePlanetNotStar();
+            preferPlanetNotFullySurveyed();
+            preferPlanetUnpopulated();
+            entity = pickPlanet();
+        } else if (this.scenarioType == ScenarioType.CAPTURED_IN_MARKET) {
+            requireMarketFaction(Factions.PIRATES);
+            requireMarketNotHidden();
+            requireMarketStabilityAtLeast(7);
+            MarketAPI market = pickMarket();
+            if (market != null) {
+                entity = market.getPrimaryEntity();
+            }
         }
 
         return entity;
+    }
+
+    @Override
+    public SectorEntityToken getGotoEntity(Object stage) {
+        if (stage == Stage.FIND) {
+            return this.entity;
+        }
+        return getPerson().getMarket().getPrimaryEntity();
     }
 
     @Override

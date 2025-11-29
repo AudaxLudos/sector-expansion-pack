@@ -343,7 +343,7 @@ sep_fem_s3OfferTextBar,SEPFEMShowOfferBar,$sep_fem_scenarioId == fem3,,"The face
 
 $HeOrShe sends you a location. ""Guide the fleet safely to $sep_fem_mrktName in the $sep_fem_sysName, ensure the cargo is delivered, and your role is done. In return, you'll receive $sep_fem_creditReward and a favorable note to who I work with.""
 
-$HeOrShe pause. ""Are you in... or out?""",,
+$HeOrShe pauses. ""Are you in... or out?""",,
 ## FEM4 dialogues,,,,,,
 sep_fem_s4Blurb,SEPFEMShowBlurb,$sep_fem_scenarioId == fem4,,"""An envoy needs to mediate issues on another colony. Their fleet needs a military escort to protect and guide them to their desitination.""",,
 sep_fem_s4OfferOption,SEPFEMShowOption,$sep_fem_scenarioId == fem4,,,sep_fem_start:Ask about escorting an envoy to another colony,
