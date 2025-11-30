@@ -145,11 +145,7 @@ public class SearchAndRescueMissionV2 extends SEPHubMissionWithScenario {
             setTimeLimit(FleetEscortMission.Stage.FAILED, MISSION_DURATION, null);
         }
 
-        if (Utils.isInEnum(this.scenario.getCreditReward(), CreditReward.class)) {
-            setCreditReward(CreditReward.valueOf(this.scenario.getCreditReward()));
-        } else {
-            setCreditReward(CreditReward.HIGH);
-        }
+        setScenarioCreditReward(this.scenario.getCreditReward());
 
         int defenderStr = Math.max(50, Math.round(getCreditsReward() / 250f / 100f) * 100);
         if (defenderStr == 50) {

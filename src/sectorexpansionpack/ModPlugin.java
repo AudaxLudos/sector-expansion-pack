@@ -14,9 +14,7 @@ import sectorexpansionpack.intel.ExpeditionFleetManager;
 import sectorexpansionpack.intel.IncursionFleetManager;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 public class ModPlugin extends BaseModPlugin {
     public static List<String> COLONY_ITEM_WHITELIST = new ArrayList<>();
@@ -133,16 +131,18 @@ public class ModPlugin extends BaseModPlugin {
                 spec.setMissionId(row.getString("missionId"));
                 spec.setFrequency((float) row.optDouble("frequency", 10f));
                 spec.setDuration((float) row.optDouble("duration", -1f));
-                spec.setCreditReward(row.optString("type", null));
+                spec.setCreditReward(row.optString("creditReward", null));
                 spec.setType(row.optString("type", null));
                 String rawComplications = row.getString("complications");
                 if (rawComplications != null && !rawComplications.isBlank()) {
-                    List<String> complications = List.of(rawComplications.replaceAll("\\s+", "").split("\\|"));
+                    List<String> c = Arrays.asList(rawComplications.replaceAll("\\s+", "").split("\\|"));
+                    HashSet<String> complications = new HashSet<>(c);
                     spec.setComplications(complications);
                 }
                 String rawTags = row.getString("tags");
                 if (rawTags != null && !rawTags.isBlank()) {
-                    List<String> tags = List.of(rawTags.replaceAll("\\s+", "").split(","));
+                    List<String> t = Arrays.asList(rawTags.replaceAll("\\s+", "").split(","));
+                    HashSet<String> tags = new HashSet<>(t);
                     spec.setTags(tags);
                 }
                 spec.setData1(row.optString("data1", null));

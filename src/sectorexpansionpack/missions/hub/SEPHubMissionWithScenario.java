@@ -44,6 +44,17 @@ public abstract class SEPHubMissionWithScenario extends SEPHubMissionWithBarEven
         return this.scenarioType != null;
     }
 
+    public void setScenarioCreditReward(String creditReward) {
+        if (Utils.isInEnum(creditReward, CreditReward.class)) {
+            setCreditReward(CreditReward.valueOf(this.scenario.getCreditReward()));
+        } else if (Integer.parseInt(creditReward) >= 1000) {
+            int r = Math.abs(Integer.parseInt(creditReward));
+            setCreditReward(r, r + 10000);
+        } else {
+            setCreditReward(CreditReward.HIGH);
+        }
+    }
+
     public <E extends Enum<E>> void setScenarioComplications(Class<E> enumClass, Logger log) {
         for (String complication : this.scenario.getComplications()) {
             List<String> tags = List.of(complication.split(","));
@@ -64,21 +75,23 @@ public abstract class SEPHubMissionWithScenario extends SEPHubMissionWithBarEven
                 continue;
             }
 
-            if (!Utils.isInEnum(tags.get(0), enumClass)) {
+            Object stage;
+            if (Utils.isInEnum(tags.get(0), enumClass)) {
+                stage = Enum.valueOf(enumClass, tags.get(0));
+            } else {
                 if (log != null) {
                     log.info("Failed to find stage for complication");
                 }
                 continue;
             }
-            if (Global.getSector().getFaction(tags.get(1)) == null) {
+            String factionId = getComplicationFactionId(tags.get(1));
+            if (factionId == null) {
                 if (log != null) {
                     log.info("Failed to find faction for complication");
                 }
                 continue;
             }
 
-            Object stage = Enum.valueOf(enumClass, tags.get(0));
-            String faction = tags.get(1);
             boolean hyperspaceOnly = tags.contains("hyperspaceOnly");
 
             SectorEntityToken gotoEntity = getGotoEntity(stage);
@@ -100,7 +113,7 @@ public abstract class SEPHubMissionWithScenario extends SEPHubMissionWithBarEven
             }
 
             beginWithinHyperspaceRangeTrigger(gotoEntity, rangeLY, hyperspaceOnly, stage);
-            triggerCreateStandardFleet(difficulty, faction, gotoEntity.getLocationInHyperspace());
+            triggerCreateStandardFleet(difficulty, factionId, gotoEntity.getLocationInHyperspace());
             if (tags.contains("hostile")) {
                 triggerSetFleetFlagsWithReason(MemFlags.MEMORY_KEY_MAKE_HOSTILE);
             }
@@ -115,7 +128,7 @@ public abstract class SEPHubMissionWithScenario extends SEPHubMissionWithBarEven
             }
             if (tags.contains("lowRep")) {
                 triggerMakeLowRepImpact();
-            } else {
+            } else if (tags.contains("noRep")) {
                 triggerMakeNoRepImpact();
             }
             if (tags.contains("nearPlayer")) {
@@ -151,6 +164,25 @@ public abstract class SEPHubMissionWithScenario extends SEPHubMissionWithBarEven
     }
 
     public void setCustomTagTriggers(List<String> tags) {
+    }
+
+    public String getComplicationFactionId(String tag) {
+        if (Global.getSector().getFaction(tag) != null) {
+            return Global.getSector().getFaction(tag).getId();
+        } else if (tag.equals("enemy")) {
+            return getComplicationEnemyFactionId();
+        } else if (tag.equals("ally")) {
+            return getComplicationAllyFactionId();
+        }
+        return null;
+    }
+
+    public String getComplicationEnemyFactionId() {
+        return null;
+    }
+
+    public String getComplicationAllyFactionId() {
+        return null;
     }
 
     public SectorEntityToken getGotoEntity(Object stage) {

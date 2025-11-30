@@ -1,6 +1,7 @@
 package sectorexpansionpack;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 public class MissionScenarioSpec {
@@ -14,8 +15,8 @@ public class MissionScenarioSpec {
 
     protected String type;
 
-    protected List<String> complications = new ArrayList<>();
-    protected List<String> tags = new ArrayList<>();
+    protected HashSet<String> complications = new HashSet<>();
+    protected HashSet<String> tags = new HashSet<>();
 
     protected String data1;
     protected String data2;
@@ -73,7 +74,7 @@ public class MissionScenarioSpec {
         return new ArrayList<>(this.complications);
     }
 
-    public void setComplications(List<String> complications) {
+    public void setComplications(HashSet<String> complications) {
         this.complications = complications;
     }
 
@@ -81,7 +82,7 @@ public class MissionScenarioSpec {
         return new ArrayList<>(this.tags);
     }
 
-    public void setTags(List<String> tags) {
+    public void setTags(HashSet<String> tags) {
         this.tags = tags;
     }
 

@@ -215,12 +215,7 @@ public class FleetEscortMission extends SEPHubMissionWithScenario {
             setTimeLimit(Stage.FAILED, MISSION_DURATION, null);
         }
 
-        if (Utils.isInEnum(this.scenario.getCreditReward(), CreditReward.class)) {
-            setCreditReward(CreditReward.valueOf(this.scenario.getCreditReward()));
-        } else {
-            setCreditReward(CreditReward.HIGH);
-        }
-
+        setScenarioCreditReward(this.scenario.getCreditReward());
         setRepChanges(0.05f, 0.1f, 0.05f, 0.1f);
         setScenarioComplications(Stage.class, log);
 
