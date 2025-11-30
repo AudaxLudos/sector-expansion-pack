@@ -349,18 +349,18 @@ $HeOrShe sends you a location. ""Guide the fleet safely to $sep_fem_mrktName in 
 
 $HeOrShe pauses. ""Are you in... or out?""",,
 ## FEM4 dialogues,,,,,,
-sep_fem_s4Blurb,SEPFEMShowBlurb,$sep_fem_scenarioId == fem4,,"""An envoy needs to mediate issues on another colony. Their fleet needs a military escort to guide and protect them to their desitination.""",,
-sep_fem_s4OfferOption,SEPFEMShowOption,$sep_fem_scenarioId == fem4,,,sep_fem_start:Ask about escorting an envoy to another colony,
-sep_fem_s4OfferText,SEPFEMShowOffer,$sep_fem_scenarioId == fem4,"SetTextHighlightColors h h h
+sep_fem_s4Blurb,SEPFEMShowBlurb,$sep_fem_scenarioId == fem5,,"""An envoy needs to mediate issues on another colony. Their fleet needs a military escort to guide and protect them to their desitination.""",,
+sep_fem_s4OfferOption,SEPFEMShowOption,$sep_fem_scenarioId == fem5,,,sep_fem_start:Ask about escorting an envoy to another colony,
+sep_fem_s4OfferText,SEPFEMShowOffer,$sep_fem_scenarioId == fem5,"SetTextHighlightColors h h h
 SetTextHighlights $sep_fem_mrktName $sep_fem_sysName $sep_fem_creditReward
 Call $sep_fem_ref showMap ""Target: $sep_fem_sysName""","$HeOrShe adjusts $hisOrHer posture before speaking. ""An envoy needs to mediate some issues on $sep_fem_mrktName in the $sep_fem_sysName. The colony refuses any official $Faction military escorts, so we need a fleet that just happens to be heading in the same direction.""
 
 $HeOrShe glances $hisOrHer datapad, then back at you. ""Your job is to accompany the envoy's fleet to the colony, wait for them to finish their assignment, and then escort them back here. Nothing more complicated than that.""
 
 $HeOrShe clasps $hisOrHer hands. ""Once the envoy returns safely, you'll receive $sep_fem_creditReward. So, what do you say?""",,
-sep_fem_s4BlurbBar,SEPFEMShowBlurbBar,$sep_fem_scenarioId == fem4,,You noticed a well spoken $manOrWoman converses with people within the bar as if probing them for something.,,
-sep_fem_s4OfferOptionBar,SEPFEMShowOptionBar,$sep_fem_scenarioId == fem4,,,sep_fem_startBar:Sit beside the $manOrWoman probing info from bar customers,
-sep_fem_s4OfferTextBar,SEPFEMShowOfferBar,$sep_fem_scenarioId == fem4,"SetTextHighlightColors h h h
+sep_fem_s4BlurbBar,SEPFEMShowBlurbBar,$sep_fem_scenarioId == fem5,,You noticed a well spoken $manOrWoman converses with people within the bar as if probing them for something.,,
+sep_fem_s4OfferOptionBar,SEPFEMShowOptionBar,$sep_fem_scenarioId == fem5,,,sep_fem_startBar:Sit beside the $manOrWoman probing info from bar customers,
+sep_fem_s4OfferTextBar,SEPFEMShowOfferBar,$sep_fem_scenarioId == fem5,"SetTextHighlightColors h h h
 SetTextHighlights $sep_fem_mrktName $sep_fem_sysName $sep_fem_creditReward
 Call $sep_fem_ref showMap ""Target: $sep_fem_sysName""","The $manOrWoman starts a casual conversation with you about various events in the sector. After a moment, $heOrShe gives you an evaluating look. ""Captain,"" $HeOrShe says with certainty, ""I believe you might just be the one I'm looking for.""
 

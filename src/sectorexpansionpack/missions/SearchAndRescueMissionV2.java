@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+// TODO: Make into version 1 on 1.0 release
 public class SearchAndRescueMissionV2 extends SEPHubMissionWithScenario {
     public static final float MISSION_DURATION = 120f;
     public static float OFFICER_EXCEPTIONAL_CHANCE = 0.05f;

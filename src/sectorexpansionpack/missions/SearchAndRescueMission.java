@@ -31,6 +31,7 @@ import java.awt.*;
 import java.util.*;
 import java.util.List;
 
+// TODO: Delete before 1.0
 public class SearchAndRescueMission extends HubMissionWithBarEvent {
     public static JSONObject SCENARIO_DEFAULTS;
     public static Logger log = Global.getLogger(SearchAndRescueMission.class);
@@ -46,6 +47,11 @@ public class SearchAndRescueMission extends HubMissionWithBarEvent {
         super();
         SCENARIO_DEFAULTS = ModPlugin.getMissionScenarioDefaults("sep_sar");
         setGenRandom(new Random(Utils.random.nextLong()));
+    }
+
+    @Override
+    public boolean shouldShowAtMarket(MarketAPI market) {
+        return false;
     }
 
     @Override

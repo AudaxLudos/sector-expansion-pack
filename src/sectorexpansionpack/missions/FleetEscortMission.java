@@ -7,7 +7,6 @@ import com.fs.starfarer.api.campaign.rules.MemoryAPI;
 import com.fs.starfarer.api.impl.campaign.fleets.FleetFactoryV3;
 import com.fs.starfarer.api.impl.campaign.ids.*;
 import com.fs.starfarer.api.impl.campaign.rulecmd.salvage.MarketCMD;
-import com.fs.starfarer.api.impl.campaign.rulecmd.salvage.special.BaseSalvageSpecial;
 import com.fs.starfarer.api.ui.SectorMapAPI;
 import com.fs.starfarer.api.ui.TooltipMakerAPI;
 import com.fs.starfarer.api.util.Misc;
@@ -15,7 +14,6 @@ import com.fs.starfarer.api.util.WeightedRandomPicker;
 import org.apache.log4j.Logger;
 import sectorexpansionpack.ModPlugin;
 import sectorexpansionpack.Utils;
-import sectorexpansionpack.intel.misc.ArtifactInstallationIntel;
 import sectorexpansionpack.missions.hub.SEPHubMissionWithScenario;
 
 import java.awt.*;
@@ -95,8 +93,6 @@ public class FleetEscortMission extends SEPHubMissionWithScenario {
             preferMarketFaction(Factions.LUDDIC_PATH, Factions.PIRATES);
         } else if (this.scenarioType == ScenarioType.REBELLION_SUPPORT) {
             requireMarketFactionNot(getPerson().getFaction().getId());
-        } else if (this.scenarioType == ScenarioType.ARTIFACT_DELIVERY) {
-            requireMarketFaction(getPerson().getFaction().getId());
         } else if (this.scenarioType == ScenarioType.VIP_ESCORT) {
             requireMarketFactionNotHostileTo(getPerson().getFaction().getId());
         }
@@ -131,12 +127,6 @@ public class FleetEscortMission extends SEPHubMissionWithScenario {
             triggerAddCommodityFractionDrop(Commodities.MARINES, 0.4f);
             triggerAddCommodityFractionDrop(Commodities.HAND_WEAPONS, 0.1f);
             triggerAddCommodityFractionDrop(Commodities.FUEL, 0.3f);
-        } else if (this.scenarioType == ScenarioType.ARTIFACT_DELIVERY) {
-            triggerScaleFleetToPlayerCapabilities(FleetStrengthType.QUALITY);
-            triggerFleetSetFreighterData(0f, 0.1f, true);
-            triggerFleetSetTankerData(0f, 0.1f, true);
-            this.itemId = pickSpecialItemId();
-            triggerAddSpecialItemDrop(this.itemId, null);
         } else if (this.scenarioType == ScenarioType.VIP_ESCORT) {
             triggerSetFleetCombatFleetPoints(30f);
             triggerFleetSetFreighterData(0f, 0.1f, true);
@@ -173,8 +163,6 @@ public class FleetEscortMission extends SEPHubMissionWithScenario {
                 removeCommodityFraction(this.fleet, Commodities.MARINES, 0.75f + getGenRandom().nextFloat() * 0.2f);
                 removeCommodityFraction(this.fleet, Commodities.HAND_WEAPONS, 0.75f + getGenRandom().nextFloat() * 0.2f);
                 removeCommodityFraction(this.fleet, Commodities.FUEL, 0.75f + getGenRandom().nextFloat() * 0.1f);
-            } else if (this.scenarioType == ScenarioType.ARTIFACT_DELIVERY) {
-                BaseSalvageSpecial.clearExtraSalvage(this.fleet);
             }
         });
         endTrigger();
@@ -312,11 +300,6 @@ public class FleetEscortMission extends SEPHubMissionWithScenario {
             if (commoditySpec != null) {
                 set("$sep_fem_itemName", commoditySpec.getName());
             }
-        } else if (this.scenarioType == ScenarioType.ARTIFACT_DELIVERY) {
-            SpecialItemSpecAPI itemSpec = Global.getSettings().getSpecialItemSpec(this.itemId);
-            if (itemSpec != null) {
-                set("$sep_fem_itemName", itemSpec.getName());
-            }
         }
     }
 
@@ -377,36 +360,6 @@ public class FleetEscortMission extends SEPHubMissionWithScenario {
             market.getStability().addTemporaryModFlat(90f, "mod_" + Misc.genUID(), "Recent armed rebellion", -3f);
             log.info(String.format("Destabilising %s in the %s for -3f Stability", market.getName(),
                     market.getStarSystem().getNameWithLowercaseTypeShort()));
-        } else if (this.scenarioType == ScenarioType.ARTIFACT_DELIVERY) {
-            SpecialItemSpecAPI specialItemSpec = Global.getSettings().getSpecialItemSpec(this.itemId);
-            if (specialItemSpec == null) {
-                return;
-            }
-            SpecialItemData specialItemData = new SpecialItemData(specialItemSpec.getId(), specialItemSpec.getParams());
-
-            resetSearch();
-            requireMarketFaction(getPerson().getFaction().getId());
-            requireMarketNotHidden();
-            requireMarketNotInHyperspace();
-            requireMarketFactionNotPlayer();
-            requireMarketCanUseSpecialItem(specialItemData);
-            preferMarketSizeAtMost(100);
-            preferMarketIs(market);
-            MarketAPI market2 = pickMarket();
-
-            if (market2 == null) {
-                log.info("Failed to find market to install special item");
-                return;
-            }
-
-            // TODO: Delay special item installation by some days
-            // TODO: Transfer previous colony item if any to another same faction market
-            Industry ind = Utils.pickIndustryToInstallItem(market2, specialItemData);
-            ind.setSpecialItem(specialItemData);
-            new ArtifactInstallationIntel(market2, ind, specialItemSpec);
-            log.info(String.format("Installing %s to %s facility %s %s in the %s",
-                    specialItemSpec.getName(), ind.getCurrentName(), market2.getOnOrAt(),
-                    market2.getName(), market2.getStarSystem().getNameWithLowercaseTypeShort()));
         } else if (this.scenarioType == ScenarioType.VIP_ESCORT) {
             if (Objects.equals(market.getFaction().getId(), getPerson().getFaction().getId())) {
                 return;
@@ -495,7 +448,6 @@ public class FleetEscortMission extends SEPHubMissionWithScenario {
         COMMODITY_DELIVERY,
         DRUG_SMUGGLING,
         REBELLION_SUPPORT,
-        ARTIFACT_DELIVERY,
         VIP_ESCORT
     }
 }
