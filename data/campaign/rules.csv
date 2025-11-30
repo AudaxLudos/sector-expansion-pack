@@ -295,8 +295,8 @@ contact_declineBarNoContinue:Decline",
 sep_fem_s1Blurb,SEPFEMShowBlurb,$sep_fem_scenarioId == fem1,,"""A trader spent all their credits on commodities and forgot to hire protection, now they are looking for a quick hired gun to escort their trade fleet.""",,
 sep_fem_s1OfferOption,SEPFEMShowOption,$sep_fem_scenarioId == fem1,,,sep_fem_start:Ask about the trader looking for a quick hired gun,
 sep_fem_s1OfferText,SEPFEMShowOffer,$sep_fem_scenarioId == fem1,"SetTextHighlightColors h h h h
-SetTextHighlights $sep_fem_itemName $sep_fem_mrktNme $sep_fem_sysName $sep_fem_creditReward
-Call $sep_fem_ref showMap ""Target: $sep_fem_sysName""","""A trader bought a supply of $sep_fem_itemName and forgot to hire combat ships to protect their shipment,"" $heOrShe explains. ""They need a combat capable fleet, to escort them all the way to $sep_fem_mrktNme in the $sep_fem_sysName.""
+SetTextHighlights $sep_fem_itemName $sep_fem_mrktName $sep_fem_sysName $sep_fem_creditReward
+Call $sep_fem_ref showMap ""Target: $sep_fem_sysName""","""A trader bought a supply of $sep_fem_itemName and forgot to hire combat ships to protect their shipment,"" $heOrShe explains. ""They need a combat capable fleet, to escort them all the way to $sep_fem_mrktName in the $sep_fem_sysName.""
 
 $HeOrShe adds, ""It's a one way trip. You go there, wait for the delivery to finish, and your job is done.""
 
@@ -304,24 +304,24 @@ $HeOrShe continues. ""In exchange, the trader is willing to split the profits se
 sep_fem_s1BlurbBar,SEPFEMShowBlurbBar,$sep_fem_scenarioId == fem1,,An anxious $manOrWoman with $hisOrHer hand on $hisOrHer temple is looking at trade papers with concern.,,
 sep_fem_s1OfferOptionBar,SEPFEMShowOptionBar,$sep_fem_scenarioId == fem1,,,sep_fem_startBar:Approach the $manOrWoman looking at trade papers with corncern,
 sep_fem_s1OfferTextBar,SEPFEMShowOfferBar,$sep_fem_scenarioId == fem1,"SetTextHighlightColors h h h h
-SetTextHighlights $sep_fem_itemName $sep_fem_mrktNme $sep_fem_sysName $sep_fem_creditReward
+SetTextHighlights $sep_fem_itemName $sep_fem_mrktName $sep_fem_sysName $sep_fem_creditReward
 Call $sep_fem_ref showMap ""Target: $sep_fem_sysName""","The $manOrWoman sizes you up with a quick glance, then checks their datapad. Their expression shifts, as if something they see there confirms a good impression.
 
-They lean in a little. ""I picked up a surplus of $sep_fem_itemName, but made the mistake of not hiring any combat escorts. My transports are supposed to head to $sep_fem_mrktNme in the $sep_fem_sysName, but let’s just say fleets like mine tend to get noticed.""
+They lean in a little. ""I picked up a surplus of $sep_fem_itemName, but made the mistake of not hiring any combat escorts. My transports are supposed to head to $sep_fem_mrktName in the $sep_fem_sysName, but let’s just say fleets like mine tend to get noticed.""
 
 They swirl the drink in their glass. ""I need the right kind of fleet to escort them and get there without trouble. In exchange, I am willing to split the profits seventy thirty, which comes out to $sep_fem_creditReward."" $HeOrShe says, slowly sliding a contract toward you. ""Interested?""",,
 ## FEM2 dialogues,,,,,,
 sep_fem_s2Blurb,SEPFEMShowBlurb,$sep_fem_scenarioId == fem2,,"""This one is interesting. A medical transport needs an escort. It's headed to a colony that might be dealing with some kind of virus, and a cure was manufactured here.""",,
 sep_fem_s2OfferOption,SEPFEMShowOption,$sep_fem_scenarioId == fem2,,,sep_fem_start:Ask about escorting a medical transport headed to a colony,
 sep_fem_s2OfferText,SEPFEMShowOffer,$sep_fem_scenarioId == fem2,"SetTextHighlightColors h h h
-SetTextHighlights $sep_fem_mrktNme $sep_fem_sysName $sep_fem_creditReward
-Call $sep_fem_ref showMap ""Target: $sep_fem_sysName""","$HeOrShe taps $hisOrHer tripad. ""We have a medical transport scheduled to depart, carrying what is officially listed as a cure for a virus."" $HisOrHer tone seemingly questionable. ""It needs an escort to $sep_fem_mrktNme in the $sep_fem_sysName, then back here, a round trip, curiously enough.""
+SetTextHighlights $sep_fem_mrktName $sep_fem_sysName $sep_fem_creditReward
+Call $sep_fem_ref showMap ""Target: $sep_fem_sysName""","$HeOrShe taps $hisOrHer tripad. ""We have a medical transport scheduled to depart, carrying what is officially listed as a cure for a virus."" $HisOrHer tone seemingly questionable. ""It needs an escort to $sep_fem_mrktName in the $sep_fem_sysName, then back here, a round trip, curiously enough.""
 
 $HeOrShe continues. ""Anyways, once the escort is completed, a hefty $sep_fem_creditReward payment has been authorized by fleet intel. Interested?""",,
 sep_fem_s2BlurbBar,SEPFEMShowBlurbBar,$sep_fem_scenarioId == fem2,,"In the dark corner of the bar, a tripad shines on the face of a $manOrWoman, $hisOrHer eyes glances at you. ",,
 sep_fem_s2OfferOptionBar,SEPFEMShowOptionBar,$sep_fem_scenarioId == fem2,,,sep_fem_startBar:Approach the $manOrWoman in the dark corner of the bar staring at you,
 sep_fem_s2OfferTextBar,SEPFEMShowOfferBar,$sep_fem_scenarioId == fem2,"SetTextHighlightColors h h h
-SetTextHighlights $sep_fem_mrktNme $sep_fem_sysName $sep_fem_creditReward
+SetTextHighlights $sep_fem_mrktName $sep_fem_sysName $sep_fem_creditReward
 Call $sep_fem_ref showMap ""Target: $sep_fem_sysName""","The $manOrWoman looks up, then hands you the tripad $heOrShe is holding. ""A medical transport needs an escort. It's carrying enough produce to keep people very happy,"" $HeOrShe says, watching your reaction.
 
 ""The fleet needs to reach $sep_fem_mrktName in the $sep_fem_sysName. Once there, wait for the transport to finish its... delivery, then escort it back here."" $HeOrShe pauses.
@@ -330,14 +330,18 @@ Call $sep_fem_ref showMap ""Target: $sep_fem_sysName""","The $manOrWoman looks u
 ## FEM3 dialogues,,,,,,
 sep_fem_s3Blurb,SEPFEMShowBlurb,$sep_fem_scenarioId == fem3,,"""An uprising is brewing on a competitor's colony. Fleet intel wants to pour a bit of oil on the fire and needs someone to guide the way.""",,
 sep_fem_s3OfferOption,SEPFEMShowOption,$sep_fem_scenarioId == fem3,,,sep_fem_start:Ask about the uprising brewing on a competitor's colony,
-sep_fem_s3OfferText,SEPFEMShowOffer,$sep_fem_scenarioId == fem3,,"""Tensions are rising on $sep_fem_mrktName in the $sep_fem_sysName. Certain groups are now quite motivated."" $HeOrShe taps a few notes on the tripad. ""A transport fleet has been dispatched to provide supplies that might help things along.""
+sep_fem_s3OfferText,SEPFEMShowOffer,$sep_fem_scenarioId == fem3,"SetTextHighlightColors h h h
+SetTextHighlights $sep_fem_mrktName $sep_fem_sysName $sep_fem_creditReward
+Call $sep_fem_ref showMap ""Target: $sep_fem_sysName""","""Tensions are rising on $sep_fem_mrktName in the $sep_fem_sysName. Certain groups are now quite motivated."" $HeOrShe taps a few notes on the tripad. ""A transport fleet has been dispatched to provide supplies that might help things along.""
 
 $HeOrShe meets your eyes. ""Your task is simple. Escort the fleet to its destination and make sure it survives long enough to offload its cargo. After that, your involvement ends.""
 
 $HeOrShe continues, ""Do that, and I'll authorize a payment of $sep_fem_creditReward, along with a favorable report to the officials of the $Faction. Interested?""",,
 sep_fem_s3BlurbBar,SEPFEMShowBlurbBar,$sep_fem_scenarioId == fem3,,"While scanning the bar, you notice a lone tripad on a table and a ringing call coming from it. ",,
 sep_fem_s3OfferOptionBar,SEPFEMShowOptionBar,$sep_fem_scenarioId == fem3,,,sep_fem_startBar:Answer the lone tripad with a ringing call coming from it,
-sep_fem_s3OfferTextBar,SEPFEMShowOfferBar,$sep_fem_scenarioId == fem3,,"The face on the screen regards you with mild surprise, then nods as if recalculating a plan.
+sep_fem_s3OfferTextBar,SEPFEMShowOfferBar,$sep_fem_scenarioId == fem3,"SetTextHighlightColors h h h
+SetTextHighlights $sep_fem_mrktName $sep_fem_sysName $sep_fem_creditReward
+Call $sep_fem_ref showMap ""Target: $sep_fem_sysName""","The face on the screen regards you with mild surprise, then nods as if recalculating a plan.
 
 ""l'll keep this brief. A transport fleet is preparing to depart, carrying... supplies intended to encourage certain movements on a competitor's colony. Nothing you need to involve yourself in beyond the escort.""
 
@@ -345,12 +349,24 @@ $HeOrShe sends you a location. ""Guide the fleet safely to $sep_fem_mrktName in 
 
 $HeOrShe pauses. ""Are you in... or out?""",,
 ## FEM4 dialogues,,,,,,
-sep_fem_s4Blurb,SEPFEMShowBlurb,$sep_fem_scenarioId == fem4,,"""An envoy needs to mediate issues on another colony. Their fleet needs a military escort to protect and guide them to their desitination.""",,
+sep_fem_s4Blurb,SEPFEMShowBlurb,$sep_fem_scenarioId == fem4,,"""An envoy needs to mediate issues on another colony. Their fleet needs a military escort to guide and protect them to their desitination.""",,
 sep_fem_s4OfferOption,SEPFEMShowOption,$sep_fem_scenarioId == fem4,,,sep_fem_start:Ask about escorting an envoy to another colony,
-sep_fem_s4OfferText,SEPFEMShowOffer,$sep_fem_scenarioId == fem4,,SAMPLE CONTACT OFFER,,
-sep_fem_s4BlurbBar,SEPFEMShowBlurbBar,$sep_fem_scenarioId == fem4,,SAMPLE BAR BLURB,,
-sep_fem_s4OfferOptionBar,SEPFEMShowOptionBar,$sep_fem_scenarioId == fem4,,,sep_fem_startBar:SAMPLE BAR OPTION,
-sep_fem_s4OfferTextBar,SEPFEMShowOfferBar,$sep_fem_scenarioId == fem4,,SAMPLE BAR OFFER TEXT,,
+sep_fem_s4OfferText,SEPFEMShowOffer,$sep_fem_scenarioId == fem4,"SetTextHighlightColors h h h
+SetTextHighlights $sep_fem_mrktName $sep_fem_sysName $sep_fem_creditReward
+Call $sep_fem_ref showMap ""Target: $sep_fem_sysName""","$HeOrShe adjusts $hisOrHer posture before speaking. ""An envoy needs to mediate some issues on $sep_fem_mrktName in the $sep_fem_sysName. The colony refuses any official $Faction military escorts, so we need a fleet that just happens to be heading in the same direction.""
+
+$HeOrShe glances $hisOrHer datapad, then back at you. ""Your job is to accompany the envoy's fleet to the colony, wait for them to finish their assignment, and then escort them back here. Nothing more complicated than that.""
+
+$HeOrShe clasps $hisOrHer hands. ""Once the envoy returns safely, you'll receive $sep_fem_creditReward. So, what do you say?""",,
+sep_fem_s4BlurbBar,SEPFEMShowBlurbBar,$sep_fem_scenarioId == fem4,,You noticed a well spoken $manOrWoman converses with people within the bar as if probing them for something.,,
+sep_fem_s4OfferOptionBar,SEPFEMShowOptionBar,$sep_fem_scenarioId == fem4,,,sep_fem_startBar:Sit beside the $manOrWoman probing info from bar customers,
+sep_fem_s4OfferTextBar,SEPFEMShowOfferBar,$sep_fem_scenarioId == fem4,"SetTextHighlightColors h h h
+SetTextHighlights $sep_fem_mrktName $sep_fem_sysName $sep_fem_creditReward
+Call $sep_fem_ref showMap ""Target: $sep_fem_sysName""","The $manOrWoman starts a casual conversation with you about various events in the sector. After a moment, $heOrShe gives you an evaluating look. ""Captain,"" $HeOrShe says with certainty, ""I believe you might just be the one I'm looking for.""
+
+$HeOrShe leans in slightly. ""Relations between the $Faction and the colony on $sep_fem_mrktName in the $sep_fem_sysName are delicate. I’ve been assigned to mediate, but the colony refuses any official military escort. That means we need an alternative, and your fleet fits the requirements.""
+
+$HeOrShe continues. ""If you're interested, my superiors are prepared to pay $sep_creditReward for a safe round trip to the colony and back.""",,
 ## FEM0 dialogues,,,,,,
 sep_fem_s0Blurb,SEPFEMShowBlurb,,,SAMPLE CONTACT BLURB,,
 sep_fem_s0OfferOption,SEPFEMShowOption,,,,sep_fem_start:SAMPLE CONTACT OPTION,

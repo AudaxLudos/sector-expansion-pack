@@ -29,12 +29,14 @@ public abstract class SEPHubMissionWithScenario extends SEPHubMissionWithBarEven
         return false;
     }
 
-    public boolean getScenario() {
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
+    public boolean setScenario() {
         this.scenario = Utils.pickMissionScenario(getMissionId(), getGenRandom());
         return this.scenario != null;
     }
 
-    public <E extends Enum<E>> boolean getScenarioType(Class<E> enumClass) {
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
+    public <E extends Enum<E>> boolean setScenarioType(Class<E> enumClass) {
         if (Utils.isInEnum(this.scenario.getType(), enumClass)) {
             this.scenarioType = Enum.valueOf(enumClass, this.scenario.getType());
         }
@@ -75,7 +77,7 @@ public abstract class SEPHubMissionWithScenario extends SEPHubMissionWithBarEven
                 continue;
             }
 
-            FleetEscortMission.Stage stage = FleetEscortMission.Stage.valueOf(tags.get(0));
+            Object stage = Enum.valueOf(enumClass, tags.get(0));
             String faction = tags.get(1);
             boolean hyperspaceOnly = tags.contains("hyperspaceOnly");
 

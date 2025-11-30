@@ -56,11 +56,11 @@ public class SearchAndRescueMissionV2 extends SEPHubMissionWithScenario {
 
     @Override
     protected boolean create(MarketAPI createdAt, boolean barEvent) {
-        if (!getScenario()) {
+        if (!setScenario()) {
             log.info("Failed to pick a scenario");
             return false;
         }
-        if (!getScenarioType(ScenarioType.class)) {
+        if (!setScenarioType(ScenarioType.class)) {
             log.info("Failed to find scenario type");
             return false;
         }

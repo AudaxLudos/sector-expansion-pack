@@ -42,11 +42,11 @@ public class FleetEscortMission extends SEPHubMissionWithScenario {
 
     @Override
     protected boolean create(MarketAPI createdAt, boolean barEvent) {
-        if (!getScenario()) {
+        if (!setScenario()) {
             log.info("Failed to pick a scenario");
             return false;
         }
-        if (!getScenarioType(ScenarioType.class)) {
+        if (!setScenarioType(ScenarioType.class)) {
             log.info("Failed to find scenario type");
             return false;
         }
@@ -312,7 +312,7 @@ public class FleetEscortMission extends SEPHubMissionWithScenario {
     @Override
     protected void updateInteractionDataImpl() {
         set("$sep_fem_scenarioId", this.scenario.getScenarioId());
-        set("$sep_fem_mrktNme", this.gotoEntity.getName());
+        set("$sep_fem_mrktName", this.gotoEntity.getName());
         set("$sep_fem_sysName", this.gotoEntity.getStarSystem().getNameWithLowercaseTypeShort());
         set("$sep_fem_duration", Misc.getWithDGS(this.timeLimit.days));
         set("$sep_fem_creditReward", Misc.getDGSCredits(getCreditsReward()));
