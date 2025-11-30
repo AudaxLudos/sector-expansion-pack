@@ -22,7 +22,6 @@ import com.fs.starfarer.api.ui.TooltipMakerAPI;
 import com.fs.starfarer.api.util.Misc;
 import com.fs.starfarer.api.util.WeightedRandomPicker;
 import org.apache.log4j.Logger;
-import org.lwjgl.util.vector.Vector2f;
 import sectorexpansionpack.Utils;
 import sectorexpansionpack.missions.hub.SEPHubMissionWithScenario;
 
@@ -272,7 +271,8 @@ public class SearchAndRescueMissionV2 extends SEPHubMissionWithScenario {
         } else if (this.scenarioType == ScenarioType.CAPTURED_IN_FLEET) {
             // TODO: Add a way to customize fleet
             beginStageTrigger(Stage.FIND);
-            triggerCreateStandardFleet(10, Factions.PIRATES, this.hideout.getLocationInHyperspace());
+            triggerCreateFleet(FleetSize.MEDIUM, FleetQuality.DEFAULT, getPerson().getFaction().getId(), FleetTypes.PATROL_MEDIUM, this.hideout.getLocationInHyperspace());
+            triggerScaleFleetToPlayerCapabilities(FleetStrengthType.QUANTITY);
             triggerMakeLowRepImpact();
             triggerMakeFleetIgnoreOtherFleets();
             triggerMakeFleetIgnoredByOtherFleets();
@@ -491,86 +491,6 @@ public class SearchAndRescueMissionV2 extends SEPHubMissionWithScenario {
         result.add(arrow);
 
         return result;
-    }
-
-    public void triggerCreateStandardFleet(int difficulty, String factionId, Vector2f locInHyper) {
-        FleetSize size;
-        FleetQuality quality;
-        String type;
-        OfficerQuality oQuality;
-        OfficerNum oNum;
-
-        if (difficulty <= 0) {
-            size = FleetSize.TINY;
-            quality = FleetQuality.VERY_LOW;
-            oQuality = OfficerQuality.LOWER;
-            oNum = OfficerNum.FC_ONLY;
-            type = FleetTypes.PATROL_SMALL;
-        } else if (difficulty == 1) {
-            size = FleetSize.VERY_SMALL;
-            quality = FleetQuality.VERY_LOW;
-            oQuality = OfficerQuality.LOWER;
-            oNum = OfficerNum.FC_ONLY;
-            type = FleetTypes.PATROL_SMALL;
-        } else if (difficulty == 2) {
-            size = FleetSize.SMALL;
-            quality = FleetQuality.DEFAULT;
-            oQuality = OfficerQuality.LOWER;
-            oNum = OfficerNum.FEWER;
-            type = FleetTypes.PATROL_SMALL;
-        } else if (difficulty == 3) {
-            size = FleetSize.SMALL;
-            quality = FleetQuality.DEFAULT;
-            oQuality = OfficerQuality.DEFAULT;
-            oNum = OfficerNum.DEFAULT;
-            type = FleetTypes.PATROL_MEDIUM;
-        } else if (difficulty == 4) {
-            size = FleetSize.MEDIUM;
-            quality = FleetQuality.DEFAULT;
-            oQuality = OfficerQuality.DEFAULT;
-            oNum = OfficerNum.DEFAULT;
-            type = FleetTypes.PATROL_MEDIUM;
-        } else if (difficulty == 5) {
-            size = FleetSize.LARGE;
-            quality = FleetQuality.DEFAULT;
-            oQuality = OfficerQuality.DEFAULT;
-            oNum = OfficerNum.DEFAULT;
-            type = FleetTypes.PATROL_LARGE;
-        } else if (difficulty == 6) {
-            size = FleetSize.LARGE;
-            quality = FleetQuality.HIGHER;
-            oQuality = OfficerQuality.DEFAULT;
-            oNum = OfficerNum.MORE;
-            type = FleetTypes.PATROL_LARGE;
-        } else if (difficulty == 7) {
-            size = FleetSize.LARGER;
-            quality = FleetQuality.HIGHER;
-            oQuality = OfficerQuality.DEFAULT;
-            oNum = OfficerNum.MORE;
-            type = FleetTypes.PATROL_LARGE;
-        } else if (difficulty == 8) {
-            size = FleetSize.VERY_LARGE;
-            quality = FleetQuality.HIGHER;
-            oQuality = OfficerQuality.DEFAULT;
-            oNum = OfficerNum.MORE;
-            type = FleetTypes.PATROL_LARGE;
-        } else if (difficulty == 9) {
-            size = FleetSize.VERY_LARGE;
-            quality = FleetQuality.HIGHER;
-            oQuality = OfficerQuality.HIGHER;
-            oNum = OfficerNum.MORE;
-            type = FleetTypes.PATROL_LARGE;
-        } else { // difficulty >= 10
-            size = FleetSize.HUGE;
-            quality = FleetQuality.HIGHER;
-            oQuality = OfficerQuality.HIGHER;
-            oNum = OfficerNum.MORE;
-            // oNum = OfficerNum.ALL_SHIPS;
-            type = FleetTypes.PATROL_LARGE;
-        }
-
-        triggerCreateFleet(size, quality, factionId, type, locInHyper);
-        triggerSetFleetOfficers(oNum, oQuality);
     }
 
     public enum Stage {

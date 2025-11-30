@@ -16,6 +16,8 @@ import com.fs.starfarer.api.impl.campaign.missions.hub.HubMissionWithBarEvent;
 import com.fs.starfarer.api.impl.campaign.missions.hub.MissionFleetAutoDespawn;
 import com.fs.starfarer.api.impl.campaign.missions.hub.MissionTrigger;
 import com.fs.starfarer.api.impl.campaign.procgen.themes.SalvageSpecialAssigner;
+import com.fs.starfarer.api.impl.campaign.shared.PersonBountyEventData;
+import com.fs.starfarer.api.impl.campaign.shared.SharedData;
 import com.fs.starfarer.api.impl.campaign.skills.OfficerTraining;
 import com.fs.starfarer.api.util.Misc;
 import org.lwjgl.util.vector.Vector2f;
@@ -97,7 +99,7 @@ public abstract class SEPHubMissionWithBarEvent extends HubMissionWithBarEvent {
         this.search.marketPrefs.add(new MarketHasCompatibleSpecialItemsWithOther(other));
     }
 
-    public void triggerCreateStandardFleet(int difficulty, String factionId, Vector2f locInHyper) {
+    public void triggerSetFleetToStandardFleet(int difficulty) {
         FleetSize size;
         FleetQuality quality;
         String type;
@@ -173,8 +175,186 @@ public abstract class SEPHubMissionWithBarEvent extends HubMissionWithBarEvent {
             type = FleetTypes.PATROL_LARGE;
         }
 
-        triggerSEPCreateFleet(size, quality, factionId, type, locInHyper);
+        triggerSetFleetSizeAndQuality(size, quality, type);
         triggerSetFleetOfficers(oNum, oQuality);
+    }
+
+    public void triggerSetFleetToQualityFleet(int difficulty) {
+        FleetSize size;
+        FleetQuality quality;
+        String type;
+        OfficerQuality oQuality;
+        OfficerNum oNum;
+
+        if (difficulty <= 0) {
+            size = FleetSize.TINY;
+            quality = FleetQuality.VERY_HIGH;
+            oQuality = OfficerQuality.DEFAULT;
+            oNum = OfficerNum.FC_ONLY;
+            type = FleetTypes.PATROL_SMALL;
+        } else if (difficulty == 1) {
+            size = FleetSize.VERY_SMALL;
+            quality = FleetQuality.VERY_HIGH;
+            oQuality = OfficerQuality.DEFAULT;
+            oNum = OfficerNum.FC_ONLY;
+            type = FleetTypes.PATROL_SMALL;
+        } else if (difficulty == 2) {
+            size = FleetSize.VERY_SMALL;
+            quality = FleetQuality.VERY_HIGH;
+            oQuality = OfficerQuality.DEFAULT;
+            oNum = OfficerNum.DEFAULT;
+            type = FleetTypes.PATROL_SMALL;
+        } else if (difficulty == 3) {
+            size = FleetSize.SMALL;
+            quality = FleetQuality.VERY_HIGH;
+            oQuality = OfficerQuality.DEFAULT;
+            oNum = OfficerNum.DEFAULT;
+            type = FleetTypes.PATROL_SMALL;
+        } else if (difficulty == 4) {
+            size = FleetSize.SMALL;
+            quality = FleetQuality.VERY_HIGH;
+            oQuality = OfficerQuality.HIGHER;
+            oNum = OfficerNum.MORE;
+            type = FleetTypes.PATROL_SMALL;
+        } else if (difficulty == 5) {
+            size = FleetSize.MEDIUM;
+            quality = FleetQuality.SMOD_1;
+            oQuality = OfficerQuality.DEFAULT;
+            oNum = OfficerNum.DEFAULT;
+            type = FleetTypes.PATROL_MEDIUM;
+        } else if (difficulty == 6) {
+            size = FleetSize.MEDIUM;
+            quality = FleetQuality.SMOD_1;
+            oQuality = OfficerQuality.DEFAULT;
+            oNum = OfficerNum.MORE;
+            type = FleetTypes.PATROL_MEDIUM;
+        } else if (difficulty == 7) {
+            size = FleetSize.LARGE;
+            quality = FleetQuality.SMOD_1;
+            oQuality = OfficerQuality.DEFAULT;
+            oNum = OfficerNum.DEFAULT;
+            type = FleetTypes.PATROL_MEDIUM;
+        } else if (difficulty == 8) {
+            size = FleetSize.LARGE;
+            quality = FleetQuality.SMOD_1;
+            oQuality = OfficerQuality.HIGHER;
+            oNum = OfficerNum.MORE;
+            type = FleetTypes.PATROL_LARGE;
+        } else if (difficulty == 9) {
+            size = FleetSize.VERY_LARGE;
+            quality = FleetQuality.SMOD_1;
+            oQuality = OfficerQuality.HIGHER;
+            oNum = OfficerNum.MORE;
+            type = FleetTypes.PATROL_LARGE;
+        } else { // difficulty >= 10
+            size = FleetSize.VERY_LARGE;
+            quality = FleetQuality.SMOD_2;
+            oQuality = OfficerQuality.HIGHER;
+            oNum = OfficerNum.MORE;
+            type = FleetTypes.PATROL_LARGE;
+        }
+
+        triggerSetFleetSizeAndQuality(size, quality, type);
+        triggerSetFleetOfficers(oNum, oQuality);
+    }
+
+
+    public void triggerSetFleetToQuantityFleet(int difficulty) {
+        FleetSize size;
+        FleetQuality quality;
+        String type;
+        OfficerQuality oQuality;
+        OfficerNum oNum;
+
+        if (difficulty <= 0) {
+            size = FleetSize.SMALL;
+            quality = FleetQuality.LOWER;
+            oQuality = OfficerQuality.LOWER;
+            oNum = OfficerNum.FC_ONLY;
+            type = FleetTypes.PATROL_SMALL;
+        } else if (difficulty == 1) {
+            size = FleetSize.SMALL;
+            quality = FleetQuality.DEFAULT;
+            oQuality = OfficerQuality.DEFAULT;
+            oNum = OfficerNum.DEFAULT;
+            type = FleetTypes.PATROL_SMALL;
+        } else if (difficulty == 2) {
+            size = FleetSize.MEDIUM;
+            quality = FleetQuality.LOWER;
+            oQuality = OfficerQuality.DEFAULT;
+            oNum = OfficerNum.DEFAULT;
+            type = FleetTypes.PATROL_MEDIUM;
+        } else if (difficulty == 3) {
+            size = FleetSize.MEDIUM;
+            quality = FleetQuality.DEFAULT;
+            oQuality = OfficerQuality.DEFAULT;
+            oNum = OfficerNum.DEFAULT;
+            type = FleetTypes.PATROL_MEDIUM;
+        } else if (difficulty == 4) {
+            size = FleetSize.LARGE;
+            quality = FleetQuality.LOWER;
+            oQuality = OfficerQuality.HIGHER;
+            oNum = OfficerNum.DEFAULT;
+            type = FleetTypes.PATROL_MEDIUM;
+        } else if (difficulty == 5) {
+            size = FleetSize.LARGE;
+            quality = FleetQuality.DEFAULT;
+            oQuality = OfficerQuality.DEFAULT;
+            oNum = OfficerNum.DEFAULT;
+            type = FleetTypes.PATROL_MEDIUM;
+        } else if (difficulty == 6) {
+            size = FleetSize.LARGER;
+            quality = FleetQuality.LOWER;
+            oQuality = OfficerQuality.DEFAULT;
+            oNum = OfficerNum.DEFAULT;
+            type = FleetTypes.PATROL_LARGE;
+        } else if (difficulty == 7) {
+            size = FleetSize.LARGER;
+            quality = FleetQuality.DEFAULT;
+            oQuality = OfficerQuality.DEFAULT;
+            oNum = OfficerNum.DEFAULT;
+            type = FleetTypes.PATROL_LARGE;
+        } else if (difficulty == 8) {
+            size = FleetSize.VERY_LARGE;
+            quality = FleetQuality.DEFAULT;
+            oQuality = OfficerQuality.DEFAULT;
+            oNum = OfficerNum.DEFAULT;
+            type = FleetTypes.PATROL_LARGE;
+        } else if (difficulty == 9) {
+            size = FleetSize.HUGE;
+            quality = FleetQuality.DEFAULT;
+            oQuality = OfficerQuality.DEFAULT;
+            oNum = OfficerNum.DEFAULT;
+            type = FleetTypes.PATROL_LARGE;
+        } else { // difficulty >= 10
+            size = FleetSize.MAXIMUM;
+            quality = FleetQuality.DEFAULT;
+            oQuality = OfficerQuality.DEFAULT;
+            oNum = OfficerNum.MORE;
+            type = FleetTypes.PATROL_LARGE;
+        }
+
+        triggerSetFleetSizeAndQuality(size, quality, type);
+        triggerSetFleetOfficers(oNum, oQuality);
+    }
+
+    public void triggerScaleFleetToPlayerCapabilities(FleetStrengthType type) {
+        SharedData sharedData = SharedData.getData();
+        if (sharedData == null) {
+            return;
+        }
+        PersonBountyEventData bountyData = sharedData.getPersonBountyEventData();
+        if (bountyData == null) {
+            return;
+        }
+        int level = bountyData.getLevel();
+        if (type == FleetStrengthType.QUANTITY) {
+            triggerSetFleetToQuantityFleet(level);
+        } else if (type == FleetStrengthType.QUALITY) {
+            triggerSetFleetToQuantityFleet(level);
+        } else {
+            triggerSetFleetToStandardFleet(level);
+        }
     }
 
     public void triggerSEPCreateFleet(FleetSize size, FleetQuality quality, String factionId, String type, Vector2f locInHyper) {
@@ -229,6 +409,12 @@ public abstract class SEPHubMissionWithBarEvent extends HubMissionWithBarEvent {
 
     public void setStageOnFleetWeakened(Object to, CampaignFleetAPI fleet, float damageThreshold) {
         this.connections.add(new StageConnection(null, to, new FleetWeakenedChecker(fleet, damageThreshold)));
+    }
+
+    public enum FleetStrengthType {
+        STANDARD,
+        QUALITY,
+        QUANTITY
     }
 
     public static class PlanetNoSpecialSalvage implements PlanetRequirement {

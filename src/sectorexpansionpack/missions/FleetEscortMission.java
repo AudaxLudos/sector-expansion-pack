@@ -2,15 +2,11 @@ package sectorexpansionpack.missions;
 
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.campaign.*;
-import com.fs.starfarer.api.campaign.econ.CommoditySpecAPI;
-import com.fs.starfarer.api.campaign.econ.MarketAPI;
-import com.fs.starfarer.api.campaign.econ.MarketDemandAPI;
+import com.fs.starfarer.api.campaign.econ.*;
 import com.fs.starfarer.api.campaign.rules.MemoryAPI;
 import com.fs.starfarer.api.impl.campaign.fleets.FleetFactoryV3;
-import com.fs.starfarer.api.impl.campaign.ids.Commodities;
-import com.fs.starfarer.api.impl.campaign.ids.Factions;
-import com.fs.starfarer.api.impl.campaign.ids.Ranks;
-import com.fs.starfarer.api.impl.campaign.ids.Tags;
+import com.fs.starfarer.api.impl.campaign.ids.*;
+import com.fs.starfarer.api.impl.campaign.rulecmd.salvage.MarketCMD;
 import com.fs.starfarer.api.impl.campaign.rulecmd.salvage.special.BaseSalvageSpecial;
 import com.fs.starfarer.api.ui.SectorMapAPI;
 import com.fs.starfarer.api.ui.TooltipMakerAPI;
@@ -19,13 +15,12 @@ import com.fs.starfarer.api.util.WeightedRandomPicker;
 import org.apache.log4j.Logger;
 import sectorexpansionpack.ModPlugin;
 import sectorexpansionpack.Utils;
+import sectorexpansionpack.intel.misc.ArtifactInstallationIntel;
 import sectorexpansionpack.missions.hub.SEPHubMissionWithScenario;
 
 import java.awt.*;
-import java.util.ArrayList;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
-import java.util.Random;
 
 public class FleetEscortMission extends SEPHubMissionWithScenario {
     public static final float MISSION_DURATION = 120f;
@@ -117,7 +112,8 @@ public class FleetEscortMission extends SEPHubMissionWithScenario {
         }
 
         beginStageTrigger(Stage.GOTO);
-        triggerCreateStandardFleet(3, getPerson().getFaction().getId(), createdAt.getLocationInHyperspace());
+        triggerCreateFleet(FleetSize.MEDIUM, FleetQuality.DEFAULT, getPerson().getFaction().getId(), FleetTypes.PATROL_MEDIUM, createdAt.getLocationInHyperspace());
+        triggerSetFleetToStandardFleet(3);
         if (this.scenarioType == ScenarioType.COMMODITY_DELIVERY) {
             triggerSetFleetCombatFleetPoints(30f);
             triggerFleetSetFreighterData(calculateCombatPoints(getPreviousCreateFleetAction()), 1f, false);
@@ -136,7 +132,7 @@ public class FleetEscortMission extends SEPHubMissionWithScenario {
             triggerAddCommodityFractionDrop(Commodities.HAND_WEAPONS, 0.1f);
             triggerAddCommodityFractionDrop(Commodities.FUEL, 0.3f);
         } else if (this.scenarioType == ScenarioType.ARTIFACT_DELIVERY) {
-            triggerSetFleetCombatFleetPoints(30f);
+            triggerScaleFleetToPlayerCapabilities(FleetStrengthType.QUALITY);
             triggerFleetSetFreighterData(0f, 0.1f, true);
             triggerFleetSetTankerData(0f, 0.1f, true);
             this.itemId = pickSpecialItemId();
@@ -332,6 +328,96 @@ public class FleetEscortMission extends SEPHubMissionWithScenario {
             entity.getContainingLocation().addEntity(this.fleet);
             this.fleet.setLocation(entity.getLocation().x, entity.getLocation().y);
             this.fleet.setFacing(getGenRandom().nextFloat() * 360f);
+        }
+    }
+
+    @Override
+    protected void endSuccessImpl(InteractionDialogAPI dialog, Map<String, MemoryAPI> memoryMap) {
+        MarketAPI market = this.gotoEntity.getMarket();
+        if (market == null) {
+            return;
+        }
+        if (this.scenarioType == ScenarioType.COMMODITY_DELIVERY) {
+            int cargoCap = (int) this.fleet.getCargo().getMaxCapacity();
+            CommodityOnMarketAPI commodityOnMarket = market.getCommodityData(this.itemId);
+            CommoditySpecAPI commoditySpec = Global.getSector().getEconomy().getCommoditySpec(commodityOnMarket.getId());
+            int commodityAmount = (int) (cargoCap * 0.75f + getGenRandom().nextFloat() * 0.2f);
+            Misc.affectAvailabilityWithinReason(commodityOnMarket, commodityAmount);
+            log.info(String.format("Affecting availability of %s on %s in the %s by %s", commoditySpec.getName(),
+                    market.getName(), market.getStarSystem().getNameWithLowercaseTypeShort(), commodityAmount));
+        } else if (this.scenarioType == ScenarioType.DRUG_SMUGGLING) {
+            int cargoCap = (int) this.fleet.getCargo().getMaxCapacity();
+            CommodityOnMarketAPI commodityOnMarket = market.getCommodityData(this.itemId);
+            CommoditySpecAPI commoditySpec = Global.getSector().getEconomy().getCommoditySpec(commodityOnMarket.getId());
+            int commodityAmount = (int) (cargoCap * 0.75f + getGenRandom().nextFloat() * 0.2f);
+            Misc.affectAvailabilityWithinReason(commodityOnMarket, commodityAmount);
+            log.info(String.format("Affecting availability of %s on %s in the %s by %s", commoditySpec.getName(),
+                    market.getName(), market.getStarSystem().getNameWithLowercaseTypeShort(), commodityAmount));
+        } else if (this.scenarioType == ScenarioType.REBELLION_SUPPORT) {
+            WeightedRandomPicker<Industry> picker = new WeightedRandomPicker<>();
+            for (Industry ind : market.getIndustries()) {
+                if (!ind.canBeDisrupted()) {
+                    continue;
+                }
+                picker.add(ind);
+            }
+
+            Industry industryToDisrupt = picker.pickAndRemove();
+            float disruptDays = MarketCMD.getDisruptDaysPerToken(market, industryToDisrupt) * 3;
+            industryToDisrupt.setDisrupted(disruptDays);
+            log.info(String.format("Disrupting %s on %s in the %s for %s", industryToDisrupt.getCurrentName(),
+                    market.getName(), market.getStarSystem().getNameWithLowercaseTypeShort(), disruptDays));
+
+            industryToDisrupt = picker.pickAndRemove();
+            disruptDays = MarketCMD.getDisruptDaysPerToken(market, industryToDisrupt) * 3;
+            industryToDisrupt.setDisrupted(MarketCMD.getDisruptDaysPerToken(market, industryToDisrupt) * 3);
+            log.info(String.format("Disrupting %s on %s in the %s for %s", industryToDisrupt.getCurrentName(),
+                    market.getName(), market.getStarSystem().getNameWithLowercaseTypeShort(), disruptDays));
+
+            market.getStability().addTemporaryModFlat(90f, "mod_" + Misc.genUID(), "Recent armed rebellion", -3f);
+            log.info(String.format("Destabilising %s in the %s for -3f Stability", market.getName(),
+                    market.getStarSystem().getNameWithLowercaseTypeShort()));
+        } else if (this.scenarioType == ScenarioType.ARTIFACT_DELIVERY) {
+            SpecialItemSpecAPI specialItemSpec = Global.getSettings().getSpecialItemSpec(this.itemId);
+            if (specialItemSpec == null) {
+                return;
+            }
+            SpecialItemData specialItemData = new SpecialItemData(specialItemSpec.getId(), specialItemSpec.getParams());
+
+            resetSearch();
+            requireMarketFaction(getPerson().getFaction().getId());
+            requireMarketNotHidden();
+            requireMarketNotInHyperspace();
+            requireMarketFactionNotPlayer();
+            requireMarketCanUseSpecialItem(specialItemData);
+            preferMarketSizeAtMost(100);
+            preferMarketIs(market);
+            MarketAPI market2 = pickMarket();
+
+            if (market2 == null) {
+                log.info("Failed to find market to install special item");
+                return;
+            }
+
+            // TODO: Delay special item installation by some days
+            // TODO: Transfer previous colony item if any to another same faction market
+            Industry ind = Utils.pickIndustryToInstallItem(market2, specialItemData);
+            ind.setSpecialItem(specialItemData);
+            new ArtifactInstallationIntel(market2, ind, specialItemSpec);
+            log.info(String.format("Installing %s to %s facility %s %s in the %s",
+                    specialItemSpec.getName(), ind.getCurrentName(), market2.getOnOrAt(),
+                    market2.getName(), market2.getStarSystem().getNameWithLowercaseTypeShort()));
+        } else if (this.scenarioType == ScenarioType.VIP_ESCORT) {
+            if (Objects.equals(market.getFaction().getId(), getPerson().getFaction().getId())) {
+                return;
+            }
+            float repAmount = 0.1f;
+            RepLevel repLevellimit = RepLevel.FRIENDLY;
+            if (rollProbability(0.5f)) {
+                repAmount = -0.1f;
+                repLevellimit = RepLevel.HOSTILE;
+            }
+            market.getFaction().adjustRelationship(getPerson().getFaction().getId(), repAmount, repLevellimit);
         }
     }
 
