@@ -1,3 +1,22 @@
+### 0.1.0a
+- Fix scenario credit reward not properly applied
+- Fix special item being installed with unmet requirements
+- Add scenarios for fleet escort mission
+- Optimize escort fleet AI
+- Add scenario complication implementation
+- Fail the mission if escort fleet points is reduced by some fraction
+- Reduce reputation when abandoning fleet escort mission
+- Fix fleets spawning without accepting the fleet escort mission
+- Fix defeat triggers not getting removed for search and rescue mission
+- Fix complications loading with whitespaces and non-visible characters
+- Scale difficulty based on rewards for search and rescue mission
+- Fix fleets spawning without accepting the search and rescue mission
+- Add search and rescue mission V2 scenarios and dialogues
+- Add search and rescue mission V2 implementation
+- Fix mission spec data loading
+- Fix incursion event fleet count exceeding limit
+- Fix error when looking for market to install colony item
+
 ### 0.0.161a
 - Fix artifact incursion raid target not getting marked
 - Fix crash when abandoning artifact incursion mission
