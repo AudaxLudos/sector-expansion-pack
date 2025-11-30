@@ -3,6 +3,7 @@ package sectorexpansionpack.missions.hub;
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.campaign.SectorEntityToken;
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
+import com.fs.starfarer.api.impl.campaign.ids.FleetTypes;
 import com.fs.starfarer.api.impl.campaign.ids.MemFlags;
 import com.fs.starfarer.api.impl.campaign.shared.PersonBountyEventData;
 import com.fs.starfarer.api.impl.campaign.shared.SharedData;
@@ -113,7 +114,8 @@ public abstract class SEPHubMissionWithScenario extends SEPHubMissionWithBarEven
             }
 
             beginWithinHyperspaceRangeTrigger(gotoEntity, rangeLY, hyperspaceOnly, stage);
-            triggerCreateStandardFleet(difficulty, factionId, gotoEntity.getLocationInHyperspace());
+            triggerCreateFleet(FleetSize.MEDIUM, FleetQuality.DEFAULT, factionId, FleetTypes.PATROL_MEDIUM, gotoEntity.getLocationInHyperspace());
+            triggerSetFleetToStandardFleet(difficulty);
             if (tags.contains("hostile")) {
                 triggerSetFleetFlagsWithReason(MemFlags.MEMORY_KEY_MAKE_HOSTILE);
             }
