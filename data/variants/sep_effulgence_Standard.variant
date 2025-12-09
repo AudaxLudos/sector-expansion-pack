@@ -9,7 +9,7 @@
         "targetingunit"
     ],
     "quality": 0.0,
-    "variantId": "sep_effulgence_Attack",
+    "variantId": "sep_effulgence_Standard",
     "weaponGroups": [
         {
             "autofire": false,
