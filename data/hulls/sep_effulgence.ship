@@ -113,7 +113,7 @@
         {
             "id": "WS 008",
             "size": "LARGE",
-            "type": "ENERGY",
+            "type": "SYNERGY",
             "mount": "HARDPOINT",
             "arc": 30,
             "angle": 0,
@@ -124,7 +124,7 @@
         {
             "id": "WS 009",
             "size": "LARGE",
-            "type": "ENERGY",
+            "type": "SYNERGY",
             "mount": "HARDPOINT",
             "arc": 30,
             "angle": 0,
