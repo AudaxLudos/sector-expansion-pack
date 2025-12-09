@@ -12,23 +12,47 @@
     "variantId": "sep_effulgence_Standard",
     "weaponGroups": [
         {
+            "autofire": true,
+            "mode": "LINKED",
+            "weapons": {
+                "WS 011": "plasma",
+                "WS 010": "plasma"
+            }
+        },
+        {
+            "autofire": false,
+            "mode": "LINKED",
+            "weapons": {
+                "WS 009": "guardian",
+                "WS 008": "guardian"
+            }
+        },
+        {
             "autofire": false,
             "mode": "ALTERNATING",
             "weapons": {
-                "WS 007": "sabotpod",
-                "WS 012": "pdburst",
-                "WS 013": "pdburst",
-                "WS 002": "pdburst",
-                "WS 000": "pdburst",
-                "WS 003": "pdburst",
-                "WS 001": "pdburst",
-                "WS 008": "guardian",
-                "WS 009": "guardian",
-                "WS 010": "plasma",
-                "WS 011": "plasma",
-                "WS 004": "pilum",
+                "WS 006": "sabotpod",
+                "WS 007": "sabotpod"
+            }
+        },
+        {
+            "autofire": false,
+            "mode": "ALTERNATING",
+            "weapons": {
                 "WS 005": "pilum",
-                "WS 006": "sabotpod"
+                "WS 004": "pilum"
+            }
+        },
+        {
+            "autofire": true,
+            "mode": "LINKED",
+            "weapons": {
+                "WS 001": "pdburst",
+                "WS 003": "pdburst",
+                "WS 000": "pdburst",
+                "WS 002": "pdburst",
+                "WS 013": "pdburst",
+                "WS 012": "pdburst"
             }
         }
     ],

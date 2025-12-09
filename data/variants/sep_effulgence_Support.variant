@@ -2,7 +2,7 @@
     "displayName": "Support",
     "fluxCapacitors": 0,
     "fluxVents": 48,
-    "goalVariant": false,
+    "goalVariant": true,
     "hullId": "sep_effulgence",
     "hullMods": [
         "eccm",
@@ -18,20 +18,38 @@
             "autofire": false,
             "mode": "ALTERNATING",
             "weapons": {
-                "WS 006": "pilum",
-                "WS 004": "pilum",
-                "WS 007": "pilum",
-                "WS 005": "pilum",
-                "WS 008": "pilum_large",
                 "WS 009": "pilum_large",
-                "WS 000": "pdburst",
-                "WS 002": "pdburst",
-                "WS 003": "pdburst",
-                "WS 001": "pdburst",
-                "WS 012": "pdburst",
+                "WS 008": "pilum_large"
+            }
+        },
+        {
+            "autofire": true,
+            "mode": "LINKED",
+            "weapons": {
+                "WS 011": "guardian",
+                "WS 010": "guardian"
+            }
+        },
+        {
+            "autofire": false,
+            "mode": "ALTERNATING",
+            "weapons": {
+                "WS 005": "pilum",
+                "WS 007": "pilum",
+                "WS 004": "pilum",
+                "WS 006": "pilum"
+            }
+        },
+        {
+            "autofire": true,
+            "mode": "LINKED",
+            "weapons": {
                 "WS 013": "pdburst",
-                "WS 010": "guardian",
-                "WS 011": "guardian"
+                "WS 012": "pdburst",
+                "WS 001": "pdburst",
+                "WS 003": "pdburst",
+                "WS 002": "pdburst",
+                "WS 000": "pdburst"
             }
         }
     ],

@@ -14,22 +14,34 @@
     "weaponGroups": [
         {
             "autofire": false,
+            "mode": "LINKED",
+            "weapons": {
+                "WS 009": "autopulse",
+                "WS 011": "autopulse",
+                "WS 008": "autopulse",
+                "WS 010": "autopulse"
+            }
+        },
+        {
+            "autofire": false,
             "mode": "ALTERNATING",
             "weapons": {
-                "WS 006": "sabotpod",
-                "WS 004": "sabotpod",
-                "WS 007": "sabotpod",
                 "WS 005": "sabotpod",
-                "WS 013": "pdburst",
-                "WS 012": "pdburst",
-                "WS 002": "pdburst",
-                "WS 000": "pdburst",
-                "WS 003": "pdburst",
+                "WS 007": "sabotpod",
+                "WS 004": "sabotpod",
+                "WS 006": "sabotpod"
+            }
+        },
+        {
+            "autofire": true,
+            "mode": "LINKED",
+            "weapons": {
                 "WS 001": "pdburst",
-                "WS 010": "autopulse",
-                "WS 008": "autopulse",
-                "WS 011": "autopulse",
-                "WS 009": "autopulse"
+                "WS 003": "pdburst",
+                "WS 000": "pdburst",
+                "WS 002": "pdburst",
+                "WS 012": "pdburst",
+                "WS 013": "pdburst"
             }
         }
     ],
