@@ -1,0 +1,40 @@
+{
+    "displayName": "Standard",
+    "fluxCapacitors": 50,
+    "fluxVents": 4,
+    "goalVariant": true,
+    "hullId": "sep_effulgence",
+    "hullMods": [
+        "hardenedshieldemitter",
+        "targetingunit"
+    ],
+    "quality": 0.0,
+    "variantId": "sep_effulgence_Attack",
+    "weaponGroups": [
+        {
+            "autofire": false,
+            "mode": "ALTERNATING",
+            "weapons": {
+                "WS 007": "sabotpod",
+                "WS 012": "pdburst",
+                "WS 013": "pdburst",
+                "WS 002": "pdburst",
+                "WS 000": "pdburst",
+                "WS 003": "pdburst",
+                "WS 001": "pdburst",
+                "WS 008": "guardian",
+                "WS 009": "guardian",
+                "WS 010": "plasma",
+                "WS 011": "plasma",
+                "WS 004": "pilum",
+                "WS 005": "pilum",
+                "WS 006": "sabotpod"
+            }
+        }
+    ],
+    "wings": [
+        "lux_wing",
+        "lux_wing",
+        "lux_wing"
+    ]
+}

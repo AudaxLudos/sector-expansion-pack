@@ -1,0 +1,43 @@
+{
+    "displayName": "Support",
+    "fluxCapacitors": 0,
+    "fluxVents": 48,
+    "goalVariant": false,
+    "hullId": "sep_effulgence",
+    "hullMods": [
+        "eccm",
+        "magazines",
+        "fluxcoil",
+        "hardenedshieldemitter",
+        "unstable_injector"
+    ],
+    "quality": 0.0,
+    "variantId": "sep_effulgence_Support",
+    "weaponGroups": [
+        {
+            "autofire": false,
+            "mode": "ALTERNATING",
+            "weapons": {
+                "WS 006": "pilum",
+                "WS 004": "pilum",
+                "WS 007": "pilum",
+                "WS 005": "pilum",
+                "WS 008": "pilum_large",
+                "WS 009": "pilum_large",
+                "WS 000": "pdburst",
+                "WS 002": "pdburst",
+                "WS 003": "pdburst",
+                "WS 001": "pdburst",
+                "WS 012": "pdburst",
+                "WS 013": "pdburst",
+                "WS 010": "guardian",
+                "WS 011": "guardian"
+            }
+        }
+    ],
+    "wings": [
+        "spark_wing",
+        "spark_wing",
+        "spark_wing"
+    ]
+}
