@@ -1,7 +1,7 @@
 {
     "displayName": "Assault",
-    "fluxCapacitors": 4,
-    "fluxVents": 50,
+    "fluxCapacitors": 50,
+    "fluxVents": 4,
     "goalVariant": true,
     "hullId": "sep_effulgence",
     "hullMods": [
