@@ -1,7 +1,11 @@
 {
-	"combatCapital":{
-		"sep_effulgence_Standard":4,
-		"sep_effulgence_Assault":3,
-		"sep_effulgence_Support":3
-	}
+  "combatSmall": {
+    "sep_blaze_Attack":3,
+    "sep_blaze_Support":3
+  },
+  "combatCapital": {
+    "sep_effulgence_Standard": 4,
+    "sep_effulgence_Assault": 3,
+    "sep_effulgence_Support": 3
+  }
 }
