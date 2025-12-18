@@ -7,7 +7,6 @@ import com.fs.starfarer.api.impl.campaign.ids.FleetTypes;
 import com.fs.starfarer.api.impl.campaign.ids.MemFlags;
 import com.fs.starfarer.api.impl.campaign.shared.PersonBountyEventData;
 import com.fs.starfarer.api.impl.campaign.shared.SharedData;
-import com.fs.starfarer.api.util.Misc;
 import org.apache.log4j.Logger;
 import sectorexpansionpack.MissionScenarioSpec;
 import sectorexpansionpack.Utils;

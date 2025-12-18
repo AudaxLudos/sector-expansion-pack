@@ -2,7 +2,7 @@ scenarioId,missionId,frequency,duration,creditReward,type,complications,tags,dat
 fem1,sep_fem,10,,,COMMODITY_DELIVERY,"GOTO,pirates,chanceHIGH,hostile,aggressive,lowRep,nearPlayer,interceptEscort|
 WAIT,pirates,chanceMID,hostile,aggressive,lowRep,interceptEscort|
 WAIT,pirates,chanceLOW,hostile,aggressive,lowRep,interceptEscort",oneWay,,,,
-fem2,sep_fem,1000,,VERY_HIGH,DRUG_SMUGGLING,"GOTO,pirates,chanceHIGH,hostile,aggressive,lowRep,nearPlayer,hyperspaceOnly,interceptEscort|
+fem2,sep_fem,3,,VERY_HIGH,DRUG_SMUGGLING,"GOTO,pirates,chanceHIGH,hostile,aggressive,lowRep,nearPlayer,hyperspaceOnly,interceptEscort|
 RETURN,pirates,chanceHIGH,hostile,aggressive,lowRep,nearPlayer,hyperspaceOnly,interceptEscort
 ",,,,,
 fem3,sep_fem,5,,VERY_HIGH,REBELLION_SUPPORT,"GOTO,pirates,chanceHIGH,hostile,aggressive,lowRep,nearPlayer,interceptEscort|
