@@ -1,4 +1,10 @@
-### 0.1.0a
+### 0.1.19a
+- Fix crash when completing a drug smuggling escort mission
+- Fix number format exception error in missions
+- Add blaze ship
+- Add effulgence ship
+
+### 0.1.0a (205)
 - Fix scenario credit reward not properly applied
 - Fix special item being installed with unmet requirements
 - Add scenarios for fleet escort mission
