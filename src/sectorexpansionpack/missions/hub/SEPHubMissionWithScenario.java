@@ -7,6 +7,7 @@ import com.fs.starfarer.api.impl.campaign.ids.FleetTypes;
 import com.fs.starfarer.api.impl.campaign.ids.MemFlags;
 import com.fs.starfarer.api.impl.campaign.shared.PersonBountyEventData;
 import com.fs.starfarer.api.impl.campaign.shared.SharedData;
+import com.fs.starfarer.api.util.Misc;
 import org.apache.log4j.Logger;
 import sectorexpansionpack.MissionScenarioSpec;
 import sectorexpansionpack.Utils;
@@ -48,7 +49,7 @@ public abstract class SEPHubMissionWithScenario extends SEPHubMissionWithBarEven
     public void setScenarioCreditReward(String creditReward) {
         if (Utils.isInEnum(creditReward, CreditReward.class)) {
             setCreditReward(CreditReward.valueOf(this.scenario.getCreditReward()));
-        } else if (Integer.parseInt(creditReward) >= 1000) {
+        } else if (creditReward != null && !creditReward.isBlank() && Utils.isNumeric(creditReward)) {
             int r = Math.abs(Integer.parseInt(creditReward));
             setCreditReward(r, r + 10000);
         } else {

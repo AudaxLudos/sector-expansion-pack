@@ -112,6 +112,10 @@ public class Utils {
         return false;
     }
 
+    public static boolean isNumeric(String str) {
+        return str.matches("^-?\\d+(?:\\.\\d+)?$");
+    }
+
     public static boolean canSpecialItemBeInstalled(String specialItemId, Industry industry) {
         InstallableItemEffect effect = ItemEffectsRepo.ITEM_EFFECTS.get(specialItemId);
         if (effect != null) {
