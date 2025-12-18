@@ -330,7 +330,7 @@ public class FleetEscortMission extends SEPHubMissionWithScenario {
                     market.getName(), market.getStarSystem().getNameWithLowercaseTypeShort(), commodityAmount));
         } else if (this.scenarioType == ScenarioType.DRUG_SMUGGLING) {
             int cargoCap = (int) this.fleet.getCargo().getMaxCapacity();
-            CommodityOnMarketAPI commodityOnMarket = market.getCommodityData(this.itemId);
+            CommodityOnMarketAPI commodityOnMarket = market.getCommodityData(Commodities.DRUGS);
             CommoditySpecAPI commoditySpec = Global.getSector().getEconomy().getCommoditySpec(commodityOnMarket.getId());
             int commodityAmount = (int) (cargoCap * 0.75f + getGenRandom().nextFloat() * 0.2f);
             Misc.affectAvailabilityWithinReason(commodityOnMarket, commodityAmount);
