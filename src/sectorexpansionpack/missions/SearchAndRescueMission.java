@@ -56,6 +56,9 @@ public class SearchAndRescueMission extends HubMissionWithBarEvent {
 
     @Override
     protected boolean create(MarketAPI createdAt, boolean barEvent) {
+        if (true) {
+            return false;
+        }
         try {
             this.scenarioData = ModPlugin.getRandomMissionScenario(getMissionId(), getGenRandom(), barEvent);
 

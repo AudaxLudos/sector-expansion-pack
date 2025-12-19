@@ -366,7 +366,7 @@ Call $sep_fem_ref showMap ""Target: $sep_fem_sysName""","The $manOrWoman starts 
 
 $HeOrShe leans in slightly. ""Relations between the $Faction and the colony on $sep_fem_mrktName in the $sep_fem_sysName are delicate. I’ve been assigned to mediate, but the colony refuses any official military escort. That means we need an alternative, and your fleet fits the requirements.""
 
-$HeOrShe continues. ""If you're interested, my superiors are prepared to pay $sep_creditReward for a safe round trip to the colony and back.""",,
+$HeOrShe continues. ""If you're interested, my superiors are prepared to pay $sep_fem_creditReward for a safe round trip to the colony and back.""",,
 ## FEM0 dialogues,,,,,,
 sep_fem_s0Blurb,SEPFEMShowBlurb,,,SAMPLE CONTACT BLURB,,
 sep_fem_s0OfferOption,SEPFEMShowOption,,,,sep_fem_start:SAMPLE CONTACT OPTION,
