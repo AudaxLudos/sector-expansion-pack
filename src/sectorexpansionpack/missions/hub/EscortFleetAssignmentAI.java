@@ -45,7 +45,6 @@ public class EscortFleetAssignmentAI implements EveryFrameScript, Script {
         return false;
     }
 
-    // IDEA: This implementation sucks update it to a better one if possible
     @Override
     public void advance(float amount) {
         CampaignFleetAPI playerFleet = Global.getSector().getPlayerFleet();

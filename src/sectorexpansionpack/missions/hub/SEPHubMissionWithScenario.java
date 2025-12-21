@@ -15,7 +15,6 @@ import sectorexpansionpack.missions.FleetEscortMission;
 import java.util.List;
 
 public abstract class SEPHubMissionWithScenario extends SEPHubMissionWithBarEvent {
-    // TODO: move common methods from all existing quests with scenarios
     protected MissionScenarioSpec scenario;
     protected Object scenarioType;
 
@@ -71,7 +70,7 @@ public abstract class SEPHubMissionWithScenario extends SEPHubMissionWithBarEven
 
             if (!rollProbability(chance)) {
                 if (log != null) {
-                    log.info("Failed to spawn due to roll check");
+                    log.info("Failed to spawn complication due to roll check");
                 }
                 continue;
             }

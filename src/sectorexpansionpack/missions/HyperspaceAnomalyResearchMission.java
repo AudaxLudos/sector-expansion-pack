@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-// TODO: Add hyperspace topography event progress when mission ends successfully
 public class HyperspaceAnomalyResearchMission extends HubMissionWithBarEvent {
     public static final String PROGRESS_STEP_UPDATE = "progress_step_update";
     public static Logger log = Global.getLogger(HyperspaceAnomalyResearchMission.class);

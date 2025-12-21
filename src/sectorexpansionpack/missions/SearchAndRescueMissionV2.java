@@ -268,7 +268,6 @@ public class SearchAndRescueMissionV2 extends SEPHubMissionWithScenario {
             requireEntityType(Entities.WRECK);
             entity = pickEntity();
         } else if (this.scenarioType == ScenarioType.CAPTURED_IN_FLEET) {
-            // TODO: Add a way to customize fleet
             beginStageTrigger(Stage.FIND);
             triggerCreateFleet(FleetSize.MEDIUM, FleetQuality.DEFAULT, getPerson().getFaction().getId(), FleetTypes.PATROL_MEDIUM, this.hideout.getLocationInHyperspace());
             triggerScaleFleetToPlayerCapabilities(FleetStrengthType.QUANTITY);
