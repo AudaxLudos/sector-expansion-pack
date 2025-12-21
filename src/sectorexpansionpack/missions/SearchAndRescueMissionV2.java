@@ -212,6 +212,7 @@ public class SearchAndRescueMissionV2 extends SEPHubMissionWithScenario {
                     person.getMemoryWithoutUpdate().set("$mentored", true);
                 }
             }
+            person.setPostId(Ranks.POST_OFFICER_FOR_HIRE);
         } else if (this.survivorPostType == PersonPostType.ADMINISTRATOR) {
             WeightedRandomPicker<Integer> tierPicker = new WeightedRandomPicker<>(getGenRandom());
             tierPicker.add(1);
