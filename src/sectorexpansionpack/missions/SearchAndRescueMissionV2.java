@@ -171,7 +171,7 @@ public class SearchAndRescueMissionV2 extends SEPHubMissionWithScenario {
 
     public PersonPostType pickSurvivorPostType() {
         WeightedRandomPicker<PersonPostType> picker = new WeightedRandomPicker<>(getGenRandom());
-        picker.add(PersonPostType.OFFICER, 5f);
+        picker.add(PersonPostType.OFFICER, 7f);
         picker.add(PersonPostType.ADMINISTRATOR, 5f);
         picker.add(PersonPostType.CONTACT, 5f);
         picker.add(PersonPostType.CIVILIAN, 10f);
