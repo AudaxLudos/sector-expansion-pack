@@ -183,9 +183,6 @@ public class SearchAndRescueMissionV2 extends SEPHubMissionWithScenario {
         if (this.survivorPostType == PersonPostType.OFFICER) {
             WeightedRandomPicker<Integer> levelPicker = new WeightedRandomPicker<>(getGenRandom());
             levelPicker.add(1, 10f);
-            levelPicker.add(1, 10f);
-            levelPicker.add(1, 10f);
-            levelPicker.add(2, 7f);
             levelPicker.add(2, 7f);
             levelPicker.add(5, 3f);
             levelPicker.add(7, 1f);
