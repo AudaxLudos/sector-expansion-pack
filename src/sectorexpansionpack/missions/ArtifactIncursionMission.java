@@ -16,6 +16,7 @@ import com.fs.starfarer.api.ui.TooltipMakerAPI;
 import com.fs.starfarer.api.util.Misc;
 import com.fs.starfarer.api.util.WeightedRandomPicker;
 import org.apache.log4j.Logger;
+import sectorexpansionpack.ModPlugin;
 import sectorexpansionpack.Utils;
 import sectorexpansionpack.missions.hub.SEPHubMissionWithBarEvent;
 
@@ -95,7 +96,7 @@ public class ArtifactIncursionMission extends SEPHubMissionWithBarEvent implemen
             return false;
         }
 
-        pickIndustryWithItem();
+        pickIndustryWithCompatibleSpecialItem(createdAt);
         if (this.industry == null) {
             log.info("Failed to find industry with artifact");
             return false;
@@ -167,31 +168,31 @@ public class ArtifactIncursionMission extends SEPHubMissionWithBarEvent implemen
         return true;
     }
 
-    public void pickIndustryWithItem() {
+    public void pickIndustryWithCompatibleSpecialItem(MarketAPI other) {
         WeightedRandomPicker<Industry> industryPicker = new WeightedRandomPicker<>(getGenRandom());
-        for (Industry industry : this.market.getIndustries()) {
-            SpecialItemData itemData = industry.getSpecialItem();
-            // TODO: Add modded colony items that is used by players only or has commodity demand effects
-            if (itemData == null
-                    || itemData.getId().equals(Items.CORONAL_PORTAL)
-                    || itemData.getId().equals(Items.ORBITAL_FUSION_LAMP)) {
+        for (Industry ind : this.market.getIndustries()) {
+            SpecialItemData installedItem = ind.getSpecialItem();
+            if (installedItem == null) {
                 continue;
             }
-            industryPicker.add(industry);
+            if (!ModPlugin.COLONY_ITEM_WHITELIST.contains(installedItem.getId())) {
+                continue;
+            }
+            for (Industry otherInd : other.getIndustries()) {
+                if (!otherInd.wantsToUseSpecialItem(installedItem)) {
+                    continue;
+                }
+                if (Utils.canSpecialItemBeInstalled(installedItem.getId(), otherInd)) {
+                    industryPicker.add(ind);
+                }
+            }
         }
 
         this.industry = industryPicker.pick();
     }
 
     public void pickItemFromIndustry() {
-        WeightedRandomPicker<SpecialItemData> specialItemPicker = new WeightedRandomPicker<>(getGenRandom());
-        for (Industry industry : this.market.getIndustries()) {
-            for (SpecialItemData data : industry.getVisibleInstalledItems()) {
-                specialItemPicker.add(data);
-            }
-        }
-
-        this.specialItemData = specialItemPicker.pick();
+        this.specialItemData = this.industry.getSpecialItem();
         if (this.specialItemData == null) {
             return;
         }
