@@ -620,11 +620,11 @@ sep_sarV2_s0FightText,SEPSARV2ShowFightText,,,"The feed crackles back on. The ki
 sep_sarV2_s0RaidFinishedText,SEPSARV2ShowRaidFinishedText,,"SetTextHighlightColors h
 SetTextHighlights $sep_sarV2_survivorFullName","Your marines advance into the pirate hideout with practiced precision, clearing the compound room by room. A few hostages are lost in the crossfire, but the assault is controlled and decisive, preventing further casualties.
 
-During the operation, $sep_sar_survivorFullName, steps forward and directs your raid leader to the remaining survivors. They are secured and extracted back to your fleet for treatment.",,
+During the operation, $sep_sarV2_survivorFullName, steps forward and directs your raid leader to the remaining survivors. They are secured and extracted back to your fleet for treatment.",,
 sep_sarV2_s0EntityDefeatedText,SEPSARV2ShowEntityDefeatedText,,"SetTextHighlightColors h
 SetTextHighlights $sep_sarV2_survivorFullName","Your sensors officer scans through the debris field, searching for any trace of the hostage. Among the wreckage, they discover a lone shuttle adrift.
 
-Inside, $sep_sar_survivorFullName is found alive, shaken but stable, and quickly transferred to your sickbay for treatment.",,
+Inside, $sep_sarV2_survivorFullName is found alive, shaken but stable, and quickly transferred to your sickbay for treatment.",,
 sep_sarV2_s0AliveText,SEPSARV2ShowAliveText,,,SAMPLE SURVIVOR ALIVE TEXT,,
 sep_sarV2_s0DeadText,SEPSARV2ShowDeadText,,,SAMPLE SURVIVOR DEAD TEXT,,
 sep_sarV2_s0AliveReturnText,SEPSARV2ShowAliveReturnText,,"SetTextHighlightColors h
