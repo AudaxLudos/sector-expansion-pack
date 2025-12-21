@@ -24,7 +24,6 @@ import com.fs.starfarer.api.util.WeightedRandomPicker;
 import org.apache.log4j.Logger;
 import sectorexpansionpack.ModPlugin;
 import sectorexpansionpack.Utils;
-import sectorexpansionpack.intel.misc.ArtifactInstallationIntel;
 import sectorexpansionpack.missions.EntityFinderMission;
 
 import java.awt.*;
@@ -671,29 +670,7 @@ public class IncursionFleetIntel extends GenericRaidFGI {
                         this.target.getStarSystem().getNameWithLowercaseTypeShort()));
             }
         } else if (RETURN_ACTION.equals(action.getId()) && this.raidAction.isActionFinished() && this.raidAction.getSuccessFraction() > 0f) {
-            this.efm.resetSearch();
-            this.efm.requireMarketFaction(this.source.getFactionId());
-            this.efm.requireMarketNotHidden();
-            this.efm.requireMarketNotInHyperspace();
-            this.efm.requireMarketFactionNotPlayer();
-            this.efm.requireMarketCanUseSpecialItem(this.specialItemData);
-            this.efm.preferMarketSizeAtMost(100);
-            this.efm.preferMarketIs(this.source);
-            MarketAPI market = this.efm.pickMarket();
-
-            if (market == null) {
-                log.info("Failed to find market to install special item");
-                return;
-            }
-
-            // IDEA: Create a courier fleet that transfers the colony item to another faction market if the source market can't use it
-            // TODO: Delay installation by a few days
-            Industry ind = Utils.pickIndustryToInstallItem(market, this.specialItemData);
-            ind.setSpecialItem(this.specialItemData);
-            new ArtifactInstallationIntel(market, ind, this.specialItemSpec);
-            log.info(String.format("Installing %s to %s facility %s %s in the %s",
-                    this.specialItemSpec.getName(), ind.getCurrentName(), market.getOnOrAt(),
-                    market.getName(), market.getStarSystem().getNameWithLowercaseTypeShort()));
+            Utils.findMarketToInstallSpecialItem(this.efm, this.source, this.specialItemData, log);
         }
     }
 

@@ -17,7 +17,6 @@ import com.fs.starfarer.api.util.Misc;
 import com.fs.starfarer.api.util.WeightedRandomPicker;
 import org.apache.log4j.Logger;
 import sectorexpansionpack.Utils;
-import sectorexpansionpack.intel.misc.ArtifactInstallationIntel;
 import sectorexpansionpack.missions.hub.SEPHubMissionWithBarEvent;
 
 import java.awt.*;
@@ -237,29 +236,7 @@ public class ArtifactIncursionMission extends SEPHubMissionWithBarEvent implemen
             return;
         }
 
-        resetSearch();
-        requireMarketFaction(getPerson().getFaction().getId());
-        requireMarketNotHidden();
-        requireMarketNotInHyperspace();
-        requireMarketFactionNotPlayer();
-        requireMarketCanUseSpecialItem(this.specialItemData);
-        preferMarketSizeAtMost(100);
-        preferMarketIs(getPerson().getMarket());
-        MarketAPI market = pickMarket();
-
-        if (market == null) {
-            log.info("Failed to find market to install special item");
-            return;
-        }
-
-        // TODO: Delay special item installation by some days
-        // TODO: Transfer previous colony item if any to another same faction market
-        Industry ind = Utils.pickIndustryToInstallItem(market, this.specialItemData);
-        ind.setSpecialItem(this.specialItemData);
-        new ArtifactInstallationIntel(market, ind, this.specialItemSpec);
-        log.info(String.format("Installing %s to %s facility %s %s in the %s",
-                this.specialItemSpec.getName(), ind.getCurrentName(), market.getOnOrAt(),
-                market.getName(), market.getStarSystem().getNameWithLowercaseTypeShort()));
+        Utils.findMarketToInstallSpecialItem(this, getPerson().getFaction().getId(), null, this.specialItemData, log);
     }
 
     @Override

@@ -31,7 +31,6 @@ import java.util.Objects;
 import java.util.Random;
 
 public abstract class SEPHubMissionWithBarEvent extends HubMissionWithBarEvent {
-    // TODO: move static class from all existing missions
     public static void makeFleetInterceptOther(CampaignFleetAPI fleet, SectorEntityToken other, float interceptDays) {
         if (fleet.getAI() == null) {
             fleet.setAI(Global.getFactory().createFleetAI(fleet));

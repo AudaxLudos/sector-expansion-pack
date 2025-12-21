@@ -8,6 +8,9 @@ import com.fs.starfarer.api.impl.campaign.econ.impl.InstallableItemEffect;
 import com.fs.starfarer.api.impl.campaign.econ.impl.ItemEffectsRepo;
 import com.fs.starfarer.api.util.Misc;
 import com.fs.starfarer.api.util.WeightedRandomPicker;
+import org.apache.log4j.Logger;
+import sectorexpansionpack.intel.misc.ArtifactInstallationIntel;
+import sectorexpansionpack.missions.hub.SEPHubMissionWithBarEvent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,6 +47,44 @@ public class Utils {
         }
 
         return result;
+    }
+
+    public static void findMarketToInstallSpecialItem(SEPHubMissionWithBarEvent efm, MarketAPI source, SpecialItemData data, Logger log) {
+        findMarketToInstallSpecialItem(efm, source.getFactionId(), source, data, log);
+    }
+
+    public static void findMarketToInstallSpecialItem(SEPHubMissionWithBarEvent efm, String factionId, MarketAPI source, SpecialItemData data, Logger log) {
+        SpecialItemSpecAPI spec = Global.getSettings().getSpecialItemSpec(data.getId());
+        efm.resetSearch();
+        efm.requireMarketFaction(factionId);
+        efm.requireMarketNotHidden();
+        efm.requireMarketNotInHyperspace();
+        efm.requireMarketFactionNotPlayer();
+        efm.requireMarketCanUseSpecialItem(data);
+        efm.preferMarketSizeAtMost(100);
+        efm.preferMarketIs(source);
+        MarketAPI market = efm.pickMarket();
+        if (market == null) {
+            log.info("Failed to find market to install special item");
+            return;
+        }
+
+        Industry ind = Utils.pickIndustryToInstallItem(market, data);
+        if (ind == null) {
+            log.info("Failed to find industry on market to install special item");
+            return;
+        }
+
+        SpecialItemData prevSpecialItem = ind.getSpecialItem();
+        if (prevSpecialItem != null) {
+            findMarketToInstallSpecialItem(efm, market.getFactionId(), market, prevSpecialItem, log);
+        }
+
+        ind.setSpecialItem(data);
+        new ArtifactInstallationIntel(market, ind, spec);
+        log.info(String.format("Installing %s to %s facility %s %s in the %s",
+                spec.getName(), ind.getCurrentName(), market.getOnOrAt(),
+                market.getName(), market.getStarSystem().getNameWithLowercaseTypeShort()));
     }
 
     public static Industry pickIndustryToInstallItem(MarketAPI market, SpecialItemData specialItemData) {

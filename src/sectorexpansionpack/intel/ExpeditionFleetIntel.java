@@ -18,7 +18,6 @@ import org.apache.log4j.Logger;
 import org.lwjgl.util.vector.Vector2f;
 import sectorexpansionpack.ModPlugin;
 import sectorexpansionpack.Utils;
-import sectorexpansionpack.intel.misc.ArtifactInstallationIntel;
 import sectorexpansionpack.intel.misc.ExpeditionFleetDepartureIntel;
 import sectorexpansionpack.intel.misc.LeakedArtifactLocationIntel;
 import sectorexpansionpack.missions.EntityFinderMission;
@@ -29,11 +28,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Random;
 
-// IDEA: Create a base expedition class then create a generic expedition intel
-// Won't be seen by the player
-// Will be used to send out departure and leak intel
-// Should replace with custom RouteFleetSpawner to make it less heavy but this works
-// Could make a BaseHubEvent with the same functionality as BaseHubMission but NO
 public class ExpeditionFleetIntel extends FleetGroupIntel {
     public static final String PREPARE_ACTION = "prepare_action";
     public static final String GOTO_ACTION = "travel_action";
@@ -46,7 +40,7 @@ public class ExpeditionFleetIntel extends FleetGroupIntel {
     public static final String MAIN_FLEET_KEY = "$sep_efi_mainFleet";
     public static final String TARGET_KEY = "$sep_efi_target";
     public static final String GUARDED_KEY = "$sep_efi_targetGuarded";
-    public static final String HAS_ARTIFACT = "$sep_efi_hasArtifact";
+    public static final String HAS_ARTIFACT_KEY = "$sep_efi_hasArtifact";
     public static final float WRECK_CHANCE = 0.5f;
     public static Logger log = Global.getLogger(ExpeditionFleetIntel.class);
 
@@ -341,32 +335,10 @@ public class ExpeditionFleetIntel extends FleetGroupIntel {
             if (mainFleet != null) {
                 Misc.makeImportant(mainFleet, "hasSpecialItem");
                 Misc.addDefeatTrigger(mainFleet, "SEPEFGIFleetDefeated");
-                mainFleet.getMemoryWithoutUpdate().set(HAS_ARTIFACT, true);
+                mainFleet.getMemoryWithoutUpdate().set(HAS_ARTIFACT_KEY, true);
             }
         } else if (DOCK_ACTION.equals(action.getId())) {
-            this.efm.resetSearch();
-            this.efm.requireMarketFaction(getFaction().getId());
-            this.efm.requireMarketNotHidden();
-            this.efm.requireMarketNotInHyperspace();
-            this.efm.requireMarketFactionNotPlayer();
-            this.efm.requireMarketCanUseSpecialItem(this.specialItemData);
-            this.efm.preferMarketSizeAtMost(100);
-            this.efm.preferMarketIs(this.source);
-            MarketAPI market = this.efm.pickMarket();
-
-            if (market == null) {
-                log.info("Failed to find market to install special item");
-                return;
-            }
-
-            // IDEA: Create a courier fleet that transfers the colony item to another faction market if the source market can't use it
-            // TODO: Delay installation by a few days
-            Industry ind = Utils.pickIndustryToInstallItem(market, this.specialItemData);
-            ind.setSpecialItem(this.specialItemData);
-            new ArtifactInstallationIntel(market, ind, this.specialItemSpec);
-            log.info(String.format("Installing %s to %s facility %s %s in the %s",
-                    this.specialItemSpec.getName(), ind.getCurrentName(), market.getOnOrAt(),
-                    market.getName(), market.getStarSystem().getNameWithLowercaseTypeShort()));
+            Utils.findMarketToInstallSpecialItem(this.efm, this.source, this.specialItemData, log);
         }
 
         if (!this.isLeaked && !PREPARE_ACTION.equals(action.getId()) && !DOCK_ACTION.equals(action.getId())) {
@@ -411,7 +383,7 @@ public class ExpeditionFleetIntel extends FleetGroupIntel {
             Misc.makeUnimportant(fleet, "hasSpecialItem");
             fleet.getMemoryWithoutUpdate().unset(FLEET_KEY);
             fleet.getMemoryWithoutUpdate().unset(MAIN_FLEET_KEY);
-            fleet.getMemoryWithoutUpdate().unset(HAS_ARTIFACT);
+            fleet.getMemoryWithoutUpdate().unset(HAS_ARTIFACT_KEY);
             fleet.getMemoryWithoutUpdate().unset(EVENT_KEY);
         }
     }
@@ -537,7 +509,6 @@ public class ExpeditionFleetIntel extends FleetGroupIntel {
         m.triggerSetFleetQuality(HubMissionWithTriggers.FleetQuality.DEFAULT);
         m.triggerSetFleetFlag(FLEET_KEY);
 
-        // IDEA: Scale fleet quality base on source market ship quality
         if (size == this.maxFleetSize) { // Main Fleet
             m.triggerSetFleetFlag(MAIN_FLEET_KEY);
             m.triggerSetFleetMemoryValue(EVENT_KEY, this);
@@ -558,7 +529,7 @@ public class ExpeditionFleetIntel extends FleetGroupIntel {
                 // Ensure fleet is marked properly when it spawns midway
                 Misc.makeImportant(fleet, "hasSpecialItem");
                 Misc.addDefeatTrigger(fleet, "SEPEFGIFleetDefeated");
-                fleet.getMemoryWithoutUpdate().set(HAS_ARTIFACT, true);
+                fleet.getMemoryWithoutUpdate().set(HAS_ARTIFACT_KEY, true);
             }
         } else {
             fleet.setName("Expedition Supply Fleet");
