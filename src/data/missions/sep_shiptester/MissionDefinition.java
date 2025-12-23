@@ -33,6 +33,16 @@ public class MissionDefinition implements MissionDefinitionPlugin {
             if (shipHullSpec.isDHull()) {
                 continue;
             }
+            if (shipHullSpec.getHints().contains(ShipHullSpecAPI.ShipTypeHints.HIDE_IN_CODEX)
+                    || shipHullSpec.getHints().contains(ShipHullSpecAPI.ShipTypeHints.STATION)
+                    || shipHullSpec.getHints().contains(ShipHullSpecAPI.ShipTypeHints.MODULE)) {
+                continue;
+            }
+            if (!Global.getSettings().isDevMode()) {
+                if (shipHullSpec.getTags().contains("omega") || shipHullSpec.getTags().contains("remnant")) {
+                    continue;
+                }
+            }
             ModSpecAPI modSpec = shipHullSpec.getSourceMod();
             if (modSpec == null || !Objects.equals(modSpec.getId(), "sectorexpansionpack")) {
                 continue;
