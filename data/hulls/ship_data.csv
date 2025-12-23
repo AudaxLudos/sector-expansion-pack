@@ -8,4 +8,5 @@ Accipiter,sep_accipiter,Destroyer,Midline,plasmajets,12,4000,300,4200,4167,300,9
 ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 # remnant,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 Blaze,sep_blaze,Drone Gunship,Remnant,phaseteleporter,15,3000,300,10000,6250,700,70,,120,175,150,50,100,300,FRONT,,300,0.4,0.6,,,0,0,10,15,1,15,10,120000,8,40,180,0.25,15,15,,,,,,,UNBOARDABLE,"remnant, auto_rec, codex_unlockable",,,0.5,0.75,2,2,,
+Sun Ray,sep_sun_ray,Droneship,Remnant,plasmajets,12,5000,450,7500,5000,500,115,,85,75,50,30,50,500,FRONT,,180,0.4,0.6,,,0,0,80,60,2,30,10,50000,5,15,420,0.25,12,12,,,,,,,UNBOARDABLE,"remnant, auto_rec, codex_unlockable",,,,0.5,2,3,,
 Effulgence,sep_effulgence,Drone Battlecarrier,Remnant,plasmajets,30,16000,1200,20000,37500,1250,300,3,50,40,30,10,14,3200,FRONT,,120,0.4,0.6,,,0,0,200,350,10,35,8,430000,3,15,720,0.25,50,50,,,,,,,UNBOARDABLE,"remnant, auto_rec, codex_unlockable",,,,0.4,2,4,,
