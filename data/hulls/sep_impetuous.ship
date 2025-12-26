@@ -1,0 +1,141 @@
+{
+    "hullName": "Impetuous",
+    "hullId": "sep_impetuous",
+    "hullSize": "FRIGATE",
+    "style": "MIDLINE",
+    "spriteName": "graphics/sectorexpansionpack/hulls/impetuous.png",
+    "height": 95,
+    "width": 92,
+    "center": [
+        46, 47.5
+    ],
+    "collisionRadius": 80,
+    "coversColor": "",
+    "shieldCenter": [
+        0, 0
+    ],
+    "shieldRadius": 70,
+    "viewOffset": 0,
+    "builtInMods": [
+        "missleracks"
+    ],
+    "builtInWings": [],
+    "builtInModules": null,
+    "weaponSlots": [
+        {
+            "id": "WS 000",
+            "size": "MEDIUM",
+            "type": "COMPOSITE",
+            "mount": "TURRET",
+            "arc": 180,
+            "angle": 45,
+            "locations": [
+                     5.5,       27
+            ]
+        },
+        {
+            "id": "WS 001",
+            "size": "MEDIUM",
+            "type": "COMPOSITE",
+            "mount": "TURRET",
+            "arc": 180,
+            "angle": -45,
+            "locations": [
+                     5.5,      -27
+            ]
+        },
+        {
+            "id": "WS 002",
+            "size": "MEDIUM",
+            "type": "COMPOSITE",
+            "mount": "HARDPOINT",
+            "arc": 15,
+            "angle": 0,
+            "locations": [
+                    33.5,        0
+            ]
+        },
+        {
+            "id": "WS 003",
+            "size": "SMALL",
+            "type": "ENERGY",
+            "mount": "TURRET",
+            "arc": 230,
+            "angle": 180,
+            "locations": [
+                   -30.5,        0
+            ]
+        }
+    ],
+    "engineSlots": [
+        {
+            "location": [
+                -47.5, 14
+            ],
+            "length": 64,
+            "width": 16,
+            "angle": 180,
+            "contrailSize": 64,
+            "style": "MIDLINE"
+        },
+        {
+            "location": [
+                -47.5, -14
+            ],
+            "length": 64,
+            "width": 16,
+            "angle": 180,
+            "contrailSize": 64,
+            "style": "MIDLINE"
+        },
+        {
+            "location": [
+                -47.5, 24
+            ],
+            "length": 32,
+            "width": 12,
+            "angle": 180,
+            "contrailSize": 64,
+            "style": "MIDLINE"
+        },
+        {
+            "location": [
+                -47.5, -24
+            ],
+            "length": 32,
+            "width": 12,
+            "angle": 180,
+            "contrailSize": 64,
+            "style": "MIDLINE"
+        },
+        {
+            "location": [
+                -47.5, 4.5
+            ],
+            "length": 32,
+            "width": 16,
+            "angle": 180,
+            "contrailSize": 64,
+            "style": "MIDLINE"
+        },
+        {
+            "location": [
+                -47.5, -4.5
+            ],
+            "length": 32,
+            "width": 16,
+            "angle": 180,
+            "contrailSize": 64,
+            "style": "MIDLINE"
+        }
+    ],
+    "bounds": [
+             -48,      -25,
+               8,      -43,
+              36,    -23.5,
+              36,     23.5,
+               8,       43,
+        
+             -48,       25
+    ]
+}
