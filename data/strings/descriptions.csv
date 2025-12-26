@@ -1,9 +1,17 @@
 id,type,text1,text2,text3,text4,text5,notes
 sep_hornet,SHIP,Approval Status: Pending,,,,,
 sep_wonder,SHIP,Approval Status: Pending,,,,,
+# midline,,,,,,,
+sep_impetuous,SHIP,"The Impetuous missile frigate is a mobile fire-support platform designed to escort larger hulls. It was primarily used to secure early victories and was outfitted to engage heavily shielded or armored targets.
+
+Developed by Altair Exotech during the early rise of power-projection strategies, shortly before the collapse of the Gate system, the frigate began as a prototype that was leaked to the public, prompting a handful of captains to commission a few hulls. Once these ships were field-tested, their formidable strength quickly became known. The frigate featured oversized missile storage, augmented missile gantries, enough missile mounts to bombard a planet, and heavy armor to match.
+
+But after the gates collapsed, its reputation was slowly eroded by mounting issues. High production costs, heavy supply upkeep, and a tendency to break apart catastrophically began to outweigh its strengths. Over time, the hull was gradually phased out of production and replaced with a larger, more reliable counterpart.
+
+Even so, the design never fully vanished. A handful of independent shipyards are still known to construct the Impetuous on a made-to-order basis, keeping the hull alive more as a curiosity than as a warship.",,,,,
 sep_accipiter,SHIP,Approval Status: Pending,,,,,
 ,,,,,,,
-# Remnant,,,,,,,
+# remnant,,,,,,,
 sep_effulgence,SHIP,"A remnant of the autonomous AI fleets developed by the Tri-Tachyon Corporation. Illegal under Domain (and Hegemony) law, and an abomination to the Church of Galactic Redemption, the First AI War saw these creations purged from the Sector. So the official histories say.
 
 The Effulgence battlecarrier was a late design born in the final stages of the First AI War. With Tri-Tachyon resources vanishing at an alarming rate, the ship was engineered for rapid production and remarkable flexibility. Its weapon mounts gave it the power to strike hard, while its fighter bays allowed it to shield itself and any fleet it accompanied. By all accounts, the battlecarrier fulfilled its purpose perfectly. Yet its debut came too late. When the first Effulgence entered the battlefield, Tri-Tachyon was already losing.
@@ -13,4 +21,4 @@ sep_blaze,SHIP,"A remnant of the autonomous AI fleets developed by the Tri-Tachy
 
 A design rarely witnessed during the First AI War, the Blaze drone gunship occupies an unusual place in recorded history. Historians describe it as inefficient, its raw strength undermined by flawed engineering, which may explain why so few were ever encountered. Yet despite its obscurity, whispers about the hull persisted. Some claim it was the precursor that paved the way for a far more terrifying design. Others insist it served as the template for a certain gunship, though such theories are officially dismissed.
 
-Even so, the uncanny similarities and coincidences are enough to make one question things.",,,,,
+Even so, the uncanny similarities and coincidences are enough to make one question things.",,,,,"Instead of ""raw strength..."" change it to ""compared to its remnant counter parts..."""
