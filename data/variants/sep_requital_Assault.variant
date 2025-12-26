@@ -1,0 +1,65 @@
+{
+    "displayName": "Assault",
+    "fluxCapacitors": 27,
+    "fluxVents": 27,
+    "goalVariant": true,
+    "hullId": "sep_requital",
+    "hullMods": [
+        "missleracks",
+        "hardenedshieldemitter",
+        "targetingunit"
+    ],
+    "quality": 0.0,
+    "variantId": "sep_requital_Assault",
+    "weaponGroups": [
+        {
+            "autofire": false,
+            "mode": "LINKED",
+            "weapons": {
+                "WS 001": "autopulse",
+                "WS 000": "autopulse"
+            }
+        },
+        {
+            "autofire": false,
+            "mode": "ALTERNATING",
+            "weapons": {
+                "WS 007": "hurricane",
+                "WS 006": "hurricane"
+            }
+        },
+        {
+            "autofire": false,
+            "mode": "ALTERNATING",
+            "weapons": {
+                "WS 009": "breachpod",
+                "WS 008": "breachpod"
+            }
+        },
+        {
+            "autofire": true,
+            "mode": "LINKED",
+            "weapons": {
+                "WS 005": "heavyneedler",
+                "WS 004": "heavyneedler"
+            }
+        },
+        {
+            "autofire": true,
+            "mode": "LINKED",
+            "weapons": {
+                "WS 011": "pdlaser",
+                "WS 010": "pdlaser",
+                "WS 003": "pdburst",
+                "WS 002": "pdburst"
+            }
+        },
+        {
+            "autofire": true,
+            "mode": "LINKED",
+            "weapons": {
+                "WS 012": "flak"
+            }
+        }
+    ]
+}

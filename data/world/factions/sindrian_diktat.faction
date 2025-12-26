@@ -1,7 +1,8 @@
 {
     "knownShips":{
         "hulls":[
-            "sep_impetuous"
+            "sep_impetuous",
+            "sep_requital"
         ]
     }
 }
