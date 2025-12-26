@@ -5,6 +5,10 @@
     "sep_impetuous_Strike": 3,
     "sep_impetuous_Support": 3
   },
+  "combatMedium": {
+    "sep_sun_ray_Attack": 5,
+    "sep_sun_ray_Support": 5
+  },
   "combatCapital": {
     "sep_effulgence_Standard": 4,
     "sep_effulgence_Assault": 3,
