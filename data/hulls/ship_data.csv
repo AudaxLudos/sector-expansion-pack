@@ -8,6 +8,7 @@ Wonder,sep_wonder,Destroyer,High Tech,maneuveringjets,10,4000,400,6000,,400,90,,
 # midline,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 Impetuous,sep_impetuous,Missile Frigate,Midline,fastmissileracks,12,3500,350,3500,,200,65,,110,100,75,60,120,300,OMNI,,180,0.4,0.8,,,20,40,80,40,1,30,9,40000,8,20,360,0.25,12,12,,,,,,,,"rare_bp, merc, ind",,,,0.75,2,2,,
 Accipiter,sep_accipiter,Destroyer,Midline,plasmajets,12,4000,300,4200,,300,95,,100,90,60,40,90,300,FRONT,,270,0.4,0.8,,,50,100,100,60,2,30,9,40000,5,12,360,0.25,12,12,,,,,,,,"midline_bp, merc, ind",,,,0.5,2,3,,
+Requital,sep_requital,Battlecruiser,Midline,microburn,26,10000,800,10000,,700,300,,75,50,40,20,30,2500,OMNI,,90,0.4,1.4,,,400,500,300,300,10,30,8,300000,3,15,600,0.25,40,40,,,,,,,,"rare_bp, merc",,,,0.5,2,4,,503
 ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 # remnant,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 Blaze,sep_blaze,Drone Gunship,Remnant,phaseteleporter,15,3000,300,10000,,700,70,,120,175,150,50,100,300,FRONT,,300,0.4,0.6,,,0,0,10,15,1,15,10,120000,8,40,180,0.25,15,15,,,,,,,UNBOARDABLE,"remnant, auto_rec, codex_unlockable",,,0.5,0.75,2,2,,
