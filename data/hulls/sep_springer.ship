@@ -1,0 +1,103 @@
+{
+    "hullName": "Springer",
+    "hullId": "sep_springer",
+    "hullSize": "FRIGATE",
+    "style": "LOW_TECH",
+    "spriteName": "graphics/sectorexpansionpack/hulls/springer.png",
+    "height": 111,
+    "width": 84,
+    "center": [
+        42, 55.5
+    ],
+    "collisionRadius": 90,
+    "coversColor": "",
+    "shieldCenter": [
+        0, 0
+    ],
+    "shieldRadius": 80,
+    "viewOffset": 0,
+    "builtInWeapons": {
+        "WS 001": "tpc"
+    },
+    "builtInWings": [],
+    "builtInModules": null,
+    "weaponSlots": [
+        {
+            "id": "WS 001",
+            "size": "LARGE",
+            "type": "BUILT_IN",
+            "mount": "HARDPOINT",
+            "arc": 0,
+            "angle": 0,
+            "locations": [
+                    36.5,        0
+            ]
+        },
+        {
+            "id": "WS 000",
+            "size": "MEDIUM",
+            "type": "COMPOSITE",
+            "mount": "TURRET",
+            "arc": 0,
+            "angle": 0,
+            "locations": [
+                     4.5,        0
+            ]
+        },
+        {
+            "id": "WS 002",
+            "size": "SMALL",
+            "type": "SYSTEM",
+            "mount": "HARDPOINT",
+            "arc": 0,
+            "angle": 0,
+            "locations": [
+                     0.5,       32
+            ]
+        },
+        {
+            "id": "WS 003",
+            "size": "SMALL",
+            "type": "SYSTEM",
+            "mount": "HARDPOINT",
+            "arc": 0,
+            "angle": 0,
+            "locations": [
+                     0.5,      -32
+            ]
+        }
+    ],
+    "engineSlots": [
+        {
+            "location": [
+                -54.5, 10
+            ],
+            "length": 100,
+            "width": 30,
+            "angle": 180,
+            "contrailSize": 64,
+            "style": "LOW_TECH"
+        },
+        {
+            "location": [
+                -54.5, -10
+            ],
+            "length": 100,
+            "width": 30,
+            "angle": 180,
+            "contrailSize": 64,
+            "style": "LOW_TECH"
+        }
+    ],
+    "bounds": [
+           -52.5,      -20,
+               4,      -42,
+            -3.5,      -30,
+              51,      -12,
+              51,       12,
+        
+            -3.5,       30,
+               4,       42,
+           -52.5,       20
+    ]
+}
