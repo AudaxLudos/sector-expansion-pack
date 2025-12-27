@@ -8,6 +8,11 @@ sep_springer,SHIP,"The Springer-class frigate is a rare Hegemony engineering ach
 In combat, the frigate functions as a fast, heavily armed skirmisher. Its speed and handling allow it to strike independently, delivering punishing bursts before disengaging to vent flux. With minimal secondary armament, the ship depends almost entirely on its main cannon, favoring decisive attacks over prolonged engagements. While most effective when paired with supporting forces, it remains dangerous on its own.
 
 The origins of the frigate remain unclear. When the hull was first sighted in an independent shipyard, its oversized armament drew immediate attention, prompting the Hegemony to suppress and hide all information regarding it. Even so, the frigate’s compact and optimized design has allowed a few hulls to escape official control, making them unusually easy to smuggle into the hands of capable captains.",,,,,
+sep_penitent,SHIP,"The Penitent traces its origins to an early period of naval development, before a complete Domain-era doctrine had been fully established. Conceived at a time when shipbuilders operated with few shared assumptions, these early design choices defined the ship’s lifelong reputation.
+
+Unconventional even by destroyer standards, the Penitent’s most notable feature is a rear-facing heavy missile system, a layout widely regarded as impractical and unintuitive. This design earned it a poor reputation among most captains, as the ship is often dismissed as an engineering misstep rather than a deliberate innovation. Yet a small number of captains have learned to exploit the Penitent’s peculiar strengths.
+
+As a result, the class remains unpopular, but those who master its quirks can extract effectiveness where others see only flaws.",,,,,
 ,,,,,,,
 # midline,,,,,,,
 sep_impetuous,SHIP,"The Impetuous missile frigate is a mobile fire-support platform designed to escort larger hulls. It was primarily used to secure early victories and was outfitted to engage heavily shielded or armored targets.
@@ -39,4 +44,4 @@ sep_blaze,SHIP,"A remnant of the autonomous AI fleets developed by the Tri-Tachy
 
 A design rarely witnessed during the First AI War, the Blaze drone gunship occupies an unusual place in recorded history. Historians describe it as inefficient, its raw strength undermined by flawed engineering, which may explain why so few were ever encountered. Yet despite its obscurity, whispers about the hull persisted. Some claim it was the precursor that paved the way for a far more terrifying design. Others insist it served as the template for a certain gunship, though such theories are officially dismissed.
 
-Even so, the uncanny similarities and coincidences are enough to make one question its origins.",,,,,"Instead of ""raw strength..."" change it to ""compared to its remnant counter parts..."""
+Even so, the uncanny similarities and coincidences are enough to make one question its origins.",,,,,
