@@ -1,5 +1,7 @@
 {
   "combatSmall": {
+    "sep_springer_Standard": 3,
+    "sep_springer_Strike": 3,
     "sep_impetuous_Strike": 3,
     "sep_impetuous_Support": 3,
     "sep_blaze_Attack": 3,
