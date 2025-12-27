@@ -1,0 +1,155 @@
+{
+    "hullName": "Penitent",
+    "hullId": "sep_penitent",
+    "hullSize": "DESTROYER",
+    "style": "LOW_TECH",
+    "spriteName": "graphics/sectorexpansionpack/hulls/penitent.png",
+    "height": 140,
+    "width": 148,
+    "center": [
+        74, 70
+    ],
+    "collisionRadius": 130,
+    "coversColor": "",
+    "shieldCenter": [
+        0, 0
+    ],
+    "shieldRadius": 120,
+    "viewOffset": 0,
+    "builtInWings": [],
+    "builtInModules": null,
+    "weaponSlots": [
+        {
+            "id": "WS 000",
+            "size": "SMALL",
+            "type": "BALLISTIC",
+            "mount": "TURRET",
+            "arc": 165,
+            "angle": 40,
+            "locations": [
+                      31,       30
+            ]
+        },
+        {
+            "id": "WS 001",
+            "size": "SMALL",
+            "type": "BALLISTIC",
+            "mount": "TURRET",
+            "arc": 165,
+            "angle": 320,
+            "locations": [
+                      31,      -30
+            ]
+        },
+        {
+            "id": "WS 002",
+            "size": "SMALL",
+            "type": "BALLISTIC",
+            "mount": "TURRET",
+            "arc": 226,
+            "angle": 80,
+            "locations": [
+                     -19,       60
+            ]
+        },
+        {
+            "id": "WS 003",
+            "size": "SMALL",
+            "type": "BALLISTIC",
+            "mount": "TURRET",
+            "arc": 226,
+            "angle": 280,
+            "locations": [
+                     -19,      -60
+            ]
+        },
+        {
+            "id": "WS 004",
+            "size": "MEDIUM",
+            "type": "BALLISTIC",
+            "mount": "TURRET",
+            "arc": 180,
+            "angle": 45,
+            "locations": [
+                      -1,       22
+            ]
+        },
+        {
+            "id": "WS 005",
+            "size": "MEDIUM",
+            "type": "BALLISTIC",
+            "mount": "TURRET",
+            "arc": 180,
+            "angle": 315,
+            "locations": [
+                      -1,      -22
+            ]
+        },
+        {
+            "id": "WS 006",
+            "size": "MEDIUM",
+            "type": "BALLISTIC",
+            "mount": "TURRET",
+            "arc": 130,
+            "angle": 0,
+            "locations": [
+                      33,        0
+            ]
+        },
+        {
+            "id": "WS 007",
+            "size": "LARGE",
+            "type": "MISSILE",
+            "mount": "HARDPOINT",
+            "arc": 15,
+            "angle": 180,
+            "locations": [
+                     -35,        0
+            ]
+        }
+    ],
+    "engineSlots": [
+        {
+            "location": [
+                -69, 33.5
+            ],
+            "length": 80,
+            "width": 32,
+            "angle": 180,
+            "contrailSize": 70,
+            "style": "LOW_TECH"
+        },
+        {
+            "location": [
+                -69, -33.5
+            ],
+            "length": 80,
+            "width": 32,
+            "angle": 180,
+            "contrailSize": 70,
+            "style": "LOW_TECH"
+        }
+    ],
+    "bounds": [
+            64.5,       -3,
+            29.5,      -44,
+            20.5,    -34.5,
+           -15.5,    -68.5,
+           -50.5,      -67,
+        
+             -64,    -52.5,
+             -68,      -24,
+           -45.5,    -17.5,
+           -45.5,     17.5,
+             -68,       24,
+        
+             -64,     52.5,
+           -50.5,       67,
+           -15.5,     68.5,
+            20.5,     34.5,
+            29.5,       44,
+        
+            64.5,        3
+    # 16 points total.
+    ]
+}
