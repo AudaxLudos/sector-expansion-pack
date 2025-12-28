@@ -1,11 +1,9 @@
 {
     "knownShips":{
         "hulls":[
+            "sep_springer",
             "sep_penitent",
             "sep_persecutor"
         ]
     }
 }
-
-
-
