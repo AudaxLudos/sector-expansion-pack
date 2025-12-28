@@ -8,6 +8,8 @@
     "sep_blaze_Support": 3
   },
   "combatMedium": {
+    "sep_penitent_Assault": 5,
+    "sep_penitent_Support": 5,
     "sep_sun_ray_Attack": 5,
     "sep_sun_ray_Support": 5
   },
