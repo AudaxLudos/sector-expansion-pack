@@ -10,6 +10,8 @@
   "combatMedium": {
     "sep_penitent_Assault": 5,
     "sep_penitent_Support": 5,
+    "sep_accipiter_Escort": 5,
+    "sep_accipiter_FireSupport": 5,
     "sep_sun_ray_Attack": 5,
     "sep_sun_ray_Support": 5
   },

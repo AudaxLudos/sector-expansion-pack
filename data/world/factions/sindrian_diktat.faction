@@ -2,6 +2,7 @@
     "knownShips":{
         "hulls":[
             "sep_impetuous",
+            "sep_accipiter",
             "sep_requital"
         ]
     }
