@@ -1,0 +1,67 @@
+{
+    "displayName": "Standard",
+    "fluxCapacitors": 45,
+    "fluxVents": 50,
+    "goalVariant": true,
+    "hullId": "sep_persecutor",
+    "hullMods": [
+        "autorepair",
+        "ballistic_rangefinder",
+        "fluxdistributor",
+        "targetingunit"
+    ],
+    "quality": 0.0,
+    "variantId": "sep_persecutor_Standard",
+    "weaponGroups": [
+        {
+            "autofire": true,
+            "mode": "LINKED",
+            "weapons": {
+                "WS 009": "hephag",
+                "WS 008": "hephag"
+            }
+        },
+        {
+            "autofire": false,
+            "mode": "ALTERNATING",
+            "weapons": {
+                "WS 015": "breach",
+                "WS 013": "breach",
+                "WS 011": "breach",
+                "WS 010": "breach",
+                "WS 012": "breach",
+                "WS 014": "breach"
+            }
+        },
+        {
+            "autofire": true,
+            "mode": "LINKED",
+            "weapons": {
+                "WS 001": "mark9"
+            }
+        },
+        {
+            "autofire": true,
+            "mode": "LINKED",
+            "weapons": {
+                "WS 005": "heavyac",
+                "WS 004": "heavyac"
+            }
+        },
+        {
+            "autofire": true,
+            "mode": "LINKED",
+            "weapons": {
+                "WS 019": "flak",
+                "WS 018": "flak",
+                "WS 017": "vulcan",
+                "WS 007": "vulcan",
+                "WS 003": "vulcan",
+                "WS 000": "vulcan",
+                "WS 002": "vulcan",
+                "WS 006": "vulcan",
+                "WS 016": "vulcan"
+            }
+        }
+    ]
+}
