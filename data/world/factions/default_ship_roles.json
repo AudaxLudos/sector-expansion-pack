@@ -4,6 +4,8 @@
     "sep_springer_Strike": 3,
     "sep_impetuous_Strike": 3,
     "sep_impetuous_Support": 3,
+    "sep_impetuous_AssaultDEM": 0,
+    "sep_impetuous_SupportDEM": 0,
     "sep_blaze_Attack": 3,
     "sep_blaze_Support": 3
   },
@@ -20,6 +22,8 @@
     "sep_persecutor_Support": 5,
     "sep_requital_Assault": 5,
     "sep_requital_Support": 5,
+    "sep_requital_AssaultDEM": 0,
+    "sep_requital_SupportDEM": 0,
     "sep_effulgence_Standard": 4,
     "sep_effulgence_Assault": 3,
     "sep_effulgence_Support": 3
