@@ -1,0 +1,60 @@
+{
+    "displayName": "Assault DEM",
+    "fluxCapacitors": 33,
+    "fluxVents": 33,
+    "goalVariant": false,
+    "hullId": "sep_requital",
+    "hullMods": [
+        "magazines",
+        "missleracks",
+        "hardenedshieldemitter",
+        "targetingunit"
+    ],
+    "quality": 0.0,
+    "variantId": "sep_requital_AssaultDEM",
+    "weaponGroups": [
+        {
+            "autofire": false,
+            "mode": "LINKED",
+            "weapons": {
+                "WS 001": "autopulse",
+                "WS 000": "autopulse"
+            }
+        },
+        {
+            "autofire": false,
+            "mode": "ALTERNATING",
+            "weapons": {
+                "WS 006": "hydra",
+                "WS 007": "hydra"
+            }
+        },
+        {
+            "autofire": false,
+            "mode": "ALTERNATING",
+            "weapons": {
+                "WS 009": "dragon",
+                "WS 008": "dragon"
+            }
+        },
+        {
+            "autofire": true,
+            "mode": "LINKED",
+            "weapons": {
+                "WS 012": "flak",
+                "WS 005": "dualflak",
+                "WS 004": "dualflak"
+            }
+        },
+        {
+            "autofire": true,
+            "mode": "LINKED",
+            "weapons": {
+                "WS 010": "pdlaser",
+                "WS 011": "pdlaser",
+                "WS 002": "pdlaser",
+                "WS 003": "pdlaser"
+            }
+        }
+    ]
+}

@@ -1,4 +1,8 @@
 {
+    "variantOverrides":{
+		"sep_requital_AssaultDEM": 5,
+		"sep_requital_SupportDEM": 5
+	},
     "knownShips":{
         "hulls":[
             "sep_impetuous",
