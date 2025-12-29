@@ -1,5 +1,7 @@
 {
     "variantOverrides":{
+        "sep_impetuous_AssaultDEM": 3,
+        "sep_impetuous_SupportDEM": 3,
 		"sep_requital_AssaultDEM": 5,
 		"sep_requital_SupportDEM": 5
 	},
