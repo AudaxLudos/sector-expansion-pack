@@ -1,13 +1,24 @@
 {
     "displayName": "Support",
-    "fluxCapacitors": 0,
-    "fluxVents": 9,
+    "fluxCapacitors": 2,
+    "fluxVents": 10,
     "goalVariant": true,
     "hullId": "sep_blaze",
-    "hullMods": [],
+    "hullMods": [
+        "hardenedshieldemitter",
+        "hardened_subsystems",
+        "targetingunit"
+    ],
     "quality": 0.0,
     "variantId": "sep_blaze_Support",
     "weaponGroups": [
+        {
+            "autofire": true,
+            "mode": "LINKED",
+            "weapons": {
+                "WS 002": "ionbeam"
+            }
+        },
         {
             "autofire": false,
             "mode": "LINKED",
@@ -19,13 +30,6 @@
             "autofire": false,
             "mode": "LINKED",
             "weapons": {
-                "WS 002": "ionbeam"
-            }
-        },
-        {
-            "autofire": true,
-            "mode": "LINKED",
-            "weapons": {
                 "WS 004": "heavyneedler"
             }
         },
@@ -33,8 +37,8 @@
             "autofire": false,
             "mode": "ALTERNATING",
             "weapons": {
-                "WS 000": "heatseeker",
-                "WS 001": "heatseeker"
+                "WS 001": "heatseeker",
+                "WS 000": "heatseeker"
             }
         }
     ]
