@@ -398,6 +398,14 @@ public abstract class SEPHubMissionWithBarEvent extends HubMissionWithBarEvent {
         this.connections.add(new StageConnection(null, to, new EntityNearbyOtherChecker(entity, other, maxRange, checkInHyperspace)));
     }
 
+    public void connectWithEntityNearbyOtherV2(Object from, Object to, SectorEntityToken entity, SectorEntityToken other, float range) {
+        this.connections.add(new StageConnection(from, to, new EntityNearbyOtherCheckerV2(entity, other, range)));
+    }
+
+    public void setStageOnEntityNearbyOtherV2(Object to, SectorEntityToken entity, SectorEntityToken other, float range) {
+        this.connections.add(new StageConnection(null, to, new EntityNearbyOtherCheckerV2(entity, other, range)));
+    }
+
     public void connectWithFactionTurnedHostile(Object from, Object to, FactionAPI faction) {
         this.connections.add(new StageConnection(from, to, new FactionTurnedHostileChecker(faction)));
     }
@@ -632,6 +640,24 @@ public abstract class SEPHubMissionWithBarEvent extends HubMissionWithBarEvent {
                 return Misc.getDistance(this.entity.getLocationInHyperspace(), this.other.getLocationInHyperspace()) < this.maxRange;
             }
             return Misc.getDistance(this.entity, this.other) < this.maxRange;
+        }
+    }
+
+    public static class EntityNearbyOtherCheckerV2 implements ConditionChecker {
+        protected SectorEntityToken entity;
+        protected SectorEntityToken other;
+        protected float range;
+
+        public EntityNearbyOtherCheckerV2(SectorEntityToken entity, SectorEntityToken other, float range) {
+            this.entity = entity;
+            this.other = other;
+            this.range = range;
+        }
+
+        @Override
+        public boolean conditionsMet() {
+            return this.entity.getContainingLocation() == this.other.getContainingLocation() &&
+                    Misc.getDistance(this.entity, this.other) < this.range;
         }
     }
 

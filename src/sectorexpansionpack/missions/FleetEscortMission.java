@@ -176,12 +176,12 @@ public class FleetEscortMission extends SEPHubMissionWithScenario {
         addFailureStages(Stage.FAILED);
 
         if (this.scenario.getTags().contains("oneWay")) {
-            connectWithEntityNearbyOther(Stage.GOTO, Stage.WAIT, this.fleet, this.gotoEntity, 1000f, false);
+            connectWithEntityNearbyOtherV2(Stage.GOTO, Stage.WAIT, this.fleet, this.gotoEntity, 1000f);
             connectWithDaysElapsed(Stage.WAIT, Stage.COMPLETED, 7f);
         } else {
-            connectWithEntityNearbyOther(Stage.GOTO, Stage.WAIT, this.fleet, this.gotoEntity, 1000f, false);
+            connectWithEntityNearbyOtherV2(Stage.GOTO, Stage.WAIT, this.fleet, this.gotoEntity, 1000f);
             connectWithDaysElapsed(Stage.WAIT, Stage.RETURN, 7f);
-            connectWithEntityNearbyOther(Stage.RETURN, Stage.COMPLETED, this.fleet, getPerson().getMarket().getPrimaryEntity(), 1000f, false);
+            connectWithEntityNearbyOtherV2(Stage.RETURN, Stage.COMPLETED, this.fleet, getPerson().getMarket().getPrimaryEntity(), 1000f);
         }
 
         setStageOnEntityNotAlive(Stage.FAILED, this.fleet);
