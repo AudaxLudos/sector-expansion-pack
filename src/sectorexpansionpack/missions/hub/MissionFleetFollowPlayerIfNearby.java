@@ -53,16 +53,19 @@ public class MissionFleetFollowPlayerIfNearby implements EveryFrameScript {
             this.done = true;
             return;
         }
-
-        float days = Misc.getDays(amount);
-        this.timer.advance(days);
-        if (!this.timer.intervalElapsed()) {
+        if (this.fleet.getBattle() != null) {
             return;
         }
 
         CampaignFleetAPI playerFleet = Global.getSector().getPlayerFleet();
 
         if (playerFleet.isInHyperspaceTransition() || this.fleet.isInHyperspaceTransition()) {
+            return;
+        }
+
+        float days = Misc.getDays(amount);
+        this.timer.advance(days);
+        if (!this.timer.intervalElapsed()) {
             return;
         }
 
