@@ -12,7 +12,7 @@ import com.fs.starfarer.api.ui.TooltipMakerAPI;
 import com.fs.starfarer.api.util.Misc;
 import com.fs.starfarer.api.util.WeightedRandomPicker;
 import org.apache.log4j.Logger;
-import sectorexpansionpack.ModPlugin;
+import sectorexpansionpack.Settings;
 import sectorexpansionpack.Utils;
 import sectorexpansionpack.missions.hub.SEPHubMissionWithScenario;
 
@@ -176,12 +176,12 @@ public class FleetEscortMission extends SEPHubMissionWithScenario {
         addFailureStages(Stage.FAILED);
 
         if (this.scenario.getTags().contains("oneWay")) {
-            connectWithEntityNearbyOtherV2(Stage.GOTO, Stage.WAIT, this.fleet, this.gotoEntity, 1000f);
+            connectWithEntityNearbyOther(Stage.GOTO, Stage.WAIT, this.fleet, this.gotoEntity, 1000f);
             connectWithDaysElapsed(Stage.WAIT, Stage.COMPLETED, 7f);
         } else {
-            connectWithEntityNearbyOtherV2(Stage.GOTO, Stage.WAIT, this.fleet, this.gotoEntity, 1000f);
+            connectWithEntityNearbyOther(Stage.GOTO, Stage.WAIT, this.fleet, this.gotoEntity, 1000f);
             connectWithDaysElapsed(Stage.WAIT, Stage.RETURN, 7f);
-            connectWithEntityNearbyOtherV2(Stage.RETURN, Stage.COMPLETED, this.fleet, getPerson().getMarket().getPrimaryEntity(), 1000f);
+            connectWithEntityNearbyOther(Stage.RETURN, Stage.COMPLETED, this.fleet, getPerson().getMarket().getPrimaryEntity(), 1000f);
         }
 
         setStageOnEntityNotAlive(Stage.FAILED, this.fleet);
@@ -249,7 +249,7 @@ public class FleetEscortMission extends SEPHubMissionWithScenario {
         WeightedRandomPicker<String> picker = new WeightedRandomPicker<>(getGenRandom());
 
         for (SpecialItemSpecAPI spec : Global.getSettings().getAllSpecialItemSpecs()) {
-            if (!ModPlugin.COLONY_ITEM_WHITELIST.contains(spec.getId())) {
+            if (!Settings.COLONY_ITEM_WHITELIST.contains(spec.getId())) {
                 continue;
             }
             picker.add(spec.getId());

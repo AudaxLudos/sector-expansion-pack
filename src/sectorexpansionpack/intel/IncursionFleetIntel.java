@@ -22,7 +22,7 @@ import com.fs.starfarer.api.ui.TooltipMakerAPI;
 import com.fs.starfarer.api.util.Misc;
 import com.fs.starfarer.api.util.WeightedRandomPicker;
 import org.apache.log4j.Logger;
-import sectorexpansionpack.ModPlugin;
+import sectorexpansionpack.Settings;
 import sectorexpansionpack.Utils;
 import sectorexpansionpack.missions.EntityFinderMission;
 
@@ -287,7 +287,7 @@ public class IncursionFleetIntel extends GenericRaidFGI {
             SpecialItemData otherData = targetInd.getSpecialItem();
             if (otherData != null) {
                 for (Industry ind : this.source.getIndustries()) {
-                    if (!ModPlugin.COLONY_ITEM_WHITELIST.contains(otherData.getId())) {
+                    if (!Settings.COLONY_ITEM_WHITELIST.contains(otherData.getId())) {
                         continue;
                     }
                     if (ind.wantsToUseSpecialItem(otherData)) {

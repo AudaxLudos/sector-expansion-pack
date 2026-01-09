@@ -1,10 +1,8 @@
 package sectorexpansionpack;
 
 import com.fs.starfarer.api.BaseModPlugin;
-import com.fs.starfarer.api.EveryFrameScript;
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.campaign.SectorAPI;
-import com.fs.starfarer.api.util.WeightedRandomPicker;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -15,75 +13,18 @@ import sectorexpansionpack.intel.ExpeditionFleetManager;
 import sectorexpansionpack.intel.IncursionFleetManager;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Random;
 
 public class ModPlugin extends BaseModPlugin {
-    public static List<String> COLONY_ITEM_WHITELIST = new ArrayList<>();
-    public static JSONObject MISSION_SCENARIOS;
-
-    public static JSONObject getRandomMissionScenario(String missionId, Random random, boolean barEventsOnly) throws JSONException {
-        WeightedRandomPicker<JSONObject> scenarioPicker = new WeightedRandomPicker<>(random);
-        JSONObject mission = MISSION_SCENARIOS.getJSONObject(missionId);
-        JSONArray scenarios = mission.getJSONArray("scenarios");
-        for (int i = 0; i < scenarios.length(); i++) {
-            JSONObject scenario = scenarios.getJSONObject(i);
-            boolean hasBarEvent;
-            boolean hasContactEvent;
-            if (scenario.has("hasBarEvent")) {
-                hasBarEvent = scenario.getBoolean("hasBarEvent");
-            } else {
-                hasBarEvent = getMissionScenarioDefaults(missionId).getBoolean("hasBarEvent");
-            }
-            if (scenario.has("hasContactEvent")) {
-                hasContactEvent = scenario.getBoolean("hasContactEvent");
-            } else {
-                hasContactEvent = getMissionScenarioDefaults(missionId).getBoolean("hasContactEvent");
-            }
-            if (barEventsOnly) {
-                if (!hasBarEvent) {
-                    continue;
-                }
-            } else {
-                if (!hasContactEvent) {
-                    continue;
-                }
-            }
-
-            float weight;
-            if (scenario.has("weight")) {
-                weight = (float) scenario.getDouble("weight");
-            } else {
-                weight = (float) getMissionScenarioDefaults(missionId).getDouble("weight");
-            }
-            scenarioPicker.add(scenario, weight);
-        }
-        return scenarioPicker.pick();
-    }
-
-    public static JSONObject getMissionScenarioDefaults(String missionId) {
-        JSONObject mission;
-        try {
-            mission = MISSION_SCENARIOS.getJSONObject(missionId).getJSONObject("defaults");
-        } catch (JSONException e) {
-            throw new RuntimeException(e);
-        }
-        return mission;
-    }
-
     @Override
     public void onApplicationLoad() {
-        loadMissionScenariosV2();
+        loadMissionScenarios();
     }
 
     public void loadMissionScenarios() {
-        try {
-            MISSION_SCENARIOS = Global.getSettings().loadJSON("data/campaign/sep_mission_scenarios.json");
-        } catch (IOException | JSONException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public void loadMissionScenariosV2() {
         try {
             JSONArray rows = Global.getSettings().loadCSV("data/campaign/sep_mission_scenarios.csv");
             for (int i = 0; i < rows.length(); i++) {
@@ -135,28 +76,7 @@ public class ModPlugin extends BaseModPlugin {
 
     public void loadModSettings() {
         Utils.setRandom(new Random(Long.parseLong(Global.getSector().getSeedString().replaceAll("\\D", ""))));
-
-        loadColonyItemWhitelist();
         Settings.load();
-    }
-
-    public void loadColonyItemWhitelist() {
-        List<String> whitelist = new ArrayList<>();
-
-        try {
-            JSONArray spreadsheet = Global.getSettings().getMergedSpreadsheetDataForMod("id", "data/config/sep_colony_item_whitelist.csv", "sectorexpansionpack");
-
-            for (int i = 0; i < spreadsheet.length(); i++) {
-                JSONObject row = spreadsheet.getJSONObject(i);
-                String specialItemId = row.getString("id");
-
-                whitelist.add(specialItemId);
-            }
-        } catch (JSONException | IOException e) {
-            throw new RuntimeException(e);
-        }
-
-        COLONY_ITEM_WHITELIST = whitelist;
     }
 
     public void loadNeededScripts() {

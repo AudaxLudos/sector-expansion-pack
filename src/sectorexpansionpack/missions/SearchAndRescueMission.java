@@ -2,312 +2,314 @@ package sectorexpansionpack.missions;
 
 import com.fs.starfarer.api.EveryFrameScript;
 import com.fs.starfarer.api.Global;
-import com.fs.starfarer.api.campaign.*;
+import com.fs.starfarer.api.campaign.CampaignFleetAPI;
+import com.fs.starfarer.api.campaign.FleetAssignment;
+import com.fs.starfarer.api.campaign.InteractionDialogAPI;
+import com.fs.starfarer.api.campaign.SectorEntityToken;
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
 import com.fs.starfarer.api.campaign.rules.MemoryAPI;
 import com.fs.starfarer.api.characters.PersonAPI;
 import com.fs.starfarer.api.impl.campaign.events.OfficerManagerEvent;
-import com.fs.starfarer.api.impl.campaign.ids.Entities;
-import com.fs.starfarer.api.impl.campaign.ids.MemFlags;
-import com.fs.starfarer.api.impl.campaign.ids.Ranks;
-import com.fs.starfarer.api.impl.campaign.ids.Tags;
+import com.fs.starfarer.api.impl.campaign.ids.*;
 import com.fs.starfarer.api.impl.campaign.intel.contacts.ContactIntel;
-import com.fs.starfarer.api.impl.campaign.missions.hub.HubMissionWithBarEvent;
 import com.fs.starfarer.api.impl.campaign.missions.hub.ReqMode;
 import com.fs.starfarer.api.impl.campaign.procgen.Constellation;
 import com.fs.starfarer.api.impl.campaign.rulecmd.salvage.MarketCMD;
 import com.fs.starfarer.api.impl.campaign.rulecmd.salvage.special.BreadcrumbSpecial;
+import com.fs.starfarer.api.impl.campaign.rulecmd.salvage.special.CryopodOfficerGen;
 import com.fs.starfarer.api.ui.SectorMapAPI;
 import com.fs.starfarer.api.ui.TooltipMakerAPI;
 import com.fs.starfarer.api.util.Misc;
+import com.fs.starfarer.api.util.WeightedRandomPicker;
 import org.apache.log4j.Logger;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-import sectorexpansionpack.ModPlugin;
 import sectorexpansionpack.Utils;
+import sectorexpansionpack.missions.hub.SEPHubMissionWithScenario;
 
 import java.awt.*;
-import java.util.*;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Random;
 
-// TODO: Delete before 1.0
-public class SearchAndRescueMission extends HubMissionWithBarEvent {
-    public static JSONObject SCENARIO_DEFAULTS;
+// TODO: Make into version 1 on 1.0 release
+public class SearchAndRescueMission extends SEPHubMissionWithScenario {
+    public static final float MISSION_DURATION = 120f;
+    public static float OFFICER_EXCEPTIONAL_CHANCE = 0.05f;
+    public static float OFFICER_MENTORED_CHANCE = 0.5f;
+    public static float CONTACT_MILITARY_CHANCE = 0.25f;
+    public static float BAR_MILITARY_CHANCE = 0.4f;
     public static Logger log = Global.getLogger(SearchAndRescueMission.class);
-    protected JSONObject scenarioData;
     protected PersonPostType survivorPostType;
     protected PersonAPI survivor;
     protected boolean survivorAlive = true;
-    protected EntityType entityType;
+    protected SectorEntityToken hideout;
     protected SectorEntityToken entity;
-    protected String subjectName = "";
+    protected float ransomAmount;
+    protected int marineAmount;
+    protected MarketCMD.RaidDangerLevel raidDangerLevel;
+    protected String subjectName = null;
 
     public SearchAndRescueMission() {
         super();
-        SCENARIO_DEFAULTS = ModPlugin.getMissionScenarioDefaults("sep_sar");
         setGenRandom(new Random(Utils.random.nextLong()));
     }
 
     @Override
-    public boolean shouldShowAtMarket(MarketAPI market) {
-        return false;
-    }
-
-    @Override
     protected boolean create(MarketAPI createdAt, boolean barEvent) {
-        if (true) {
+        if (!setScenario()) {
+            log.info("Failed to pick a scenario");
             return false;
         }
-        try {
-            this.scenarioData = ModPlugin.getRandomMissionScenario(getMissionId(), getGenRandom(), barEvent);
-
-            if (this.scenarioData == null) {
-                log.info("Failed to choose a mission scenario");
-                return false;
-            }
-
-            if (barEvent) {
-                JSONObject barGiverStats = (JSONObject) getScenarioData("barGiverStats");
-                setGiverRank(barGiverStats.getString("rank"));
-                setGiverPost(barGiverStats.getString("post"));
-                setGiverImportance(PersonImportance.valueOf(barGiverStats.getString("importance")));
-                if (barGiverStats.has("faction") && !barGiverStats.getString("faction").isEmpty()) {
-                    setGiverFaction(barGiverStats.getString("faction"));
-                }
-                if (barGiverStats.has("tags")) {
-                    JSONArray tags = barGiverStats.getJSONArray("tags");
-                    List<String> giverTags = new ArrayList<>();
-                    for (int i = 0; i < tags.length(); i++) {
-                        giverTags.add(tags.getString(i));
-                    }
-                    String[] tagArray = new String[giverTags.size()];
-                    setGiverTags(giverTags.toArray(tagArray));
-                }
-                findOrCreateGiver(createdAt, true, false);
-            }
-
-            if (!setPersonMissionRef(getPerson(), "$sep_sar_ref")) {
-                log.info("Failed to find or create contact");
-                return false;
-            }
-
-            if (barEvent) {
-                setGiverIsPotentialContactOnSuccess();
-            }
-
-            this.survivor = pickSurvivor();
-            if (this.survivor == null) {
-                log.info("Failed to create survivor");
-                return false;
-            }
-
-            this.subjectName = getScenarioData("subjectName").toString();
-
-            this.entity = pickSurvivorEntity();
-            if (!setEntityMissionRef(this.entity, "$sep_sar_ref")) {
-                log.info("Failed to find entity containing survivor");
-                return false;
-            }
-
-            makeImportant(this.entity, "$sep_sar_survivorEntity", Stage.FIND);
-            makeImportant(getPerson(), "$sep_sar_contactPerson", Stage.RETURN);
-
-            setStartingStage(Stage.FIND);
-            setSuccessStage(Stage.COMPLETED);
-            addFailureStages(Stage.FAILED);
-
-            connectWithMemoryFlag(Stage.FIND, Stage.RETURN, this.entity, "$sep_sar_returnToContact");
-            setStageOnMemoryFlag(Stage.COMPLETED, getPerson(), "$sep_sar_completed");
-
-            addNoPenaltyFailureStages(Stage.FAILED_DECIV);
-            connectWithMarketDecivilized(Stage.RETURN, Stage.FAILED_DECIV, createdAt);
-            setStageOnMarketDecivilized(Stage.FAILED_DECIV, createdAt);
-
-            setTimeLimit(Stage.FAILED, ((Number) getScenarioData("missionDuration")).floatValue(), null, Stage.RETURN);
-
-            setCreditReward(getScenarioCreditReward(false));
-
-            JSONArray complications = (JSONArray) getScenarioData("complications");
-            for (int i = 0; i < complications.length(); i++) {
-                JSONObject complication = complications.getJSONObject(i);
-                if (complication.has("probability") && rollProbability((float) complication.getDouble("probability"))) {
-                    continue;
-                }
-
-                beginWithinHyperspaceRangeTrigger(
-                        this.entity.getStarSystem(),
-                        2000f,
-                        false,
-                        Stage.valueOf(complication.getString("stageTrigger")));
-
-                triggerCreateFleet(
-                        FleetSize.valueOf(complication.getString("fleetSize")),
-                        FleetQuality.valueOf(complication.getString("fleetQuality")),
-                        complication.getString("factionId"),
-                        complication.getString("fleetTypes"),
-                        this.entity.getStarSystem());
-
-                if (complication.has("autoAdjust")) {
-                    switch (complication.getString("autoAdjust")) {
-                        case "MODERATE" -> triggerAutoAdjustFleetStrengthModerate();
-                        case "MAJOR" -> triggerAutoAdjustFleetStrengthMajor();
-                        case "EXTREME" -> triggerAutoAdjustFleetStrengthExtreme();
-                    }
-                }
-
-                triggerPickLocationAroundEntity(this.entity, 500f);
-                triggerSpawnFleetAtPickedLocation();
-
-                if (complication.has("lowRepImpact") && complication.getBoolean("lowRepImpact")) {
-                    triggerMakeLowRepImpact();
-                }
-                if (complication.has("hostileAndAggressive") && complication.getBoolean("hostileAndAggressive")) {
-                    triggerMakeHostileAndAggressive();
-                }
-                if (complication.has("ignoreOtherFleets") && complication.getBoolean("ignoreOtherFleets")) {
-                    triggerMakeFleetIgnoreOtherFleets();
-                }
-                if (complication.has("ignoredByOtherFleets") && complication.getBoolean("ignoredByOtherFleets")) {
-                    triggerMakeFleetIgnoredByOtherFleets();
-                }
-                if (complication.has("notIgnorePlayer") && complication.getBoolean("notIgnorePlayer")) {
-                    triggerMakeFleetNotIgnorePlayer();
-                }
-                if (complication.has("noFactionInName") && complication.getBoolean("noFactionInName")) {
-                    triggerFleetSetNoFactionInName();
-                }
-                if (complication.has("fleetName") && !complication.getString("fleetName").isEmpty()) {
-                    triggerFleetSetName(complication.getString("fleetName"));
-                }
-
-                triggerOrderFleetPatrol(this.entity);
-                endTrigger();
-            }
-
-            return false;
-        } catch (JSONException e) {
-            log.error(e);
+        if (!setScenarioType(ScenarioType.class)) {
+            log.info("Failed to find scenario type");
             return false;
         }
+
+        if (barEvent) {
+            if (rollProbability(BAR_MILITARY_CHANCE)) {
+                List<String> posts = new ArrayList<>();
+                posts.add(Ranks.POST_AGENT);
+                if (Misc.isMilitary(createdAt)) {
+                    posts.add(Ranks.POST_BASE_COMMANDER);
+                }
+                if (Misc.hasOrbitalStation(createdAt)) {
+                    posts.add(Ranks.POST_STATION_COMMANDER);
+                }
+                setGiverRank(pickOne(Ranks.GROUND_CAPTAIN, Ranks.GROUND_COLONEL, Ranks.GROUND_MAJOR,
+                        Ranks.SPACE_COMMANDER, Ranks.SPACE_CAPTAIN, Ranks.SPACE_ADMIRAL));
+                setGiverPost(pickOne(posts));
+                setGiverImportance(pickHighImportance());
+                setGiverTags(Tags.CONTACT_MILITARY);
+            } else {
+                setGiverRank(Ranks.CITIZEN);
+                String post = pickOne(Ranks.POST_TRADER, Ranks.POST_COMMODITIES_AGENT, Ranks.POST_PORTMASTER,
+                        Ranks.POST_MERCHANT, Ranks.POST_INVESTOR, Ranks.POST_EXECUTIVE,
+                        Ranks.POST_SENIOR_EXECUTIVE);
+                setGiverPost(post);
+                if (post.equals(Ranks.POST_SENIOR_EXECUTIVE)) {
+                    setGiverImportance(pickHighImportance());
+                } else {
+                    setGiverImportance(pickImportance());
+                }
+                setGiverTags(Tags.CONTACT_TRADE);
+            }
+            findOrCreateGiver(createdAt, true, false);
+        }
+
+        if (!setPersonMissionRef(getPerson(), "$sep_sar_ref")) {
+            log.info("Failed to find or create contact");
+            return false;
+        }
+
+        if (barEvent) {
+            setGiverIsPotentialContactOnSuccess();
+        }
+
+        this.survivorPostType = pickSurvivorPostType();
+        this.survivor = createSurvivor();
+        if (this.survivor == null) {
+            log.info("Failed to create survivor");
+            return false;
+        }
+        this.subjectName = this.survivor.getNameString();
+
+        this.hideout = pickHideoutForFleet();
+        if (this.hideout == null && this.scenarioType == ScenarioType.CAPTURED_IN_FLEET) {
+            log.info("Failed to find hideout for fleet");
+            return false;
+        }
+
+        this.entity = pickSurvivorEntity();
+        if (!setEntityMissionRef(this.entity, "$sep_sar_ref")) {
+            log.info("Failed to find entity containing survivor");
+            return false;
+        }
+
+        makeImportant(this.entity, "$sep_sar_survivorEntity", Stage.FIND);
+        makeImportant(getPerson(), "$sep_sar_contactPerson", Stage.RETURN);
+
+        setStartingStage(Stage.FIND);
+        setSuccessStage(Stage.COMPLETED);
+        addFailureStages(Stage.FAILED);
+
+        connectWithMemoryFlag(Stage.FIND, Stage.RETURN, this.entity, "$sep_sar_returnToContact");
+        setStageOnMemoryFlag(Stage.COMPLETED, getPerson(), "$sep_sar_completed");
+
+        addNoPenaltyFailureStages(Stage.FAILED_DECIV);
+        connectWithMarketDecivilized(Stage.RETURN, Stage.FAILED_DECIV, createdAt);
+        setStageOnMarketDecivilized(Stage.FAILED_DECIV, createdAt);
+
+        if (this.scenario.getDuration() > -1) {
+            setTimeLimit(FleetEscortMission.Stage.FAILED, this.scenario.getDuration(), null);
+        } else {
+            setTimeLimit(FleetEscortMission.Stage.FAILED, MISSION_DURATION, null);
+        }
+
+        setScenarioCreditReward(this.scenario.getCreditReward());
+
+        int defenderStr = Math.max(50, Math.round(getCreditsReward() / 250f / 100f) * 100);
+        if (defenderStr == 50) {
+            this.raidDangerLevel = MarketCMD.RaidDangerLevel.MINIMAL;
+        } else if (defenderStr <= 100) {
+            this.raidDangerLevel = MarketCMD.RaidDangerLevel.LOW;
+        } else if (defenderStr <= 300) {
+            this.raidDangerLevel = MarketCMD.RaidDangerLevel.MEDIUM;
+        } else if (defenderStr <= 500) {
+            this.raidDangerLevel = MarketCMD.RaidDangerLevel.HIGH;
+        } else {
+            this.raidDangerLevel = MarketCMD.RaidDangerLevel.EXTREME;
+        }
+        this.marineAmount = getMarinesRequiredForCustomDefenderStrength(defenderStr, this.raidDangerLevel);
+        int bonus = getRewardBonusForMarines(this.marineAmount);
+        setCreditReward(getCreditsReward() + bonus);
+        this.ransomAmount = Math.round(getCreditsReward() * (0.8f + 0.4f * getGenRandom().nextFloat()) / 1000f) * 1000f;
+
+        setScenarioComplications(Stage.class, log);
+
+        return true;
     }
 
-    public PersonAPI pickSurvivor() throws JSONException {
-        PersonAPI person;
-        JSONObject survivorStats = (JSONObject) getScenarioData("survivorStats");
-        this.survivorPostType = PersonPostType.valueOf((String) getScenarioData("survivorType"));
-        if (this.survivorPostType == PersonPostType.RANDOM) {
-            this.survivorPostType = (PersonPostType) pickOneObject(
-                    Arrays.asList(PersonPostType.OFFICER, PersonPostType.ADMINISTRATOR,
-                            PersonPostType.CIVILIAN, PersonPostType.CONTACT));
-        }
+    public PersonPostType pickSurvivorPostType() {
+        WeightedRandomPicker<PersonPostType> picker = new WeightedRandomPicker<>(getGenRandom());
+        picker.add(PersonPostType.OFFICER, 7f);
+        picker.add(PersonPostType.ADMINISTRATOR, 5f);
+        picker.add(PersonPostType.CONTACT, 3f);
+        picker.add(PersonPostType.CIVILIAN, 10f);
+        return picker.pick();
+    }
+
+    public PersonAPI createSurvivor() {
+        PersonAPI person = getPerson().getFaction().createRandomPerson(getGenRandom());
         if (this.survivorPostType == PersonPostType.OFFICER) {
-            person = OfficerManagerEvent.createOfficer(getPerson().getFaction(), survivorStats.getInt("level"), OfficerManagerEvent.SkillPickPreference.ANY, getGenRandom());
-            person.setPostId(Ranks.POST_OFFICER_FOR_HIRE);
-            person.getMemoryWithoutUpdate().set("$mentored", survivorStats.getBoolean("mentored"));
-            if (survivorStats.getInt("maxLevel") > 6) {
-                person.getMemoryWithoutUpdate().set(MemFlags.OFFICER_MAX_LEVEL, survivorStats.getInt("maxLevel"));
-            }
-            if (survivorStats.getInt("maxEliteSkills") > 3) {
-                person.getMemoryWithoutUpdate().set(MemFlags.OFFICER_MAX_ELITE_SKILLS, survivorStats.getInt("maxEliteSkills"));
-            }
-        } else if (this.survivorPostType == PersonPostType.ADMINISTRATOR) {
-            person = OfficerManagerEvent.createAdmin(getPerson().getFaction(), survivorStats.getInt("level"), getGenRandom());
-        } else if (this.survivorPostType == PersonPostType.CONTACT) {
-            person = getPerson().getFaction().createRandomPerson(getGenRandom());
-            person.setRankId(survivorStats.getString("rank"));
-            person.setPostId(survivorStats.getString("post"));
-            person.setImportance(PersonImportance.valueOf(survivorStats.getString("importance")));
-            if (survivorStats.has("tags")) {
-                JSONArray tags = survivorStats.getJSONArray("tags");
-                for (int i = 0; i < tags.length(); i++) {
-                    person.addTag(tags.getString(i));
+            WeightedRandomPicker<Integer> levelPicker = new WeightedRandomPicker<>(getGenRandom());
+            levelPicker.add(1, 10f);
+            levelPicker.add(2, 7f);
+            levelPicker.add(5, 3f);
+            levelPicker.add(7, 1f);
+            int level = levelPicker.pick();
+            boolean isExceptional = level == 7;
+            boolean isNormal = level == 5;
+            if (isExceptional) {
+                CryopodOfficerGen.CryopodOfficerTemplate template = CryopodOfficerGen.TEMPLATES_EXCEPTIONAL.pick(getGenRandom());
+                if (template != null) {
+                    person = template.create(getPerson().getFaction(), getGenRandom());
+                }
+            } else if (isNormal) {
+                CryopodOfficerGen.CryopodOfficerTemplate template = CryopodOfficerGen.TEMPLATES_NORMAL.pick(getGenRandom());
+                if (template != null) {
+                    person = template.create(getPerson().getFaction(), getGenRandom());
+                }
+            } else {
+                person = OfficerManagerEvent.createOfficer(getPerson().getFaction(), level, OfficerManagerEvent.SkillPickPreference.ANY, getGenRandom());
+                if (rollProbability(OFFICER_EXCEPTIONAL_CHANCE)) {
+                    person.getMemoryWithoutUpdate().set(MemFlags.OFFICER_MAX_LEVEL, 7);
+                    person.getMemoryWithoutUpdate().set(MemFlags.OFFICER_MAX_ELITE_SKILLS, 5);
+                }
+                if (rollProbability(OFFICER_MENTORED_CHANCE)) {
+                    person.getMemoryWithoutUpdate().set("$mentored", true);
                 }
             }
-        } else {
-            person = getPerson().getFaction().createRandomPerson(getGenRandom());
+            person.setPostId(Ranks.POST_OFFICER_FOR_HIRE);
+        } else if (this.survivorPostType == PersonPostType.ADMINISTRATOR) {
+            WeightedRandomPicker<Integer> tierPicker = new WeightedRandomPicker<>(getGenRandom());
+            tierPicker.add(1);
+            tierPicker.add(2);
+            tierPicker.add(3);
+            person = OfficerManagerEvent.createAdmin(getPerson().getFaction(), tierPicker.pick(), getGenRandom());
+        } else if (this.survivorPostType == PersonPostType.CONTACT) {
+            person.setImportance(pickHighImportance());
+            if (rollProbability(CONTACT_MILITARY_CHANCE)) {
+                if (person.getImportance().ordinal() > 2) {
+                    person.setRankId(pickOne(Ranks.SPACE_COMMANDER, Ranks.SPACE_CAPTAIN, Ranks.SPACE_ADMIRAL));
+                    person.setPostId(pickOne(Ranks.POST_AGENT, Ranks.POST_FLEET_COMMANDER, Ranks.POST_PATROL_COMMANDER));
+                } else {
+                    person.setRankId(pickOne(Ranks.SPACE_LIEUTENANT, Ranks.POST_FLEET_COMMANDER, Ranks.SPACE_CAPTAIN));
+                    person.setPostId(pickOne(Ranks.POST_AGENT, Ranks.POST_MERCENARY, Ranks.POST_SPACER));
+                }
+                person.addTag(Tags.CONTACT_MILITARY);
+            } else { // Contact will be trader
+                if (person.getImportance().ordinal() > 2) {
+                    person.setRankId(pickOne(Ranks.CITIZEN, Ranks.ARISTOCRAT, Ranks.SPECIAL_AGENT));
+                    person.setPostId(pickOne(Ranks.POST_EXECUTIVE, Ranks.POST_SENIOR_EXECUTIVE));
+                } else {
+                    person.setRankId(pickOne(Ranks.CITIZEN, Ranks.ARISTOCRAT, Ranks.SPECIAL_AGENT));
+                    person.setPostId(pickOne(Ranks.POST_TRADER, Ranks.POST_MERCHANT, Ranks.POST_COMMODITIES_AGENT));
+                }
+                person.addTag(Tags.CONTACT_TRADE);
+            }
         }
 
         return person;
     }
 
-    public SectorEntityToken pickSurvivorEntity() throws JSONException {
-        SectorEntityToken entity;
+    public SectorEntityToken pickHideoutForFleet() {
+        SectorEntityToken hideout;
+        if (this.scenarioType == ScenarioType.CAPTURED_IN_FLEET) {
+            requireSystemHasSafeStars();
+            preferPlanetNotFullySurveyed();
+            preferPlanetUnpopulated();
+            preferPlanetWithRuins();
+            hideout = pickPlanet();
+        } else {
+            hideout = null;
+        }
+
+        return hideout;
+    }
+
+    public SectorEntityToken pickSurvivorEntity() {
+        SectorEntityToken entity = null;
 
         preferSystemInInnerSector();
         preferSystemInDirectionOfOtherMissions();
 
-        this.entityType = EntityType.valueOf((String) getScenarioData("entityType"));
-        switch (this.entityType) {
-            case WRECK:
-                requireEntityTags(ReqMode.ALL, Tags.SALVAGEABLE);
-                requireEntityType(Entities.WRECK);
-                entity = pickEntity();
-                break;
-            case FLEET:
-                requireSystemHasSafeStars();
-                requireSystemTags(ReqMode.NOT_ALL, Tags.THEME_UNSAFE);
-                preferPlanetNotFullySurveyed();
-                preferPlanetUnpopulated();
-                preferPlanetWithRuins();
-                PlanetAPI planet = pickPlanet();
-
-                JSONObject entityStats = (JSONObject) getScenarioData("entityStats");
-                beginStageTrigger(Stage.FIND);
-                triggerCreateFleet(
-                        FleetSize.valueOf(entityStats.getString("fleetSize")),
-                        FleetQuality.valueOf(entityStats.getString("fleetQuality")),
-                        entityStats.getString("factionId"),
-                        entityStats.getString("fleetTypes"),
-                        planet.getStarSystem());
-
-                if (entityStats.has("autoAdjust")) {
-                    switch (entityStats.getString("autoAdjust")) {
-                        case "MODERATE" -> triggerAutoAdjustFleetStrengthModerate();
-                        case "MAJOR" -> triggerAutoAdjustFleetStrengthMajor();
-                        case "EXTREME" -> triggerAutoAdjustFleetStrengthExtreme();
-                    }
-                }
-
-                triggerPickLocationAroundEntity(planet, 1000f);
-                triggerSpawnFleetAtPickedLocation();
-
-                triggerMakeLowRepImpact();
-                triggerMakeFleetIgnoreOtherFleets();
-                triggerMakeFleetIgnoredByOtherFleets();
-                triggerMakeFleetNotIgnorePlayer();
-                triggerOrderFleetPatrol(planet);
-                triggerFleetAddDefeatTrigger("SEPSARFleetDefeated");
-
-                if (entityStats.has("fleetName") && !entityStats.getString("fleetName").isEmpty()) {
-                    triggerFleetSetName(entityStats.getString("fleetName"));
-                }
-
-                endTrigger();
-
-                List<CampaignFleetAPI> fleets = runStageTriggersReturnFleets(Stage.FIND);
+        if (this.scenarioType == ScenarioType.STRANDED_IN_WRECK) {
+            requireEntityTags(ReqMode.ALL, Tags.SALVAGEABLE);
+            requireEntityType(Entities.WRECK);
+            entity = pickEntity();
+        } else if (this.scenarioType == ScenarioType.CAPTURED_IN_FLEET) {
+            beginStageTrigger(Stage.FIND);
+            triggerCreateFleet(FleetSize.MEDIUM, FleetQuality.DEFAULT, getPerson().getFaction().getId(), FleetTypes.PATROL_MEDIUM, this.hideout.getLocationInHyperspace());
+            triggerScaleFleetToPlayerCapabilities(FleetStrengthType.QUANTITY);
+            triggerMakeLowRepImpact();
+            triggerMakeFleetIgnoreOtherFleets();
+            triggerMakeFleetIgnoredByOtherFleets();
+            triggerMakeLowRepImpact();
+            triggerOrderFleetPatrol(this.hideout);
+            triggerFleetAddDefeatTrigger("SEPSARFleetDefeated");
+            triggerFleetSetNoFactionInName();
+            triggerFleetSetName("Terrorist Group");
+            endTrigger();
+            List<CampaignFleetAPI> fleets = runStageTriggersReturnFleets(Stage.FIND);
+            if (!fleets.isEmpty()) {
                 entity = fleets.get(0);
-                break;
-            case PLANET_RAID:
-            case PLANET:
-                requireSystemInterestingAndNotCore();
-                requirePlanetNotGasGiant();
-                requirePlanetNotStar();
-                preferPlanetNotFullySurveyed();
-                preferPlanetUnpopulated();
-                entity = pickPlanet();
-                break;
-            case MARKET:
-                requireMarketNotHidden();
-                preferMarketFactionHostileTo(getPerson().getFaction().getId());
-                entity = pickMarket().getPrimaryEntity();
-                break;
-            default:
-                entity = null;
-                break;
+            }
+        } else if (this.scenarioType == ScenarioType.STRANDED_IN_PLANET || this.scenarioType == ScenarioType.CAPTURED_IN_PLANET) {
+            requireSystemInterestingAndNotCore();
+            requirePlanetNotGasGiant();
+            requirePlanetNotStar();
+            preferPlanetNotFullySurveyed();
+            preferPlanetUnpopulated();
+            entity = pickPlanet();
+        } else if (this.scenarioType == ScenarioType.CAPTURED_IN_MARKET) {
+            requireMarketFaction(Factions.PIRATES);
+            requireMarketNotHidden();
+            requireMarketStabilityAtLeast(7);
+            MarketAPI market = pickMarket();
+            if (market != null) {
+                entity = market.getPrimaryEntity();
+            }
         }
 
         return entity;
+    }
+
+    @Override
+    public SectorEntityToken getGotoEntity(Object stage) {
+        if (stage == Stage.FIND) {
+            return this.entity;
+        }
+        return getPerson().getMarket().getPrimaryEntity();
     }
 
     @Override
@@ -316,110 +318,55 @@ public class SearchAndRescueMission extends HubMissionWithBarEvent {
     }
 
     @Override
-    public String getIcon() {
-        if (this.subjectName.isEmpty()) {
-            return this.survivor.getPortraitSprite();
+    protected void updateInteractionDataImpl() {
+        set("$sep_sar_scenarioId", this.scenario.getScenarioId());
+        set("$sep_sar_scenarioType", this.scenarioType);
+        set("$sep_sar_survivorPostType", this.survivorPostType);
+        set("$sep_sar_survivorAlive", this.survivorAlive);
+        set("$sep_sar_creditReward", Misc.getDGSCredits(getCreditsReward()));
+        set("$sep_sar_creditRansom", Misc.getDGSCredits(this.ransomAmount));
+        set("$sep_sar_raidDangerLevel", this.raidDangerLevel);
+        set("$sep_sar_marineAmount", Misc.getWithDGS(this.marineAmount));
+        if (this.hideout != null) {
+            set("$sep_sar_possibleLoc", BreadcrumbSpecial.getLocationDescription(this.hideout, false));
+        } else {
+            set("$sep_sar_possibleLoc", BreadcrumbSpecial.getLocationDescription(this.entity, false));
         }
-        return super.getIcon();
+        set("$sep_sar_survivorFullName", this.survivor.getNameString());
+        set("$sep_sar_survivorFirstName", this.survivor.getName().getFirst());
+        set("$sep_sar_survivorLastName", this.survivor.getName().getLast());
+        set("$sep_sar_survivorHeOrShe", this.survivor.getHeOrShe());
+        set("$sep_sar_SurvivorHeOrShe", Misc.ucFirst(this.survivor.getHeOrShe()));
+        set("$sep_sar_survivorHisOrHer", this.survivor.getHisOrHer());
+        set("$sep_sar_survivorHimOrHer", this.survivor.getHimOrHer());
+        set("$sep_sar_survivorManOrWoman", this.survivor.getManOrWoman());
     }
 
     @Override
-    protected void updateInteractionDataImpl() {
-        try {
-            set("$sep_sar_survivorAlive", this.survivorAlive);
-            set("$sep_sar_survivorPostType", this.survivorPostType);
-            set("$sep_sar_entityType", this.entityType);
-            set("$sep_sar_creditReward", Misc.getDGSCredits(getCreditsReward()));
-            set("$sep_sar_creditRansom", Misc.getDGSCredits(getCreditsReward() * 0.75f));
-            set("$sep_sar_danger", MarketCMD.RaidDangerLevel.MEDIUM);
-            set("$sep_sar_possibleLoc", BreadcrumbSpecial.getLocationDescription(this.entity, false));
-
-            set("$sep_sar_survivorFullName", this.survivor.getNameString());
-            set("$sep_sar_survivorFirstName", this.survivor.getName().getFirst());
-            set("$sep_sar_survivorLastName", this.survivor.getName().getLast());
-            set("$sep_sar_survivorHeOrShe", this.survivor.getHeOrShe());
-            set("$sep_sar_survivorHisOrHer", this.survivor.getHisOrHer());
-            set("$sep_sar_survivorHimOrHer", this.survivor.getHimOrHer());
-            set("$sep_sar_survivorManOrWoman", this.survivor.getManOrWoman());
-            set("$sep_sar_subjectName", this.subjectName.isEmpty() ? this.survivor.getNameString() : this.subjectName);
-
-            if (this.entityType == EntityType.FLEET) {
-                set("$sep_sar_entityFaction", this.entity.getFaction().getEntityNamePrefix());
-            }
-            if (this.entityType == EntityType.PLANET_RAID) {
-                try {
-                    JSONObject entityStats = (JSONObject) getScenarioData("entityStats");
-                    set("$sep_sar_raidDangerLevel", MarketCMD.RaidDangerLevel.valueOf(entityStats.getString("raidDangerLevel")));
-                    set("$sep_sar_marineAmount", entityStats.getInt("marineAmount"));
-                } catch (JSONException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-
-            if (this.currentStage == null) {
-                if (!isBarEvent()) {
-                    set("$sep_sar_contactMissionBlurb", getDialogText("contactMissionBlurb"));
-                    set("$sep_sar_contactMissionOption", getDialogText("contactMissionOption"));
-                    set("$sep_sar_contactMissionOfferText", getDialogText("contactMissionOfferText"));
-                } else {
-                    set("$sep_sar_barMissionBlurb", getDialogText("barMissionBlurb"));
-                    set("$sep_sar_barMissionOption", getDialogText("barMissionOption"));
-                    set("$sep_sar_barMissionOfferText", getDialogText("barMissionOfferText"));
-                }
-            }
-
-            if (this.currentStage == Stage.FIND) {
-                set("$sep_sar_entityDialogText", getDialogText("entityDialogText"));
-                if (this.entityType == EntityType.FLEET) {
-                    set("$sep_sar_entityPayRansomText", getDialogText("entityPayRansomText"));
-                    set("$sep_sar_entityFightText", getDialogText("entityFightText"));
-                    set("$sep_sar_entityPersuadeToFreeText", getDialogText("entityPersuadeToFreeText"));
-                    set("$sep_sar_entityDefeatedText", getDialogText("entityDefeatedText"));
-                } else if (this.entityType == EntityType.PLANET_RAID) {
-                    set("$sep_sar_entityRaidFinishedText", getDialogText("entityRaidFinishedText"));
-                }
-                set("$sep_sar_survivorAliveText", getDialogText("survivorAliveText"));
-                set("$sep_sar_survivorDeadText", getDialogText("survivorDeadText"));
-            }
-
-            if (this.currentStage == Stage.RETURN) {
-                set("$sep_sar_returnSurvivorAliveText", getDialogText("returnSurvivorAliveText"));
-                set("$sep_sar_survivorDialogText", getDialogText("survivorDialogText"));
-                set("$sep_sar_returnSurvivorDeadText", getDialogText("returnSurvivorDeadText"));
-            }
-        } catch (JSONException e) {
-            throw new RuntimeException(e);
+    public void acceptImpl(InteractionDialogAPI dialog, Map<String, MemoryAPI> memoryMap) {
+        if (this.entity instanceof CampaignFleetAPI fleet) {
+            this.hideout.getContainingLocation().addEntity(this.entity);
+            fleet.setLocation(this.hideout.getLocation().x, this.hideout.getLocation().y);
+            fleet.setFacing(getGenRandom().nextFloat() * 360f);
         }
-    }
-
-    public String getDialogText(String id) throws JSONException {
-        String result;
-        if (this.scenarioData.has(id)) {
-            result = this.scenarioData.getString(id);
-        } else {
-            result = ModPlugin.getMissionScenarioDefaults(getMissionId()).getString(id);
-        }
-
-        return result;
     }
 
     @Override
     public boolean addNextStepText(TooltipMakerAPI info, Color tc, float pad) {
-        String prefix = "";
-        String subjectName = this.survivor.getNameString();
-        if (!this.subjectName.isEmpty()) {
-            prefix = "the ";
-            subjectName = this.subjectName;
-        }
+        Color h = Misc.getHighlightColor();
         if (this.currentStage == Stage.FIND) {
-            String loc = BreadcrumbSpecial.getLocationDescription(this.entity, false);
-            info.addPara("Search for " + prefix + "%s in " + loc, 3f, tc, Misc.getHighlightColor(), subjectName);
+            String loc;
+            if (this.hideout != null) {
+                loc = BreadcrumbSpecial.getLocationDescription(this.hideout, false);
+            } else {
+                loc = BreadcrumbSpecial.getLocationDescription(this.entity, false);
+            }
+            info.addPara("Search for %s in " + loc, 3f, tc, h, this.subjectName);
             return true;
         } else if (this.currentStage == Stage.RETURN) {
-            info.addPara("Return to " + getPerson().getMarket().getName() + " in the "
-                            + getPerson().getMarket().getStarSystem().getNameWithLowercaseTypeShort()
-                            + " and talk to " + getPerson().getNameString() + ".",
-                    3f, tc, Misc.getHighlightColor());
+            info.addPara("Return to " + getPerson().getMarket().getName() + " in the " +
+                    getPerson().getMarket().getStarSystem().getNameWithLowercaseTypeShort()
+                    + " and talk to " + getPerson().getNameString() + ".", 3f, tc, h);
             return true;
         }
         return false;
@@ -427,20 +374,20 @@ public class SearchAndRescueMission extends HubMissionWithBarEvent {
 
     @Override
     public void addDescriptionForNonEndStage(TooltipMakerAPI info, float width, float height) {
-        String prefix = "";
-        String subjectName = this.survivor.getNameString();
-        if (!this.subjectName.isEmpty()) {
-            prefix = "the";
-            subjectName = this.subjectName;
-        }
+        Color h = Misc.getHighlightColor();
+        Color tc = Misc.getTextColor();
         if (this.currentStage == Stage.FIND) {
-            String loc = BreadcrumbSpecial.getLocationDescription(this.entity, false);
-            info.addPara("Search for " + prefix + "%s in " + loc, 10f, Misc.getHighlightColor(), subjectName);
+            String loc;
+            if (this.hideout != null) {
+                loc = BreadcrumbSpecial.getLocationDescription(this.hideout, false);
+            } else {
+                loc = BreadcrumbSpecial.getLocationDescription(this.entity, false);
+            }
+            info.addPara("Search for %s in " + loc, 10f, tc, h, this.subjectName);
         } else if (this.currentStage == Stage.RETURN) {
-            info.addPara("Return with " + prefix + "%s to " + getPerson().getMarket().getName() + " in the "
-                            + getPerson().getMarket().getStarSystem().getNameWithLowercaseTypeShort()
-                            + " and talk to " + getPerson().getNameString() + ".",
-                    10f, Misc.getHighlightColor(), subjectName);
+            info.addPara("Bring %s to " + getPerson().getMarket().getName() + " in the " +
+                    getPerson().getMarket().getStarSystem().getNameWithLowercaseTypeShort()
+                    + " and talk to " + getPerson().getNameString() + ".", 10f, tc, h, this.subjectName);
         }
     }
 
@@ -461,14 +408,14 @@ public class SearchAndRescueMission extends HubMissionWithBarEvent {
                 return true;
             }
             case "addBonusCreditReward" -> {
-                int creditRewardBonus;
-                try {
-                    creditRewardBonus = getScenarioCreditReward(true);
-                } catch (JSONException e) {
-                    log.error(e);
-                    creditRewardBonus = getCreditRewardValue(CreditReward.LOW.min, CreditReward.LOW.max);
+                int bonusCreditReward = (int) (getCreditsReward() * 0.2f);
+                setCreditReward(getCreditsReward() + bonusCreditReward);
+                return true;
+            }
+            case "removeDefeatTrigger" -> {
+                if (dialog.getInteractionTarget() instanceof CampaignFleetAPI fleet) {
+                    Misc.removeDefeatTrigger(fleet, "SEPSARFleetDefeated");
                 }
-                setCreditReward(getCreditsReward() + creditRewardBonus);
                 return true;
             }
         }
@@ -478,25 +425,41 @@ public class SearchAndRescueMission extends HubMissionWithBarEvent {
 
     @Override
     protected void endSuccessImpl(InteractionDialogAPI dialog, Map<String, MemoryAPI> memoryMap) {
-        if (this.survivorAlive && this.survivorPostType != PersonPostType.CIVILIAN) {
-            for (EveryFrameScript script : Global.getSector().getScripts()) {
-                if (script instanceof OfficerManagerEvent manager) {
-                    float salary = (this.survivorPostType == PersonPostType.OFFICER ?
-                            Misc.getOfficerSalary(this.survivor) : Misc.getAdminSalary(this.survivor)) * 0.5f;
-                    OfficerManagerEvent.AvailableOfficer officer = new OfficerManagerEvent.AvailableOfficer(
-                            this.survivor, getPerson().getMarket().getId(), 0, Math.round(salary));
+        if (!this.survivorAlive || this.survivorPostType == PersonPostType.CIVILIAN) {
+            return;
+        }
 
-                    if (this.survivorPostType == PersonPostType.OFFICER) {
-                        manager.addAvailable(officer);
-                    } else if (this.survivorPostType == PersonPostType.ADMINISTRATOR) {
-                        manager.addAvailableAdmin(officer);
-                    } else if (this.survivorPostType == PersonPostType.CONTACT) {
-                        ContactIntel.addPotentialContact(this.survivor, getPerson().getMarket(), dialog.getTextPanel());
-                    }
+        for (EveryFrameScript script : Global.getSector().getScripts()) {
+            if (script instanceof OfficerManagerEvent manager) {
+                float salary = (this.survivorPostType == PersonPostType.OFFICER ?
+                        Misc.getOfficerSalary(this.survivor) : Misc.getAdminSalary(this.survivor)) * 0.5f;
+                OfficerManagerEvent.AvailableOfficer officer = new OfficerManagerEvent.AvailableOfficer(
+                        this.survivor, getPerson().getMarket().getId(), 0, Math.round(salary));
 
-                    officer.person.getMemoryWithoutUpdate().set("$sep_survivor", true);
-                    break;
+                if (this.survivorPostType == PersonPostType.OFFICER) {
+                    manager.addAvailable(officer);
+                } else if (this.survivorPostType == PersonPostType.ADMINISTRATOR) {
+                    manager.addAvailableAdmin(officer);
+                } else if (this.survivorPostType == PersonPostType.CONTACT) {
+                    ContactIntel.addPotentialContact(this.survivor, getPerson().getMarket(), dialog.getTextPanel());
                 }
+
+                officer.person.getMemoryWithoutUpdate().set("$sep_survivor", true);
+                break;
+            }
+        }
+    }
+
+    @Override
+    protected void notifyEnding() {
+        super.notifyEnding();
+
+        if (this.entity instanceof CampaignFleetAPI fleet) {
+            fleet.clearAssignments();
+            if (this.hideout != null) {
+                fleet.getAI().addAssignment(FleetAssignment.GO_TO_LOCATION_AND_DESPAWN, this.hideout, 1000000f, null);
+            } else {
+                fleet.despawn();
             }
         }
     }
@@ -528,37 +491,6 @@ public class SearchAndRescueMission extends HubMissionWithBarEvent {
         return result;
     }
 
-    public Object getScenarioData(String id) throws JSONException {
-        Object result;
-        if (this.scenarioData.has(id)) {
-            result = this.scenarioData.get(id);
-        } else {
-            result = SCENARIO_DEFAULTS.get(id);
-        }
-        return result;
-    }
-
-    public int getScenarioCreditReward(boolean isBonus) throws JSONException {
-        Object data = getScenarioData(!isBonus ? "creditReward" : "creditRewardBonus");
-        int result = 0;
-        if (data instanceof String value) {
-            CreditReward creditRewardType = CreditReward.valueOf(value);
-            result = getCreditRewardValue(creditRewardType.min, creditRewardType.max);
-        } else if (data instanceof Integer value) {
-            result = value;
-        }
-        return result;
-    }
-
-    public int getCreditRewardValue(int min, int max) {
-        int reward = min + getGenRandom().nextInt(max - min + 1);
-        reward = reward / 1000 * 1000;
-        if (reward > 100000) {
-            reward = reward / 10000 * 10000;
-        }
-        return reward;
-    }
-
     public enum Stage {
         FIND,
         RETURN,
@@ -571,15 +503,14 @@ public class SearchAndRescueMission extends HubMissionWithBarEvent {
         OFFICER,
         ADMINISTRATOR,
         CONTACT,
-        CIVILIAN,
-        RANDOM
+        CIVILIAN
     }
 
-    public enum EntityType {
-        WRECK,
-        FLEET,
-        PLANET,
-        MARKET,
-        PLANET_RAID
+    public enum ScenarioType {
+        STRANDED_IN_WRECK,
+        STRANDED_IN_PLANET,
+        CAPTURED_IN_FLEET,
+        CAPTURED_IN_PLANET,
+        CAPTURED_IN_MARKET
     }
 }

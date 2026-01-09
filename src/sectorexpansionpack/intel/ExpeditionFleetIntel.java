@@ -16,7 +16,7 @@ import com.fs.starfarer.api.util.Misc;
 import com.fs.starfarer.api.util.WeightedRandomPicker;
 import org.apache.log4j.Logger;
 import org.lwjgl.util.vector.Vector2f;
-import sectorexpansionpack.ModPlugin;
+import sectorexpansionpack.Settings;
 import sectorexpansionpack.Utils;
 import sectorexpansionpack.intel.misc.ExpeditionFleetDepartureIntel;
 import sectorexpansionpack.intel.misc.LeakedArtifactLocationIntel;
@@ -242,7 +242,7 @@ public class ExpeditionFleetIntel extends FleetGroupIntel {
     public void pickSpecialItem() {
         WeightedRandomPicker<SpecialItemSpecAPI> specialItemPicker = new WeightedRandomPicker<>(getRandom());
         for (SpecialItemSpecAPI spec : Global.getSettings().getAllSpecialItemSpecs()) {
-            if (!ModPlugin.COLONY_ITEM_WHITELIST.contains(spec.getId())) {
+            if (!Settings.COLONY_ITEM_WHITELIST.contains(spec.getId())) {
                 continue;
             }
             if (spec.getParams() == null || spec.getParams().isEmpty()) {

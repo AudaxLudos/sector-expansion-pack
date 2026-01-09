@@ -19,7 +19,7 @@ import com.fs.starfarer.api.ui.TooltipMakerAPI;
 import com.fs.starfarer.api.util.Misc;
 import com.fs.starfarer.api.util.WeightedRandomPicker;
 import org.apache.log4j.Logger;
-import sectorexpansionpack.ModPlugin;
+import sectorexpansionpack.Settings;
 import sectorexpansionpack.Utils;
 import sectorexpansionpack.missions.hub.SEPHubMissionWithBarEvent;
 
@@ -178,7 +178,7 @@ public class ArtifactIncursionMission extends SEPHubMissionWithBarEvent implemen
             if (installedItem == null) {
                 continue;
             }
-            if (!ModPlugin.COLONY_ITEM_WHITELIST.contains(installedItem.getId())) {
+            if (!Settings.COLONY_ITEM_WHITELIST.contains(installedItem.getId())) {
                 continue;
             }
             for (Industry otherInd : other.getIndustries()) {

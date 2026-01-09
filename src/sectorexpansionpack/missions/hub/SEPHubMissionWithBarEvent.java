@@ -21,7 +21,7 @@ import com.fs.starfarer.api.impl.campaign.shared.SharedData;
 import com.fs.starfarer.api.impl.campaign.skills.OfficerTraining;
 import com.fs.starfarer.api.util.Misc;
 import org.lwjgl.util.vector.Vector2f;
-import sectorexpansionpack.ModPlugin;
+import sectorexpansionpack.Settings;
 import sectorexpansionpack.Utils;
 import sectorexpansionpack.missions.FleetEscortMission;
 
@@ -390,20 +390,12 @@ public abstract class SEPHubMissionWithBarEvent extends HubMissionWithBarEvent {
         this.connections.add(new StageConnection(from, to, new DaysElapsedChecker(days, this)));
     }
 
-    public void connectWithEntityNearbyOther(Object from, Object to, SectorEntityToken entity, SectorEntityToken other, float maxRange, boolean checkInHyperspace) {
-        this.connections.add(new StageConnection(from, to, new EntityNearbyOtherChecker(entity, other, maxRange, checkInHyperspace)));
+    public void connectWithEntityNearbyOther(Object from, Object to, SectorEntityToken entity, SectorEntityToken other, float maxRange) {
+        this.connections.add(new StageConnection(from, to, new EntityNearbyOtherChecker(entity, other, maxRange)));
     }
 
-    public void setStageOnEntityNearbyOther(Object to, SectorEntityToken entity, SectorEntityToken other, float maxRange, boolean checkInHyperspace) {
-        this.connections.add(new StageConnection(null, to, new EntityNearbyOtherChecker(entity, other, maxRange, checkInHyperspace)));
-    }
-
-    public void connectWithEntityNearbyOtherV2(Object from, Object to, SectorEntityToken entity, SectorEntityToken other, float range) {
-        this.connections.add(new StageConnection(from, to, new EntityNearbyOtherCheckerV2(entity, other, range)));
-    }
-
-    public void setStageOnEntityNearbyOtherV2(Object to, SectorEntityToken entity, SectorEntityToken other, float range) {
-        this.connections.add(new StageConnection(null, to, new EntityNearbyOtherCheckerV2(entity, other, range)));
+    public void setStageOnEntityNearbyOther(Object to, SectorEntityToken entity, SectorEntityToken other, float maxRange) {
+        this.connections.add(new StageConnection(null, to, new EntityNearbyOtherChecker(entity, other, maxRange)));
     }
 
     public void connectWithFactionTurnedHostile(Object from, Object to, FactionAPI faction) {
@@ -483,7 +475,7 @@ public abstract class SEPHubMissionWithBarEvent extends HubMissionWithBarEvent {
                 if (i.getSpecialItem() == null) {
                     continue;
                 }
-                if (!ModPlugin.COLONY_ITEM_WHITELIST.contains(i.getSpecialItem().getId())) {
+                if (!Settings.COLONY_ITEM_WHITELIST.contains(i.getSpecialItem().getId())) {
                     continue;
                 }
                 return true;
@@ -506,7 +498,7 @@ public abstract class SEPHubMissionWithBarEvent extends HubMissionWithBarEvent {
                 if (otherData == null) {
                     continue;
                 }
-                if (!ModPlugin.COLONY_ITEM_WHITELIST.contains(otherData.getId())) {
+                if (!Settings.COLONY_ITEM_WHITELIST.contains(otherData.getId())) {
                     continue;
                 }
                 for (Industry otherInd : this.other.getIndustries()) {
@@ -624,31 +616,9 @@ public abstract class SEPHubMissionWithBarEvent extends HubMissionWithBarEvent {
     public static class EntityNearbyOtherChecker implements ConditionChecker {
         protected SectorEntityToken entity;
         protected SectorEntityToken other;
-        protected float maxRange;
-        protected boolean checkInHyperspace;
-
-        public EntityNearbyOtherChecker(SectorEntityToken entity, SectorEntityToken other, float maxRange, boolean checkInHyperspace) {
-            this.entity = entity;
-            this.other = other;
-            this.maxRange = maxRange;
-            this.checkInHyperspace = checkInHyperspace;
-        }
-
-        @Override
-        public boolean conditionsMet() {
-            if (this.checkInHyperspace && (this.entity.isInHyperspace() || this.other.isInHyperspace())) {
-                return Misc.getDistance(this.entity.getLocationInHyperspace(), this.other.getLocationInHyperspace()) < this.maxRange;
-            }
-            return Misc.getDistance(this.entity, this.other) < this.maxRange;
-        }
-    }
-
-    public static class EntityNearbyOtherCheckerV2 implements ConditionChecker {
-        protected SectorEntityToken entity;
-        protected SectorEntityToken other;
         protected float range;
 
-        public EntityNearbyOtherCheckerV2(SectorEntityToken entity, SectorEntityToken other, float range) {
+        public EntityNearbyOtherChecker(SectorEntityToken entity, SectorEntityToken other, float range) {
             this.entity = entity;
             this.other = other;
             this.range = range;
