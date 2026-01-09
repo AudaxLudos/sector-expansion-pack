@@ -1,6 +1,7 @@
 package sectorexpansionpack;
 
 import com.fs.starfarer.api.BaseModPlugin;
+import com.fs.starfarer.api.EveryFrameScript;
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.campaign.SectorAPI;
 import com.fs.starfarer.api.util.WeightedRandomPicker;
@@ -71,40 +72,7 @@ public class ModPlugin extends BaseModPlugin {
 
     @Override
     public void onApplicationLoad() {
-        loadMissionScenarios();
         loadMissionScenariosV2();
-    }
-
-    @Override
-    public void onGameLoad(boolean newGame) {
-        Utils.setRandom(new Random(Long.parseLong(Global.getSector().getSeedString().replaceAll("\\D", ""))));
-
-        loadColonyItemWhitelist();
-        loadMissionScenarios();
-        loadNeededScripts();
-
-        StormPacifierGhostCreator.register();
-        StormInducerGhostCreator.register();
-        FleetEaterGhostCreator.register();
-    }
-
-    public void loadColonyItemWhitelist() {
-        List<String> whitelist = new ArrayList<>();
-
-        try {
-            JSONArray spreadsheet = Global.getSettings().getMergedSpreadsheetDataForMod("id", "data/config/sep_colony_item_whitelist.csv", "sectorexpansionpack");
-
-            for (int i = 0; i < spreadsheet.length(); i++) {
-                JSONObject row = spreadsheet.getJSONObject(i);
-                String specialItemId = row.getString("id");
-
-                whitelist.add(specialItemId);
-            }
-        } catch (JSONException | IOException e) {
-            throw new RuntimeException(e);
-        }
-
-        COLONY_ITEM_WHITELIST = whitelist;
     }
 
     public void loadMissionScenarios() {
@@ -153,6 +121,42 @@ public class ModPlugin extends BaseModPlugin {
         } catch (IOException | JSONException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public void onGameLoad(boolean newGame) {
+        loadModSettings();
+        loadNeededScripts();
+
+        StormPacifierGhostCreator.register();
+        StormInducerGhostCreator.register();
+        FleetEaterGhostCreator.register();
+    }
+
+    public void loadModSettings() {
+        Utils.setRandom(new Random(Long.parseLong(Global.getSector().getSeedString().replaceAll("\\D", ""))));
+
+        loadColonyItemWhitelist();
+        Settings.load();
+    }
+
+    public void loadColonyItemWhitelist() {
+        List<String> whitelist = new ArrayList<>();
+
+        try {
+            JSONArray spreadsheet = Global.getSettings().getMergedSpreadsheetDataForMod("id", "data/config/sep_colony_item_whitelist.csv", "sectorexpansionpack");
+
+            for (int i = 0; i < spreadsheet.length(); i++) {
+                JSONObject row = spreadsheet.getJSONObject(i);
+                String specialItemId = row.getString("id");
+
+                whitelist.add(specialItemId);
+            }
+        } catch (JSONException | IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        COLONY_ITEM_WHITELIST = whitelist;
     }
 
     public void loadNeededScripts() {

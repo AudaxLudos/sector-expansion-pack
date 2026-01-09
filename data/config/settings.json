@@ -1,4 +1,6 @@
 {
+  "sep_expeditions_enabled": true,
+  "sep_incursions_enabled": true,
   "graphics": {
     "intel": {
       "sep_expeditionFleet": "graphics/sectorexpansionpack/icons/expedition_fleet.png",

@@ -1,0 +1,10 @@
+fieldID,fieldName,fieldType,defaultValue,secondaryValue,fieldDescription,minValue,maxValue,tab
+sep_expeditions_settings_header,Expeditions Settings,Header,Expeditions Settings,,,,,
+sep_expeditions_enabled,Expeditions Enabled,Boolean,TRUE,,"Sets whether or not expeditions can happen in a campaign.
+
+Default Value: True",,,
+,,,,,,,,
+sep_incursion_settings_header,Incursions Settings,Header,Incursions Settings,,,,,
+sep_incursions_enabled,Incursions Enabled,Boolean,TRUE,,"Sets whether or not incursions can happen in a campaign.
+
+Default Value: True",,,

@@ -3,6 +3,7 @@ package sectorexpansionpack.intel;
 import com.fs.starfarer.api.EveryFrameScript;
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.impl.campaign.intel.BaseEventManager;
+import sectorexpansionpack.Settings;
 
 public class ExpeditionFleetManager extends BaseEventManager {
     public static final String KEY = "$sep_core_artifactExpeditionManager";
@@ -51,5 +52,10 @@ public class ExpeditionFleetManager extends BaseEventManager {
         }
 
         return event;
+    }
+
+    @Override
+    public boolean isDone() {
+        return !Settings.EXPEDITIONS_ENABLED;
     }
 }
