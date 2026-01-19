@@ -292,7 +292,7 @@ public class ExpeditionFleetIntel extends FleetGroupIntel {
         this.efm.requireMarketFactionNotPlayer();
         this.efm.requireMarketStabilityAtLeast(8);
         this.source = this.efm.pickMarket();
-        if (this.source == null) {
+        if (this.source == null || this.source.getStarSystem() == null) {
             endImmediately();
         }
     }
