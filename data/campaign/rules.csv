@@ -52,6 +52,18 @@ FireAll PopulateOptionsHire","After a short wait, your connection request is acc
 $personName looks at you eagerly.
 
 ""Captain, thank you again for saving me. I knew you would see the value in giving me a chance. You will not regret it. I am more capable than most you will find out here.""",,
+sep_survivorOfficerMentored,PopulateOptionsHire,"$sep_survivor score:1000
+$askedSkills == true
+$mentored == true","SetTextHighlightColors storyOptionColor
+SetTextHighlights Mentored",The officer will to learn more than usual. $HeOrShe will earn more experience in combat and can select more skills when leveling up.,,
+sep_survivorOfficerMaxLevel,PopulateOptionsHire,"$sep_survivor score:1000
+$askedSkills == true
+$officerMaxLevel > 5","SetTextHighlightColors hColor hColor
+SetTextHighlights ""Max Level"" $officerMaxLevel",The officer will go above and beyond the norm. $HeOrShe can reach a max level of $officerMaxLevel.,,
+sep_survivorOfficerMaxEliteSkills,PopulateOptionsHire,"$sep_survivor score:1000
+$askedSkills == true
+$officerMaxEliteSkills > 3","SetTextHighlightColors hColor hColor
+SetTextHighlights ""Max Elite Skills"" $officerMaxEliteSkills",The officer is willing to achieve exceptional mastery over many different fields. $HeOrShe can maintain up to $officerMaxEliteSkills elite skills.,,
 sep_survivorAskHireOfficer,DialogOptionSelected,"$sep_survivor score:1000
 $option == ome_askHire","AddText ""\""You saved my life, and I’ll never forget that. Serving under you would mean a great deal, so I won’t ask for a hiring bonus and am willing to start at a reduced salary of $ome_salary credits per month, half the standard rate. If you accept, I’ll be ready to board within the hour.\""""
 SetTextHighlightColors hColor hColor
@@ -276,7 +288,7 @@ sep_fem_s0OfferTextBar,SEPFEMShowOfferBar,,,SAMPLE BAR OFFER TEXT,,
 ,,,,,,
 ,,,,,,
 ,,,,,,
-# Search and Rescue V2 START,,,,,,
+# Search and Rescue START,,,,,,
 sep_sar_blurb,sep_sar_blurb,,FireBest SEPSARShowBlurb true,,,
 sep_sar_offerOption,sep_sar_option,,FireBest SEPSARShowOption true,,,
 sep_sar_offerTextContact1,DialogOptionSelected,$option == sep_sar_start,"FireBest SEPSARShowOffer true
@@ -540,7 +552,7 @@ sep_sar_s0DeadReturnText,SEPSARShowDeadReturnText,,"SetTextHighlightColors h
 SetTextHighlights $sep_sar_survivorFullName","You report to $PersonPost $personLastName about the success of your mission, bringing the grim news that $sep_sar_survivorFullName had died by the time you reached $sep_sar_survivorHimOrHer.
 
 Afterward, you order your chief security officer to escort the recovered remains to a safe location, while you provide a full report detailing the mission before receiving your reward.",,Generic dialogue can be replaced
-# Search and Rescue V2 END,,,,,,
+# Search and Rescue END,,,,,,
 ,,,,,,
 ,,,,,,
 ,,,,,,

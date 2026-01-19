@@ -19,7 +19,7 @@ RETURN,pirates,chanceMID,hostile,aggressive,lowRep,hyperspaceOnly,interceptEscor
 sar1,sep_sar,10,,,STRANDED_IN_WRECK,"FIND,pirates,chanceHIGH,hostile,aggressive,lowRep",,,,,
 sar2,sep_sar,10,,,STRANDED_IN_PLANET,"FIND,pirates,chanceHIGH,hostile,aggressive,lowRep",,,,,
 sar3,sep_sar,10,,,CAPTURED_IN_FLEET,"FIND,pirates,chanceHIGH,hostile,aggressive,lowRep",,,,,
-sar4,sep_sar,10,,,CAPTURED_IN_PLANET,"FIND,chanceHIGH,pirates,hostile,aggressive,lowRep|
-FIND,chanceMID,pirates,hostile,aggressive,lowRep",,,,,
+sar4,sep_sar,10,,,CAPTURED_IN_PLANET,"FIND,pirates,chanceHIGH,hostile,aggressive,lowRep|
+FIND,pirates,chanceMID,hostile,aggressive,lowRep",,,,,
 #sar5,sep_sar,10,,,CAPTURED_IN_MARKET,,,,,,Not implemented
 ,,,,,,,,,,,
