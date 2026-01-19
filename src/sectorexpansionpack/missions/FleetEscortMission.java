@@ -12,7 +12,6 @@ import com.fs.starfarer.api.ui.TooltipMakerAPI;
 import com.fs.starfarer.api.util.Misc;
 import com.fs.starfarer.api.util.WeightedRandomPicker;
 import org.apache.log4j.Logger;
-import sectorexpansionpack.Settings;
 import sectorexpansionpack.Utils;
 import sectorexpansionpack.missions.hub.SEPHubMissionWithScenario;
 
@@ -239,20 +238,10 @@ public class FleetEscortMission extends SEPHubMissionWithScenario {
     public String pickCommodityIdMarketDemand(MarketAPI market) {
         WeightedRandomPicker<String> picker = new WeightedRandomPicker<>(getGenRandom());
         for (MarketDemandAPI demand : market.getDemandData().getDemandList()) {
-            picker.add(demand.getBaseCommodity().getId());
-        }
-
-        return picker.pick();
-    }
-
-    public String pickSpecialItemId() {
-        WeightedRandomPicker<String> picker = new WeightedRandomPicker<>(getGenRandom());
-
-        for (SpecialItemSpecAPI spec : Global.getSettings().getAllSpecialItemSpecs()) {
-            if (!Settings.COLONY_ITEM_WHITELIST.contains(spec.getId())) {
+            if (demand.getBaseCommodity() == null || demand.getBaseCommodity().hasTag("nonecon") || demand.getBaseCommodity().hasTag("ai_core")) {
                 continue;
             }
-            picker.add(spec.getId());
+            picker.add(demand.getBaseCommodity().getId());
         }
 
         return picker.pick();
