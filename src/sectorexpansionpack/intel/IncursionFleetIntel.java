@@ -262,7 +262,7 @@ public class IncursionFleetIntel extends GenericRaidFGI {
         this.efm.requireMarketFactionNotPlayer();
         this.efm.preferMarketMilitary();
         this.source = this.efm.pickMarket();
-        if (this.source == null) {
+        if (this.source == null || this.source.getStarSystem() == null) {
             endImmediately();
         }
     }
