@@ -97,7 +97,7 @@ public class AptitudePurist extends SCBaseAptitudePlugin {
     public void createSections() {
         SCAptitudeSection section1 = new SCAptitudeSection(true, 0, "industry1");
         section1.addSkill("sep_sic_baseline_restoration");
-        section1.addSkill("sep_sic_compact_profile");
+        section1.addSkill("sep_sic_harmonized_sensors");
         section1.addSkill("sep_sic_standard_repairs");
         section1.addSkill("sep_sic_unified_logistics");
         addSection(section1);

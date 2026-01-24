@@ -8,7 +8,7 @@ import second_in_command.specs.SCBaseSkillPlugin;
 
 import java.awt.*;
 
-public class CompactProfile extends SCBaseSkillPlugin {
+public class HarmonizedSensors extends SCBaseSkillPlugin {
     public static float DETECTED_RANGE_MULT = 0.25f;
     public static float SENSOR_PROFILE_MULT = 0.25f;
     public static float MOVE_SLOW_SPEED_MOD = 3f;
