@@ -11,7 +11,7 @@ import java.awt.*;
 public class HarmonizedSensors extends SCBaseSkillPlugin {
     public static float DETECTED_RANGE_MULT = 0.25f;
     public static float SENSOR_PROFILE_MULT = 0.25f;
-    public static float MOVE_SLOW_SPEED_MOD = 3f;
+    public static float SENSOR_RANGE_MULT = 0.25f;
 
     @Override
     public String getAffectsString() {
@@ -41,8 +41,9 @@ public class HarmonizedSensors extends SCBaseSkillPlugin {
         float penaltyMult = designData.computeTotalPenaltyMult();
         float bonusMult = designData.getDoctrineExtremismMult();
 
-        data.getFleet().getStats().getDetectedRangeMod().modifyMult(getId(), 1f - DETECTED_RANGE_MULT * bonusMult * penaltyMult, "Harmonized Sensors");
-        data.getFleet().getStats().getSensorProfileMod().modifyMult(getId(), 1f - SENSOR_PROFILE_MULT * bonusMult * penaltyMult, "Harmonized Sensors");
+        data.getFleet().getStats().getDetectedRangeMod().modifyMult(getId(), 1f - (DETECTED_RANGE_MULT * bonusMult * penaltyMult), "Harmonized Sensors");
+        data.getFleet().getStats().getSensorProfileMod().modifyMult(getId(), 1f - (SENSOR_PROFILE_MULT * bonusMult * penaltyMult), "Harmonized Sensors");
+        data.getFleet().getStats().getSensorRangeMod().modifyMult(getId(), 1f - (SENSOR_RANGE_MULT * bonusMult * penaltyMult), "Harmonized Sensors");
     }
 
     @Override
@@ -51,13 +52,15 @@ public class HarmonizedSensors extends SCBaseSkillPlugin {
         float penaltyMult = designData.computeTotalPenaltyMult();
         float bonusMult = designData.getDoctrineExtremismMult();
 
-        data.getFleet().getStats().getDetectedRangeMod().modifyMult(getId(), 1f - DETECTED_RANGE_MULT * bonusMult * penaltyMult, "Harmonized Sensors");
-        data.getFleet().getStats().getSensorProfileMod().modifyMult(getId(), 1f - SENSOR_PROFILE_MULT * bonusMult * penaltyMult, "Harmonized Sensors");
+        data.getFleet().getStats().getDetectedRangeMod().modifyMult(getId(), 1f - (DETECTED_RANGE_MULT * bonusMult * penaltyMult), "Harmonized Sensors");
+        data.getFleet().getStats().getSensorProfileMod().modifyMult(getId(), 1f - (SENSOR_PROFILE_MULT * bonusMult * penaltyMult), "Harmonized Sensors");
+        data.getFleet().getStats().getSensorRangeMod().modifyMult(getId(), 1f - (SENSOR_RANGE_MULT * bonusMult * penaltyMult), "Harmonized Sensors");
     }
 
     @Override
     public void onDeactivation(SCData data) {
         data.getFleet().getStats().getDetectedRangeMod().unmodify(getId());
         data.getFleet().getStats().getSensorProfileMod().unmodify(getId());
+        data.getFleet().getStats().getSensorRangeMod().unmodify(getId());
     }
 }
