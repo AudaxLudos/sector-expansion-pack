@@ -12,6 +12,7 @@ import java.awt.*;
 import java.util.Objects;
 
 public class EquipmentFamiliarity extends SCBaseSkillPlugin {
+    public static float CREW_MIN_REQ_MULT = 0.2f;
     public static float PEAK_PERFORMANCE_TIME_MULT = 0.25f;
     public static float MAX_COMBAT_READINESS_MOD = 0.15f;
 
@@ -31,7 +32,8 @@ public class EquipmentFamiliarity extends SCBaseSkillPlugin {
         tooltip.addPara("Bonuses are reduced by %s due to %s other design types in the fleet", 0f, new Color[]{Misc.getNegativeHighlightColor(), Misc.getHighlightColor()}, Math.round(otherDesignTypeCount * 10f) + "%", otherDesignTypeCount + "");
         tooltip.setBulletedListMode(null);
 
-        tooltip.addPara("%s (Max: %s) peak performance time", 10f, Misc.getHighlightColor(), Misc.getHighlightColor(), "+" + Math.round(PEAK_PERFORMANCE_TIME_MULT * debuffMult * 100f) + "%", Math.round(PEAK_PERFORMANCE_TIME_MULT * 100f) + "%");
+        tooltip.addPara("%s (Max: %s) minimum crew requirements", 10f, Misc.getHighlightColor(), Misc.getHighlightColor(), "-" + Math.round(CREW_MIN_REQ_MULT * debuffMult * 100f) + "%", Math.round(CREW_MIN_REQ_MULT * 100f) + "%");
+        tooltip.addPara("%s (Max: %s) peak performance time", 0f, Misc.getHighlightColor(), Misc.getHighlightColor(), "+" + Math.round(PEAK_PERFORMANCE_TIME_MULT * debuffMult * 100f) + "%", Math.round(PEAK_PERFORMANCE_TIME_MULT * 100f) + "%");
         tooltip.addPara("%s (Max: %s) max combat readiness", 0f, Misc.getHighlightColor(), Misc.getHighlightColor(), "+" + Math.round(MAX_COMBAT_READINESS_MOD * debuffMult * 100f) + "%", Math.round(MAX_COMBAT_READINESS_MOD * 100f) + "%");
     }
 
@@ -46,6 +48,7 @@ public class EquipmentFamiliarity extends SCBaseSkillPlugin {
             int otherDesignTypeCount = AptitudePurist.getNonCommonShipDesignTypeCount(data);
             float debuffMult = 1f - (otherDesignTypeCount * 0.1f);
 
+            stats.getMinCrewMod().modifyMult(getId(), 1f - CREW_MIN_REQ_MULT * debuffMult);
             stats.getPeakCRDuration().modifyMult(getId(), (1f + PEAK_PERFORMANCE_TIME_MULT) * debuffMult);
             stats.getMaxCombatReadiness().modifyFlat(getId(), MAX_COMBAT_READINESS_MOD * debuffMult, "Design Commonality");
         }
