@@ -10,7 +10,7 @@ import java.awt.*;
 public class DoctrineExtremism extends SCBaseSkillPlugin {
     @Override
     public String getAffectsString() {
-        return "ships with the second most common design type";
+        return "ships with the most common design type";
     }
 
     @Override

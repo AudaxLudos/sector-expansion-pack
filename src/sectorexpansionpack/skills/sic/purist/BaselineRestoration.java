@@ -18,7 +18,7 @@ public class BaselineRestoration extends SCBaseSkillPlugin {
 
     @Override
     public String getAffectsString() {
-        return "ships with the first most common design type";
+        return "ships with the most common design type";
     }
 
     @Override
@@ -26,11 +26,12 @@ public class BaselineRestoration extends SCBaseSkillPlugin {
         AptitudePurist.FleetDesignData designData = AptitudePurist.getFleetDesignData(data);
         float penaltyMult = designData.computeTotalPenaltyMult();
         float bonusMult = designData.getDoctrineExtremismMult();
+        String typeText = designData.nonCommonTypeCount > 1 ? "types" : "type";
 
         tooltip.addPara("The most common design type is %s", 0f, Misc.getHighlightColor(), Misc.getDesignTypeColor(designData.primary), designData.primary);
         tooltip.setBulletedListMode("   - ");
-        tooltip.addPara("Bonuses are reduced by %s due to %s other design types in the fleet", 0f, new Color[]{Misc.getNegativeHighlightColor(), Misc.getHighlightColor()}, Math.round(designData.nonCommonTypePenalty * bonusMult * 100f) + "%", designData.nonCommonTypeCount + "");
-        tooltip.addPara("Bonuses are reduced by a further %s due to the dominance of other design types", 0f, new Color[]{Misc.getNegativeHighlightColor(), Misc.getHighlightColor()}, Math.round(designData.otherTypeDominancePenalty * bonusMult * 100f) + "%");
+        tooltip.addPara("Skill effects are reduced by %s due to %s other design " + typeText + " in the fleet", 0f, new Color[]{Misc.getNegativeHighlightColor(), Misc.getHighlightColor()}, Math.round(designData.nonCommonTypePenalty * bonusMult * 100f) + "%", designData.nonCommonTypeCount + "");
+        tooltip.addPara("Skill effects are reduced by a further %s due to the dominance of other design types", 0f, new Color[]{Misc.getNegativeHighlightColor(), Misc.getHighlightColor()}, Math.round(designData.otherTypeDominancePenalty * bonusMult * 100f) + "%");
         tooltip.setBulletedListMode(null);
 
         tooltip.addPara("%s (Max: %s) chance for ships to be recoverable if lost in combat", 10f, Misc.getHighlightColor(), Misc.getHighlightColor(), "+" + Math.round(SHIP_RECOVERY_MOD * bonusMult * penaltyMult * 100f) + "%", Math.round(SHIP_RECOVERY_MOD * bonusMult * 100f) + "%");
