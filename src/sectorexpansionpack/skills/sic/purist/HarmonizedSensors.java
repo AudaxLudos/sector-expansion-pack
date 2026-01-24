@@ -33,9 +33,6 @@ public class HarmonizedSensors extends SCBaseSkillPlugin {
 
         tooltip.addPara("%s (Max: %s) detected-at range", 10f, Misc.getHighlightColor(), Misc.getHighlightColor(), "-" + Math.round(DETECTED_RANGE_MULT * bonusMult * penaltyMult * 100f) + "%", Math.round(DETECTED_RANGE_MULT * bonusMult * 100f) + "%");
         tooltip.addPara("%s (Max: %s) sensor profile", 0f, Misc.getHighlightColor(), Misc.getHighlightColor(), "-" + Math.round(SENSOR_PROFILE_MULT * bonusMult * penaltyMult * 100f) + "%", Math.round(SENSOR_PROFILE_MULT * bonusMult * 100f) + "%");
-        tooltip.addPara("%s (Max: %s) burn level at which the fleet is considered to be moving slowly*", 0f, Misc.getHighlightColor(), Misc.getHighlightColor(), "+" + Math.round(MOVE_SLOW_SPEED_MOD * bonusMult * penaltyMult), Math.round(MOVE_SLOW_SPEED_MOD * bonusMult) + "");
-
-        tooltip.addPara("*A slow moving fleet is harder to detect in some types of terrain, and can avoid some hazards. Some abilities also make the fleet move slowly when activated. A fleet is considered slow-moving at a burn level of half of its slowest ship.", 10f, Misc.getGrayColor(), Misc.getHighlightColor());
     }
 
     @Override
@@ -44,8 +41,23 @@ public class HarmonizedSensors extends SCBaseSkillPlugin {
         float penaltyMult = designData.computeTotalPenaltyMult();
         float bonusMult = designData.getDoctrineExtremismMult();
 
-        data.getFleet().getStats().getDetectedRangeMod().modifyMult(getId(), 1f - DETECTED_RANGE_MULT * bonusMult * penaltyMult, "Compact Profile");
-        data.getFleet().getStats().getSensorProfileMod().modifyMult(getId(), 1f - SENSOR_PROFILE_MULT * bonusMult * penaltyMult, "Compact Profile");
-        data.getFleet().getStats().getDynamic().getMod(Stats.MOVE_SLOW_SPEED_BONUS_MOD).modifyFlat(getId(), MOVE_SLOW_SPEED_MOD * bonusMult * penaltyMult, "Compact Profile");
+        data.getFleet().getStats().getDetectedRangeMod().modifyMult(getId(), 1f - DETECTED_RANGE_MULT * bonusMult * penaltyMult, "Harmonized Sensors");
+        data.getFleet().getStats().getSensorProfileMod().modifyMult(getId(), 1f - SENSOR_PROFILE_MULT * bonusMult * penaltyMult, "Harmonized Sensors");
+    }
+
+    @Override
+    public void onActivation(SCData data) {
+        AptitudePurist.FleetDesignData designData = AptitudePurist.getFleetDesignData(data);
+        float penaltyMult = designData.computeTotalPenaltyMult();
+        float bonusMult = designData.getDoctrineExtremismMult();
+
+        data.getFleet().getStats().getDetectedRangeMod().modifyMult(getId(), 1f - DETECTED_RANGE_MULT * bonusMult * penaltyMult, "Harmonized Sensors");
+        data.getFleet().getStats().getSensorProfileMod().modifyMult(getId(), 1f - SENSOR_PROFILE_MULT * bonusMult * penaltyMult, "Harmonized Sensors");
+    }
+
+    @Override
+    public void onDeactivation(SCData data) {
+        data.getFleet().getStats().getDetectedRangeMod().unmodify(getId());
+        data.getFleet().getStats().getSensorProfileMod().unmodify(getId());
     }
 }
