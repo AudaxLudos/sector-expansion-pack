@@ -14,6 +14,8 @@ import java.util.Objects;
 public class UnifiedLogistics extends SCBaseSkillPlugin {
     public static float SUPPLIES_PER_MONTH_MULT = 0.25f;
     public static float FUEL_USE_MULT = 0.25f;
+    public static float FUEL_CAP_MULT = 0.2f;
+    public static float CARGO_CAP_MULT = 0.2f;
 
     @Override
     public String getAffectsString() {
@@ -33,6 +35,8 @@ public class UnifiedLogistics extends SCBaseSkillPlugin {
 
         tooltip.addPara("%s (Max: %s) monthly supply consumption for ship maintenance", 10f, Misc.getHighlightColor(), Misc.getHighlightColor(), "+" + Math.round(SUPPLIES_PER_MONTH_MULT * debuffMult * 100f) + "%", Math.round(SUPPLIES_PER_MONTH_MULT * 100f) + "%");
         tooltip.addPara("%s (Max: %s) fuel usage", 0f, Misc.getHighlightColor(), Misc.getHighlightColor(), "+" + Math.round(FUEL_USE_MULT * debuffMult * 100f) + "%", Math.round(FUEL_USE_MULT * 100f) + "%");
+        tooltip.addPara("%s (Max: %s) cargo capacity", 0f, Misc.getHighlightColor(), Misc.getHighlightColor(), "+" + Math.round(CARGO_CAP_MULT * debuffMult * 100f) + "%", Math.round(CARGO_CAP_MULT * 100f) + "%");
+        tooltip.addPara("%s (Max: %s) fuel capacity", 0f, Misc.getHighlightColor(), Misc.getHighlightColor(), "+" + Math.round(FUEL_CAP_MULT * debuffMult * 100f) + "%", Math.round(FUEL_CAP_MULT * 100f) + "%");
     }
 
     @Override
@@ -46,8 +50,10 @@ public class UnifiedLogistics extends SCBaseSkillPlugin {
             int otherDesignTypeCount = AptitudePurist.getNonCommonShipDesignTypeCount(data);
             float debuffMult = 1f - (otherDesignTypeCount * 0.1f);
 
-            stats.getSuppliesPerMonth().modifyMult(getId(), (1f - SUPPLIES_PER_MONTH_MULT) * debuffMult);
-            stats.getFuelUseMod().modifyMult(getId(), (1f - FUEL_USE_MULT) * debuffMult);
+            stats.getSuppliesPerMonth().modifyMult(getId(), 1f - SUPPLIES_PER_MONTH_MULT * debuffMult);
+            stats.getFuelUseMod().modifyMult(getId(), 1f - FUEL_USE_MULT * debuffMult);
+            stats.getFuelMod().modifyMult(getId(), 1f + FUEL_CAP_MULT * debuffMult);
+            stats.getCargoMod().modifyMult(getId(), 1f + CARGO_CAP_MULT * debuffMult);
         }
     }
 }
