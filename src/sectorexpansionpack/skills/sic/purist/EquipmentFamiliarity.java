@@ -23,34 +23,33 @@ public class EquipmentFamiliarity extends SCBaseSkillPlugin {
 
     @Override
     public void addTooltip(SCData data, TooltipMakerAPI tooltip) {
-        int otherDesignTypeCount = AptitudePurist.getNonCommonShipDesignTypeCount(data);
-        String commonDesignType = AptitudePurist.getPrimaryShipDesignType(data);
-        float debuffMult = 1f - (otherDesignTypeCount * 0.1f);
+        AptitudePurist.FleetDesignData designData = AptitudePurist.getFleetDesignData(data);
+        float penaltyMult = designData.computeTotalPenaltyMult();
+        float bonusMult = designData.getDoctrineExtremismMult();
 
-        tooltip.addPara("The most common design type is %s", 0f, Misc.getHighlightColor(), Misc.getDesignTypeColor(commonDesignType), commonDesignType);
+        tooltip.addPara("The most common design type is %s", 0f, Misc.getHighlightColor(), Misc.getDesignTypeColor(designData.primary), designData.primary);
         tooltip.setBulletedListMode("   - ");
-        tooltip.addPara("Bonuses are reduced by %s due to %s other design types in the fleet", 0f, new Color[]{Misc.getNegativeHighlightColor(), Misc.getHighlightColor()}, Math.round(otherDesignTypeCount * 10f) + "%", otherDesignTypeCount + "");
+        tooltip.addPara("Bonuses are reduced by %s due to %s other design types in the fleet", 0f, new Color[]{Misc.getNegativeHighlightColor(), Misc.getHighlightColor()}, Math.round(designData.nonCommonTypePenalty * bonusMult * 100f) + "%", designData.nonCommonTypeCount + "");
+        tooltip.addPara("Bonuses are reduced by a further %s due to the dominance of other design types", 0f, new Color[]{Misc.getNegativeHighlightColor(), Misc.getHighlightColor()}, Math.round(designData.otherTypeDominancePenalty * bonusMult * 100f) + "%");
         tooltip.setBulletedListMode(null);
 
-        tooltip.addPara("%s (Max: %s) minimum crew requirements", 10f, Misc.getHighlightColor(), Misc.getHighlightColor(), "-" + Math.round(CREW_MIN_REQ_MULT * debuffMult * 100f) + "%", Math.round(CREW_MIN_REQ_MULT * 100f) + "%");
-        tooltip.addPara("%s (Max: %s) peak performance time", 0f, Misc.getHighlightColor(), Misc.getHighlightColor(), "+" + Math.round(PEAK_PERFORMANCE_TIME_MULT * debuffMult * 100f) + "%", Math.round(PEAK_PERFORMANCE_TIME_MULT * 100f) + "%");
-        tooltip.addPara("%s (Max: %s) max combat readiness", 0f, Misc.getHighlightColor(), Misc.getHighlightColor(), "+" + Math.round(MAX_COMBAT_READINESS_MOD * debuffMult * 100f) + "%", Math.round(MAX_COMBAT_READINESS_MOD * 100f) + "%");
+        tooltip.addPara("%s (Max: %s) minimum crew requirements", 10f, Misc.getHighlightColor(), Misc.getHighlightColor(), "-" + Math.round(CREW_MIN_REQ_MULT * bonusMult * penaltyMult * 100f) + "%", Math.round(CREW_MIN_REQ_MULT * bonusMult * 100f) + "%");
+        tooltip.addPara("%s (Max: %s) peak performance time", 0f, Misc.getHighlightColor(), Misc.getHighlightColor(), "+" + Math.round(PEAK_PERFORMANCE_TIME_MULT * bonusMult * penaltyMult * 100f) + "%", Math.round(PEAK_PERFORMANCE_TIME_MULT * bonusMult * 100f) + "%");
+        tooltip.addPara("%s (Max: %s) max combat readiness", 0f, Misc.getHighlightColor(), Misc.getHighlightColor(), "+" + Math.round(MAX_COMBAT_READINESS_MOD * bonusMult * penaltyMult * 100f) + "%", Math.round(MAX_COMBAT_READINESS_MOD * bonusMult * 100f) + "%");
     }
 
     @Override
     public void applyEffectsBeforeShipCreation(SCData data, MutableShipStatsAPI stats, ShipVariantAPI variant, ShipAPI.HullSize hullSize, String id) {
         String variantType = variant.getHullSpec().getManufacturer();
-        String primaryType = AptitudePurist.getPrimaryShipDesignType(data);
-        String secondaryType = AptitudePurist.getSecondaryShipDesignType(data);
-        boolean hasDesignCompromise = data.getAllActiveSkillsPlugins().stream().anyMatch(s -> Objects.equals(s.getId(), "sep_sic_design_compromise"));
+        AptitudePurist.FleetDesignData designData = AptitudePurist.getFleetDesignData(data);
 
-        if (Objects.equals(variantType, primaryType) || (hasDesignCompromise && Objects.equals(variantType, secondaryType))) {
-            int otherDesignTypeCount = AptitudePurist.getNonCommonShipDesignTypeCount(data);
-            float debuffMult = 1f - (otherDesignTypeCount * 0.1f);
+        if (Objects.equals(variantType, designData.primary) || (designData.hasDesignCompromise && Objects.equals(variantType, designData.secondary))) {
+            float penaltyMult = designData.computeTotalPenaltyMult();
+            float bonusMult = designData.getDoctrineExtremismMult();
 
-            stats.getMinCrewMod().modifyMult(getId(), 1f - CREW_MIN_REQ_MULT * debuffMult);
-            stats.getPeakCRDuration().modifyMult(getId(), (1f + PEAK_PERFORMANCE_TIME_MULT) * debuffMult);
-            stats.getMaxCombatReadiness().modifyFlat(getId(), MAX_COMBAT_READINESS_MOD * debuffMult, "Design Commonality");
+            stats.getMinCrewMod().modifyMult(getId(), 1f - CREW_MIN_REQ_MULT * bonusMult * penaltyMult);
+            stats.getPeakCRDuration().modifyMult(getId(), 1f + PEAK_PERFORMANCE_TIME_MULT * bonusMult * penaltyMult);
+            stats.getMaxCombatReadiness().modifyFlat(getId(), MAX_COMBAT_READINESS_MOD * bonusMult * penaltyMult, "Design Commonality");
         }
     }
 }

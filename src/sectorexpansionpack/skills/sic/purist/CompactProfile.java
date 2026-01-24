@@ -20,29 +20,31 @@ public class CompactProfile extends SCBaseSkillPlugin {
 
     @Override
     public void addTooltip(SCData data, TooltipMakerAPI tooltip) {
-        int otherDesignTypeCount = AptitudePurist.getNonCommonShipDesignTypeCount(data);
-        String primaryType = AptitudePurist.getPrimaryShipDesignType(data);
-        float debuffMult = 1f - (otherDesignTypeCount * 0.1f);
+        AptitudePurist.FleetDesignData designData = AptitudePurist.getFleetDesignData(data);
+        float penaltyMult = designData.computeTotalPenaltyMult();
+        float bonusMult = designData.getDoctrineExtremismMult();
 
-        tooltip.addPara("The most common design type is %s", 0f, Misc.getHighlightColor(), Misc.getDesignTypeColor(primaryType), primaryType);
+        tooltip.addPara("The most common design type is %s", 0f, Misc.getHighlightColor(), Misc.getDesignTypeColor(designData.primary), designData.primary);
         tooltip.setBulletedListMode("   - ");
-        tooltip.addPara("Bonuses are reduced by %s due to %s other design types in the fleet", 0f, new Color[]{Misc.getNegativeHighlightColor(), Misc.getHighlightColor()}, Math.round(otherDesignTypeCount * 10f) + "%", otherDesignTypeCount + "");
+        tooltip.addPara("Bonuses are reduced by %s due to %s other design types in the fleet", 0f, new Color[]{Misc.getNegativeHighlightColor(), Misc.getHighlightColor()}, Math.round(designData.nonCommonTypePenalty * bonusMult * 100f) + "%", designData.nonCommonTypeCount + "");
+        tooltip.addPara("Bonuses are reduced by a further %s due to the dominance of other design types", 0f, new Color[]{Misc.getNegativeHighlightColor(), Misc.getHighlightColor()}, Math.round(designData.otherTypeDominancePenalty * bonusMult * 100f) + "%");
         tooltip.setBulletedListMode(null);
 
-        tooltip.addPara("%s (Max: %s) detected-at range", 10f, Misc.getHighlightColor(), Misc.getHighlightColor(), "-" + Math.round(DETECTED_RANGE_MULT * debuffMult * 100f) + "%", Math.round(DETECTED_RANGE_MULT * 100f) + "%");
-        tooltip.addPara("%s (Max: %s) sensor profile", 0f, Misc.getHighlightColor(), Misc.getHighlightColor(), "-" + Math.round(SENSOR_PROFILE_MULT * debuffMult * 100f) + "%", Math.round(SENSOR_PROFILE_MULT * 100f) + "%");
-        tooltip.addPara("%s (Max: %s) burn level at which the fleet is considered to be moving slowly*", 0f, Misc.getHighlightColor(), Misc.getHighlightColor(), "+" + Math.round(MOVE_SLOW_SPEED_MOD * debuffMult), Math.round(MOVE_SLOW_SPEED_MOD) + "");
+        tooltip.addPara("%s (Max: %s) detected-at range", 10f, Misc.getHighlightColor(), Misc.getHighlightColor(), "-" + Math.round(DETECTED_RANGE_MULT * bonusMult * penaltyMult * 100f) + "%", Math.round(DETECTED_RANGE_MULT * bonusMult * 100f) + "%");
+        tooltip.addPara("%s (Max: %s) sensor profile", 0f, Misc.getHighlightColor(), Misc.getHighlightColor(), "-" + Math.round(SENSOR_PROFILE_MULT * bonusMult * penaltyMult * 100f) + "%", Math.round(SENSOR_PROFILE_MULT * bonusMult * 100f) + "%");
+        tooltip.addPara("%s (Max: %s) burn level at which the fleet is considered to be moving slowly*", 0f, Misc.getHighlightColor(), Misc.getHighlightColor(), "+" + Math.round(MOVE_SLOW_SPEED_MOD * bonusMult * penaltyMult), Math.round(MOVE_SLOW_SPEED_MOD * bonusMult) + "");
 
         tooltip.addPara("*A slow moving fleet is harder to detect in some types of terrain, and can avoid some hazards. Some abilities also make the fleet move slowly when activated. A fleet is considered slow-moving at a burn level of half of its slowest ship.", 10f, Misc.getGrayColor(), Misc.getHighlightColor());
     }
 
     @Override
     public void advance(SCData data, Float amount) {
-        int otherDesignTypeCount = AptitudePurist.getNonCommonShipDesignTypeCount(data);
-        float debuffMult = 1f - (otherDesignTypeCount * 0.1f);
+        AptitudePurist.FleetDesignData designData = AptitudePurist.getFleetDesignData(data);
+        float penaltyMult = designData.computeTotalPenaltyMult();
+        float bonusMult = designData.getDoctrineExtremismMult();
 
-        data.getFleet().getStats().getDetectedRangeMod().modifyMult(getId(), 1f - DETECTED_RANGE_MULT * debuffMult, "Compact Profile");
-        data.getFleet().getStats().getSensorProfileMod().modifyMult(getId(), 1f - SENSOR_PROFILE_MULT * debuffMult, "Compact Profile");
-        data.getFleet().getStats().getDynamic().getMod(Stats.MOVE_SLOW_SPEED_BONUS_MOD).modifyFlat(getId(), MOVE_SLOW_SPEED_MOD * debuffMult, "Compact Profile");
+        data.getFleet().getStats().getDetectedRangeMod().modifyMult(getId(), 1f - DETECTED_RANGE_MULT * bonusMult * penaltyMult, "Compact Profile");
+        data.getFleet().getStats().getSensorProfileMod().modifyMult(getId(), 1f - SENSOR_PROFILE_MULT * bonusMult * penaltyMult, "Compact Profile");
+        data.getFleet().getStats().getDynamic().getMod(Stats.MOVE_SLOW_SPEED_BONUS_MOD).modifyFlat(getId(), MOVE_SLOW_SPEED_MOD * bonusMult * penaltyMult, "Compact Profile");
     }
 }

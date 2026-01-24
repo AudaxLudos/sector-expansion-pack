@@ -1,7 +1,6 @@
 package sectorexpansionpack.skills.sic.purist;
 
 import com.fs.starfarer.api.campaign.CampaignFleetAPI;
-import com.fs.starfarer.api.combat.ShipHullSpecAPI;
 import com.fs.starfarer.api.fleet.FleetMemberAPI;
 import com.fs.starfarer.api.ui.TooltipMakerAPI;
 import com.fs.starfarer.api.util.Misc;
@@ -14,85 +13,79 @@ import java.util.Map;
 import java.util.Objects;
 
 public class AptitudePurist extends SCBaseAptitudePlugin {
-    public static String PRIMARY_SHIP_DESIGN_TYPE_KEY = "sep_sic_primary_ship_design_type_key";
-    public static String SECONDARY_SHIP_DESIGN_TYPE_KEY = "sep_sic_secondary_ship_design_type_key";
-    public static String NON_COMMON_SHIP_DESIGN_TYPE_COUNT_KEY = "sep_sic_non_common_design_type_count_key";
+    public static String FLEET_DESIGN_STATS_KEY = "sep_fleet_design_stats";
+    public static float AVERAGE_DESIGN_TYPE_NEEDED = 0.5f;
+    public static float SKILL_EFFECT_REDUCTION_MULT = 0.1f;
 
-    public static Map<String, Integer> getCountByShipDesignType(SCData data) {
-        Map<String, Integer> result = new HashMap<>();
+    private static FleetDesignData computeFleetDesignStats(SCData data) {
+        FleetDesignData stats = new FleetDesignData();
+        Map<String, Integer> counts = new HashMap<>();
+        float totalShips = 0;
 
         for (FleetMemberAPI member : data.getFleet().getFleetData().getMembersListCopy()) {
-            ShipHullSpecAPI spec = member.getVariant().getHullSpec();
-            String designType = spec.getManufacturer();
-            int count = 0;
-            if (result.containsKey(designType)) {
-                count = result.get(designType);
-            }
-            count++;
-            result.put(designType, count);
+            String type = member.getVariant().getHullSpec().getManufacturer();
+            counts.merge(type, 1, Integer::sum);
+            totalShips++;
         }
 
-        return result;
-    }
+        stats.primary = counts.entrySet()
+                .stream()
+                .max(Map.Entry.comparingByValue())
+                .map(Map.Entry::getKey)
+                .orElse(null);
 
-    public static String getPrimaryShipDesignType(SCData data) {
-        String result = (String) data.getFleet().getFleetData().getCacheClearedOnSync().get(PRIMARY_SHIP_DESIGN_TYPE_KEY);
-        if (result != null) {
-            return result;
-        }
+        stats.secondary = counts.entrySet()
+                .stream()
+                .filter(e -> !Objects.equals(e.getKey(), stats.primary))
+                .max(Map.Entry.comparingByValue())
+                .map(Map.Entry::getKey)
+                .orElse(null);
 
-        Map<String, Integer> countByDesignType = getCountByShipDesignType(data);
-        Map.Entry<String, Integer> type = countByDesignType.entrySet().stream().max(Map.Entry.comparingByValue()).orElse(null);
-        if (type != null) {
-            result = type.getKey();
-        }
-        data.getFleet().getFleetData().getCacheClearedOnSync().put(PRIMARY_SHIP_DESIGN_TYPE_KEY, result);
+        stats.hasDesignCompromise = data.getAllActiveSkillsPlugins()
+                .stream()
+                .anyMatch(s -> Objects.equals(s.getId(), "sep_sic_design_compromise"));
+        stats.hasDoctrineExtremism = data.getAllActiveSkillsPlugins()
+                .stream()
+                .anyMatch(s -> Objects.equals(s.getId(), "sep_sic_doctrine_extremism"));
 
-        return result;
-    }
-
-    public static String getSecondaryShipDesignType(SCData data) {
-        String result = (String) data.getFleet().getFleetData().getCacheClearedOnSync().get(SECONDARY_SHIP_DESIGN_TYPE_KEY);
-        if (result != null) {
-            return result;
-        }
-
-        String primaryType = getPrimaryShipDesignType(data);
-        Map<String, Integer> countByDesignType = getCountByShipDesignType(data);
-        Map.Entry<String, Integer> type = countByDesignType.entrySet().stream().filter(t -> !Objects.equals(t.getKey(), primaryType)).max(Map.Entry.comparingByValue()).orElse(null);
-        if (type != null) {
-            result = type.getKey();
-        }
-        data.getFleet().getFleetData().getCacheClearedOnSync().put(SECONDARY_SHIP_DESIGN_TYPE_KEY, result);
-
-        return result;
-    }
-
-    public static int getNonCommonShipDesignTypeCount(SCData data) {
-        Integer result = (Integer) data.getFleet().getFleetData().getCacheClearedOnSync().get(NON_COMMON_SHIP_DESIGN_TYPE_COUNT_KEY);
-        if (result != null) {
-            return result;
-        }
-
-        result = 0;
-        String primaryType = getPrimaryShipDesignType(data);
-        String secondaryType = getSecondaryShipDesignType(data);
-        Map<String, Integer> countByDesignType = getCountByShipDesignType(data);
-
-        for (Map.Entry<String, Integer> entry : countByDesignType.entrySet()) {
-            if (Objects.equals(primaryType, entry.getKey())) {
+        int nonCommonTypeCount = 0;
+        for (String type : counts.keySet()) {
+            if (Objects.equals(type, stats.primary)) {
                 continue;
             }
-            if (data.getAllActiveSkillsPlugins().stream().anyMatch(s -> Objects.equals(s.getId(), "sep_sic_design_compromise"))
-                    && Objects.equals(secondaryType, entry.getKey())) {
+            if (stats.hasDesignCompromise && Objects.equals(type, stats.secondary)) {
                 continue;
             }
-            result++;
+            nonCommonTypeCount++;
+        }
+        stats.nonCommonTypeCount = nonCommonTypeCount;
+        stats.nonCommonTypePenalty = nonCommonTypeCount * SKILL_EFFECT_REDUCTION_MULT;
+
+        int effectivePrimaryCount = counts.getOrDefault(stats.primary, 0);
+        if (stats.hasDesignCompromise && stats.secondary != null) {
+            effectivePrimaryCount += counts.getOrDefault(stats.secondary, 0);
+        }
+        float ratio = totalShips > 0 ? (float) effectivePrimaryCount / totalShips : 0f;
+        stats.otherTypeDominancePenalty = ratio >= AVERAGE_DESIGN_TYPE_NEEDED ? 0f : SKILL_EFFECT_REDUCTION_MULT;
+
+        return stats;
+    }
+
+    public static FleetDesignData getFleetDesignData(SCData data) {
+        Object cached = data.getFleet().getFleetData()
+                .getCacheClearedOnSync()
+                .get(FLEET_DESIGN_STATS_KEY);
+
+        if (cached instanceof FleetDesignData) {
+            return (FleetDesignData) cached;
         }
 
-        data.getFleet().getFleetData().getCacheClearedOnSync().put(NON_COMMON_SHIP_DESIGN_TYPE_COUNT_KEY, result);
+        FleetDesignData stats = computeFleetDesignStats(data);
+        data.getFleet().getFleetData()
+                .getCacheClearedOnSync()
+                .put(FLEET_DESIGN_STATS_KEY, stats);
 
-        return result;
+        return stats;
     }
 
     @Override
@@ -109,19 +102,20 @@ public class AptitudePurist extends SCBaseAptitudePlugin {
         section1.addSkill("sep_sic_unified_logistics");
         addSection(section1);
 
-        SCAptitudeSection section2 = new SCAptitudeSection(true, 0, "industry1");
+        SCAptitudeSection section2 = new SCAptitudeSection(true, 2, "industry1");
         section2.addSkill("sep_sic_efficient_operations");
         section2.addSkill("sep_sic_equipment_familiarity");
         addSection(section2);
 
-        SCAptitudeSection section3 = new SCAptitudeSection(true, 0, "industry1");
+        SCAptitudeSection section3 = new SCAptitudeSection(false, 5, "industry1");
         section3.addSkill("sep_sic_design_compromise");
+        section3.addSkill("sep_sic_doctrine_extremism");
         addSection(section3);
     }
 
     @Override
     public Float getNPCFleetSpawnWeight(SCData scData, CampaignFleetAPI campaignFleetAPI) {
-        return 0f;
+        return 1f;
     }
 
     @Override
@@ -133,5 +127,27 @@ public class AptitudePurist extends SCBaseAptitudePlugin {
                 Misc.getTextColor(),
                 Misc.getHighlightColor(),
                 "Purist");
+    }
+
+    public static class FleetDesignData {
+        String primary;
+        String secondary;
+        boolean hasDesignCompromise = false;
+        boolean hasDoctrineExtremism = false;
+        int nonCommonTypeCount;
+        float nonCommonTypePenalty;
+        float otherTypeDominancePenalty;
+
+        float computeTotalPenaltyMult() {
+            return 1f - (this.nonCommonTypePenalty + this.otherTypeDominancePenalty) * getDoctrineExtremismMult();
+        }
+
+        float getDoctrineExtremismMult() {
+            float doctrineExtremismMult = 1f;
+            if (this.hasDoctrineExtremism) {
+                doctrineExtremismMult = 2f;
+            }
+            return doctrineExtremismMult;
+        }
     }
 }
