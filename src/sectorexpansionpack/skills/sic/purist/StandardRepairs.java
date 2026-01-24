@@ -3,6 +3,7 @@ package sectorexpansionpack.skills.sic.purist;
 import com.fs.starfarer.api.combat.MutableShipStatsAPI;
 import com.fs.starfarer.api.combat.ShipAPI;
 import com.fs.starfarer.api.combat.ShipVariantAPI;
+import com.fs.starfarer.api.ui.LabelAPI;
 import com.fs.starfarer.api.ui.TooltipMakerAPI;
 import com.fs.starfarer.api.util.Misc;
 import second_in_command.SCData;
@@ -17,7 +18,7 @@ public class StandardRepairs extends SCBaseSkillPlugin {
 
     @Override
     public String getAffectsString() {
-        return "Affects ships with the most common design type";
+        return "ships with the most common design type";
     }
 
     @Override
@@ -27,7 +28,7 @@ public class StandardRepairs extends SCBaseSkillPlugin {
         float bonusMult = designData.getDoctrineExtremismMult();
         String typeText = designData.nonCommonTypeCount > 1 ? "types" : "type";
 
-        tooltip.addPara("The most common design type is %s", 0f, Misc.getHighlightColor(), Misc.getDesignTypeColor(designData.primary), designData.primary);
+        tooltip.addPara("The most common design type is %s*", 0f, Misc.getHighlightColor(), Misc.getDesignTypeColor(designData.primary), designData.primary);
         tooltip.setBulletedListMode("   - ");
         tooltip.addPara("Skill effects are reduced by %s due to %s other design " + typeText + " in the fleet", 0f, new Color[]{Misc.getNegativeHighlightColor(), Misc.getHighlightColor()}, Math.round(designData.nonCommonTypePenalty * bonusMult * 100f) + "%", designData.nonCommonTypeCount + "");
         tooltip.addPara("Skill effects are reduced by a further %s due to the dominance of other design types", 0f, new Color[]{Misc.getNegativeHighlightColor(), Misc.getHighlightColor()}, Math.round(designData.otherTypeDominancePenalty * bonusMult * 100f) + "%");
@@ -35,6 +36,15 @@ public class StandardRepairs extends SCBaseSkillPlugin {
 
         tooltip.addPara("%s (Max: %s) hull and armor repair rate outside of combat", 10f, Misc.getHighlightColor(), Misc.getHighlightColor(), "+" + Math.round(REPAIR_RATE_PER_DAY_MULT * bonusMult* penaltyMult * 100f) + "%", Math.round(REPAIR_RATE_PER_DAY_MULT* bonusMult * 100f) + "%");
         tooltip.addPara("%s (Max: %s) flat increase to combat readiness recovered per day", 0f, Misc.getHighlightColor(), Misc.getHighlightColor(), "+" + Math.round(CR_RECOVERY_RATE_PER_DAY_MOD * bonusMult* penaltyMult * 100f) + "%", Math.round(CR_RECOVERY_RATE_PER_DAY_MOD* bonusMult * 100f) + "%");
+
+        String statReductionMultText = Math.round(AptitudePurist.SKILL_EFFECT_REDUCTION_MULT * 100f) + "%";
+        String dominantFractionText = Math.round(AptitudePurist.AVERAGE_DESIGN_TYPE_NEEDED * 100f) + "%";
+        LabelAPI label = tooltip.addPara("*The highest number of ships with the same design type will be the most common type. " +
+                "If there is a tie, the type is chosen alphabetically. Each different design type other than the most common incurs a "
+                + statReductionMultText + " penalty." + " At least " + dominantFractionText + " of the fleet must share the most common type to avoid the "
+                + statReductionMultText + " dominated penalty.", Misc.getGrayColor(), 10f);
+        label.setHighlight(statReductionMultText, dominantFractionText, statReductionMultText);
+        label.setHighlightColors(Misc.getNegativeHighlightColor(), Misc.getHighlightColor(), Misc.getNegativeHighlightColor());
     }
 
     @Override

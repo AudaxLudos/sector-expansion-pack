@@ -102,12 +102,12 @@ public class AptitudePurist extends SCBaseAptitudePlugin {
         section1.addSkill("sep_sic_unified_logistics");
         addSection(section1);
 
-        SCAptitudeSection section2 = new SCAptitudeSection(true, 3, "industry1");
+        SCAptitudeSection section2 = new SCAptitudeSection(true, 2, "industry1");
         section2.addSkill("sep_sic_efficient_operations");
         section2.addSkill("sep_sic_equipment_familiarity");
         addSection(section2);
 
-        SCAptitudeSection section3 = new SCAptitudeSection(false, 5, "industry1");
+        SCAptitudeSection section3 = new SCAptitudeSection(false, 4, "industry1");
         section3.addSkill("sep_sic_design_compromise");
         section3.addSkill("sep_sic_doctrine_extremism");
         addSection(section3);
@@ -115,7 +115,7 @@ public class AptitudePurist extends SCBaseAptitudePlugin {
 
     @Override
     public Float getNPCFleetSpawnWeight(SCData scData, CampaignFleetAPI campaignFleetAPI) {
-        return 1f;
+        return 10f;
     }
 
     @Override
