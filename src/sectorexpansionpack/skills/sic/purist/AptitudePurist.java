@@ -90,7 +90,7 @@ public class AptitudePurist extends SCBaseAptitudePlugin {
 
     @Override
     public String getOriginSkillId() {
-        return "sep_sic_cohesive_formation";
+        return "sep_sic_synchronized_drives";
     }
 
     @Override
@@ -102,7 +102,7 @@ public class AptitudePurist extends SCBaseAptitudePlugin {
         section1.addSkill("sep_sic_unified_logistics");
         addSection(section1);
 
-        SCAptitudeSection section2 = new SCAptitudeSection(true, 2, "industry1");
+        SCAptitudeSection section2 = new SCAptitudeSection(true, 3, "industry1");
         section2.addSkill("sep_sic_efficient_operations");
         section2.addSkill("sep_sic_equipment_familiarity");
         addSection(section2);
