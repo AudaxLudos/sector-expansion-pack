@@ -13,8 +13,8 @@ import java.awt.*;
 import java.util.Objects;
 
 public class EfficientOperations extends SCBaseSkillPlugin {
-    public static float DP_REDUCTION_MAX = 10f;
-    public static float DP_REDUCTION_MULT = 0.2f;
+    public static float DP_REDUCTION_MAX = 5f;
+    public static float DP_REDUCTION_MULT = 0.1f;
 
     @Override
     public String getAffectsString() {
