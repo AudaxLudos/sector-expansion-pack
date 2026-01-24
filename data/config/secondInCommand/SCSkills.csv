@@ -1,0 +1,13 @@
+id,name,iconPath,npcSpawnWeight,plugin
+#Purist,,,,
+sep_sic_baseline_restoration,Baseline Restoration,graphics/secondInCommand/empty.png,1,sectorexpansionpack.skills.sic.purist.BaselineRestoration
+sep_sic_cohesive_formation,Cohesive Formation,graphics/secondInCommand/empty.png,1,sectorexpansionpack.skills.sic.purist.CohesiveFormation
+sep_sic_compact_profile,Compact Profile,graphics/secondInCommand/empty.png,1,sectorexpansionpack.skills.sic.purist.CompactProfile
+sep_sic_design_compromise,Design Compromise,graphics/secondInCommand/empty.png,1,sectorexpansionpack.skills.sic.purist.DesignCompromise
+sep_sic_efficient_operations,Efficient Operations,graphics/secondInCommand/empty.png,1,sectorexpansionpack.skills.sic.purist.EfficientOperations
+sep_sic_equipment_familiarity,Equipment Familiarity,graphics/secondInCommand/empty.png,1,sectorexpansionpack.skills.sic.purist.EquipmentFamiliarity
+sep_sic_standard_repairs,Standard Repairs,graphics/secondInCommand/empty.png,1,sectorexpansionpack.skills.sic.purist.StandardRepairs
+sep_sic_unified_logistics,Unified Logistics,graphics/secondInCommand/empty.png,1,sectorexpansionpack.skills.sic.purist.UnifiedLogistics
+,,,,
+,,,,
+,,,,
