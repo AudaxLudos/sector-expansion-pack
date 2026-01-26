@@ -13,7 +13,7 @@ import java.util.Map;
 import java.util.Objects;
 
 public class AptitudePurist extends SCBaseAptitudePlugin {
-    public static String FLEET_DESIGN_STATS_KEY = "sep_fleet_design_stats";
+    public static String PURIST_FLEET_DATA_KEY = "sep_purist_fleet_data_key";
     public static float AVERAGE_DESIGN_TYPE_NEEDED = 0.5f;
     public static float SKILL_EFFECT_REDUCTION_MULT = 0.1f;
 
@@ -74,7 +74,7 @@ public class AptitudePurist extends SCBaseAptitudePlugin {
     public static PuristFleetData getPuristFleetData(SCData data) {
         Object cached = data.getFleet().getFleetData()
                 .getCacheClearedOnSync()
-                .get(FLEET_DESIGN_STATS_KEY);
+                .get(PURIST_FLEET_DATA_KEY);
 
         if (cached instanceof PuristFleetData) {
             return (PuristFleetData) cached;
@@ -83,7 +83,7 @@ public class AptitudePurist extends SCBaseAptitudePlugin {
         PuristFleetData stats = computePuristFleetData(data);
         data.getFleet().getFleetData()
                 .getCacheClearedOnSync()
-                .put(FLEET_DESIGN_STATS_KEY, stats);
+                .put(PURIST_FLEET_DATA_KEY, stats);
 
         return stats;
     }
