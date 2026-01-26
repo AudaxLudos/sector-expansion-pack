@@ -13,12 +13,12 @@ public class DesignCompromise extends SCBaseSkillPlugin {
 
     @Override
     public void addTooltip(SCData data, TooltipMakerAPI tooltip) {
-        AptitudePurist.FleetDesignData designData = AptitudePurist.getFleetDesignData(data);
+        AptitudePurist.PuristFleetData puristData = AptitudePurist.getPuristFleetData(data);
 
         tooltip.addPara("Skill effects will also be applied to the second most common design type", Misc.getHighlightColor(), 0f);
         tooltip.setBulletedListMode("   - ");
-        if (designData.secondary != null) {
-            tooltip.addPara("The second most common design type is %s", 0f, Misc.getTextColor(), Misc.getDesignTypeColor(designData.secondary), designData.secondary);
+        if (puristData.secondary != null) {
+            tooltip.addPara("The second most common design type is %s", 0f, Misc.getTextColor(), Misc.getDesignTypeColor(puristData.secondary), puristData.secondary);
         } else {
             tooltip.addPara("No second most common design type found", 0f, Misc.getNegativeHighlightColor());
         }

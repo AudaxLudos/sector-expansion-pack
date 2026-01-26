@@ -21,15 +21,15 @@ public class SynchronizedDrives extends SCBaseSkillPlugin {
 
     @Override
     public void addTooltip(SCData data, TooltipMakerAPI tooltip) {
-        AptitudePurist.FleetDesignData designData = AptitudePurist.getFleetDesignData(data);
-        float penaltyMult = designData.computeTotalPenaltyMult();
-        float bonusMult = designData.getDoctrineExtremismMult();
-        String typeText = designData.nonCommonTypeCount > 1 ? "types" : "type";
+        AptitudePurist.PuristFleetData puristData = AptitudePurist.getPuristFleetData(data);
+        float penaltyMult = puristData.computeTotalPenaltyMult();
+        float bonusMult = puristData.getDoctrineExtremismMult();
+        String typeText = puristData.nonCommonTypeCount > 1 ? "types" : "type";
 
-        tooltip.addPara("The most common design type is %s*", 0f, Misc.getHighlightColor(), Misc.getDesignTypeColor(designData.primary), designData.primary);
+        tooltip.addPara("The most common design type is %s*", 0f, Misc.getHighlightColor(), Misc.getDesignTypeColor(puristData.primary), puristData.primary);
         tooltip.setBulletedListMode("   - ");
-        tooltip.addPara("Skill effects are reduced by %s due to %s other design " + typeText + " in the fleet", 0f, new Color[]{Misc.getNegativeHighlightColor(), Misc.getHighlightColor()}, Math.round(designData.nonCommonTypePenalty * bonusMult * 100f) + "%", designData.nonCommonTypeCount + "");
-        tooltip.addPara("Skill effects are reduced by a further %s due to the dominance of other design types", 0f, new Color[]{Misc.getNegativeHighlightColor(), Misc.getHighlightColor()}, Math.round(designData.otherTypeDominancePenalty * bonusMult * 100f) + "%");
+        tooltip.addPara("Skill effects are reduced by %s due to %s other design " + typeText + " in the fleet", 0f, new Color[]{Misc.getNegativeHighlightColor(), Misc.getHighlightColor()}, Math.round(puristData.nonCommonTypePenalty * bonusMult * 100f) + "%", puristData.nonCommonTypeCount + "");
+        tooltip.addPara("Skill effects are reduced by a further %s due to the dominance of other design types", 0f, new Color[]{Misc.getNegativeHighlightColor(), Misc.getHighlightColor()}, Math.round(puristData.otherTypeDominancePenalty * bonusMult * 100f) + "%");
         tooltip.setBulletedListMode(null);
 
         tooltip.addPara("%s (Max: %s) maximum burn level", 10f, Misc.getHighlightColor(), Misc.getHighlightColor(), "+" + Math.round(MAX_BURN_MOD * bonusMult * penaltyMult), "" + Math.round(MAX_BURN_MOD * bonusMult));
@@ -49,9 +49,9 @@ public class SynchronizedDrives extends SCBaseSkillPlugin {
 
     @Override
     public void advance(SCData data, Float amount) {
-        AptitudePurist.FleetDesignData designData = AptitudePurist.getFleetDesignData(data);
-        float penaltyMult = designData.computeTotalPenaltyMult();
-        float bonusMult = designData.getDoctrineExtremismMult();
+        AptitudePurist.PuristFleetData puristData = AptitudePurist.getPuristFleetData(data);
+        float penaltyMult = puristData.computeTotalPenaltyMult();
+        float bonusMult = puristData.getDoctrineExtremismMult();
 
         data.getFleet().getStats().getFleetwideMaxBurnMod().modifyFlat(getId(), (float) Math.round(MAX_BURN_MOD * bonusMult * penaltyMult), "Synchronized Drives");
         data.getFleet().getStats().getAccelerationMult().modifyMult(getId(), 1f + (ACCELERATION_MULT * bonusMult * penaltyMult), "Synchronized Drives");
@@ -60,9 +60,9 @@ public class SynchronizedDrives extends SCBaseSkillPlugin {
 
     @Override
     public void onActivation(SCData data) {
-        AptitudePurist.FleetDesignData designData = AptitudePurist.getFleetDesignData(data);
-        float penaltyMult = designData.computeTotalPenaltyMult();
-        float bonusMult = designData.getDoctrineExtremismMult();
+        AptitudePurist.PuristFleetData puristData = AptitudePurist.getPuristFleetData(data);
+        float penaltyMult = puristData.computeTotalPenaltyMult();
+        float bonusMult = puristData.getDoctrineExtremismMult();
 
         data.getFleet().getStats().getFleetwideMaxBurnMod().modifyFlat(getId(), (float) Math.round(MAX_BURN_MOD * bonusMult * penaltyMult), "Synchronized Drives");
         data.getFleet().getStats().getAccelerationMult().modifyMult(getId(), 1f + (ACCELERATION_MULT * bonusMult * penaltyMult), "Synchronized Drives");

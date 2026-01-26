@@ -17,8 +17,8 @@ public class AptitudePurist extends SCBaseAptitudePlugin {
     public static float AVERAGE_DESIGN_TYPE_NEEDED = 0.5f;
     public static float SKILL_EFFECT_REDUCTION_MULT = 0.1f;
 
-    private static FleetDesignData computeFleetDesignStats(SCData data) {
-        FleetDesignData stats = new FleetDesignData();
+    private static PuristFleetData computePuristFleetData(SCData data) {
+        PuristFleetData puristData = new PuristFleetData();
         Map<String, Integer> counts = new HashMap<>();
         float totalShips = 0;
 
@@ -28,59 +28,59 @@ public class AptitudePurist extends SCBaseAptitudePlugin {
             totalShips++;
         }
 
-        stats.primary = counts.entrySet()
+        puristData.primary = counts.entrySet()
                 .stream()
                 .max(Map.Entry.comparingByValue())
                 .map(Map.Entry::getKey)
                 .orElse(null);
 
-        stats.secondary = counts.entrySet()
+        puristData.secondary = counts.entrySet()
                 .stream()
-                .filter(e -> !Objects.equals(e.getKey(), stats.primary))
+                .filter(e -> !Objects.equals(e.getKey(), puristData.primary))
                 .max(Map.Entry.comparingByValue())
                 .map(Map.Entry::getKey)
                 .orElse(null);
 
-        stats.hasDesignCompromise = data.getAllActiveSkillsPlugins()
+        puristData.hasDesignCompromise = data.getAllActiveSkillsPlugins()
                 .stream()
                 .anyMatch(s -> Objects.equals(s.getId(), "sep_sic_design_compromise"));
-        stats.hasDoctrineExtremism = data.getAllActiveSkillsPlugins()
+        puristData.hasDoctrineExtremism = data.getAllActiveSkillsPlugins()
                 .stream()
                 .anyMatch(s -> Objects.equals(s.getId(), "sep_sic_doctrine_extremism"));
 
         int nonCommonTypeCount = 0;
         for (String type : counts.keySet()) {
-            if (Objects.equals(type, stats.primary)) {
+            if (Objects.equals(type, puristData.primary)) {
                 continue;
             }
-            if (stats.hasDesignCompromise && Objects.equals(type, stats.secondary)) {
+            if (puristData.hasDesignCompromise && Objects.equals(type, puristData.secondary)) {
                 continue;
             }
             nonCommonTypeCount++;
         }
-        stats.nonCommonTypeCount = nonCommonTypeCount;
-        stats.nonCommonTypePenalty = nonCommonTypeCount * SKILL_EFFECT_REDUCTION_MULT;
+        puristData.nonCommonTypeCount = nonCommonTypeCount;
+        puristData.nonCommonTypePenalty = nonCommonTypeCount * SKILL_EFFECT_REDUCTION_MULT;
 
-        int effectivePrimaryCount = counts.getOrDefault(stats.primary, 0);
-        if (stats.hasDesignCompromise && stats.secondary != null) {
-            effectivePrimaryCount += counts.getOrDefault(stats.secondary, 0);
+        int effectivePrimaryCount = counts.getOrDefault(puristData.primary, 0);
+        if (puristData.hasDesignCompromise && puristData.secondary != null) {
+            effectivePrimaryCount += counts.getOrDefault(puristData.secondary, 0);
         }
         float ratio = totalShips > 0 ? (float) effectivePrimaryCount / totalShips : 0f;
-        stats.otherTypeDominancePenalty = ratio >= AVERAGE_DESIGN_TYPE_NEEDED ? 0f : SKILL_EFFECT_REDUCTION_MULT;
+        puristData.otherTypeDominancePenalty = ratio >= AVERAGE_DESIGN_TYPE_NEEDED ? 0f : SKILL_EFFECT_REDUCTION_MULT;
 
-        return stats;
+        return puristData;
     }
 
-    public static FleetDesignData getFleetDesignData(SCData data) {
+    public static PuristFleetData getPuristFleetData(SCData data) {
         Object cached = data.getFleet().getFleetData()
                 .getCacheClearedOnSync()
                 .get(FLEET_DESIGN_STATS_KEY);
 
-        if (cached instanceof FleetDesignData) {
-            return (FleetDesignData) cached;
+        if (cached instanceof PuristFleetData) {
+            return (PuristFleetData) cached;
         }
 
-        FleetDesignData stats = computeFleetDesignStats(data);
+        PuristFleetData stats = computePuristFleetData(data);
         data.getFleet().getFleetData()
                 .getCacheClearedOnSync()
                 .put(FLEET_DESIGN_STATS_KEY, stats);
@@ -130,7 +130,7 @@ public class AptitudePurist extends SCBaseAptitudePlugin {
                 "Purist");
     }
 
-    public static class FleetDesignData {
+    public static class PuristFleetData {
         String primary;
         String secondary;
         boolean hasDesignCompromise = false;
