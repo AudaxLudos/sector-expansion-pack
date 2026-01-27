@@ -1,3 +1,13 @@
+### 0.1.101a
+- Add second-in-command purist aptitude and skills
+- Fix crash when source market system for expedition is non-existent
+- Fix crash when source market system for incursion is non-existent
+- Fix escort missions using commodity with nonecon tags
+- Add more information for hireable exceptional survivors from rescue missions
+- Add settings to disable or enable incursions or expeditions
+- Fix escort mission progressing without reaching goto entity
+- Fix escorted fleet following player while in battle
+
 ### 0.1.72a
 - Add accipiter midline ship variants
 - Rebalance accipiter ship stats

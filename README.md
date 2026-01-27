@@ -9,6 +9,10 @@ A mod for Starsector that adds new ships, weapons, hullmods, missions, explorati
     - Default Starsector directory "C:\Program Files (x86)\Fractal Softworks\Starsector"
 3. Run the game and click mods button and activate the mod
 
+## Compatibilities
+
+- Second-in-Command - Adds 1 new aptitude.
+
 ## Credits
 
 <strong>Wispborne</strong>: for the starsector intellij mod template and the GitHub action script.  
