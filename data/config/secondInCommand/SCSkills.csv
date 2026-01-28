@@ -1,5 +1,10 @@
 id,name,iconPath,npcSpawnWeight,plugin
 #Purist,,,,
+sep_sic_shared_telemetry,Shared Telemetry,graphics/secondInCommand/empty.png,0,sectorexpansionpack.skills.sic.eclectic.SharedTelemetry
+,,,,
+,,,,
+,,,,
+#Purist,,,,
 sep_sic_baseline_restoration,Baseline Restoration,graphics/sectorexpansionpack/icons/skills/purist/baseline_restoration.png,0,sectorexpansionpack.skills.sic.purist.BaselineRestoration
 sep_sic_design_compromise,Design Compromise,graphics/sectorexpansionpack/icons/skills/purist/design_compromise.png,5,sectorexpansionpack.skills.sic.purist.DesignCompromise
 sep_sic_doctrine_extremism,Doctrine Extremism,graphics/sectorexpansionpack/icons/skills/purist/doctrine_extremism.png,1,sectorexpansionpack.skills.sic.purist.DoctrineExtremism
