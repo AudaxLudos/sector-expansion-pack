@@ -62,8 +62,9 @@ public class AptitudeEclectic extends SCBaseAptitudePlugin {
 
     @Override
     public void createSections() {
-        // SCAptitudeSection section1 = new SCAptitudeSection(true, 0, "industry1");
-        // addSection(section1);
+        SCAptitudeSection section1 = new SCAptitudeSection(true, 0, "industry1");
+        section1.addSkill("sep_sic_every_nook_and_cranny");
+        addSection(section1);
     }
 
     @Override

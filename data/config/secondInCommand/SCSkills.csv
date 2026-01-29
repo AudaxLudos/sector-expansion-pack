@@ -1,7 +1,7 @@
 id,name,iconPath,npcSpawnWeight,plugin
 #Purist,,,,
 sep_sic_shared_telemetry,Shared Telemetry,graphics/secondInCommand/empty.png,0,sectorexpansionpack.skills.sic.eclectic.SharedTelemetry
-,,,,
+sep_sic_every_nook_and_cranny,Every Nook and Cranny,graphics/secondInCommand/empty.png,0,sectorexpansionpack.skills.sic.eclectic.EveryNookAndCranny
 ,,,,
 ,,,,
 #Purist,,,,

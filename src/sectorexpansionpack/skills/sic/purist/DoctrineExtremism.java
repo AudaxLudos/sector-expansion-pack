@@ -5,8 +5,6 @@ import com.fs.starfarer.api.util.Misc;
 import second_in_command.SCData;
 import second_in_command.specs.SCBaseSkillPlugin;
 
-import java.awt.*;
-
 public class DoctrineExtremism extends SCBaseSkillPlugin {
     @Override
     public String getAffectsString() {
