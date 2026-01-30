@@ -6,6 +6,8 @@ import second_in_command.SCData;
 import second_in_command.specs.SCBaseSkillPlugin;
 
 public class DesignTolerance extends SCBaseSkillPlugin {
+    public static int DESIGN_TYPE_SHIP_LIMIT = 5;
+
     @Override
     public String getAffectsString() {
         return "fleet";
@@ -13,6 +15,6 @@ public class DesignTolerance extends SCBaseSkillPlugin {
 
     @Override
     public void addTooltip(SCData scData, TooltipMakerAPI tooltip) {
-        tooltip.addPara("Max ship count per design type is set to 5", Misc.getHighlightColor(), 0f);
+        tooltip.addPara("Max ship count per design type is set to %s", 0f, Misc.getHighlightColor(), Misc.getHighlightColor(), DESIGN_TYPE_SHIP_LIMIT + "");
     }
 }
