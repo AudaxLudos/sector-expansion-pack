@@ -9,10 +9,11 @@ import second_in_command.specs.SCBaseAptitudePlugin;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class AptitudeEclectic extends SCBaseAptitudePlugin {
     public static String ECLECTIC_FLEET_DATA_KEY = "sep_eclectic_fleet_data_key";
-    public static int DESIGN_TYPE_SHIP_LIMIT = 3;
+    public static int DEFAULT_DESIGN_TYPE_SHIP_LIMIT = 3;
     public static float SKILL_EFFECT_MAX_MULT = 1f;
     public static float SKILL_EFFECT_BONUS_PER_DESIGN_TYPE_MULT = 0.2f;
     public static float SKILL_EFFECT_REDUCTION_MULT = 0.2f;
@@ -30,12 +31,9 @@ public class AptitudeEclectic extends SCBaseAptitudePlugin {
 
         eclecticData.designTypes = counts.size();
         eclecticData.designTypesAverage = totalShips / counts.size();
-
-        for (Map.Entry<String, Integer> count : counts.entrySet()) {
-            if (count.getValue() > eclecticData.designTypesAverage) {
-                eclecticData.designTypesAboveAverage++;
-            }
-        }
+        eclecticData.hasDesignTolerance = data.getAllActiveSkillsPlugins()
+                .stream()
+                .anyMatch(s -> Objects.equals(s.getId(), "sep_sic_design_compromise"));
 
         return eclecticData;
     }
@@ -68,6 +66,11 @@ public class AptitudeEclectic extends SCBaseAptitudePlugin {
         section1.addSkill("sep_sic_every_nook_and_cranny");
         section1.addSkill("sep_sic_logistics_reallocation");
         addSection(section1);
+
+        SCAptitudeSection section2 = new SCAptitudeSection(false, 4, "industry1");
+        section2.addSkill("sep_sic_design_tolerance");
+        section2.addSkill("sep_sic_diverse_fleet");
+        addSection(section2);
     }
 
     @Override
@@ -81,12 +84,14 @@ public class AptitudeEclectic extends SCBaseAptitudePlugin {
     }
 
     public static class EclecticFleetData {
-        int designTypes;
-        float designTypesAverage;
+        int designTypes = 0;
+        float designTypesAverage = 0f;
         int designTypesAboveAverage = 0;
+        boolean hasDesignTolerance = false;
+        boolean hasDiverseFleet = false;
 
         public float getSkillEffectBonus() {
-            return this.designTypes * SKILL_EFFECT_BONUS_PER_DESIGN_TYPE_MULT;
+            return Math.min(getMaxSkillEffectMult(), this.designTypes * SKILL_EFFECT_BONUS_PER_DESIGN_TYPE_MULT);
         }
 
         public float getSkillEffectPenalty() {
@@ -95,6 +100,20 @@ public class AptitudeEclectic extends SCBaseAptitudePlugin {
 
         public float getSkillEffectTotal() {
             return getSkillEffectBonus() - getSkillEffectPenalty();
+        }
+
+        public float getMaxSkillEffectMult() {
+            return !this.hasDiverseFleet ? SKILL_EFFECT_MAX_MULT : SKILL_EFFECT_MAX_MULT * DiverseFleet.SKILL_EFFICIENCY_MULT;
+        }
+
+        public int getDesignTypeShipLimit() {
+            if (this.hasDiverseFleet) {
+                return DesignTolerance.DESIGN_TYPE_SHIP_LIMIT;
+            }
+            if (this.hasDesignTolerance) {
+                return DesignTolerance.DESIGN_TYPE_SHIP_LIMIT;
+            }
+            return DEFAULT_DESIGN_TYPE_SHIP_LIMIT;
         }
     }
 }

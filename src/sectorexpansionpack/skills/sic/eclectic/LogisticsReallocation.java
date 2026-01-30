@@ -24,6 +24,7 @@ public class LogisticsReallocation extends SCBaseSkillPlugin {
     public void addTooltip(SCData data, TooltipMakerAPI tooltip) {
         AptitudeEclectic.EclecticFleetData eclecticData = AptitudeEclectic.getEclecticFleetData(data);
         float bonusMult = eclecticData.getSkillEffectBonus();
+        float maxMult = eclecticData.getMaxSkillEffectMult();
         float penaltyMult = eclecticData.getSkillEffectPenalty();
         float totalMult = eclecticData.getSkillEffectTotal();
 
@@ -33,11 +34,11 @@ public class LogisticsReallocation extends SCBaseSkillPlugin {
         tooltip.addPara("Skill efficiency is reduced by %s due to %s design types above there ship limit", 0f, new Color[]{Misc.getNegativeHighlightColor(), Misc.getHighlightColor()}, Math.round(penaltyMult * 100f) + "%", eclecticData.designTypesAboveAverage + "");
         tooltip.setBulletedListMode(null);
 
-        tooltip.addPara("%s (Max: %s) monthly supply consumption for ship maintenance", 10f, Misc.getHighlightColor(), Misc.getHighlightColor(), "+" + Math.round(SUPPLIES_PER_MONTH_MULT * bonusMult * penaltyMult * 100f) + "%", Math.round(SUPPLIES_PER_MONTH_MULT * bonusMult * 100f) + "%");
-        tooltip.addPara("%s (Max: %s) fuel usage", 0f, Misc.getHighlightColor(), Misc.getHighlightColor(), "+" + Math.round(FUEL_USE_MULT * bonusMult * penaltyMult * 100f) + "%", Math.round(FUEL_USE_MULT * bonusMult * 100f) + "%");
+        tooltip.addPara("%s (Max: %s) monthly supply consumption for ship maintenance", 10f, Misc.getHighlightColor(), Misc.getHighlightColor(), "+" + Math.round(totalMult * SUPPLIES_PER_MONTH_MULT * 100f) + "%", Math.round(maxMult * SUPPLIES_PER_MONTH_MULT * 100f) + "%");
+        tooltip.addPara("%s (Max: %s) fuel usage", 0f, Misc.getHighlightColor(), Misc.getHighlightColor(), "+" + Math.round(totalMult * FUEL_USE_MULT * 100f) + "%", Math.round(maxMult * FUEL_USE_MULT * 100f) + "%");
 
-        String designTypeShipLimit = AptitudeEclectic.DESIGN_TYPE_SHIP_LIMIT + "";
-        String skillEfficiencyLimit = Math.round(AptitudeEclectic.SKILL_EFFECT_MAX_MULT * 100f) + "%";
+        String designTypeShipLimit = eclecticData.getDesignTypeShipLimit() + "";
+        String skillEfficiencyLimit = Math.round(eclecticData.getMaxSkillEffectMult() * 100f) + "%";
         String skillEfficiencyPerType = Math.round(AptitudeEclectic.SKILL_EFFECT_BONUS_PER_DESIGN_TYPE_MULT * 100f) + "%";
         LabelAPI label = tooltip.addPara("*Skill efficiency is capped at " + skillEfficiencyLimit +
                 ". Every design type in the fleet increases skill efficiency by " + skillEfficiencyPerType +
