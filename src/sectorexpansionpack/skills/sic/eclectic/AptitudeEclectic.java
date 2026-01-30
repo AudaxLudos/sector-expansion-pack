@@ -69,6 +69,7 @@ public class AptitudeEclectic extends SCBaseAptitudePlugin {
         section1.addSkill("sep_sic_alternative_replacements");
         section1.addSkill("sep_sic_every_nook_and_cranny");
         section1.addSkill("sep_sic_improvised_restoration");
+        section1.addSkill("sep_sic_joint_reclamation");
         section1.addSkill("sep_sic_logistics_reallocation");
         addSection(section1);
 
