@@ -1,8 +1,10 @@
 id,name,iconPath,npcSpawnWeight,plugin
 #Purist,,,,
+sep_sic_alternative_replacements,Alternative Replacements,graphics/secondInCommand/empty.png,0,sectorexpansionpack.skills.sic.eclectic.AlternativeReplacements
 sep_sic_design_tolerance,Design Tolerance,graphics/secondInCommand/empty.png,0,sectorexpansionpack.skills.sic.eclectic.DesignTolerance
 sep_sic_diverse_fleet,Diverse Fleet,graphics/secondInCommand/empty.png,0,sectorexpansionpack.skills.sic.eclectic.DiverseFleet
 sep_sic_every_nook_and_cranny,Every Nook and Cranny,graphics/secondInCommand/empty.png,0,sectorexpansionpack.skills.sic.eclectic.EveryNookAndCranny
+sep_sic_improvised_restoration,Improvised Restoration,graphics/secondInCommand/empty.png,0,sectorexpansionpack.skills.sic.eclectic.ImprovisedRestoration
 sep_sic_logistics_reallocation,Logistics Reallocation,graphics/secondInCommand/empty.png,0,sectorexpansionpack.skills.sic.eclectic.LogisticsReallocation
 sep_sic_shared_telemetry,Shared Telemetry,graphics/secondInCommand/empty.png,0,sectorexpansionpack.skills.sic.eclectic.SharedTelemetry
 ,,,,
