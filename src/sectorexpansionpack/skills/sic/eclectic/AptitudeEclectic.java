@@ -73,10 +73,14 @@ public class AptitudeEclectic extends SCBaseAptitudePlugin {
         section1.addSkill("sep_sic_logistics_reallocation");
         addSection(section1);
 
-        SCAptitudeSection section2 = new SCAptitudeSection(false, 4, "industry1");
-        section2.addSkill("sep_sic_design_tolerance");
-        section2.addSkill("sep_sic_diverse_fleet");
+        SCAptitudeSection section2 = new SCAptitudeSection(true, 2, "industry1");
+        section2.addSkill("sep_sic_flux_optimizations");
         addSection(section2);
+
+        SCAptitudeSection section3 = new SCAptitudeSection(false, 4, "industry1");
+        section3.addSkill("sep_sic_design_tolerance");
+        section3.addSkill("sep_sic_diverse_fleet");
+        addSection(section3);
     }
 
     @Override
