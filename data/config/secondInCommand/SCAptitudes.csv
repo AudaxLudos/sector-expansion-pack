@@ -1,5 +1,5 @@
 id,name,categories,spawnWeight,color,tags,order,plugin
-sep_sic_eclectic,Eclectic,,1.0,"191,205,220,255","startingOption,",70000,sectorexpansionpack.skills.sic.eclectic.AptitudeEclectic
+sep_sic_eclectic,Eclectic,,1.0,"187,203,46,255","startingOption,",70000,sectorexpansionpack.skills.sic.eclectic.AptitudeEclectic
 sep_sic_purist,Purist,,1.0,"191,205,220,255","startingOption,",70100,sectorexpansionpack.skills.sic.purist.AptitudePurist
 ,,,,,,,
 ,,,,,,,
