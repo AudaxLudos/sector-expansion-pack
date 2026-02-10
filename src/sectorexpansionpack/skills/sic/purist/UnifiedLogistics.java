@@ -36,8 +36,8 @@ public class UnifiedLogistics extends SCBaseSkillPlugin {
         tooltip.addPara("Skill effects are reduced by a further %s due to the dominance of other design types", 0f, new Color[]{Misc.getNegativeHighlightColor(), Misc.getHighlightColor()}, Math.round(puristData.otherTypeDominancePenalty * bonusMult * 100f) + "%");
         tooltip.setBulletedListMode(null);
 
-        tooltip.addPara("%s (Max: %s) monthly supply consumption for ship maintenance", 10f, Misc.getHighlightColor(), Misc.getHighlightColor(), "+" + Math.round(SUPPLIES_PER_MONTH_MULT * bonusMult * penaltyMult * 100f) + "%", Math.round(SUPPLIES_PER_MONTH_MULT * bonusMult * 100f) + "%");
-        tooltip.addPara("%s (Max: %s) fuel usage", 0f, Misc.getHighlightColor(), Misc.getHighlightColor(), "+" + Math.round(FUEL_USE_MULT * bonusMult * penaltyMult * 100f) + "%", Math.round(FUEL_USE_MULT * bonusMult * 100f) + "%");
+        tooltip.addPara("%s (Max: %s) monthly supply consumption for ship maintenance", 10f, Misc.getHighlightColor(), Misc.getHighlightColor(), "-" + Math.round(SUPPLIES_PER_MONTH_MULT * bonusMult * penaltyMult * 100f) + "%", Math.round(SUPPLIES_PER_MONTH_MULT * bonusMult * 100f) + "%");
+        tooltip.addPara("%s (Max: %s) fuel usage", 0f, Misc.getHighlightColor(), Misc.getHighlightColor(), "-" + Math.round(FUEL_USE_MULT * bonusMult * penaltyMult * 100f) + "%", Math.round(FUEL_USE_MULT * bonusMult * 100f) + "%");
         tooltip.addPara("%s (Max: %s) cargo capacity", 0f, Misc.getHighlightColor(), Misc.getHighlightColor(), "+" + Math.round(CARGO_CAP_MULT * bonusMult * penaltyMult * 100f) + "%", Math.round(CARGO_CAP_MULT * bonusMult * 100f) + "%");
         tooltip.addPara("%s (Max: %s) fuel capacity", 0f, Misc.getHighlightColor(), Misc.getHighlightColor(), "+" + Math.round(FUEL_CAP_MULT * bonusMult * penaltyMult * 100f) + "%", Math.round(FUEL_CAP_MULT * bonusMult * 100f) + "%");
 
