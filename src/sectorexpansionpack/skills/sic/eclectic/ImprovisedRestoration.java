@@ -32,7 +32,7 @@ public class ImprovisedRestoration extends SCBaseSkillPlugin {
         tooltip.addPara("Total skill efficiency is at %s*", 0f, Misc.getHighlightColor(), Misc.getPositiveHighlightColor(), Math.round(totalMult * 100f) + "%");
         tooltip.setBulletedListMode("   - ");
         tooltip.addPara("Skill efficiency is increased by %s due to %s design types in the fleet", 0f, new Color[]{Misc.getPositiveHighlightColor(), Misc.getHighlightColor()}, Math.round(bonusMult * 100f) + "%", eclecticData.designTypes + "");
-        tooltip.addPara("Skill efficiency is reduced by %s due to %s design types above there ship limit", 0f, new Color[]{Misc.getNegativeHighlightColor(), Misc.getHighlightColor()}, Math.round(penaltyMult * 100f) + "%", eclecticData.designTypesAboveAverage + "");
+        tooltip.addPara("Skill efficiency is reduced by %s due to %s design types above there ship limit", 0f, new Color[]{Misc.getNegativeHighlightColor(), Misc.getHighlightColor()}, Math.round(penaltyMult * 100f) + "%", eclecticData.designTypesAboveLimit + "");
         tooltip.setBulletedListMode(null);
 
         tooltip.addPara("%s (Max: %s) chance for ships to be recoverable if lost in combat", 10f, Misc.getHighlightColor(), Misc.getHighlightColor(), "+" + Math.round(SHIP_RECOVERY_MOD * bonusMult * penaltyMult * 100f) + "%", Math.round(SHIP_RECOVERY_MOD * bonusMult * 100f) + "%");

@@ -31,7 +31,7 @@ public class AlternativeReplacements extends SCBaseSkillPlugin {
         tooltip.addPara("Total skill efficiency is at %s*", 0f, Misc.getHighlightColor(), Misc.getPositiveHighlightColor(), Math.round(totalMult * 100f) + "%");
         tooltip.setBulletedListMode("   - ");
         tooltip.addPara("Skill efficiency is increased by %s due to %s design types in the fleet", 0f, new Color[]{Misc.getPositiveHighlightColor(), Misc.getHighlightColor()}, Math.round(bonusMult * 100f) + "%", eclecticData.designTypes + "");
-        tooltip.addPara("Skill efficiency is reduced by %s due to %s design types above there ship limit", 0f, new Color[]{Misc.getNegativeHighlightColor(), Misc.getHighlightColor()}, Math.round(penaltyMult * 100f) + "%", eclecticData.designTypesAboveAverage + "");
+        tooltip.addPara("Skill efficiency is reduced by %s due to %s design types above there ship limit", 0f, new Color[]{Misc.getNegativeHighlightColor(), Misc.getHighlightColor()}, Math.round(penaltyMult * 100f) + "%", eclecticData.designTypesAboveLimit + "");
         tooltip.setBulletedListMode(null);
 
         tooltip.addPara("%s (Max: %s) hull and armor repair rate outside of combat", 10f, Misc.getHighlightColor(), Misc.getHighlightColor(), "+" + Math.round(totalMult * REPAIR_RATE_PER_DAY_MULT * 100f) + "%", Math.round(maxMult * REPAIR_RATE_PER_DAY_MULT * 100f) + "%");

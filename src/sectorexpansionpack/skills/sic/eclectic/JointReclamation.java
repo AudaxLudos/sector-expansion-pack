@@ -30,7 +30,7 @@ public class JointReclamation extends SCBaseSkillPlugin {
         tooltip.addPara("Total skill efficiency is at %s*", 0f, Misc.getHighlightColor(), Misc.getPositiveHighlightColor(), Math.round(totalMult * 100f) + "%");
         tooltip.setBulletedListMode("   - ");
         tooltip.addPara("Skill efficiency is increased by %s due to %s design types in the fleet", 0f, new Color[]{Misc.getPositiveHighlightColor(), Misc.getHighlightColor()}, Math.round(bonusMult * 100f) + "%", eclecticData.designTypes + "");
-        tooltip.addPara("Skill efficiency is reduced by %s due to %s design types above there ship limit", 0f, new Color[]{Misc.getNegativeHighlightColor(), Misc.getHighlightColor()}, Math.round(penaltyMult * 100f) + "%", eclecticData.designTypesAboveAverage + "");
+        tooltip.addPara("Skill efficiency is reduced by %s due to %s design types above there ship limit", 0f, new Color[]{Misc.getNegativeHighlightColor(), Misc.getHighlightColor()}, Math.round(penaltyMult * 100f) + "%", eclecticData.designTypesAboveLimit + "");
         tooltip.setBulletedListMode(null);
 
         tooltip.addPara("%s (Max: %s) post-battle salvage", 10f, Misc.getHighlightColor(), Misc.getHighlightColor(), "+" + Math.round(totalMult * POST_BATTLE_SALVAGE_MOD * 100f) + "%", Math.round(maxMult * POST_BATTLE_SALVAGE_MOD * 100f) + "%");
@@ -52,6 +52,8 @@ public class JointReclamation extends SCBaseSkillPlugin {
     public void advance(SCData data, Float amount) {
         AptitudeEclectic.EclecticFleetData eclecticData = AptitudeEclectic.getEclecticFleetData(data);
         float effectMult = eclecticData.getSkillEffectTotal();
+
+        System.out.println(eclecticData.designTypesAboveLimit);
 
         data.getFleet().getStats().getDynamic().getStat(Stats.BATTLE_SALVAGE_MULT_FLEET).modifyFlat(getId(), effectMult * POST_BATTLE_SALVAGE_MOD);
         data.getFleet().getStats().getDynamic().getStat(Stats.FUEL_SALVAGE_VALUE_MULT_FLEET).modifyFlat(getId(), effectMult * FUEL_SALVAGE_BONUS);

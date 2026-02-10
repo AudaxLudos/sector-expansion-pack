@@ -21,22 +21,33 @@ public class AptitudeEclectic extends SCBaseAptitudePlugin {
     private static EclecticFleetData computeEclecticFleetData(SCData data) {
         EclecticFleetData eclecticData = new EclecticFleetData();
         Map<String, Integer> counts = new HashMap<>();
-        float totalShips = 0;
 
         for (FleetMemberAPI member : data.getFleet().getFleetData().getMembersListCopy()) {
             String type = member.getVariant().getHullSpec().getManufacturer();
             counts.merge(type, 1, Integer::sum);
-            totalShips++;
         }
 
         eclecticData.designTypes = counts.size();
-        eclecticData.designTypesAverage = totalShips / counts.size();
         eclecticData.hasDesignTolerance = data.getAllActiveSkillsPlugins()
                 .stream()
                 .anyMatch(s -> Objects.equals(s.getId(), "sep_sic_design_tolerance"));
         eclecticData.hasDiverseFleet = data.getAllActiveSkillsPlugins()
                 .stream()
                 .anyMatch(s -> Objects.equals(s.getId(), "sep_sic_diverse_fleet"));
+
+        int designTypesShipLimit = DESIGN_TYPE_SHIP_LIMIT;
+        if (eclecticData.hasDiverseFleet) {
+            designTypesShipLimit = DiverseFleet.DESIGN_TYPE_SHIP_LIMIT;
+        } else if (eclecticData.hasDesignTolerance) {
+            designTypesShipLimit = DesignTolerance.DESIGN_TYPE_SHIP_LIMIT;
+        }
+
+        eclecticData.designTypesAboveLimit = 0;
+        for (Map.Entry<String, Integer> count : counts.entrySet()) {
+            if (count.getValue() > designTypesShipLimit) {
+                eclecticData.designTypesAboveLimit++;
+            }
+        }
 
         return eclecticData;
     }
@@ -95,8 +106,7 @@ public class AptitudeEclectic extends SCBaseAptitudePlugin {
 
     public static class EclecticFleetData {
         int designTypes = 0;
-        float designTypesAverage = 0f;
-        int designTypesAboveAverage = 0;
+        int designTypesAboveLimit = 0;
         boolean hasDesignTolerance = false;
         boolean hasDiverseFleet = false;
 
@@ -105,7 +115,7 @@ public class AptitudeEclectic extends SCBaseAptitudePlugin {
         }
 
         public float getSkillEffectPenalty() {
-            return this.designTypesAboveAverage * SKILL_EFFECT_REDUCTION_MULT;
+            return this.designTypesAboveLimit * SKILL_EFFECT_REDUCTION_MULT;
         }
 
         public float getSkillEffectTotal() {
