@@ -1,9 +1,11 @@
 id,name,iconPath,npcSpawnWeight,plugin
-#Purist,,,,
+#Eclectic,,,,
 sep_sic_alternative_replacements,Alternative Replacements,graphics/secondInCommand/empty.png,0,sectorexpansionpack.skills.sic.eclectic.AlternativeReplacements
+sep_sic_collaborative_training,Collaborative Training,graphics/secondInCommand/empty.png,0,sectorexpansionpack.skills.sic.eclectic.CollaborativeTraining
 sep_sic_design_tolerance,Design Tolerance,graphics/secondInCommand/empty.png,0,sectorexpansionpack.skills.sic.eclectic.DesignTolerance
 sep_sic_diverse_fleet,Diverse Fleet,graphics/secondInCommand/empty.png,0,sectorexpansionpack.skills.sic.eclectic.DiverseFleet
 sep_sic_every_nook_and_cranny,Every Nook and Cranny,graphics/secondInCommand/empty.png,0,sectorexpansionpack.skills.sic.eclectic.EveryNookAndCranny
+sep_sic_flux_optimizations,Flux Optimizations,graphics/secondInCommand/empty.png,0,sectorexpansionpack.skills.sic.eclectic.FluxOptimizations
 sep_sic_improvised_restoration,Improvised Restoration,graphics/secondInCommand/empty.png,0,sectorexpansionpack.skills.sic.eclectic.ImprovisedRestoration
 sep_sic_joint_reclamation,Joint Reclamation,graphics/secondInCommand/empty.png,0,sectorexpansionpack.skills.sic.eclectic.JointReclamation
 sep_sic_logistics_reallocation,Logistics Reallocation,graphics/secondInCommand/empty.png,0,sectorexpansionpack.skills.sic.eclectic.LogisticsReallocation
