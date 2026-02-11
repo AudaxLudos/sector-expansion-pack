@@ -15,6 +15,6 @@ public class DesignTolerance extends SCBaseSkillPlugin {
 
     @Override
     public void addTooltip(SCData scData, TooltipMakerAPI tooltip) {
-        tooltip.addPara("Max ship count per design type is set to %s", 0f, Misc.getHighlightColor(), Misc.getHighlightColor(), DESIGN_TYPE_SHIP_LIMIT + "");
+        tooltip.addPara("Max ship count per design type is increased to %s", 0f, Misc.getHighlightColor(), Misc.getHighlightColor(), DESIGN_TYPE_SHIP_LIMIT + "");
     }
 }

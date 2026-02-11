@@ -49,7 +49,7 @@ public class AptitudeEclectic extends SCBaseAptitudePlugin {
         }
 
         eData.bonusMultMax = !hasDiverseFleet ? SKILL_EFFECT_MAX_MULT : DiverseFleet.SKILL_EFFECT_MAX_MULT;
-        eData.bonusMult = eData.designTypesCount * SKILL_EFFECT_BONUS_PER_DESIGN_TYPE_MULT;
+        eData.bonusMult = Math.min(eData.bonusMultMax, eData.designTypesCount * SKILL_EFFECT_BONUS_PER_DESIGN_TYPE_MULT);
         eData.penaltyMult = eData.designTypesAboveLimit * SKILL_EFFECT_REDUCTION_MULT;
         eData.totalMult = Math.min(eData.bonusMultMax, eData.bonusMult - eData.penaltyMult);
 
