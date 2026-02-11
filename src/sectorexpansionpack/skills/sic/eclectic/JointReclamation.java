@@ -21,42 +21,51 @@ public class JointReclamation extends SCBaseSkillPlugin {
 
     @Override
     public void addTooltip(SCData data, TooltipMakerAPI tooltip) {
-        AptitudeEclectic.EclecticFleetData eclecticData = AptitudeEclectic.getEclecticFleetData(data);
-        float bonusMult = eclecticData.getSkillEffectBonus();
-        float maxMult = eclecticData.getMaxSkillEffectMult();
-        float penaltyMult = eclecticData.getSkillEffectPenalty();
-        float totalMult = eclecticData.getSkillEffectTotal();
+        AptitudeEclectic.EclecticFleetData eData = AptitudeEclectic.getEclecticFleetData(data);
 
-        tooltip.addPara("Total skill efficiency is at %s*", 0f, Misc.getHighlightColor(), Misc.getPositiveHighlightColor(), Math.round(totalMult * 100f) + "%");
+        tooltip.addPara("%s total skill effect multiplier*", 0f, Misc.getHighlightColor(), Misc.getHighlightColor(), String.format("%+d", Math.round(eData.totalMult * 100f)) + "%");
         tooltip.setBulletedListMode("   - ");
-        tooltip.addPara("Skill efficiency is increased by %s due to %s design types in the fleet", 0f, new Color[]{Misc.getPositiveHighlightColor(), Misc.getHighlightColor()}, Math.round(bonusMult * 100f) + "%", eclecticData.designTypes + "");
-        tooltip.addPara("Skill efficiency is reduced by %s due to %s design types above there ship limit", 0f, new Color[]{Misc.getNegativeHighlightColor(), Misc.getHighlightColor()}, Math.round(penaltyMult * 100f) + "%", eclecticData.designTypesAboveLimit + "");
+        tooltip.addPara("Increased by %s due to %s design types in the fleet", 0f, new Color[]{Misc.getPositiveHighlightColor(), Misc.getHighlightColor()}, Math.round(eData.bonusMult * 100f) + "%", eData.designTypesCount + "");
+        tooltip.addPara("Reduced by %s due to %s design types above their ship limit", 0f, new Color[]{Misc.getNegativeHighlightColor(), Misc.getHighlightColor()}, Math.round(eData.penaltyMult * 100f) + "%", eData.designTypesAboveLimit + "");
         tooltip.setBulletedListMode(null);
 
-        tooltip.addPara("%s (Max: %s) post-battle salvage", 10f, Misc.getHighlightColor(), Misc.getHighlightColor(), "+" + Math.round(totalMult * POST_BATTLE_SALVAGE_MOD * 100f) + "%", Math.round(maxMult * POST_BATTLE_SALVAGE_MOD * 100f) + "%");
-        tooltip.addPara("%s (Max: %s) fuel salvage", 0f, Misc.getHighlightColor(), Misc.getHighlightColor(), "+" + Math.round(totalMult * FUEL_SALVAGE_BONUS * 100f) + "%", Math.round(maxMult * FUEL_SALVAGE_BONUS * 100f) + "%");
-        tooltip.addPara("%s (Max: %s) crew loss to non-combat operations", 0f, Misc.getHighlightColor(), Misc.getHighlightColor(), "+" + Math.round(totalMult * NON_COMBAT_CREW_LOSS_MULT * 100f) + "%", Math.round(maxMult * NON_COMBAT_CREW_LOSS_MULT * 100f) + "%");
+        tooltip.addPara("%s (Max: %s) post-battle salvage", 10f, Misc.getHighlightColor(), Misc.getHighlightColor(), "+" + Math.round(eData.totalMult * POST_BATTLE_SALVAGE_MOD * 100f) + "%", Math.round(eData.bonusMultMax * POST_BATTLE_SALVAGE_MOD * 100f) + "%");
+        tooltip.addPara("%s (Max: %s) fuel salvage", 0f, Misc.getHighlightColor(), Misc.getHighlightColor(), "+" + Math.round(eData.totalMult * FUEL_SALVAGE_BONUS * 100f) + "%", Math.round(eData.bonusMultMax * FUEL_SALVAGE_BONUS * 100f) + "%");
+        tooltip.addPara("%s (Max: %s) crew loss to non-combat operations", 0f, Misc.getHighlightColor(), Misc.getHighlightColor(), "+" + Math.round(eData.totalMult * NON_COMBAT_CREW_LOSS_MULT * 100f) + "%", Math.round(eData.bonusMultMax * NON_COMBAT_CREW_LOSS_MULT * 100f) + "%");
 
-        String designTypeShipLimit = eclecticData.getDesignTypeShipLimit() + "";
-        String skillEfficiencyLimit = Math.round(eclecticData.getMaxSkillEffectMult() * 100f) + "%";
-        String skillEfficiencyPerType = Math.round(AptitudeEclectic.SKILL_EFFECT_BONUS_PER_DESIGN_TYPE_MULT * 100f) + "%";
-        LabelAPI label = tooltip.addPara("*Skill efficiency is capped at " + skillEfficiencyLimit +
-                ". Every design type in the fleet increases skill efficiency by " + skillEfficiencyPerType +
+        String designTypeShipLimit = eData.designTypesShipLimit + "";
+        String multLimit = Math.round(eData.bonusMultMax * 100f) + "%";
+        String perTypeMult = Math.round(AptitudeEclectic.SKILL_EFFECT_BONUS_PER_DESIGN_TYPE_MULT * 100f) + "%";
+        LabelAPI label = tooltip.addPara("*The skill effect multiplier is capped at " + multLimit +
+                ". Every design type in the fleet increases the skill effect multiplier by " + perTypeMult +
                 ". Every design type has a ship limit of " + designTypeShipLimit +
-                ". Every design type above there ship limit reduces skill efficiency by " + skillEfficiencyPerType, Misc.getGrayColor(), 10f);
-        label.setHighlight(skillEfficiencyLimit, skillEfficiencyPerType, designTypeShipLimit, skillEfficiencyPerType);
+                ". Every design type above their ship limit reduces the skill effect multiplier by " + perTypeMult, Misc.getGrayColor(), 10f);
+        label.setHighlight(multLimit, perTypeMult, designTypeShipLimit, perTypeMult);
         label.setHighlightColors(Misc.getHighlightColor(), Misc.getPositiveHighlightColor(), Misc.getHighlightColor(), Misc.getNegativeHighlightColor());
     }
 
     @Override
     public void advance(SCData data, Float amount) {
-        AptitudeEclectic.EclecticFleetData eclecticData = AptitudeEclectic.getEclecticFleetData(data);
-        float effectMult = eclecticData.getSkillEffectTotal();
+        AptitudeEclectic.EclecticFleetData eData = AptitudeEclectic.getEclecticFleetData(data);
 
-        System.out.println(eclecticData.designTypesAboveLimit);
+        data.getFleet().getStats().getDynamic().getStat(Stats.BATTLE_SALVAGE_MULT_FLEET).modifyFlat(getId(), eData.totalMult * POST_BATTLE_SALVAGE_MOD);
+        data.getFleet().getStats().getDynamic().getStat(Stats.FUEL_SALVAGE_VALUE_MULT_FLEET).modifyFlat(getId(), eData.totalMult * FUEL_SALVAGE_BONUS);
+        data.getFleet().getStats().getDynamic().getStat(Stats.NON_COMBAT_CREW_LOSS_MULT).modifyMult(getId(), 1f - eData.totalMult * NON_COMBAT_CREW_LOSS_MULT);
+    }
 
-        data.getFleet().getStats().getDynamic().getStat(Stats.BATTLE_SALVAGE_MULT_FLEET).modifyFlat(getId(), effectMult * POST_BATTLE_SALVAGE_MOD);
-        data.getFleet().getStats().getDynamic().getStat(Stats.FUEL_SALVAGE_VALUE_MULT_FLEET).modifyFlat(getId(), effectMult * FUEL_SALVAGE_BONUS);
-        data.getFleet().getStats().getDynamic().getStat(Stats.NON_COMBAT_CREW_LOSS_MULT).modifyMult(getId(), 1f - effectMult * NON_COMBAT_CREW_LOSS_MULT);
+    @Override
+    public void onActivation(SCData data) {
+        AptitudeEclectic.EclecticFleetData eData = AptitudeEclectic.getEclecticFleetData(data);
+
+        data.getFleet().getStats().getDynamic().getStat(Stats.BATTLE_SALVAGE_MULT_FLEET).modifyFlat(getId(), eData.totalMult * POST_BATTLE_SALVAGE_MOD);
+        data.getFleet().getStats().getDynamic().getStat(Stats.FUEL_SALVAGE_VALUE_MULT_FLEET).modifyFlat(getId(), eData.totalMult * FUEL_SALVAGE_BONUS);
+        data.getFleet().getStats().getDynamic().getStat(Stats.NON_COMBAT_CREW_LOSS_MULT).modifyMult(getId(), 1f - eData.totalMult * NON_COMBAT_CREW_LOSS_MULT);
+    }
+
+    @Override
+    public void onDeactivation(SCData data) {
+        data.getFleet().getStats().getDynamic().getStat(Stats.BATTLE_SALVAGE_MULT_FLEET).unmodify(getId());
+        data.getFleet().getStats().getDynamic().getStat(Stats.FUEL_SALVAGE_VALUE_MULT_FLEET).unmodify(getId());
+        data.getFleet().getStats().getDynamic().getStat(Stats.NON_COMBAT_CREW_LOSS_MULT).unmodify(getId());
     }
 }

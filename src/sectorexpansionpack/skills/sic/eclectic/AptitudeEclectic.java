@@ -19,7 +19,7 @@ public class AptitudeEclectic extends SCBaseAptitudePlugin {
     public static float SKILL_EFFECT_REDUCTION_MULT = 0.2f;
 
     private static EclecticFleetData computeEclecticFleetData(SCData data) {
-        EclecticFleetData eclecticData = new EclecticFleetData();
+        EclecticFleetData eData = new EclecticFleetData();
         Map<String, Integer> counts = new HashMap<>();
 
         for (FleetMemberAPI member : data.getFleet().getFleetData().getMembersListCopy()) {
@@ -27,29 +27,33 @@ public class AptitudeEclectic extends SCBaseAptitudePlugin {
             counts.merge(type, 1, Integer::sum);
         }
 
-        eclecticData.designTypes = counts.size();
-        eclecticData.hasDesignTolerance = data.getAllActiveSkillsPlugins()
+        eData.designTypesCount = counts.size();
+        boolean hasDesignTolerance = data.getAllActiveSkillsPlugins()
                 .stream()
                 .anyMatch(s -> Objects.equals(s.getId(), "sep_sic_design_tolerance"));
-        eclecticData.hasDiverseFleet = data.getAllActiveSkillsPlugins()
+        boolean hasDiverseFleet = data.getAllActiveSkillsPlugins()
                 .stream()
                 .anyMatch(s -> Objects.equals(s.getId(), "sep_sic_diverse_fleet"));
 
-        int designTypesShipLimit = DESIGN_TYPE_SHIP_LIMIT;
-        if (eclecticData.hasDiverseFleet) {
-            designTypesShipLimit = DiverseFleet.DESIGN_TYPE_SHIP_LIMIT;
-        } else if (eclecticData.hasDesignTolerance) {
-            designTypesShipLimit = DesignTolerance.DESIGN_TYPE_SHIP_LIMIT;
+        if (hasDiverseFleet) {
+            eData.designTypesShipLimit = DiverseFleet.DESIGN_TYPE_SHIP_LIMIT;
+        } else if (hasDesignTolerance) {
+            eData.designTypesShipLimit = DesignTolerance.DESIGN_TYPE_SHIP_LIMIT;
         }
 
-        eclecticData.designTypesAboveLimit = 0;
+        eData.designTypesAboveLimit = 0;
         for (Map.Entry<String, Integer> count : counts.entrySet()) {
-            if (count.getValue() > designTypesShipLimit) {
-                eclecticData.designTypesAboveLimit++;
+            if (count.getValue() > eData.designTypesShipLimit) {
+                eData.designTypesAboveLimit++;
             }
         }
 
-        return eclecticData;
+        eData.bonusMultMax = !hasDiverseFleet ? SKILL_EFFECT_MAX_MULT : DiverseFleet.SKILL_EFFECT_MAX_MULT;
+        eData.bonusMult = eData.designTypesCount * SKILL_EFFECT_BONUS_PER_DESIGN_TYPE_MULT;
+        eData.penaltyMult = eData.designTypesAboveLimit * SKILL_EFFECT_REDUCTION_MULT;
+        eData.totalMult = Math.min(eData.bonusMultMax, eData.bonusMult - eData.penaltyMult);
+
+        return eData;
     }
 
     public static EclecticFleetData getEclecticFleetData(SCData data) {
@@ -106,35 +110,13 @@ public class AptitudeEclectic extends SCBaseAptitudePlugin {
     }
 
     public static class EclecticFleetData {
-        int designTypes = 0;
+        int designTypesCount = 0;
+        int designTypesShipLimit = DESIGN_TYPE_SHIP_LIMIT;
         int designTypesAboveLimit = 0;
-        boolean hasDesignTolerance = false;
-        boolean hasDiverseFleet = false;
 
-        public float getSkillEffectBonus() {
-            return this.designTypes * SKILL_EFFECT_BONUS_PER_DESIGN_TYPE_MULT;
-        }
-
-        public float getSkillEffectPenalty() {
-            return this.designTypesAboveLimit * SKILL_EFFECT_REDUCTION_MULT;
-        }
-
-        public float getSkillEffectTotal() {
-            return Math.min(getMaxSkillEffectMult(), getSkillEffectBonus() - getSkillEffectPenalty());
-        }
-
-        public float getMaxSkillEffectMult() {
-            return !this.hasDiverseFleet ? SKILL_EFFECT_MAX_MULT : DiverseFleet.SKILL_EFFECT_MAX_MULT;
-        }
-
-        public int getDesignTypeShipLimit() {
-            if (this.hasDiverseFleet) {
-                return DiverseFleet.DESIGN_TYPE_SHIP_LIMIT;
-            }
-            if (this.hasDesignTolerance) {
-                return DesignTolerance.DESIGN_TYPE_SHIP_LIMIT;
-            }
-            return DESIGN_TYPE_SHIP_LIMIT;
-        }
+        float bonusMultMax;
+        float bonusMult;
+        float penaltyMult;
+        float totalMult;
     }
 }

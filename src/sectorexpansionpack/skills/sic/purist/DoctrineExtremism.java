@@ -13,7 +13,7 @@ public class DoctrineExtremism extends SCBaseSkillPlugin {
 
     @Override
     public void addTooltip(SCData data, TooltipMakerAPI tooltip) {
-        tooltip.addPara("Skill effects are doubled", Misc.getHighlightColor(), 0f);
-        tooltip.addPara("Skill penalties are doubled", Misc.getDarkHighlightColor(), 0f);
+        tooltip.addPara("Purist skill effects are doubled", Misc.getHighlightColor(), 0f);
+        tooltip.addPara("Purist skill penalties are doubled", Misc.getDarkHighlightColor(), 0f);
     }
 }
