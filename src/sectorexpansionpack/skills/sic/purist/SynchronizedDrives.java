@@ -10,9 +10,9 @@ import second_in_command.specs.SCBaseSkillPlugin;
 import java.awt.*;
 
 public class SynchronizedDrives extends SCBaseSkillPlugin {
-    public static float MAX_BURN_MOD = 2;
-    public static float ACCELERATION_MULT = 1f;
-    public static float MOVE_SLOW_SPEED_MOD = 3f;
+    public static float MAX_BURN_MOD = 1f;
+    public static float ACCELERATION_MULT = 0.50f;
+    public static float MOVE_SLOW_SPEED_MOD = 2f;
 
     @Override
     public String getAffectsString() {
