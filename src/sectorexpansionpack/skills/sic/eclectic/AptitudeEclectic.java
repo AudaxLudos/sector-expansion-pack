@@ -101,7 +101,17 @@ public class AptitudeEclectic extends SCBaseAptitudePlugin {
 
     @Override
     public Float getNPCFleetSpawnWeight(SCData scData, CampaignFleetAPI campaignFleetAPI) {
-        return 0f;
+        EclecticFleetData eData = getEclecticFleetData(scData);
+        float weight = 0f;
+        if (eData.designTypesCount >= 5) {
+            weight = 1f;
+        }
+        if (eData.designTypesAboveLimit >= eData.designTypesCount) {
+            weight = 0f;
+        } else if (eData.designTypesAboveLimit == 1) {
+            weight -= 0.2f;
+        }
+        return Math.min(0f, weight);
     }
 
     @Override
