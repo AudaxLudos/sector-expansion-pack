@@ -15,10 +15,11 @@ import java.util.Objects;
 public class AptitudePurist extends SCBaseAptitudePlugin {
     public static String PURIST_FLEET_DATA_KEY = "sep_purist_fleet_data_key";
     public static float AVERAGE_DESIGN_TYPE_NEEDED = 0.5f;
+    public static float SKILL_EFFECT_MAX_MULT = 1f;
     public static float SKILL_EFFECT_REDUCTION_MULT = 0.1f;
 
     private static PuristFleetData computePuristFleetData(SCData data) {
-        PuristFleetData puristData = new PuristFleetData();
+        PuristFleetData pData = new PuristFleetData();
         Map<String, Integer> counts = new HashMap<>();
         float totalShips = 0;
 
@@ -28,47 +29,56 @@ public class AptitudePurist extends SCBaseAptitudePlugin {
             totalShips++;
         }
 
-        puristData.primary = counts.entrySet()
+        pData.primary = counts.entrySet()
                 .stream()
                 .max(Map.Entry.comparingByValue())
                 .map(Map.Entry::getKey)
                 .orElse(null);
 
-        puristData.secondary = counts.entrySet()
+        pData.secondary = counts.entrySet()
                 .stream()
-                .filter(e -> !Objects.equals(e.getKey(), puristData.primary))
+                .filter(e -> !Objects.equals(e.getKey(), pData.primary))
                 .max(Map.Entry.comparingByValue())
                 .map(Map.Entry::getKey)
                 .orElse(null);
 
-        puristData.hasDesignCompromise = data.getAllActiveSkillsPlugins()
+        pData.hasDesignCompromise = data.getAllActiveSkillsPlugins()
                 .stream()
                 .anyMatch(s -> Objects.equals(s.getId(), "sep_sic_design_compromise"));
-        puristData.hasDoctrineExtremism = data.getAllActiveSkillsPlugins()
+        pData.hasDoctrineExtremism = data.getAllActiveSkillsPlugins()
                 .stream()
                 .anyMatch(s -> Objects.equals(s.getId(), "sep_sic_doctrine_extremism"));
 
-        int nonCommonTypeCount = 0;
+        pData.nonCommonTypeCount = 0;
         for (String type : counts.keySet()) {
-            if (Objects.equals(type, puristData.primary)) {
+            if (Objects.equals(type, pData.primary)) {
                 continue;
             }
-            if (puristData.hasDesignCompromise && Objects.equals(type, puristData.secondary)) {
+            if (pData.hasDesignCompromise && Objects.equals(type, pData.secondary)) {
                 continue;
             }
-            nonCommonTypeCount++;
+            pData.nonCommonTypeCount++;
         }
-        puristData.nonCommonTypeCount = nonCommonTypeCount;
-        puristData.nonCommonTypePenalty = nonCommonTypeCount * SKILL_EFFECT_REDUCTION_MULT;
 
-        int effectivePrimaryCount = counts.getOrDefault(puristData.primary, 0);
-        if (puristData.hasDesignCompromise && puristData.secondary != null) {
-            effectivePrimaryCount += counts.getOrDefault(puristData.secondary, 0);
+        pData.bonusMultMax = !pData.hasDoctrineExtremism ? SKILL_EFFECT_MAX_MULT : DoctrineExtremism.SKILL_EFFECT_MAX_MULT;
+        pData.bonusMult = 0f;
+        if (pData.primary != null && !pData.primary.isBlank()) {
+            pData.bonusMult = 1f;
+        }
+        pData.bonusMult *= pData.bonusMultMax;
+
+        pData.nonCommonTypePenalty = pData.nonCommonTypeCount * SKILL_EFFECT_REDUCTION_MULT * pData.bonusMultMax;
+        int effectivePrimaryCount = counts.getOrDefault(pData.primary, 0);
+        if (pData.hasDesignCompromise && pData.secondary != null) {
+            effectivePrimaryCount += counts.getOrDefault(pData.secondary, 0);
         }
         float ratio = totalShips > 0 ? (float) effectivePrimaryCount / totalShips : 0f;
-        puristData.otherTypeDominancePenalty = ratio >= AVERAGE_DESIGN_TYPE_NEEDED ? 0f : SKILL_EFFECT_REDUCTION_MULT;
+        pData.otherTypeDominancePenalty = ratio >= AVERAGE_DESIGN_TYPE_NEEDED ? 0f : SKILL_EFFECT_REDUCTION_MULT * pData.bonusMultMax;
+        pData.penaltyMult = pData.nonCommonTypePenalty + pData.otherTypeDominancePenalty;
 
-        return puristData;
+        pData.totalMult = pData.bonusMult - pData.penaltyMult;
+
+        return pData;
     }
 
     public static PuristFleetData getPuristFleetData(SCData data) {
@@ -139,16 +149,9 @@ public class AptitudePurist extends SCBaseAptitudePlugin {
         float nonCommonTypePenalty;
         float otherTypeDominancePenalty;
 
-        float computeTotalPenaltyMult() {
-            return 1f - (this.nonCommonTypePenalty + this.otherTypeDominancePenalty) * getDoctrineExtremismMult();
-        }
-
-        float getDoctrineExtremismMult() {
-            float doctrineExtremismMult = 1f;
-            if (this.hasDoctrineExtremism) {
-                doctrineExtremismMult = 2f;
-            }
-            return doctrineExtremismMult;
-        }
+        float bonusMultMax;
+        float bonusMult;
+        float penaltyMult;
+        float totalMult;
     }
 }
