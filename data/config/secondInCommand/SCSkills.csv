@@ -1,20 +1,20 @@
 id,name,iconPath,npcSpawnWeight,plugin
 #Eclectic,,,,
-sep_sic_alternative_replacements,Alternative Replacements,graphics/sectorexpansionpack/icons/skills/eclectic/alternative_replacements.png,0,sectorexpansionpack.skills.sic.eclectic.AlternativeReplacements
-sep_sic_collaborative_training,Collaborative Training,graphics/sectorexpansionpack/icons/skills/eclectic/collaborative_training.png,0,sectorexpansionpack.skills.sic.eclectic.CollaborativeTraining
-sep_sic_design_tolerance,Design Tolerance,graphics/sectorexpansionpack/icons/skills/eclectic/design_tolerance.png,0,sectorexpansionpack.skills.sic.eclectic.DesignTolerance
-sep_sic_diverse_fleet,Diverse Fleet,graphics/sectorexpansionpack/icons/skills/eclectic/diverse_fleet.png,0,sectorexpansionpack.skills.sic.eclectic.DiverseFleet
-sep_sic_every_nook_and_cranny,Every Nook and Cranny,graphics/sectorexpansionpack/icons/skills/eclectic/every_nook_and_cranny.png,0,sectorexpansionpack.skills.sic.eclectic.EveryNookAndCranny
-sep_sic_flux_optimizations,Flux Optimizations,graphics/sectorexpansionpack/icons/skills/eclectic/flux_optimizations.png,0,sectorexpansionpack.skills.sic.eclectic.FluxOptimizations
-sep_sic_improvised_restoration,Improvised Restoration,graphics/sectorexpansionpack/icons/skills/eclectic/improvised_restoration.png,0,sectorexpansionpack.skills.sic.eclectic.ImprovisedRestoration
-sep_sic_joint_reclamation,Joint Reclamation,graphics/sectorexpansionpack/icons/skills/eclectic/joint_reclamation.png,0,sectorexpansionpack.skills.sic.eclectic.JointReclamation
-sep_sic_logistics_reallocation,Logistics Reallocation,graphics/sectorexpansionpack/icons/skills/eclectic/logistics_reallocation.png,0,sectorexpansionpack.skills.sic.eclectic.LogisticsReallocation
-sep_sic_shared_telemetry,Shared Telemetry,graphics/sectorexpansionpack/icons/skills/eclectic/shared_telemetry.png,0,sectorexpansionpack.skills.sic.eclectic.SharedTelemetry
+sep_sic_alternative_replacements,Alternative Replacements,graphics/sectorexpansionpack/icons/skills/eclectic/alternative_replacements.png,1,sectorexpansionpack.skills.sic.eclectic.AlternativeReplacements
+sep_sic_collaborative_training,Collaborative Training,graphics/sectorexpansionpack/icons/skills/eclectic/collaborative_training.png,5,sectorexpansionpack.skills.sic.eclectic.CollaborativeTraining
+sep_sic_design_tolerance,Design Tolerance,graphics/sectorexpansionpack/icons/skills/eclectic/design_tolerance.png,5,sectorexpansionpack.skills.sic.eclectic.DesignTolerance
+sep_sic_diverse_fleet,Diverse Fleet,graphics/sectorexpansionpack/icons/skills/eclectic/diverse_fleet.png,1,sectorexpansionpack.skills.sic.eclectic.DiverseFleet
+sep_sic_every_nook_and_cranny,Every Nook and Cranny,graphics/sectorexpansionpack/icons/skills/eclectic/every_nook_and_cranny.png,1,sectorexpansionpack.skills.sic.eclectic.EveryNookAndCranny
+sep_sic_flux_optimizations,Flux Optimizations,graphics/sectorexpansionpack/icons/skills/eclectic/flux_optimizations.png,5,sectorexpansionpack.skills.sic.eclectic.FluxOptimizations
+sep_sic_improvised_restoration,Improvised Restoration,graphics/sectorexpansionpack/icons/skills/eclectic/improvised_restoration.png,1,sectorexpansionpack.skills.sic.eclectic.ImprovisedRestoration
+sep_sic_joint_reclamation,Joint Reclamation,graphics/sectorexpansionpack/icons/skills/eclectic/joint_reclamation.png,1,sectorexpansionpack.skills.sic.eclectic.JointReclamation
+sep_sic_logistics_reallocation,Logistics Reallocation,graphics/sectorexpansionpack/icons/skills/eclectic/logistics_reallocation.png,1,sectorexpansionpack.skills.sic.eclectic.LogisticsReallocation
+sep_sic_shared_telemetry,Shared Telemetry,graphics/sectorexpansionpack/icons/skills/eclectic/shared_telemetry.png,1,sectorexpansionpack.skills.sic.eclectic.SharedTelemetry
 ,,,,
 ,,,,
 ,,,,
 #Purist,,,,
-sep_sic_baseline_restoration,Baseline Restoration,graphics/sectorexpansionpack/icons/skills/purist/baseline_restoration.png,0,sectorexpansionpack.skills.sic.purist.BaselineRestoration
+sep_sic_baseline_restoration,Baseline Restoration,graphics/sectorexpansionpack/icons/skills/purist/baseline_restoration.png,1,sectorexpansionpack.skills.sic.purist.BaselineRestoration
 sep_sic_design_compromise,Design Compromise,graphics/sectorexpansionpack/icons/skills/purist/design_compromise.png,5,sectorexpansionpack.skills.sic.purist.DesignCompromise
 sep_sic_doctrine_extremism,Doctrine Extremism,graphics/sectorexpansionpack/icons/skills/purist/doctrine_extremism.png,1,sectorexpansionpack.skills.sic.purist.DoctrineExtremism
 sep_sic_efficient_operations,Efficient Operations,graphics/sectorexpansionpack/icons/skills/purist/efficient_operations.png,5,sectorexpansionpack.skills.sic.purist.EfficientOperations
