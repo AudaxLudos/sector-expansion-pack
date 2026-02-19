@@ -13,10 +13,10 @@ import java.awt.*;
 import java.util.Objects;
 
 public class UnifiedLogistics extends SCBaseSkillPlugin {
-    public static float SUPPLIES_PER_MONTH_MULT = 0.25f;
-    public static float FUEL_USE_MULT = 0.25f;
-    public static float FUEL_CAP_MULT = 0.2f;
-    public static float CARGO_CAP_MULT = 0.2f;
+    public static float SUPPLIES_PER_MONTH_MULT = 0.20f;
+    public static float FUEL_USE_MULT = 0.20f;
+    public static float FUEL_CAP_MULT = 0.20f;
+    public static float CARGO_CAP_MULT = 0.20f;
 
     @Override
     public String getAffectsString() {
