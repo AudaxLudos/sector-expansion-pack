@@ -17,6 +17,6 @@ public class DiverseFleet extends SCBaseSkillPlugin {
     @Override
     public void addTooltip(SCData data, TooltipMakerAPI tooltip) {
         tooltip.addPara("Max ship count per design type is reduced to %s", 0f, Misc.getHighlightColor(), Misc.getHighlightColor(), DESIGN_TYPE_SHIP_LIMIT + "");
-        tooltip.addPara("Eclectic skill efficiency caps increased to %s", 0f, Misc.getHighlightColor(), Misc.getHighlightColor(), Math.round(SKILL_EFFECT_MAX_MULT * 100f) + "%");
+        tooltip.addPara("Eclectic skill efficiency max base value increased to %s", 0f, Misc.getHighlightColor(), Misc.getHighlightColor(), Math.round(SKILL_EFFECT_MAX_MULT * 100f) + "%");
     }
 }

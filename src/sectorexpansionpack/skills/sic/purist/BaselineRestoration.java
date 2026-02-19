@@ -26,7 +26,7 @@ public class BaselineRestoration extends SCBaseSkillPlugin {
     public void addTooltip(SCData data, TooltipMakerAPI tooltip) {
         AptitudePurist.PuristFleetData pData = AptitudePurist.getPuristFleetData(data);
 
-        tooltip.addPara("%s (Max: %s) skill efficiency*", 0f, Misc.getHighlightColor(), Misc.getHighlightColor(), Math.round(pData.totalMult * 100f) + "%", Math.round(pData.bonusMultMax * 100f) + "%");
+        tooltip.addPara("%s skill efficiency*", 0f, Misc.getHighlightColor(), Misc.getHighlightColor(), Math.round(pData.totalMult * 100f) + "%");
         tooltip.setBulletedListMode("   - ");
         tooltip.addPara("Based value of %s (Max: %s) due to %s primary design type", 0f, new Color[]{Misc.getPositiveHighlightColor(), Misc.getHighlightColor(), Misc.getDesignTypeColor(pData.primary)}, Math.round(pData.bonusMult * 100f) + "%", Math.round(pData.bonusMultMax * 100f) + "%", pData.primary);
         tooltip.addPara("Reduced by %s due to %s other design types in the fleet", 0f, new Color[]{Misc.getNegativeHighlightColor(), Misc.getHighlightColor()}, Math.round(pData.nonCommonTypePenalty * 100f) + "%", pData.nonCommonTypeCount + "");
