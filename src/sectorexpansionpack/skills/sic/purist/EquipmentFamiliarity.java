@@ -13,8 +13,8 @@ import java.awt.*;
 import java.util.Objects;
 
 public class EquipmentFamiliarity extends SCBaseSkillPlugin {
-    public static float CREW_MIN_REQ_MULT = 0.2f;
-    public static float PEAK_PERFORMANCE_TIME_MULT = 0.25f;
+    public static float CREW_MIN_REQ_MULT = 0.15f;
+    public static float PEAK_PERFORMANCE_TIME_MULT = 0.15f;
     public static float MAX_COMBAT_READINESS_MOD = 0.15f;
 
     @Override
