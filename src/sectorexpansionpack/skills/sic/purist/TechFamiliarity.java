@@ -12,7 +12,7 @@ import second_in_command.specs.SCBaseSkillPlugin;
 import java.awt.*;
 import java.util.Objects;
 
-public class EquipmentFamiliarity extends SCBaseSkillPlugin {
+public class TechFamiliarity extends SCBaseSkillPlugin {
     public static float CREW_MIN_REQ_MULT = 0.15f;
     public static float PEAK_PERFORMANCE_TIME_MULT = 0.15f;
     public static float MAX_COMBAT_READINESS_MOD = 0.15f;
@@ -55,7 +55,7 @@ public class EquipmentFamiliarity extends SCBaseSkillPlugin {
         if (Objects.equals(variantType, pData.primary) || (pData.hasDesignCompromise && Objects.equals(variantType, pData.secondary))) {
             stats.getMinCrewMod().modifyMult(getId(), 1f - (pData.totalMult * CREW_MIN_REQ_MULT));
             stats.getPeakCRDuration().modifyMult(getId(), 1f + (pData.totalMult * PEAK_PERFORMANCE_TIME_MULT));
-            stats.getMaxCombatReadiness().modifyFlat(getId(), pData.totalMult * MAX_COMBAT_READINESS_MOD, "Equipment Familiarity");
+            stats.getMaxCombatReadiness().modifyFlat(getId(), pData.totalMult * MAX_COMBAT_READINESS_MOD, "Tech Familiarity");
         }
     }
 }

@@ -114,8 +114,8 @@ public class AptitudePurist extends SCBaseAptitudePlugin {
 
         SCAptitudeSection section2 = new SCAptitudeSection(true, 2, "industry1");
         section2.addSkill("sep_sic_efficient_operations");
-        section2.addSkill("sep_sic_equipment_familiarity");
         section2.addSkill("sep_sic_targeting_synergy");
+        section2.addSkill("sep_sic_tech_familiarity");
         addSection(section2);
 
         SCAptitudeSection section3 = new SCAptitudeSection(false, 4, "industry1");
