@@ -9,8 +9,8 @@ import second_in_command.specs.SCBaseSkillPlugin;
 import java.awt.*;
 
 public class SharedTelemetry extends SCBaseSkillPlugin {
-    public static float SENSOR_PROFILE_MULT = 0.25f;
-    public static float SENSOR_RANGE_MULT = 0.25f;
+    public static float SENSOR_PROFILE_MULT = 0.20f;
+    public static float SENSOR_RANGE_MULT = 0.20f;
 
     @Override
     public String getAffectsString() {
