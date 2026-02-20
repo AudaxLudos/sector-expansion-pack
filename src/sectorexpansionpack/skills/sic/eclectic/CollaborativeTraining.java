@@ -27,7 +27,8 @@ public class CollaborativeTraining extends SCBaseSkillPlugin {
         tooltip.addPara("Reduced by %s due to %s design types above their ship limit", 0f, new Color[]{Misc.getNegativeHighlightColor(), Misc.getHighlightColor()}, Math.round(eData.penaltyMult * 100f) + "%", eData.designTypesAboveLimit + "");
         tooltip.setBulletedListMode(null);
 
-        tooltip.addPara("%s (Max: %s) to maximum number of elite skills for officers under your command*", 0f, Misc.getHighlightColor(), Misc.getHighlightColor(), "+" + Math.round(eData.totalMult * OFFICER_MAX_ELITE_SKILLS_MOD), Math.round(eData.bonusMultMax * OFFICER_MAX_ELITE_SKILLS_MOD) + "");
+        tooltip.addPara("%s to maximum number of elite skills for officers under your command (%s × skill efficiency)", 10f, Misc.getHighlightColor(), Misc.getHighlightColor(),
+                "+" + Math.round(eData.totalMult * OFFICER_MAX_ELITE_SKILLS_MOD), "" + OFFICER_MAX_ELITE_SKILLS_MOD);
 
         String designTypeShipLimit = eData.designTypesShipLimit + "";
         String multLimit = Math.round(eData.bonusMultMax * 100f) + "%";

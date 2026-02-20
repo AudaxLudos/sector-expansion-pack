@@ -27,8 +27,10 @@ public class SharedTelemetry extends SCBaseSkillPlugin {
         tooltip.addPara("Reduced by %s due to %s design types above their ship limit", 0f, new Color[]{Misc.getNegativeHighlightColor(), Misc.getHighlightColor()}, Math.round(eData.penaltyMult * 100f) + "%", eData.designTypesAboveLimit + "");
         tooltip.setBulletedListMode(null);
 
-        tooltip.addPara("%s (Max: %s) sensor profile", 10f, Misc.getHighlightColor(), Misc.getHighlightColor(), "-" + Math.round(eData.totalMult * SENSOR_PROFILE_MULT * 100f) + "%", Math.round(eData.bonusMultMax * SENSOR_PROFILE_MULT * 100f) + "%");
-        tooltip.addPara("%s (Max: %s) sensor range", 0f, Misc.getHighlightColor(), Misc.getHighlightColor(), "+" + Math.round(eData.totalMult * SENSOR_RANGE_MULT * 100f) + "%", Math.round(eData.bonusMultMax * SENSOR_RANGE_MULT * 100f) + "%");
+        tooltip.addPara("%s sensor profile (%s × skill efficiency)", 10f, Misc.getHighlightColor(), Misc.getHighlightColor(),
+                "-" + Math.round(eData.totalMult * SENSOR_PROFILE_MULT * 100f) + "%", Math.round(SENSOR_PROFILE_MULT * 100f) + "%");
+        tooltip.addPara("%s sensor range (%s × skill efficiency)", 0f, Misc.getHighlightColor(), Misc.getHighlightColor(),
+                "+" + Math.round(eData.totalMult * SENSOR_RANGE_MULT * 100f) + "%", Math.round(SENSOR_RANGE_MULT * 100f) + "%");
 
         String designTypeShipLimit = eData.designTypesShipLimit + "";
         String multLimit = Math.round(eData.bonusMultMax * 100f) + "%";

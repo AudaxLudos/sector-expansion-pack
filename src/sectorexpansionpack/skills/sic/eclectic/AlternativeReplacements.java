@@ -30,8 +30,10 @@ public class AlternativeReplacements extends SCBaseSkillPlugin {
         tooltip.addPara("Reduced by %s due to %s design types above their ship limit", 0f, new Color[]{Misc.getNegativeHighlightColor(), Misc.getHighlightColor()}, Math.round(eData.penaltyMult * 100f) + "%", eData.designTypesAboveLimit + "");
         tooltip.setBulletedListMode(null);
 
-        tooltip.addPara("%s (Max: %s) hull and armor repair rate outside of combat", 10f, Misc.getHighlightColor(), Misc.getHighlightColor(), "+" + Math.round(eData.totalMult * REPAIR_RATE_PER_DAY_MULT * 100f) + "%", Math.round(eData.bonusMultMax * REPAIR_RATE_PER_DAY_MULT * 100f) + "%");
-        tooltip.addPara("%s (Max: %s) flat increase to combat readiness recovered per day", 0f, Misc.getHighlightColor(), Misc.getHighlightColor(), "+" + Math.round(eData.totalMult * CR_RECOVERY_RATE_PER_DAY_MOD * 100f) + "%", Math.round(eData.bonusMultMax * CR_RECOVERY_RATE_PER_DAY_MOD * 100f) + "%");
+        tooltip.addPara("%s hull and armor repair rate outside of combat (%s × skill efficiency)", 10f, Misc.getHighlightColor(), Misc.getHighlightColor(),
+                "+" + Math.round(eData.totalMult * REPAIR_RATE_PER_DAY_MULT * 100f) + "%", Math.round(REPAIR_RATE_PER_DAY_MULT * 100f) + "%");
+        tooltip.addPara("%s flat increase to combat readiness recovered per day (%s × skill efficiency)", 0f, Misc.getHighlightColor(), Misc.getHighlightColor(),
+                "+" + Math.round(eData.totalMult * CR_RECOVERY_RATE_PER_DAY_MOD * 100f) + "%", Math.round(CR_RECOVERY_RATE_PER_DAY_MOD * 100f) + "%");
 
         String designTypeShipLimit = eData.designTypesShipLimit + "";
         String multLimit = Math.round(eData.bonusMultMax * 100f) + "%";

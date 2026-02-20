@@ -32,8 +32,10 @@ public class StandardRepairs extends SCBaseSkillPlugin {
         tooltip.addPara("Reduced by %s due to the dominance of other design types", 0f, Misc.getNegativeHighlightColor(), Math.round(pData.otherTypeDominancePenalty * 100f) + "%");
         tooltip.setBulletedListMode(null);
 
-        tooltip.addPara("%s (Max: %s) hull and armor repair rate outside of combat", 10f, Misc.getHighlightColor(), Misc.getHighlightColor(), "+" + Math.round(pData.totalMult * REPAIR_RATE_PER_DAY_MULT * 100f) + "%", Math.round(pData.bonusMultMax * REPAIR_RATE_PER_DAY_MULT * 100f) + "%");
-        tooltip.addPara("%s (Max: %s) flat increase to combat readiness recovered per day", 0f, Misc.getHighlightColor(), Misc.getHighlightColor(), "+" + Math.round(pData.totalMult * CR_RECOVERY_RATE_PER_DAY_MOD * 100f) + "%", Math.round(pData.bonusMultMax * CR_RECOVERY_RATE_PER_DAY_MOD * 100f) + "%");
+        tooltip.addPara("%s hull and armor repair rate outside of combat (%s × skill efficiency)", 10f, Misc.getHighlightColor(), Misc.getHighlightColor(),
+                "+" + Math.round(pData.totalMult * REPAIR_RATE_PER_DAY_MULT * 100f) + "%", Math.round(REPAIR_RATE_PER_DAY_MULT * 100f) + "%");
+        tooltip.addPara("%s flat increase to combat readiness recovered per day (%s × skill efficiency)", 0f, Misc.getHighlightColor(), Misc.getHighlightColor(),
+                "+" + Math.round(pData.totalMult * CR_RECOVERY_RATE_PER_DAY_MOD * 100f) + "%", Math.round(CR_RECOVERY_RATE_PER_DAY_MOD * 100f) + "%");
 
         String statReductionMultText = Math.round(AptitudePurist.SKILL_EFFECT_REDUCTION_MULT * 100f) + "%";
         String dominantFractionText = Math.round(AptitudePurist.AVERAGE_DESIGN_TYPE_NEEDED * 100f) + "%";

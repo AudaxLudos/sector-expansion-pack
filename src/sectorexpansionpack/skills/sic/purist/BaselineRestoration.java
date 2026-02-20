@@ -33,8 +33,10 @@ public class BaselineRestoration extends SCBaseSkillPlugin {
         tooltip.addPara("Reduced by %s due to the dominance of other design types", 0f, Misc.getNegativeHighlightColor(), Math.round(pData.otherTypeDominancePenalty * 100f) + "%");
         tooltip.setBulletedListMode(null);
 
-        tooltip.addPara("%s (Max: %s) chance for ships to be recoverable if lost in combat", 10f, Misc.getHighlightColor(), Misc.getHighlightColor(), "+" + Math.round(pData.totalMult * SHIP_RECOVERY_MOD * 100f) + "%", Math.round(pData.bonusMultMax * SHIP_RECOVERY_MOD * 100f) + "%");
-        tooltip.addPara("%s (Max: %s) of hull and armor damage taken repaired after combat ends, at no cost", 0f, Misc.getHighlightColor(), Misc.getHighlightColor(), "+" + Math.round(pData.totalMult * INSTANT_REPAIR_MOD * 100f) + "%", Math.round(pData.bonusMultMax * INSTANT_REPAIR_MOD * 100f) + "%");
+        tooltip.addPara("%s chance for ships to be recoverable if lost in combat (%s × skill efficiency)", 10f, Misc.getHighlightColor(), Misc.getHighlightColor(),
+                "+" + Math.round(pData.totalMult * SHIP_RECOVERY_MOD * 100f) + "%", Math.round(SHIP_RECOVERY_MOD * 100f) + "%");
+        tooltip.addPara("%s of hull and armor damage taken repaired after combat ends, at no cost (%s × skill efficiency)", 0f, Misc.getHighlightColor(), Misc.getHighlightColor(),
+                "+" + Math.round(pData.totalMult * INSTANT_REPAIR_MOD * 100f) + "%", Math.round(INSTANT_REPAIR_MOD * 100f) + "%");
 
         String statReductionMultText = Math.round(pData.bonusMultMax * AptitudePurist.SKILL_EFFECT_REDUCTION_MULT * 100f) + "%";
         String dominantFractionText = Math.round(pData.bonusMultMax * AptitudePurist.AVERAGE_DESIGN_TYPE_NEEDED * 100f) + "%";

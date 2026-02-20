@@ -33,9 +33,12 @@ public class TechFamiliarity extends SCBaseSkillPlugin {
         tooltip.addPara("Reduced by %s due to the dominance of other design types", 0f, Misc.getNegativeHighlightColor(), Math.round(pData.otherTypeDominancePenalty * 100f) + "%");
         tooltip.setBulletedListMode(null);
 
-        tooltip.addPara("%s (Max: %s) minimum crew requirements", 10f, Misc.getHighlightColor(), Misc.getHighlightColor(), "-" + Math.round(pData.totalMult * CREW_MIN_REQ_MULT * 100f) + "%", Math.round(pData.bonusMultMax * CREW_MIN_REQ_MULT * 100f) + "%");
-        tooltip.addPara("%s (Max: %s) peak performance time", 0f, Misc.getHighlightColor(), Misc.getHighlightColor(), "+" + Math.round(pData.totalMult * PEAK_PERFORMANCE_TIME_MULT * 100f) + "%", Math.round(pData.bonusMultMax * PEAK_PERFORMANCE_TIME_MULT * 100f) + "%");
-        tooltip.addPara("%s (Max: %s) max combat readiness", 0f, Misc.getHighlightColor(), Misc.getHighlightColor(), "+" + Math.round(pData.totalMult * MAX_COMBAT_READINESS_MOD * 100f) + "%", Math.round(pData.bonusMultMax * MAX_COMBAT_READINESS_MOD * 100f) + "%");
+        tooltip.addPara("%s minimum crew requirements (%s × skill efficiency)", 10f, Misc.getHighlightColor(), Misc.getHighlightColor(),
+                "-" + Math.round(pData.totalMult * CREW_MIN_REQ_MULT * 100f) + "%", Math.round(CREW_MIN_REQ_MULT * 100f) + "%");
+        tooltip.addPara("%s peak performance time (%s × skill efficiency)", 0f, Misc.getHighlightColor(), Misc.getHighlightColor(),
+                "+" + Math.round(pData.totalMult * PEAK_PERFORMANCE_TIME_MULT * 100f) + "%", Math.round(PEAK_PERFORMANCE_TIME_MULT * 100f) + "%");
+        tooltip.addPara("%s max combat readiness (%s × skill efficiency)", 0f, Misc.getHighlightColor(), Misc.getHighlightColor(),
+                "+" + Math.round(pData.totalMult * MAX_COMBAT_READINESS_MOD * 100f) + "%", Math.round(MAX_COMBAT_READINESS_MOD * 100f) + "%");
 
         String statReductionMultText = Math.round(AptitudePurist.SKILL_EFFECT_REDUCTION_MULT * 100f) + "%";
         String dominantFractionText = Math.round(AptitudePurist.AVERAGE_DESIGN_TYPE_NEEDED * 100f) + "%";

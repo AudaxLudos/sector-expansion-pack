@@ -30,8 +30,10 @@ public class EveryNookAndCranny extends SCBaseSkillPlugin {
         tooltip.addPara("Reduced by %s due to %s design types above their ship limit", 0f, new Color[]{Misc.getNegativeHighlightColor(), Misc.getHighlightColor()}, Math.round(eData.penaltyMult * 100f) + "%", eData.designTypesAboveLimit + "");
         tooltip.setBulletedListMode(null);
 
-        tooltip.addPara("%s (Max: %s) cargo capacity", 10f, Misc.getHighlightColor(), Misc.getHighlightColor(), "+" + Math.round(eData.totalMult * CARGO_CAP_MULT * 100f) + "%", Math.round(eData.bonusMultMax * CARGO_CAP_MULT * 100f) + "%");
-        tooltip.addPara("%s (Max: %s) fuel capacity", 0f, Misc.getHighlightColor(), Misc.getHighlightColor(), "+" + Math.round(eData.totalMult * FUEL_CAP_MULT * 100f) + "%", Math.round(eData.bonusMultMax * FUEL_CAP_MULT * 100f) + "%");
+        tooltip.addPara("%s cargo capacity (%s × skill efficiency)", 10f, Misc.getHighlightColor(), Misc.getHighlightColor(),
+                "+" + Math.round(eData.totalMult * CARGO_CAP_MULT * 100f) + "%", Math.round(CARGO_CAP_MULT * 100f) + "%");
+        tooltip.addPara("%s fuel capacity (%s × skill efficiency)", 0f, Misc.getHighlightColor(), Misc.getHighlightColor(),
+                "+" + Math.round(eData.totalMult * FUEL_CAP_MULT * 100f) + "%", Math.round(FUEL_CAP_MULT * 100f) + "%");
 
         String designTypeShipLimit = eData.designTypesShipLimit + "";
         String multLimit = Math.round(eData.bonusMultMax * 100f) + "%";

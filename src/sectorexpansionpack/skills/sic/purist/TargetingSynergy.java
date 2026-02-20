@@ -32,8 +32,10 @@ public class TargetingSynergy extends SCBaseSkillPlugin {
         tooltip.addPara("Reduced by %s due to the dominance of other design types", 0f, Misc.getNegativeHighlightColor(), Math.round(pData.otherTypeDominancePenalty * 100f) + "%");
         tooltip.setBulletedListMode(null);
 
-        tooltip.addPara("%s (Max: %s) non-missile weapon range", 10f, Misc.getHighlightColor(), Misc.getHighlightColor(), "+" + Math.round(pData.totalMult * NON_MISSILE_WEAPON_RANGE_MULT * 100f) + "%", Math.round(pData.bonusMultMax * NON_MISSILE_WEAPON_RANGE_MULT * 100f) + "%");
-        tooltip.addPara("%s (Max: %s) non-missile weapon damage", 0f, Misc.getHighlightColor(), Misc.getHighlightColor(), "+" + Math.round(pData.totalMult * NON_MISSILE_WEAPON_DAMAGE_MULT * 100f) + "%", Math.round(pData.bonusMultMax * NON_MISSILE_WEAPON_DAMAGE_MULT * 100f) + "%");
+        tooltip.addPara("%s non-missile weapon range (%s × skill efficiency)", 10f, Misc.getHighlightColor(), Misc.getHighlightColor(),
+                "+" + Math.round(pData.totalMult * NON_MISSILE_WEAPON_RANGE_MULT * 100f) + "%", Math.round(NON_MISSILE_WEAPON_RANGE_MULT * 100f) + "%");
+        tooltip.addPara("%s non-missile weapon damage (%s × skill efficiency)", 0f, Misc.getHighlightColor(), Misc.getHighlightColor(),
+                "+" + Math.round(pData.totalMult * NON_MISSILE_WEAPON_DAMAGE_MULT * 100f) + "%", Math.round(NON_MISSILE_WEAPON_DAMAGE_MULT * 100f) + "%");
 
         String statReductionMultText = Math.round(AptitudePurist.SKILL_EFFECT_REDUCTION_MULT * 100f) + "%";
         String dominantFractionText = Math.round(AptitudePurist.AVERAGE_DESIGN_TYPE_NEEDED * 100f) + "%";

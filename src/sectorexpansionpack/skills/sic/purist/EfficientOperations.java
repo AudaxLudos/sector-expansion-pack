@@ -33,9 +33,9 @@ public class EfficientOperations extends SCBaseSkillPlugin {
         tooltip.addPara("Reduced by %s due to the dominance of other design types", 0f, Misc.getNegativeHighlightColor(), Math.round(pData.otherTypeDominancePenalty * 100f) + "%");
         tooltip.setBulletedListMode(null);
 
-        tooltip.addPara("Deployment point cost reduced by %s or %s (Max: %s or %s), whichever is less", 10f, Misc.getHighlightColor(), Misc.getHighlightColor(),
-                Math.round(pData.totalMult * DP_REDUCTION_MULT * 100f) + "%", Math.round(pData.totalMult * DP_REDUCTION_MAX) + "",
-                Math.round(pData.bonusMultMax * DP_REDUCTION_MULT * 100f) + "%", Math.round(pData.bonusMultMax * DP_REDUCTION_MAX) + "");
+        tooltip.addPara("Deployment point cost reduced by %s or %s, whichever is less (%s or %s × skill efficiency)", 10f, Misc.getHighlightColor(), Misc.getHighlightColor(),
+                Math.round(pData.totalMult * DP_REDUCTION_MULT * 100f) + "%", Math.round(DP_REDUCTION_MAX) + "",
+                Math.round(pData.totalMult * DP_REDUCTION_MULT * 100f) + "%", Math.round(DP_REDUCTION_MAX) + "");
 
         String statReductionMultText = Math.round(AptitudePurist.SKILL_EFFECT_REDUCTION_MULT * 100f) + "%";
         String dominantFractionText = Math.round(AptitudePurist.AVERAGE_DESIGN_TYPE_NEEDED * 100f) + "%";

@@ -29,9 +29,12 @@ public class JointReclamation extends SCBaseSkillPlugin {
         tooltip.addPara("Reduced by %s due to %s design types above their ship limit", 0f, new Color[]{Misc.getNegativeHighlightColor(), Misc.getHighlightColor()}, Math.round(eData.penaltyMult * 100f) + "%", eData.designTypesAboveLimit + "");
         tooltip.setBulletedListMode(null);
 
-        tooltip.addPara("%s (Max: %s) post-battle salvage", 10f, Misc.getHighlightColor(), Misc.getHighlightColor(), "+" + Math.round(eData.totalMult * POST_BATTLE_SALVAGE_MOD * 100f) + "%", Math.round(eData.bonusMultMax * POST_BATTLE_SALVAGE_MOD * 100f) + "%");
-        tooltip.addPara("%s (Max: %s) fuel salvage", 0f, Misc.getHighlightColor(), Misc.getHighlightColor(), "+" + Math.round(eData.totalMult * FUEL_SALVAGE_BONUS * 100f) + "%", Math.round(eData.bonusMultMax * FUEL_SALVAGE_BONUS * 100f) + "%");
-        tooltip.addPara("%s (Max: %s) crew loss to non-combat operations", 0f, Misc.getHighlightColor(), Misc.getHighlightColor(), "+" + Math.round(eData.totalMult * NON_COMBAT_CREW_LOSS_MULT * 100f) + "%", Math.round(eData.bonusMultMax * NON_COMBAT_CREW_LOSS_MULT * 100f) + "%");
+        tooltip.addPara("%s post-battle salvage (%s × skill efficiency)", 10f, Misc.getHighlightColor(), Misc.getHighlightColor(),
+                "+" + Math.round(eData.totalMult * POST_BATTLE_SALVAGE_MOD * 100f) + "%", Math.round(POST_BATTLE_SALVAGE_MOD * 100f) + "%");
+        tooltip.addPara("%s fuel salvage (%s × skill efficiency)", 0f, Misc.getHighlightColor(), Misc.getHighlightColor(),
+                "+" + Math.round(eData.totalMult * FUEL_SALVAGE_BONUS * 100f) + "%", Math.round(FUEL_SALVAGE_BONUS * 100f) + "%");
+        tooltip.addPara("%s crew loss to non-combat operations (%s × skill efficiency)", 0f, Misc.getHighlightColor(), Misc.getHighlightColor(),
+                "+" + Math.round(eData.totalMult * NON_COMBAT_CREW_LOSS_MULT * 100f) + "%", Math.round(NON_COMBAT_CREW_LOSS_MULT * 100f) + "%");
 
         String designTypeShipLimit = eData.designTypesShipLimit + "";
         String multLimit = Math.round(eData.bonusMultMax * 100f) + "%";

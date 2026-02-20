@@ -31,8 +31,10 @@ public class ImprovisedRestoration extends SCBaseSkillPlugin {
         tooltip.addPara("Reduced by %s due to %s design types above their ship limit", 0f, new Color[]{Misc.getNegativeHighlightColor(), Misc.getHighlightColor()}, Math.round(eData.penaltyMult * 100f) + "%", eData.designTypesAboveLimit + "");
         tooltip.setBulletedListMode(null);
 
-        tooltip.addPara("%s (Max: %s) chance for ships to be recoverable if lost in combat", 10f, Misc.getHighlightColor(), Misc.getHighlightColor(), "+" + Math.round(eData.totalMult * SHIP_RECOVERY_MOD * 100f) + "%", Math.round(eData.bonusMultMax * SHIP_RECOVERY_MOD * 100f) + "%");
-        tooltip.addPara("%s (Max: %s) of hull and armor damage taken repaired after combat ends, at no cost", 0f, Misc.getHighlightColor(), Misc.getHighlightColor(), "+" + Math.round(eData.totalMult * INSTANT_REPAIR_MOD * 100f) + "%", Math.round(eData.bonusMultMax * INSTANT_REPAIR_MOD * 100f) + "%");
+        tooltip.addPara("%s chance for ships to be recoverable if lost in combat (%s × skill efficiency)", 10f, Misc.getHighlightColor(), Misc.getHighlightColor(),
+                "+" + Math.round(eData.totalMult * SHIP_RECOVERY_MOD * 100f) + "%", Math.round(SHIP_RECOVERY_MOD * 100f) + "%");
+        tooltip.addPara("%s of hull and armor damage taken repaired after combat ends, at no cost (%s × skill efficiency)", 0f, Misc.getHighlightColor(), Misc.getHighlightColor(),
+                "+" + Math.round(eData.totalMult * INSTANT_REPAIR_MOD * 100f) + "%", Math.round(INSTANT_REPAIR_MOD * 100f) + "%");
 
         String designTypeShipLimit = eData.designTypesShipLimit + "";
         String multLimit = Math.round(eData.bonusMultMax * 100f) + "%";

@@ -34,10 +34,14 @@ public class UnifiedLogistics extends SCBaseSkillPlugin {
         tooltip.addPara("Reduced by %s due to the dominance of other design types", 0f, Misc.getNegativeHighlightColor(), Math.round(pData.otherTypeDominancePenalty * 100f) + "%");
         tooltip.setBulletedListMode(null);
 
-        tooltip.addPara("%s (Max: %s) monthly supply consumption for ship maintenance", 10f, Misc.getHighlightColor(), Misc.getHighlightColor(), "-" + Math.round(pData.totalMult * SUPPLIES_PER_MONTH_MULT * 100f) + "%", Math.round(pData.bonusMultMax * SUPPLIES_PER_MONTH_MULT * 100f) + "%");
-        tooltip.addPara("%s (Max: %s) fuel usage", 0f, Misc.getHighlightColor(), Misc.getHighlightColor(), "-" + Math.round(pData.totalMult * FUEL_USE_MULT * 100f) + "%", Math.round(pData.bonusMultMax * FUEL_USE_MULT * 100f) + "%");
-        tooltip.addPara("%s (Max: %s) cargo capacity", 0f, Misc.getHighlightColor(), Misc.getHighlightColor(), "+" + Math.round(pData.totalMult * CARGO_CAP_MULT * 100f) + "%", Math.round(pData.bonusMultMax * CARGO_CAP_MULT * 100f) + "%");
-        tooltip.addPara("%s (Max: %s) fuel capacity", 0f, Misc.getHighlightColor(), Misc.getHighlightColor(), "+" + Math.round(pData.totalMult * FUEL_CAP_MULT * 100f) + "%", Math.round(pData.bonusMultMax * FUEL_CAP_MULT * 100f) + "%");
+        tooltip.addPara("%s monthly supply consumption for ship maintenance (%s × skill efficiency)", 10f, Misc.getHighlightColor(), Misc.getHighlightColor(),
+                "-" + Math.round(pData.totalMult * SUPPLIES_PER_MONTH_MULT * 100f) + "%", Math.round(SUPPLIES_PER_MONTH_MULT * 100f) + "%");
+        tooltip.addPara("%s fuel usage (%s × skill efficiency)", 0f, Misc.getHighlightColor(), Misc.getHighlightColor(),
+                "-" + Math.round(pData.totalMult * FUEL_USE_MULT * 100f) + "%", Math.round(FUEL_USE_MULT * 100f) + "%");
+        tooltip.addPara("%s cargo capacity (%s × skill efficiency)", 0f, Misc.getHighlightColor(), Misc.getHighlightColor(),
+                "+" + Math.round(pData.totalMult * CARGO_CAP_MULT * 100f) + "%", Math.round(CARGO_CAP_MULT * 100f) + "%");
+        tooltip.addPara("%s fuel capacity (%s × skill efficiency)", 0f, Misc.getHighlightColor(), Misc.getHighlightColor(),
+                "+" + Math.round(pData.totalMult * FUEL_CAP_MULT * 100f) + "%", Math.round(FUEL_CAP_MULT * 100f) + "%");
 
         String statReductionMultText = Math.round(AptitudePurist.SKILL_EFFECT_REDUCTION_MULT * 100f) + "%";
         String dominantFractionText = Math.round(AptitudePurist.AVERAGE_DESIGN_TYPE_NEEDED * 100f) + "%";

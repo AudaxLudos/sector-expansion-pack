@@ -30,9 +30,12 @@ public class SynchronizedDrives extends SCBaseSkillPlugin {
         tooltip.addPara("Reduced by %s due to the dominance of other design types", 0f, Misc.getNegativeHighlightColor(), Math.round(pData.otherTypeDominancePenalty * 100f) + "%");
         tooltip.setBulletedListMode(null);
 
-        tooltip.addPara("%s (Max: %s) maximum burn level", 10f, Misc.getHighlightColor(), Misc.getHighlightColor(), "+" + Math.round(pData.totalMult * MAX_BURN_MOD), "" + Math.round(pData.bonusMultMax * MAX_BURN_MOD));
-        tooltip.addPara("%s (Max: %s) maneuverability for the fleet outside of combat", 0f, Misc.getHighlightColor(), Misc.getHighlightColor(), "+" + Math.round(pData.totalMult * ACCELERATION_MULT * 100f) + "%", Math.round(pData.bonusMultMax * ACCELERATION_MULT * 100f) + "%");
-        tooltip.addPara("%s (Max: %s) burn level at which the fleet is considered to be moving slowly*", 0f, Misc.getHighlightColor(), Misc.getHighlightColor(), "+" + Math.round(pData.totalMult * MOVE_SLOW_SPEED_MOD), Math.round(pData.bonusMultMax * MOVE_SLOW_SPEED_MOD) + "");
+        tooltip.addPara("%s maximum burn level (%s × skill efficiency)", 10f, Misc.getHighlightColor(), Misc.getHighlightColor(),
+                "+" + Math.round(pData.totalMult * MAX_BURN_MOD), "" + Math.round(MAX_BURN_MOD));
+        tooltip.addPara("%s maneuverability for the fleet outside of combat (%s × skill efficiency)", 0f, Misc.getHighlightColor(), Misc.getHighlightColor(),
+                "+" + Math.round(pData.totalMult * ACCELERATION_MULT * 100f) + "%", Math.round(ACCELERATION_MULT * 100f) + "%");
+        tooltip.addPara("%s burn level at which the fleet is considered to be moving slowly* (%s × skill efficiency)", 0f, Misc.getHighlightColor(), Misc.getHighlightColor(),
+                "+" + Math.round(pData.totalMult * MOVE_SLOW_SPEED_MOD), Math.round(MOVE_SLOW_SPEED_MOD) + "");
 
         String statReductionMultText = Math.round(AptitudePurist.SKILL_EFFECT_REDUCTION_MULT * 100f) + "%";
         String dominantFractionText = Math.round(AptitudePurist.AVERAGE_DESIGN_TYPE_NEEDED * 100f) + "%";
@@ -42,6 +45,10 @@ public class SynchronizedDrives extends SCBaseSkillPlugin {
                 ". If " + dominantFractionText + " of the fleet is not the most common type skill efficiency is reduced by " + statReductionMultText, Misc.getGrayColor(), 10f);
         label.setHighlight(statReductionMultText, dominantFractionText, statReductionMultText);
         label.setHighlightColors(Misc.getNegativeHighlightColor(), Misc.getHighlightColor(), Misc.getNegativeHighlightColor());
+
+        tooltip.addPara("*A slow-moving fleet is harder to detect in some types of terrain, and can avoid some hazards. " +
+                "Some abilities also make the fleet move slowly when activated. " +
+                "A fleet is considered slow-moving at a burn level of half that of its slowest ship.", Misc.getGrayColor(), 10f);
     }
 
     @Override

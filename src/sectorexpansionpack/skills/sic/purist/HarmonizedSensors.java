@@ -29,9 +29,12 @@ public class HarmonizedSensors extends SCBaseSkillPlugin {
         tooltip.addPara("Reduced by %s due to the dominance of other design types", 0f, Misc.getNegativeHighlightColor(), Math.round(pData.otherTypeDominancePenalty * 100f) + "%");
         tooltip.setBulletedListMode(null);
 
-        tooltip.addPara("%s (Max: %s) detected-at range", 10f, Misc.getHighlightColor(), Misc.getHighlightColor(), "-" + Math.round(pData.totalMult * DETECTED_RANGE_MULT * 100f) + "%", Math.round(pData.bonusMultMax * DETECTED_RANGE_MULT * 100f) + "%");
-        tooltip.addPara("%s (Max: %s) sensor profile", 0f, Misc.getHighlightColor(), Misc.getHighlightColor(), "-" + Math.round(pData.totalMult * SENSOR_PROFILE_MULT * 100f) + "%", Math.round(pData.bonusMultMax * SENSOR_PROFILE_MULT * 100f) + "%");
-        tooltip.addPara("%s (Max: %s) sensor range", 0f, Misc.getHighlightColor(), Misc.getHighlightColor(), "+" + Math.round(pData.totalMult * SENSOR_RANGE_MULT * 100f) + "%", Math.round(pData.bonusMultMax * SENSOR_RANGE_MULT * 100f) + "%");
+        tooltip.addPara("%s detected-at range (%s × skill efficiency)", 10f, Misc.getHighlightColor(), Misc.getHighlightColor(),
+                "-" + Math.round(pData.totalMult * DETECTED_RANGE_MULT * 100f) + "%", Math.round(DETECTED_RANGE_MULT * 100f) + "%");
+        tooltip.addPara("%s sensor profile (%s × skill efficiency)", 0f, Misc.getHighlightColor(), Misc.getHighlightColor(),
+                "-" + Math.round(pData.totalMult * SENSOR_PROFILE_MULT * 100f) + "%", Math.round(SENSOR_PROFILE_MULT * 100f) + "%");
+        tooltip.addPara("%s sensor range (%s × skill efficiency)", 0f, Misc.getHighlightColor(), Misc.getHighlightColor(),
+                "+" + Math.round(pData.totalMult * SENSOR_RANGE_MULT * 100f) + "%", Math.round(SENSOR_RANGE_MULT * 100f) + "%");
 
         String statReductionMultText = Math.round(AptitudePurist.SKILL_EFFECT_REDUCTION_MULT * 100f) + "%";
         String dominantFractionText = Math.round(AptitudePurist.AVERAGE_DESIGN_TYPE_NEEDED * 100f) + "%";

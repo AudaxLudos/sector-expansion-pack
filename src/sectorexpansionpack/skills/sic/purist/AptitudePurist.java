@@ -131,7 +131,7 @@ public class AptitudePurist extends SCBaseAptitudePlugin {
             return 0f;
         } else if (pData.nonCommonTypeCount == 2) {
             return 0.50f;
-        } else if  (pData.nonCommonTypeCount == 1) {
+        } else if (pData.nonCommonTypeCount == 1) {
             return 0.75f;
         }
         return 1f;

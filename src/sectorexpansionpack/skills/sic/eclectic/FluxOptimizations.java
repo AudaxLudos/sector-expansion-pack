@@ -30,8 +30,10 @@ public class FluxOptimizations extends SCBaseSkillPlugin {
         tooltip.addPara("Reduced by %s due to %s design types above their ship limit", 0f, new Color[]{Misc.getNegativeHighlightColor(), Misc.getHighlightColor()}, Math.round(eData.penaltyMult * 100f) + "%", eData.designTypesAboveLimit + "");
         tooltip.setBulletedListMode(null);
 
-        tooltip.addPara("%s (Max: %s) flux dissipation", 10f, Misc.getHighlightColor(), Misc.getHighlightColor(), "+" + Math.round(eData.totalMult * FLUX_DISSIPATION_MULT * 100f) + "%", Math.round(eData.bonusMultMax * FLUX_DISSIPATION_MULT * 100f) + "%");
-        tooltip.addPara("%s (Max: %s) flux capacity", 0f, Misc.getHighlightColor(), Misc.getHighlightColor(), "+" + Math.round(eData.totalMult * FLUX_CAPACITY_MULT * 100f) + "%", Math.round(eData.bonusMultMax * FLUX_CAPACITY_MULT * 100f) + "%");
+        tooltip.addPara("%s flux dissipation (%s × skill efficiency)", 10f, Misc.getHighlightColor(), Misc.getHighlightColor(),
+                "+" + Math.round(eData.totalMult * FLUX_DISSIPATION_MULT * 100f) + "%", Math.round(FLUX_DISSIPATION_MULT * 100f) + "%");
+        tooltip.addPara("%s flux capacity (%s × skill efficiency)", 0f, Misc.getHighlightColor(), Misc.getHighlightColor(),
+                "+" + Math.round(eData.totalMult * FLUX_CAPACITY_MULT * 100f) + "%", Math.round(FLUX_CAPACITY_MULT * 100f) + "%");
 
         String designTypeShipLimit = eData.designTypesShipLimit + "";
         String multLimit = Math.round(eData.bonusMultMax * 100f) + "%";

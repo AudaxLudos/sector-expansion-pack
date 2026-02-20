@@ -30,8 +30,10 @@ public class LogisticsReallocation extends SCBaseSkillPlugin {
         tooltip.addPara("Reduced by %s due to %s design types above their ship limit", 0f, new Color[]{Misc.getNegativeHighlightColor(), Misc.getHighlightColor()}, Math.round(eData.penaltyMult * 100f) + "%", eData.designTypesAboveLimit + "");
         tooltip.setBulletedListMode(null);
 
-        tooltip.addPara("%s (Max: %s) monthly supply consumption for ship maintenance", 10f, Misc.getHighlightColor(), Misc.getHighlightColor(), "-" + Math.round(eData.totalMult * SUPPLIES_PER_MONTH_MULT * 100f) + "%", Math.round(eData.bonusMultMax * SUPPLIES_PER_MONTH_MULT * 100f) + "%");
-        tooltip.addPara("%s (Max: %s) fuel usage", 0f, Misc.getHighlightColor(), Misc.getHighlightColor(), "-" + Math.round(eData.totalMult * FUEL_USE_MULT * 100f) + "%", Math.round(eData.bonusMultMax * FUEL_USE_MULT * 100f) + "%");
+        tooltip.addPara("%s monthly supply consumption for ship maintenance (%s × skill efficiency)", 10f, Misc.getHighlightColor(), Misc.getHighlightColor(),
+                "-" + Math.round(eData.totalMult * SUPPLIES_PER_MONTH_MULT * 100f) + "%", Math.round(SUPPLIES_PER_MONTH_MULT * 100f) + "%");
+        tooltip.addPara("%s fuel consumption (%s × skill efficiency)", 0f, Misc.getHighlightColor(), Misc.getHighlightColor(),
+                "-" + Math.round(eData.totalMult * FUEL_USE_MULT * 100f) + "%", Math.round(FUEL_USE_MULT * 100f) + "%");
 
         String designTypeShipLimit = eData.designTypesShipLimit + "";
         String multLimit = Math.round(eData.bonusMultMax * 100f) + "%";
