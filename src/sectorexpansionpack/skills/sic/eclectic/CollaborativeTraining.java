@@ -11,7 +11,6 @@ import java.awt.*;
 
 public class CollaborativeTraining extends SCBaseSkillPlugin {
     public static int OFFICER_MAX_ELITE_SKILLS_MOD = 1;
-    public static int OFFICER_MAX_LEVEL_MOD = 1;
 
     @Override
     public String getAffectsString() {
@@ -28,7 +27,6 @@ public class CollaborativeTraining extends SCBaseSkillPlugin {
         tooltip.addPara("Reduced by %s due to %s design types above their ship limit", 0f, new Color[]{Misc.getNegativeHighlightColor(), Misc.getHighlightColor()}, Math.round(eData.penaltyMult * 100f) + "%", eData.designTypesAboveLimit + "");
         tooltip.setBulletedListMode(null);
 
-        tooltip.addPara("%s (Max: %s) to maximum level of officers under your command", 10f, Misc.getHighlightColor(), Misc.getHighlightColor(), "+" + Math.round(eData.totalMult * OFFICER_MAX_LEVEL_MOD), Math.round(eData.bonusMultMax * OFFICER_MAX_LEVEL_MOD) + "");
         tooltip.addPara("%s (Max: %s) to maximum number of elite skills for officers under your command*", 0f, Misc.getHighlightColor(), Misc.getHighlightColor(), "+" + Math.round(eData.totalMult * OFFICER_MAX_ELITE_SKILLS_MOD), Math.round(eData.bonusMultMax * OFFICER_MAX_ELITE_SKILLS_MOD) + "");
 
         String designTypeShipLimit = eData.designTypesShipLimit + "";
@@ -39,21 +37,17 @@ public class CollaborativeTraining extends SCBaseSkillPlugin {
                 ". Every design type above their ship limit reduces skill efficiency by " + perTypeMult, Misc.getGrayColor(), 10f);
         label.setHighlight(multLimit, perTypeMult, multLimit, designTypeShipLimit, perTypeMult);
         label.setHighlightColors(Misc.getHighlightColor(), Misc.getPositiveHighlightColor(), Misc.getHighlightColor(), Misc.getHighlightColor(), Misc.getNegativeHighlightColor());
-
-        tooltip.addPara("*If this skill is unassigned officers over the level limit will have excess skills made inactive, prioritising elite skills", 10f, Misc.getGrayColor(), Misc.getHighlightColor());
     }
 
     @Override
     public void onActivation(SCData data) {
         AptitudeEclectic.EclecticFleetData eData = AptitudeEclectic.getEclecticFleetData(data);
 
-        data.getCommander().getStats().getDynamic().getMod(Stats.OFFICER_MAX_LEVEL_MOD).modifyFlat(getId(), 1f + eData.totalMult * OFFICER_MAX_LEVEL_MOD);
         data.getCommander().getStats().getDynamic().getMod(Stats.OFFICER_MAX_ELITE_SKILLS_MOD).modifyFlat(getId(), 1f + eData.totalMult * OFFICER_MAX_ELITE_SKILLS_MOD);
     }
 
     @Override
     public void onDeactivation(SCData data) {
-        data.getCommander().getStats().getDynamic().getMod(Stats.OFFICER_MAX_LEVEL_MOD).unmodify(getId());
         data.getCommander().getStats().getDynamic().getMod(Stats.OFFICER_MAX_ELITE_SKILLS_MOD).unmodify(getId());
     }
 }
