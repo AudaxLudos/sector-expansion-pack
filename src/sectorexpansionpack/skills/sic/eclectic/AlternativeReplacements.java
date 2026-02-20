@@ -12,8 +12,8 @@ import second_in_command.specs.SCBaseSkillPlugin;
 import java.awt.*;
 
 public class AlternativeReplacements extends SCBaseSkillPlugin {
-    public static float REPAIR_RATE_PER_DAY_MULT = 0.40f;
-    public static float CR_RECOVERY_RATE_PER_DAY_MOD = 0.05f;
+    public static float REPAIR_RATE_PER_DAY_MULT = 0.30f;
+    public static float CR_RECOVERY_RATE_PER_DAY_MOD = 0.04f;
 
     @Override
     public String getAffectsString() {
