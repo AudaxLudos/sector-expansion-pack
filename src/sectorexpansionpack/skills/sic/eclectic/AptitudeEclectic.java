@@ -91,6 +91,7 @@ public class AptitudeEclectic extends SCBaseAptitudePlugin {
         SCAptitudeSection section2 = new SCAptitudeSection(true, 2, "industry1");
         section2.addSkill("sep_sic_collaborative_training");
         section2.addSkill("sep_sic_flux_optimizations");
+        section2.addSkill("sep_sic_weakness_mitigation");
         addSection(section2);
 
         SCAptitudeSection section3 = new SCAptitudeSection(false, 4, "industry1");
