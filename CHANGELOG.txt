@@ -1,3 +1,29 @@
+### 0.1.159a
+- Add second-in-command eclectic aptitude and skills
+- Add civilian tolerance purist skill
+- Rebalance baseline restoration purist skill
+    - Reduce supply consumption per month multiplier to 20% from 25%
+    - Reduce fuel use multiplier to 20% from 25%
+- Rebalance equipment familiarity purist skill
+    - Reduce crew requirement multiplier to 15% from 20%
+    - Reduce peak performance multiplier to 15% from 20%
+- Rebalance harmonized sensors purist skill
+    - Remove detected-at range multiplier
+    - Reduce sensor profile multiplier to 20% from 25%
+    - Reduce sensor range multiplier to 20% from 25%
+- Rebalance standard repairs purist skill
+    - Reduce repair rate outside of combat multiplier to 30% from 40%
+    - Reduce combat readiness flat recovery rate modifier to 4% from 5%
+- Rebalance optimized engines purist skill
+    - Add fuel use multiplier of 20%
+    - Reduce max burn modifier to 1 from 2
+    - Remove fleet manoeuvrability multiplier
+    - Remove burn level at which fleet is considered slow modifier
+- Rename synchronized drives to optimized engines
+- Rebalance unified logistics purist skill
+    - Reduce supplies used per month multiplier to 20% from 25%
+    - Remove fuel use multiplier
+
 ### 0.1.101a
 - Add second-in-command purist aptitude and skills
 - Fix crash when source market system for expedition is non-existent
