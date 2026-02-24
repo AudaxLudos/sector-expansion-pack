@@ -46,10 +46,6 @@ public class OptimizedEngines extends SCBaseSkillPlugin {
                 ". If " + dominantFractionText + " of the fleet is not the most common type skill efficiency is reduced by " + statReductionMultText, Misc.getGrayColor(), 10f);
         label.setHighlight(statReductionMultText, dominantFractionText, statReductionMultText);
         label.setHighlightColors(Misc.getNegativeHighlightColor(), Misc.getHighlightColor(), Misc.getNegativeHighlightColor());
-
-        tooltip.addPara("*A slow-moving fleet is harder to detect in some types of terrain, and can avoid some hazards. " +
-                "Some abilities also make the fleet move slowly when activated. " +
-                "A fleet is considered slow-moving at a burn level of half that of its slowest ship.", Misc.getGrayColor(), 10f);
     }
 
     @Override

@@ -2,11 +2,13 @@ package sectorexpansionpack.skills.sic.purist;
 
 import com.fs.starfarer.api.campaign.CampaignFleetAPI;
 import com.fs.starfarer.api.fleet.FleetMemberAPI;
+import com.fs.starfarer.api.impl.campaign.ids.HullMods;
 import com.fs.starfarer.api.ui.TooltipMakerAPI;
 import com.fs.starfarer.api.util.Misc;
 import second_in_command.SCData;
 import second_in_command.specs.SCAptitudeSection;
 import second_in_command.specs.SCBaseAptitudePlugin;
+import second_in_command.specs.SCBaseSkillPlugin;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -23,10 +25,27 @@ public class AptitudePurist extends SCBaseAptitudePlugin {
         Map<String, Integer> counts = new HashMap<>();
         float totalShips = 0;
 
+        for (SCBaseSkillPlugin skill : data.getAllActiveSkillsPlugins()) {
+            if (Objects.equals(skill.getId(), "sep_sic_civilian_tolerance")) {
+                pData.hasCivilianTolerance = true;
+            } else if (Objects.equals(skill.getId(), "sep_sic_design_compromise")) {
+                pData.hasDesignCompromise = true;
+            } else if (Objects.equals(skill.getId(), "sep_sic_doctrine_extremism")) {
+                pData.hasDoctrineExtremism = true;
+            }
+        }
+
         for (FleetMemberAPI member : data.getFleet().getFleetData().getMembersListCopy()) {
             String type = member.getVariant().getHullSpec().getManufacturer();
-            counts.merge(type, 1, Integer::sum);
-            totalShips++;
+            if (pData.hasCivilianTolerance) {
+                if (!member.getVariant().isCivilian()) {
+                    counts.merge(type, 1, Integer::sum);
+                    totalShips++;
+                }
+            } else {
+                counts.merge(type, 1, Integer::sum);
+                totalShips++;
+            }
         }
 
         pData.primary = counts.entrySet()
@@ -41,13 +60,6 @@ public class AptitudePurist extends SCBaseAptitudePlugin {
                 .max(Map.Entry.comparingByValue())
                 .map(Map.Entry::getKey)
                 .orElse(null);
-
-        pData.hasDesignCompromise = data.getAllActiveSkillsPlugins()
-                .stream()
-                .anyMatch(s -> Objects.equals(s.getId(), "sep_sic_design_compromise"));
-        pData.hasDoctrineExtremism = data.getAllActiveSkillsPlugins()
-                .stream()
-                .anyMatch(s -> Objects.equals(s.getId(), "sep_sic_doctrine_extremism"));
 
         pData.nonCommonTypeCount = 0;
         for (String type : counts.keySet()) {
@@ -107,6 +119,7 @@ public class AptitudePurist extends SCBaseAptitudePlugin {
     public void createSections() {
         SCAptitudeSection section1 = new SCAptitudeSection(true, 0, "industry1");
         section1.addSkill("sep_sic_baseline_restoration");
+        section1.addSkill("sep_sic_civilian_tolerance");
         section1.addSkill("sep_sic_harmonized_sensors");
         section1.addSkill("sep_sic_standard_repairs");
         section1.addSkill("sep_sic_unified_logistics");
@@ -151,6 +164,7 @@ public class AptitudePurist extends SCBaseAptitudePlugin {
     public static class PuristFleetData {
         String primary;
         String secondary;
+        boolean hasCivilianTolerance = false;
         boolean hasDesignCompromise = false;
         boolean hasDoctrineExtremism = false;
         int nonCommonTypeCount;

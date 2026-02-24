@@ -16,6 +16,7 @@ sep_sic_weakness_mitigation,Weakness Mitigation,graphics/sectorexpansionpack/ico
 ,,,,
 #Purist,,,,
 sep_sic_baseline_restoration,Baseline Restoration,graphics/sectorexpansionpack/icons/skills/purist/baseline_restoration.png,1,sectorexpansionpack.skills.sic.purist.BaselineRestoration
+sep_sic_civilian_tolerance,Civilian Tolerance,graphics/sectorexpansionpack/icons/skills/purist/design_compromise.png,5,sectorexpansionpack.skills.sic.purist.CivilianTolerance
 sep_sic_design_compromise,Design Compromise,graphics/sectorexpansionpack/icons/skills/purist/design_compromise.png,5,sectorexpansionpack.skills.sic.purist.DesignCompromise
 sep_sic_doctrine_extremism,Doctrine Extremism,graphics/sectorexpansionpack/icons/skills/purist/doctrine_extremism.png,1,sectorexpansionpack.skills.sic.purist.DoctrineExtremism
 sep_sic_efficient_operations,Efficient Operations,graphics/sectorexpansionpack/icons/skills/purist/efficient_operations.png,5,sectorexpansionpack.skills.sic.purist.EfficientOperations

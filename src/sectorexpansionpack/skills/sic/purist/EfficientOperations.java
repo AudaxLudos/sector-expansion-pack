@@ -34,7 +34,7 @@ public class EfficientOperations extends SCBaseSkillPlugin {
         tooltip.setBulletedListMode(null);
 
         tooltip.addPara("Deployment point cost reduced by %s or %s, whichever is less (%s or %s × skill efficiency)", 10f, Misc.getHighlightColor(), Misc.getHighlightColor(),
-                Math.round(pData.totalMult * DP_REDUCTION_MULT * 100f) + "%", Math.round(DP_REDUCTION_MAX) + "",
+                Math.round(pData.totalMult * DP_REDUCTION_MULT * 100f) + "%", Math.round(pData.totalMult * DP_REDUCTION_MAX) + "",
                 Math.round(pData.totalMult * DP_REDUCTION_MULT * 100f) + "%", Math.round(DP_REDUCTION_MAX) + "");
 
         String statReductionMultText = Math.round(AptitudePurist.SKILL_EFFECT_REDUCTION_MULT * 100f) + "%";
