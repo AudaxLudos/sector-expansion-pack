@@ -9,8 +9,7 @@ import second_in_command.specs.SCBaseSkillPlugin;
 
 import java.awt.*;
 
-// TODO: joint salvaging
-public class JointReclamation extends SCBaseSkillPlugin {
+public class JointSalvaging extends SCBaseSkillPlugin {
     public static float POST_BATTLE_SALVAGE_MOD = 0.3f;
     public static float FUEL_SALVAGE_BONUS = 0.3f;
     public static float NON_COMBAT_CREW_LOSS_MULT = 0.4f;

@@ -7,7 +7,7 @@ sep_sic_diverse_fleet,Diverse Fleet,graphics/sectorexpansionpack/icons/skills/ec
 sep_sic_every_nook_and_cranny,Every Nook and Cranny,graphics/sectorexpansionpack/icons/skills/eclectic/every_nook_and_cranny.png,0,sectorexpansionpack.skills.sic.eclectic.EveryNookAndCranny
 sep_sic_flux_optimizations,Flux Optimizations,graphics/sectorexpansionpack/icons/skills/eclectic/flux_optimizations.png,1,sectorexpansionpack.skills.sic.eclectic.FluxOptimizations
 sep_sic_improvised_restoration,Improvised Restoration,graphics/sectorexpansionpack/icons/skills/eclectic/improvised_restoration.png,0,sectorexpansionpack.skills.sic.eclectic.ImprovisedRestoration
-sep_sic_joint_reclamation,Joint Reclamation,graphics/sectorexpansionpack/icons/skills/eclectic/joint_reclamation.png,0,sectorexpansionpack.skills.sic.eclectic.JointReclamation
+sep_sic_joint_salvaging,Joint Salvaging,graphics/sectorexpansionpack/icons/skills/eclectic/joint_salvaging.png,0,sectorexpansionpack.skills.sic.eclectic.JointSalvaging
 sep_sic_logistics_reallocation,Logistics Reallocation,graphics/sectorexpansionpack/icons/skills/eclectic/logistics_reallocation.png,1,sectorexpansionpack.skills.sic.eclectic.LogisticsReallocation
 sep_sic_shared_telemetry,Shared Telemetry,graphics/sectorexpansionpack/icons/skills/eclectic/shared_telemetry.png,1,sectorexpansionpack.skills.sic.eclectic.SharedTelemetry
 sep_sic_weakness_mitigation,Weakness Mitigation,graphics/sectorexpansionpack/icons/skills/eclectic/weakness_mitigation.png,1,sectorexpansionpack.skills.sic.eclectic.WeaknessMitigation
