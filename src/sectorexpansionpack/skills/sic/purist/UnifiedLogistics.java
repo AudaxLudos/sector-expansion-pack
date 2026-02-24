@@ -14,7 +14,6 @@ import java.util.Objects;
 
 public class UnifiedLogistics extends SCBaseSkillPlugin {
     public static float SUPPLIES_PER_MONTH_MULT = 0.20f;
-    public static float FUEL_USE_MULT = 0.20f;
     public static float FUEL_CAP_MULT = 0.20f;
     public static float CARGO_CAP_MULT = 0.20f;
 
@@ -36,8 +35,6 @@ public class UnifiedLogistics extends SCBaseSkillPlugin {
 
         tooltip.addPara("%s monthly supply consumption for ship maintenance (%s × skill efficiency)", 10f, Misc.getHighlightColor(), Misc.getHighlightColor(),
                 "-" + Math.round(pData.totalMult * SUPPLIES_PER_MONTH_MULT * 100f) + "%", Math.round(SUPPLIES_PER_MONTH_MULT * 100f) + "%");
-        tooltip.addPara("%s fuel usage (%s × skill efficiency)", 0f, Misc.getHighlightColor(), Misc.getHighlightColor(),
-                "-" + Math.round(pData.totalMult * FUEL_USE_MULT * 100f) + "%", Math.round(FUEL_USE_MULT * 100f) + "%");
         tooltip.addPara("%s cargo capacity (%s × skill efficiency)", 0f, Misc.getHighlightColor(), Misc.getHighlightColor(),
                 "+" + Math.round(pData.totalMult * CARGO_CAP_MULT * 100f) + "%", Math.round(CARGO_CAP_MULT * 100f) + "%");
         tooltip.addPara("%s fuel capacity (%s × skill efficiency)", 0f, Misc.getHighlightColor(), Misc.getHighlightColor(),
@@ -60,7 +57,6 @@ public class UnifiedLogistics extends SCBaseSkillPlugin {
 
         if (Objects.equals(variantType, pData.primary) || (pData.hasDesignCompromise && Objects.equals(variantType, pData.secondary))) {
             stats.getSuppliesPerMonth().modifyMult(getId(), 1f - (pData.totalMult * SUPPLIES_PER_MONTH_MULT));
-            stats.getFuelUseMod().modifyMult(getId(), 1f - (pData.totalMult * FUEL_USE_MULT));
             stats.getFuelMod().modifyMult(getId(), 1f + (pData.totalMult * FUEL_CAP_MULT));
             stats.getCargoMod().modifyMult(getId(), 1f + (pData.totalMult * CARGO_CAP_MULT));
         }

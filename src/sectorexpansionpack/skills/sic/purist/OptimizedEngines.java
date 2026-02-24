@@ -19,7 +19,7 @@ public class OptimizedEngines extends SCBaseSkillPlugin {
 
     @Override
     public String getAffectsString() {
-        return "fleet";
+        return "ships with the most common design type";
     }
 
     @Override
