@@ -1,5 +1,8 @@
 package sectorexpansionpack.skills.sic.purist;
 
+import com.fs.starfarer.api.combat.MutableShipStatsAPI;
+import com.fs.starfarer.api.combat.ShipAPI;
+import com.fs.starfarer.api.combat.ShipVariantAPI;
 import com.fs.starfarer.api.impl.campaign.ids.Stats;
 import com.fs.starfarer.api.ui.LabelAPI;
 import com.fs.starfarer.api.ui.TooltipMakerAPI;
@@ -8,11 +11,11 @@ import second_in_command.SCData;
 import second_in_command.specs.SCBaseSkillPlugin;
 
 import java.awt.*;
+import java.util.Objects;
 
-public class SynchronizedDrives extends SCBaseSkillPlugin {
+public class OptimizedEngines extends SCBaseSkillPlugin {
     public static float MAX_BURN_MOD = 1f;
-    public static float ACCELERATION_MULT = 0.50f;
-    public static float MOVE_SLOW_SPEED_MOD = 2f;
+    public static float FUEL_USE_MULT = 0.20f;
 
     @Override
     public String getAffectsString() {
@@ -32,10 +35,8 @@ public class SynchronizedDrives extends SCBaseSkillPlugin {
 
         tooltip.addPara("%s maximum burn level (%s × skill efficiency)", 10f, Misc.getHighlightColor(), Misc.getHighlightColor(),
                 "+" + Math.round(pData.totalMult * MAX_BURN_MOD), "" + Math.round(MAX_BURN_MOD));
-        tooltip.addPara("%s maneuverability for the fleet outside of combat (%s × skill efficiency)", 0f, Misc.getHighlightColor(), Misc.getHighlightColor(),
-                "+" + Math.round(pData.totalMult * ACCELERATION_MULT * 100f) + "%", Math.round(ACCELERATION_MULT * 100f) + "%");
-        tooltip.addPara("%s burn level at which the fleet is considered to be moving slowly* (%s × skill efficiency)", 0f, Misc.getHighlightColor(), Misc.getHighlightColor(),
-                "+" + Math.round(pData.totalMult * MOVE_SLOW_SPEED_MOD), Math.round(MOVE_SLOW_SPEED_MOD) + "");
+        tooltip.addPara("%s fuel usage (%s × skill efficiency)", 0f, Misc.getHighlightColor(), Misc.getHighlightColor(),
+                "-" + Math.round(pData.totalMult * FUEL_USE_MULT * 100f) + "%", Math.round(FUEL_USE_MULT * 100f) + "%");
 
         String statReductionMultText = Math.round(AptitudePurist.SKILL_EFFECT_REDUCTION_MULT * 100f) + "%";
         String dominantFractionText = Math.round(AptitudePurist.AVERAGE_DESIGN_TYPE_NEEDED * 100f) + "%";
@@ -52,27 +53,13 @@ public class SynchronizedDrives extends SCBaseSkillPlugin {
     }
 
     @Override
-    public void advance(SCData data, Float amount) {
+    public void applyEffectsBeforeShipCreation(SCData data, MutableShipStatsAPI stats, ShipVariantAPI variant, ShipAPI.HullSize hullSize, String id) {
+        String variantType = variant.getHullSpec().getManufacturer();
         AptitudePurist.PuristFleetData pData = AptitudePurist.getPuristFleetData(data);
 
-        data.getFleet().getStats().getFleetwideMaxBurnMod().modifyFlat(getId(), (float) Math.round(pData.totalMult * MAX_BURN_MOD), "Synchronized Drives");
-        data.getFleet().getStats().getAccelerationMult().modifyMult(getId(), 1f + (pData.totalMult * ACCELERATION_MULT), "Synchronized Drives");
-        data.getFleet().getStats().getDynamic().getMod(Stats.MOVE_SLOW_SPEED_BONUS_MOD).modifyFlat(getId(), pData.totalMult * MOVE_SLOW_SPEED_MOD, "Synchronized Drives");
-    }
-
-    @Override
-    public void onActivation(SCData data) {
-        AptitudePurist.PuristFleetData pData = AptitudePurist.getPuristFleetData(data);
-
-        data.getFleet().getStats().getFleetwideMaxBurnMod().modifyFlat(getId(), (float) Math.round(pData.totalMult * MAX_BURN_MOD), "Synchronized Drives");
-        data.getFleet().getStats().getAccelerationMult().modifyMult(getId(), 1f + (pData.totalMult * ACCELERATION_MULT), "Synchronized Drives");
-        data.getFleet().getStats().getDynamic().getMod(Stats.MOVE_SLOW_SPEED_BONUS_MOD).modifyFlat(getId(), pData.totalMult * MOVE_SLOW_SPEED_MOD, "Synchronized Drives");
-    }
-
-    @Override
-    public void onDeactivation(SCData data) {
-        data.getFleet().getStats().getFleetwideMaxBurnMod().unmodify(getId());
-        data.getFleet().getStats().getAccelerationMult().unmodify(getId());
-        data.getFleet().getStats().getDynamic().getMod(Stats.MOVE_SLOW_SPEED_BONUS_MOD).unmodify(getId());
+        if (Objects.equals(variantType, pData.primary) || (pData.hasDesignCompromise && Objects.equals(variantType, pData.secondary))) {
+            stats.getMaxBurnLevel().modifyFlat(getId(), MAX_BURN_MOD);
+            stats.getFuelUseMod().modifyMult(getId(), 1f - (pData.totalMult * FUEL_USE_MULT));
+        }
     }
 }

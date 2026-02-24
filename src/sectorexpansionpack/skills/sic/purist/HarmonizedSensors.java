@@ -33,7 +33,7 @@ public class HarmonizedSensors extends SCBaseSkillPlugin {
         tooltip.addPara("Reduced by %s due to the dominance of other design types", 0f, Misc.getNegativeHighlightColor(), Math.round(pData.otherTypeDominancePenalty * 100f) + "%");
         tooltip.setBulletedListMode(null);
 
-        tooltip.addPara("%s sensor profile (%s × skill efficiency)", 0f, Misc.getHighlightColor(), Misc.getHighlightColor(),
+        tooltip.addPara("%s sensor profile (%s × skill efficiency)", 10f, Misc.getHighlightColor(), Misc.getHighlightColor(),
                 "-" + Math.round(pData.totalMult * SENSOR_PROFILE_MULT * 100f) + "%", Math.round(SENSOR_PROFILE_MULT * 100f) + "%");
         tooltip.addPara("%s sensor range (%s × skill efficiency)", 0f, Misc.getHighlightColor(), Misc.getHighlightColor(),
                 "+" + Math.round(pData.totalMult * SENSOR_RANGE_MULT * 100f) + "%", Math.round(SENSOR_RANGE_MULT * 100f) + "%");
@@ -54,8 +54,8 @@ public class HarmonizedSensors extends SCBaseSkillPlugin {
         AptitudePurist.PuristFleetData pData = AptitudePurist.getPuristFleetData(data);
 
         if (Objects.equals(variantType, pData.primary) || (pData.hasDesignCompromise && Objects.equals(variantType, pData.secondary))) {
-            data.getFleet().getStats().getSensorProfileMod().modifyMult(getId(), 1f - (pData.totalMult * SENSOR_PROFILE_MULT), "Harmonized Sensors");
-            data.getFleet().getStats().getSensorRangeMod().modifyMult(getId(), 1f + (pData.totalMult * SENSOR_RANGE_MULT), "Harmonized Sensors");
+            stats.getSensorProfile().modifyMult(getId(), 1f - (pData.totalMult * SENSOR_PROFILE_MULT), "Harmonized Sensors");
+            stats.getSensorStrength().modifyMult(getId(), 1f + (pData.totalMult * SENSOR_RANGE_MULT), "Harmonized Sensors");
         }
     }
 }
