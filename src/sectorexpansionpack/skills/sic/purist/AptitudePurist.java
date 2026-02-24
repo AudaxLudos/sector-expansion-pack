@@ -100,7 +100,7 @@ public class AptitudePurist extends SCBaseAptitudePlugin {
 
     @Override
     public String getOriginSkillId() {
-        return "sep_sic_synchronized_drives";
+        return "sep_sic_optimized_engines";
     }
 
     @Override
