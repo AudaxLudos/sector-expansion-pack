@@ -14,7 +14,7 @@ public class CollaborativeTraining extends SCBaseSkillPlugin {
 
     @Override
     public String getAffectsString() {
-        return "All officers";
+        return "all officers";
     }
 
     @Override

@@ -17,7 +17,7 @@ public class FluxOptimizations extends SCBaseSkillPlugin {
 
     @Override
     public String getAffectsString() {
-        return "All ships";
+        return "all ships";
     }
 
     @Override
