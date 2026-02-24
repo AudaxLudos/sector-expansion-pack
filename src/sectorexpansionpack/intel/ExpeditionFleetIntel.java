@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Random;
 
+// TODO: Integrate with Nexerlin
 public class ExpeditionFleetIntel extends FleetGroupIntel {
     public static final String PREPARE_ACTION = "prepare_action";
     public static final String GOTO_ACTION = "travel_action";

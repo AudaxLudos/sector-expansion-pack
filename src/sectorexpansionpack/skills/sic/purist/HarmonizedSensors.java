@@ -1,5 +1,9 @@
 package sectorexpansionpack.skills.sic.purist;
 
+import com.fs.starfarer.api.combat.MutableShipStatsAPI;
+import com.fs.starfarer.api.combat.ShipAPI;
+import com.fs.starfarer.api.combat.ShipVariantAPI;
+import com.fs.starfarer.api.impl.campaign.ids.Stats;
 import com.fs.starfarer.api.ui.LabelAPI;
 import com.fs.starfarer.api.ui.TooltipMakerAPI;
 import com.fs.starfarer.api.util.Misc;
@@ -7,15 +11,15 @@ import second_in_command.SCData;
 import second_in_command.specs.SCBaseSkillPlugin;
 
 import java.awt.*;
+import java.util.Objects;
 
 public class HarmonizedSensors extends SCBaseSkillPlugin {
-    public static float DETECTED_RANGE_MULT = 0.20f;
     public static float SENSOR_PROFILE_MULT = 0.20f;
     public static float SENSOR_RANGE_MULT = 0.20f;
 
     @Override
     public String getAffectsString() {
-        return "fleet";
+        return "ships with the most common design type";
     }
 
     @Override
@@ -29,8 +33,6 @@ public class HarmonizedSensors extends SCBaseSkillPlugin {
         tooltip.addPara("Reduced by %s due to the dominance of other design types", 0f, Misc.getNegativeHighlightColor(), Math.round(pData.otherTypeDominancePenalty * 100f) + "%");
         tooltip.setBulletedListMode(null);
 
-        tooltip.addPara("%s detected-at range (%s × skill efficiency)", 10f, Misc.getHighlightColor(), Misc.getHighlightColor(),
-                "-" + Math.round(pData.totalMult * DETECTED_RANGE_MULT * 100f) + "%", Math.round(DETECTED_RANGE_MULT * 100f) + "%");
         tooltip.addPara("%s sensor profile (%s × skill efficiency)", 0f, Misc.getHighlightColor(), Misc.getHighlightColor(),
                 "-" + Math.round(pData.totalMult * SENSOR_PROFILE_MULT * 100f) + "%", Math.round(SENSOR_PROFILE_MULT * 100f) + "%");
         tooltip.addPara("%s sensor range (%s × skill efficiency)", 0f, Misc.getHighlightColor(), Misc.getHighlightColor(),
@@ -47,27 +49,13 @@ public class HarmonizedSensors extends SCBaseSkillPlugin {
     }
 
     @Override
-    public void advance(SCData data, Float amount) {
+    public void applyEffectsBeforeShipCreation(SCData data, MutableShipStatsAPI stats, ShipVariantAPI variant, ShipAPI.HullSize hullSize, String id) {
+        String variantType = variant.getHullSpec().getManufacturer();
         AptitudePurist.PuristFleetData pData = AptitudePurist.getPuristFleetData(data);
 
-        data.getFleet().getStats().getDetectedRangeMod().modifyMult(getId(), 1f - (pData.totalMult * DETECTED_RANGE_MULT), "Harmonized Sensors");
-        data.getFleet().getStats().getSensorProfileMod().modifyMult(getId(), 1f - (pData.totalMult * SENSOR_PROFILE_MULT), "Harmonized Sensors");
-        data.getFleet().getStats().getSensorRangeMod().modifyMult(getId(), 1f + (pData.totalMult * SENSOR_RANGE_MULT), "Harmonized Sensors");
-    }
-
-    @Override
-    public void onActivation(SCData data) {
-        AptitudePurist.PuristFleetData pData = AptitudePurist.getPuristFleetData(data);
-
-        data.getFleet().getStats().getDetectedRangeMod().modifyMult(getId(), 1f - (pData.totalMult * DETECTED_RANGE_MULT), "Harmonized Sensors");
-        data.getFleet().getStats().getSensorProfileMod().modifyMult(getId(), 1f - (pData.totalMult * SENSOR_PROFILE_MULT), "Harmonized Sensors");
-        data.getFleet().getStats().getSensorRangeMod().modifyMult(getId(), 1f + (pData.totalMult * SENSOR_RANGE_MULT), "Harmonized Sensors");
-    }
-
-    @Override
-    public void onDeactivation(SCData data) {
-        data.getFleet().getStats().getDetectedRangeMod().unmodify(getId());
-        data.getFleet().getStats().getSensorProfileMod().unmodify(getId());
-        data.getFleet().getStats().getSensorRangeMod().unmodify(getId());
+        if (Objects.equals(variantType, pData.primary) || (pData.hasDesignCompromise && Objects.equals(variantType, pData.secondary))) {
+            data.getFleet().getStats().getSensorProfileMod().modifyMult(getId(), 1f - (pData.totalMult * SENSOR_PROFILE_MULT), "Harmonized Sensors");
+            data.getFleet().getStats().getSensorRangeMod().modifyMult(getId(), 1f + (pData.totalMult * SENSOR_RANGE_MULT), "Harmonized Sensors");
+        }
     }
 }

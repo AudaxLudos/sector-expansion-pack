@@ -5,7 +5,6 @@ import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.impl.campaign.intel.BaseEventManager;
 import sectorexpansionpack.Settings;
 
-// IDEA: Delay incursions until enough colony items are used by all factions
 public class IncursionFleetManager extends BaseEventManager {
     public static final String KEY = "$sep_core_artifactIncursionManager";
     protected int counter = 0;
