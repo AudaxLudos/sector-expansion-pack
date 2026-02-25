@@ -13,6 +13,10 @@ public class CivilianTolerance extends SCBaseSkillPlugin {
 
     @Override
     public void addTooltip(SCData data, TooltipMakerAPI tooltip) {
-        tooltip.addPara("Exclude civilian ships from penalty calculations (does not apply bonuses to civilian ships)", Misc.getHighlightColor(), 0f);
+        tooltip.addPara("Exclude civilian ships from penalty calculations", Misc.getHighlightColor(), 0f);
+        tooltip.setBulletedListMode("   - ");
+        tooltip.addPara("Civilian ships with the most common design type is unaffected", 0f, Misc.getHighlightColor());
+        tooltip.addPara("If design compromise skill is active, civilian ships with the second most common design type is unaffected", 0f, Misc.getHighlightColor());
+        tooltip.setBulletedListMode(null);
     }
 }
