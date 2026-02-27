@@ -152,10 +152,9 @@ public class AptitudePurist extends SCBaseAptitudePlugin {
     @Override
     public void addCodexDescription(TooltipMakerAPI tooltip) {
         tooltip.addPara(
-                "The %s aptitude rewards fleets built around a single design type, granting broad improvements " +
-                        "to ships with the most common design type. The presence of ships with other design types reduces " +
-                        "the effectiveness of such improvements. As a result, the aptitude favors a disciplined fleet " +
-                        "composition and is well suited to captains seeking to enforce consistent fleet standards.",
+                "The %s aptitude rewards captains who use only a single ship design type in their fleet, " +
+                        "granting broad improvements to those ships. However, for every other design type present " +
+                        "in the fleet, these improvements become less effective.",
                 0f,
                 Misc.getTextColor(),
                 Misc.getHighlightColor(),

@@ -118,10 +118,9 @@ public class AptitudeEclectic extends SCBaseAptitudePlugin {
 
     @Override
     public void addCodexDescription(TooltipMakerAPI tooltip) {
-        tooltip.addPara("The %s aptitude rewards fleets built around diverse ship designs, allowing vessels " +
-                        "to share strengths and offset weaknesses through varied design philosophies. If any single design begins " +
-                        "to dominate, these shared improvements become skewed and less effective. The aptitude favors balanced " +
-                        "diversity, rewarding captains who maximize fleet adaptability through careful composition.",
+        tooltip.addPara("Eclectic is an aptitude that favors the use of different ship design types, granting " +
+                        "broad improvements that scale with each different design present in the fleet. However, if any " +
+                        "single design begins to dominate, these improvements become less effective.",
                 0f,
                 Misc.getTextColor(),
                 Misc.getHighlightColor(),
