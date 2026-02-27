@@ -8,6 +8,8 @@ import second_in_command.specs.SCBaseSkillPlugin;
 
 import java.awt.*;
 
+// TODO: Reduce sensor profile mult to 15%
+// TODO: Reduce sensor range mult to 15%
 public class SharedTelemetry extends SCBaseSkillPlugin {
     public static float SENSOR_PROFILE_MULT = 0.20f;
     public static float SENSOR_RANGE_MULT = 0.20f;

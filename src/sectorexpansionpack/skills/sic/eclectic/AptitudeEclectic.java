@@ -3,6 +3,7 @@ package sectorexpansionpack.skills.sic.eclectic;
 import com.fs.starfarer.api.campaign.CampaignFleetAPI;
 import com.fs.starfarer.api.fleet.FleetMemberAPI;
 import com.fs.starfarer.api.ui.TooltipMakerAPI;
+import com.fs.starfarer.api.util.Misc;
 import second_in_command.SCData;
 import second_in_command.specs.SCAptitudeSection;
 import second_in_command.specs.SCBaseAptitudePlugin;
@@ -117,7 +118,14 @@ public class AptitudeEclectic extends SCBaseAptitudePlugin {
 
     @Override
     public void addCodexDescription(TooltipMakerAPI tooltip) {
-        tooltip.addPara("test", 0f);
+        tooltip.addPara("The %s aptitude rewards fleets built around diverse ship designs, allowing vessels " +
+                        "to share strengths and offset weaknesses through varied design philosophies. If any single design begins " +
+                        "to dominate, these shared improvements become skewed and less effective. The aptitude favors balanced " +
+                        "diversity, rewarding captains who maximize fleet adaptability through careful composition.",
+                0f,
+                Misc.getTextColor(),
+                Misc.getHighlightColor(),
+                getName());
     }
 
     public static class EclecticFleetData {
