@@ -14,8 +14,8 @@ import java.util.Objects;
 
 public class TechFamiliarity extends SCBaseSkillPlugin {
     public static float CREW_MIN_REQ_MULT = 0.15f;
-    public static float PEAK_PERFORMANCE_TIME_MULT = 0.15f;
-    public static float MAX_COMBAT_READINESS_MOD = 0.15f;
+    public static float PEAK_PERFORMANCE_TIME_MOD = 75f;
+    public static float MAX_COMBAT_READINESS_MOD = 0.10f;
 
     @Override
     public String getAffectsString() {
@@ -35,8 +35,8 @@ public class TechFamiliarity extends SCBaseSkillPlugin {
 
         tooltip.addPara("%s minimum crew requirements (%s × skill efficiency)", 10f, Misc.getHighlightColor(), Misc.getHighlightColor(),
                 "-" + Math.round(pData.totalMult * CREW_MIN_REQ_MULT * 100f) + "%", Math.round(CREW_MIN_REQ_MULT * 100f) + "%");
-        tooltip.addPara("%s peak performance time (%s × skill efficiency)", 0f, Misc.getHighlightColor(), Misc.getHighlightColor(),
-                "+" + Math.round(pData.totalMult * PEAK_PERFORMANCE_TIME_MULT * 100f) + "%", Math.round(PEAK_PERFORMANCE_TIME_MULT * 100f) + "%");
+        tooltip.addPara("%s seconds peak operating time (%s × skill efficiency)", 0f, Misc.getHighlightColor(), Misc.getHighlightColor(),
+                "+" + Math.round(pData.totalMult * PEAK_PERFORMANCE_TIME_MOD * 100f) + "%", Math.round(PEAK_PERFORMANCE_TIME_MOD * 100f) + "%");
         tooltip.addPara("%s max combat readiness (%s × skill efficiency)", 0f, Misc.getHighlightColor(), Misc.getHighlightColor(),
                 "+" + Math.round(pData.totalMult * MAX_COMBAT_READINESS_MOD * 100f) + "%", Math.round(MAX_COMBAT_READINESS_MOD * 100f) + "%");
 
@@ -57,7 +57,7 @@ public class TechFamiliarity extends SCBaseSkillPlugin {
 
         if (Objects.equals(variantType, pData.primary) || (pData.hasDesignCompromise && Objects.equals(variantType, pData.secondary))) {
             stats.getMinCrewMod().modifyMult(getId(), 1f - (pData.totalMult * CREW_MIN_REQ_MULT));
-            stats.getPeakCRDuration().modifyMult(getId(), 1f + (pData.totalMult * PEAK_PERFORMANCE_TIME_MULT));
+            stats.getPeakCRDuration().modifyFlat(getId(), pData.totalMult * PEAK_PERFORMANCE_TIME_MOD);
             stats.getMaxCombatReadiness().modifyFlat(getId(), pData.totalMult * MAX_COMBAT_READINESS_MOD, "Tech Familiarity");
         }
     }
