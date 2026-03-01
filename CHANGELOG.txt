@@ -1,12 +1,14 @@
-### 0.1.159a
+### 0.1.167a
+- Fix crash when abandoning search and rescue mission
+- Update second in command aptitude descriptions
 - Add second-in-command eclectic aptitude and skills
 - Add civilian tolerance purist skill
 - Rebalance baseline restoration purist skill
     - Reduce supply consumption per month multiplier to 20% from 25%
     - Reduce fuel use multiplier to 20% from 25%
 - Rebalance equipment familiarity purist skill
-    - Reduce crew requirement multiplier to 15% from 20%
-    - Reduce peak performance multiplier to 15% from 20%
+    - Change peak performance time multiplier to modifier of 75 seconds
+    - Reduce combat readiness mod to 10% from 15%
 - Rebalance harmonized sensors purist skill
     - Remove detected-at range multiplier
     - Reduce sensor profile multiplier to 20% from 25%
