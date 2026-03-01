@@ -482,6 +482,10 @@ public class SearchAndRescueMission extends SEPHubMissionWithScenario {
 
     @Override
     public List<ArrowData> getArrowData(SectorMapAPI map) {
+        if (map == null || getMapLocation(map) == null) {
+            return null;
+        }
+
         List<ArrowData> result = new ArrayList<>();
 
         ArrowData arrow = new ArrowData(Global.getSector().getPlayerFleet(), getMapLocation(map));
