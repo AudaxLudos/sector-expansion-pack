@@ -10,6 +10,7 @@
     - Change peak performance time multiplier to modifier of 75 seconds
     - Reduce combat readiness mod to 10% from 15%
 - Rebalance harmonized sensors purist skill
+    - Change affected ships to ships with most common design type from fleet
     - Remove detected-at range multiplier
     - Reduce sensor profile multiplier to 20% from 25%
     - Reduce sensor range multiplier to 20% from 25%
@@ -17,12 +18,14 @@
     - Reduce repair rate outside of combat multiplier to 30% from 40%
     - Reduce combat readiness flat recovery rate modifier to 4% from 5%
 - Rebalance optimized engines purist skill
+    - Change affected ships to ships with most common design type from fleet
     - Add fuel use multiplier of 20%
     - Reduce max burn modifier to 1 from 2
     - Remove fleet manoeuvrability multiplier
     - Remove burn level at which fleet is considered slow modifier
 - Rename synchronized drives to optimized engines
 - Rebalance unified logistics purist skill
+    - Change affected ships to ships with most common design type from fleet
     - Reduce supplies used per month multiplier to 20% from 25%
     - Remove fuel use multiplier
 
