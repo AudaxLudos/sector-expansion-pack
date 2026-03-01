@@ -1,4 +1,4 @@
-### 0.1.167a
+### 0.1.169a
 - Fix crash when abandoning search and rescue mission
 - Update second in command aptitude descriptions
 - Add second-in-command eclectic aptitude and skills
