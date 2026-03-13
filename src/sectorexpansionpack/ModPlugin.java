@@ -3,6 +3,7 @@ package sectorexpansionpack;
 import com.fs.starfarer.api.BaseModPlugin;
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.campaign.SectorAPI;
+import com.fs.starfarer.api.campaign.listeners.ListenerManagerAPI;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -11,6 +12,7 @@ import sectorexpansionpack.ghosts.types.StormInducerGhostCreator;
 import sectorexpansionpack.ghosts.types.StormPacifierGhostCreator;
 import sectorexpansionpack.intel.ExpeditionFleetManager;
 import sectorexpansionpack.intel.IncursionFleetManager;
+import sectorexpansionpack.listeners.MatrixCatalystOptionProvider;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -68,6 +70,7 @@ public class ModPlugin extends BaseModPlugin {
     public void onGameLoad(boolean newGame) {
         loadModSettings();
         loadNeededScripts();
+        loadNeededListeners();
 
         StormPacifierGhostCreator.register();
         StormInducerGhostCreator.register();
@@ -86,6 +89,13 @@ public class ModPlugin extends BaseModPlugin {
         }
         if (!sector.hasScript(IncursionFleetManager.class)) {
             sector.addScript(new IncursionFleetManager());
+        }
+    }
+
+    public void loadNeededListeners() {
+        ListenerManagerAPI listeners = Global.getSector().getListenerManager();
+        if (!listeners.hasListenerOfClass(MatrixCatalystOptionProvider.class)) {
+            listeners.addListener(new MatrixCatalystOptionProvider(), true);
         }
     }
 }
