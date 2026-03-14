@@ -21,8 +21,8 @@ import java.util.List;
 
 public class FleetEscortMission extends SEPHubMissionWithScenario {
     public static final float MISSION_DURATION = 120f;
-    public static float BAR_MILITARY_CHANCE = 0.4f;
-    public static Logger log = Global.getLogger(FleetEscortMission.class);
+    public static final float BAR_MILITARY_CHANCE = 0.4f;
+    public static final Logger log = Global.getLogger(FleetEscortMission.class);
     protected CampaignFleetAPI fleet;
     protected SectorEntityToken gotoEntity;
     protected String itemId;

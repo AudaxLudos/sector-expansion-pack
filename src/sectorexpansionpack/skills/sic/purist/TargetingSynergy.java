@@ -13,8 +13,8 @@ import java.awt.*;
 import java.util.Objects;
 
 public class TargetingSynergy extends SCBaseSkillPlugin {
-    public static float NON_MISSILE_WEAPON_RANGE_MULT = 0.05f;
-    public static float NON_MISSILE_WEAPON_DAMAGE_MULT = 0.05f;
+    public static final float NON_MISSILE_WEAPON_RANGE_MULT = 0.05f;
+    public static final float NON_MISSILE_WEAPON_DAMAGE_MULT = 0.05f;
 
     @Override
     public String getAffectsString() {

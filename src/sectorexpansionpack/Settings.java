@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Settings implements LunaSettingsListener {
-    public static String MOD_ID = "sectorexpansionpack";
+    public static final String MOD_ID = "sectorexpansionpack";
     public static boolean EXPEDITIONS_ENABLED;
     public static boolean INCURSIONS_ENABLED;
     public static List<String> COLONY_ITEM_WHITELIST = new ArrayList<>();

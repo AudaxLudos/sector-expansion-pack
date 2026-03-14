@@ -12,8 +12,8 @@ import second_in_command.specs.SCBaseSkillPlugin;
 import java.awt.*;
 
 public class FluxOptimizations extends SCBaseSkillPlugin {
-    public static float FLUX_DISSIPATION_MULT = 0.1f;
-    public static float FLUX_CAPACITY_MULT = 0.1f;
+    public static final float FLUX_DISSIPATION_MULT = 0.1f;
+    public static final float FLUX_CAPACITY_MULT = 0.1f;
 
     @Override
     public String getAffectsString() {

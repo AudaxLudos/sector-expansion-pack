@@ -40,10 +40,9 @@ public class IncursionFleetIntel extends GenericRaidFGI {
     public static final String MAIN_FLEET_KEY = "$sep_ifi_mainFleet";
     public static final String TARGET_KEY = "$sep_ifi_target";
     public static final String HAS_ARTIFACT = "$sep_ifi_hasArtifact";
-    public static Logger log = Global.getLogger(IncursionFleetIntel.class);
-
+    public static final Logger log = Global.getLogger(IncursionFleetIntel.class);
+    protected final EntityFinderMission efm;
     protected Integer maxFleetSize = 10;
-    protected EntityFinderMission efm;
     protected MarketAPI source;
     protected MarketAPI target;
     protected SpecialItemSpecAPI specialItemSpec;

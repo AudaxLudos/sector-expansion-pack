@@ -19,12 +19,12 @@ import java.util.Set;
 
 public class MissionFleetFollowPlayerIfNearby implements EveryFrameScript {
     public static Logger log = Global.getLogger(MissionFleetFollowPlayerIfNearby.class);
-    protected CampaignFleetAPI fleet;
-    protected BaseHubMission mission;
-    protected Set<Object> stages = new HashSet<>();
+    protected final CampaignFleetAPI fleet;
+    protected final BaseHubMission mission;
+    protected final Set<Object> stages = new HashSet<>();
+    protected final float maxRange;
+    protected final IntervalUtil timer = new IntervalUtil(0.2f, 0.4f);
     protected boolean done = false;
-    protected float maxRange;
-    protected IntervalUtil timer = new IntervalUtil(0.2f, 0.4f);
 
     public MissionFleetFollowPlayerIfNearby(CampaignFleetAPI fleet, BaseHubMission mission, float maxRange, List<Object> stages) {
         this.fleet = fleet;

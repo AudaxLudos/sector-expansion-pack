@@ -25,8 +25,8 @@ import java.util.Random;
 
 public class HyperspaceAnomalyResearchMission extends HubMissionWithBarEvent {
     public static final String PROGRESS_STEP_UPDATE = "progress_step_update";
-    public static Logger log = Global.getLogger(HyperspaceAnomalyResearchMission.class);
-    protected IntervalUtil timer = new IntervalUtil(0.9f, 1.1f);
+    public static final Logger log = Global.getLogger(HyperspaceAnomalyResearchMission.class);
+    protected final IntervalUtil timer = new IntervalUtil(0.9f, 1.1f);
     protected List<CustomCampaignEntityAPI> ghostsCache;
     protected float currProgress;
     protected float maxProgress;

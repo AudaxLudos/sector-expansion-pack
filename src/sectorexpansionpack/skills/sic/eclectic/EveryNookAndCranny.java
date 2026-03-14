@@ -12,8 +12,8 @@ import second_in_command.specs.SCBaseSkillPlugin;
 import java.awt.*;
 
 public class EveryNookAndCranny extends SCBaseSkillPlugin {
-    public static float CARGO_CAP_MULT = 0.40f;
-    public static float FUEL_CAP_MULT = 0.40f;
+    public static final float CARGO_CAP_MULT = 0.40f;
+    public static final float FUEL_CAP_MULT = 0.40f;
 
     @Override
     public String getAffectsString() {

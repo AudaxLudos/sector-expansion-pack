@@ -17,13 +17,13 @@ import java.util.List;
 import java.util.Set;
 
 public class LeakedArtifactLocationIntel extends BaseIntelPlugin {
-    protected String actionId;
-    protected MarketAPI source;
-    protected SectorEntityToken target;
-    protected FactionAPI faction;
-    protected boolean showArtifact = false;
-    protected long queuedTimestamp;
-    protected BaseIntelPlugin intel;
+    protected final String actionId;
+    protected final MarketAPI source;
+    protected final SectorEntityToken target;
+    protected final FactionAPI faction;
+    protected final boolean showArtifact = false;
+    protected final long queuedTimestamp;
+    protected final BaseIntelPlugin intel;
 
     public LeakedArtifactLocationIntel(String actionId, MarketAPI source, SectorEntityToken target, ExpeditionFleetIntel intel) {
         this.actionId = actionId;

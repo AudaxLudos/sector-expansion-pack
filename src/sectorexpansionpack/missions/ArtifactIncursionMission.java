@@ -29,9 +29,9 @@ import java.util.List;
 
 // TODO: Add custom dialogs to quick reaction force fleet
 public class ArtifactIncursionMission extends SEPHubMissionWithBarEvent implements GroundRaidObjectivesListener {
-    public static Logger log = Global.getLogger(ArtifactIncursionMission.class);
-    public static float MILITARY_CONTACT_CHANCE = 0.5f;
-    public static float MISSION_DURATION = 120f;
+    public static final Logger log = Global.getLogger(ArtifactIncursionMission.class);
+    public static final float MILITARY_CONTACT_CHANCE = 0.5f;
+    public static final float MISSION_DURATION = 120f;
     protected MarketAPI market;
     protected Industry industry;
     protected SpecialItemSpecAPI specialItemSpec;

@@ -6,7 +6,7 @@ import second_in_command.SCData;
 import second_in_command.specs.SCBaseSkillPlugin;
 
 public class DoctrineExtremism extends SCBaseSkillPlugin {
-    public static float SKILL_EFFECT_MAX_MULT = 2f;
+    public static final float SKILL_EFFECT_MAX_MULT = 2f;
 
     @Override
     public String getAffectsString() {

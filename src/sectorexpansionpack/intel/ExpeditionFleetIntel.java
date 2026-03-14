@@ -43,12 +43,11 @@ public class ExpeditionFleetIntel extends FleetGroupIntel {
     public static final String GUARDED_KEY = "$sep_efi_targetGuarded";
     public static final String HAS_ARTIFACT_KEY = "$sep_efi_hasArtifact";
     public static final float WRECK_CHANCE = 0.5f;
-    public static Logger log = Global.getLogger(ExpeditionFleetIntel.class);
-
+    public static final Logger log = Global.getLogger(ExpeditionFleetIntel.class);
+    protected final EntityFinderMission efm;
     protected GenericRaidFGI.GenericRaidParams params;
     protected Integer maxFleetSize = 0;
     protected HubMissionWithTriggers.FleetQuality maxFleetQuality = HubMissionWithTriggers.FleetQuality.DEFAULT;
-    protected EntityFinderMission efm;
     protected float revealChance = 0.2f;
     protected boolean isLeaked = false;
     protected SpecialItemSpecAPI specialItemSpec;

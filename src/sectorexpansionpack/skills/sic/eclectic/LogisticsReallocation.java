@@ -12,8 +12,8 @@ import second_in_command.specs.SCBaseSkillPlugin;
 import java.awt.*;
 
 public class LogisticsReallocation extends SCBaseSkillPlugin {
-    public static float SUPPLIES_PER_MONTH_MULT = 0.20f;
-    public static float FUEL_USE_MULT = 0.20f;
+    public static final float SUPPLIES_PER_MONTH_MULT = 0.20f;
+    public static final float FUEL_USE_MULT = 0.20f;
 
     @Override
     public String getAffectsString() {

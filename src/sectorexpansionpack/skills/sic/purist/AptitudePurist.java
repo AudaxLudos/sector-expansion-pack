@@ -14,10 +14,10 @@ import java.util.Map;
 import java.util.Objects;
 
 public class AptitudePurist extends SCBaseAptitudePlugin {
-    public static String PURIST_FLEET_DATA_KEY = "sep_purist_fleet_data_key";
-    public static float AVERAGE_DESIGN_TYPE_NEEDED = 0.5f;
-    public static float SKILL_EFFECT_MAX_MULT = 1f;
-    public static float SKILL_EFFECT_REDUCTION_MULT = 0.1f;
+    public static final String PURIST_FLEET_DATA_KEY = "sep_purist_fleet_data_key";
+    public static final float AVERAGE_DESIGN_TYPE_NEEDED = 0.5f;
+    public static final float SKILL_EFFECT_MAX_MULT = 1f;
+    public static final float SKILL_EFFECT_REDUCTION_MULT = 0.1f;
 
     private static PuristFleetData computePuristFleetData(SCData data) {
         PuristFleetData pData = new PuristFleetData();

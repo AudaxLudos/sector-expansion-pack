@@ -45,7 +45,7 @@ public class SEPHiddenItemSpecial extends BaseSalvageSpecial {
     }
 
     public static class HiddenSpecialItemSpecialData implements SalvageSpecialInteraction.SalvageSpecialData {
-        String specialItemId;
+        final String specialItemId;
 
         public HiddenSpecialItemSpecialData(String specialItemId) {
             this.specialItemId = specialItemId;

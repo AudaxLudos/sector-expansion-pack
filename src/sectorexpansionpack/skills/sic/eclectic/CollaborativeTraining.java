@@ -10,7 +10,7 @@ import second_in_command.specs.SCBaseSkillPlugin;
 import java.awt.*;
 
 public class CollaborativeTraining extends SCBaseSkillPlugin {
-    public static int OFFICER_MAX_ELITE_SKILLS_MOD = 1;
+    public static final int OFFICER_MAX_ELITE_SKILLS_MOD = 1;
 
     @Override
     public String getAffectsString() {

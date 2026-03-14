@@ -13,8 +13,8 @@ import java.awt.*;
 import java.util.Objects;
 
 public class OptimizedEngines extends SCBaseSkillPlugin {
-    public static float MAX_BURN_MOD = 1f;
-    public static float FUEL_USE_MULT = 0.20f;
+    public static final float MAX_BURN_MOD = 1f;
+    public static final float FUEL_USE_MULT = 0.20f;
 
     @Override
     public String getAffectsString() {

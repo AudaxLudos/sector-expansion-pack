@@ -13,9 +13,9 @@ import java.awt.*;
 import java.util.Objects;
 
 public class TechFamiliarity extends SCBaseSkillPlugin {
-    public static float CREW_MIN_REQ_MULT = 0.15f;
-    public static float PEAK_PERFORMANCE_TIME_MOD = 75f;
-    public static float MAX_COMBAT_READINESS_MOD = 0.10f;
+    public static final float CREW_MIN_REQ_MULT = 0.15f;
+    public static final float PEAK_PERFORMANCE_TIME_MOD = 75f;
+    public static final float MAX_COMBAT_READINESS_MOD = 0.10f;
 
     @Override
     public String getAffectsString() {

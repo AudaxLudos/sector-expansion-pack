@@ -1,5 +1,6 @@
 package sectorexpansionpack.industries;
 
+import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.impl.campaign.econ.impl.BaseIndustry;
 
 public class MatrixCatalyst extends BaseIndustry {

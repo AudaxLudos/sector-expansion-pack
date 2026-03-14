@@ -10,9 +10,9 @@ import second_in_command.specs.SCBaseSkillPlugin;
 import java.awt.*;
 
 public class JointSalvaging extends SCBaseSkillPlugin {
-    public static float POST_BATTLE_SALVAGE_MOD = 0.3f;
-    public static float FUEL_SALVAGE_BONUS = 0.3f;
-    public static float NON_COMBAT_CREW_LOSS_MULT = 0.4f;
+    public static final float POST_BATTLE_SALVAGE_MOD = 0.3f;
+    public static final float FUEL_SALVAGE_BONUS = 0.3f;
+    public static final float NON_COMBAT_CREW_LOSS_MULT = 0.4f;
 
     @Override
     public String getAffectsString() {

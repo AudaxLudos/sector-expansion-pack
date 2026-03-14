@@ -20,12 +20,11 @@ public class EscortFleetAssignmentAI implements EveryFrameScript, Script {
     public static final float TRIGGER_DISTANCE = 1000f;
     public static final float FOLLOW_DISTANCE = 2000f;
     public static final float JUMP_FOLLOW_DISTANCE = 2000f;
-    public static Logger log = Global.getLogger(EscortFleetAssignmentAI.class);
-
+    public static final Logger log = Global.getLogger(EscortFleetAssignmentAI.class);
+    protected final CampaignFleetAPI fleet;
+    protected final FleetEscortMission mission;
+    protected final IntervalUtil timer = new IntervalUtil(0.2f, 0.4f);
     protected boolean isDone = false;
-    protected CampaignFleetAPI fleet;
-    protected FleetEscortMission mission;
-    protected IntervalUtil timer = new IntervalUtil(0.2f, 0.4f);
 
     public EscortFleetAssignmentAI(CampaignFleetAPI fleet, FleetEscortMission mission) {
         this.fleet = fleet;

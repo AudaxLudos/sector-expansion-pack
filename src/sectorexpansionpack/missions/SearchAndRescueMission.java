@@ -34,11 +34,11 @@ import java.util.Random;
 // TODO: Make into version 1 on 1.0 release
 public class SearchAndRescueMission extends SEPHubMissionWithScenario {
     public static final float MISSION_DURATION = 120f;
-    public static float OFFICER_EXCEPTIONAL_CHANCE = 0.05f;
-    public static float OFFICER_MENTORED_CHANCE = 0.5f;
-    public static float CONTACT_MILITARY_CHANCE = 0.25f;
-    public static float BAR_MILITARY_CHANCE = 0.4f;
-    public static Logger log = Global.getLogger(SearchAndRescueMission.class);
+    public static final float OFFICER_EXCEPTIONAL_CHANCE = 0.05f;
+    public static final float OFFICER_MENTORED_CHANCE = 0.5f;
+    public static final float CONTACT_MILITARY_CHANCE = 0.25f;
+    public static final float BAR_MILITARY_CHANCE = 0.4f;
+    public static final Logger log = Global.getLogger(SearchAndRescueMission.class);
     protected PersonPostType survivorPostType;
     protected PersonAPI survivor;
     protected boolean survivorAlive = true;

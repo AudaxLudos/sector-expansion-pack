@@ -431,8 +431,8 @@ public abstract class SEPHubMissionWithBarEvent extends HubMissionWithBarEvent {
     }
 
     public static class EntityBooleanMemoryFlag implements EntityRequirement {
-        String flag;
-        boolean negate;
+        final String flag;
+        final boolean negate;
 
         public EntityBooleanMemoryFlag(String flag, boolean negate) {
             this.flag = flag;
@@ -450,8 +450,8 @@ public abstract class SEPHubMissionWithBarEvent extends HubMissionWithBarEvent {
     }
 
     public static class MarketBooleanMemoryFlag implements MarketRequirement {
-        String flag;
-        boolean negate;
+        final String flag;
+        final boolean negate;
 
         public MarketBooleanMemoryFlag(String flag, boolean negate) {
             this.flag = flag;
@@ -485,7 +485,7 @@ public abstract class SEPHubMissionWithBarEvent extends HubMissionWithBarEvent {
     }
 
     public static class MarketHasCompatibleSpecialItemsWithOther implements MarketRequirement {
-        MarketAPI other;
+        final MarketAPI other;
 
         public MarketHasCompatibleSpecialItemsWithOther(MarketAPI other) {
             this.other = other;
@@ -514,12 +514,7 @@ public abstract class SEPHubMissionWithBarEvent extends HubMissionWithBarEvent {
         }
     }
 
-    public static class MarketCanUseSpecialItemReq implements MarketRequirement {
-        public SpecialItemData specialItemData;
-
-        public MarketCanUseSpecialItemReq(SpecialItemData specialItemData) {
-            this.specialItemData = specialItemData;
-        }
+    public record MarketCanUseSpecialItemReq(SpecialItemData specialItemData) implements MarketRequirement {
 
         @Override
         public boolean marketMatchesRequirement(MarketAPI market) {
@@ -536,8 +531,8 @@ public abstract class SEPHubMissionWithBarEvent extends HubMissionWithBarEvent {
     }
 
     public static class MarketFactionChangedChecker implements ConditionChecker {
-        public String prevFactionId;
-        public MarketAPI market;
+        public final String prevFactionId;
+        public final MarketAPI market;
 
         public MarketFactionChangedChecker(MarketAPI market) {
             this.prevFactionId = market.getFactionId();
@@ -550,12 +545,7 @@ public abstract class SEPHubMissionWithBarEvent extends HubMissionWithBarEvent {
         }
     }
 
-    public static class FactionTurnedHostileChecker implements ConditionChecker {
-        public FactionAPI faction;
-
-        public FactionTurnedHostileChecker(FactionAPI faction) {
-            this.faction = faction;
-        }
+    public record FactionTurnedHostileChecker(FactionAPI faction) implements ConditionChecker {
 
         @Override
         public boolean conditionsMet() {
@@ -564,8 +554,8 @@ public abstract class SEPHubMissionWithBarEvent extends HubMissionWithBarEvent {
     }
 
     public static class PlanetBooleanMemoryFlag implements PlanetRequirement {
-        String flag;
-        boolean negate;
+        final String flag;
+        final boolean negate;
 
         public PlanetBooleanMemoryFlag(String flag, boolean negate) {
             this.flag = flag;
@@ -583,7 +573,7 @@ public abstract class SEPHubMissionWithBarEvent extends HubMissionWithBarEvent {
     }
 
     public static class OrderFleetInterceptOtherAction implements MissionTrigger.TriggerAction {
-        protected SectorEntityToken other;
+        protected final SectorEntityToken other;
 
         public OrderFleetInterceptOtherAction(SectorEntityToken other) {
             this.other = other;
@@ -598,9 +588,9 @@ public abstract class SEPHubMissionWithBarEvent extends HubMissionWithBarEvent {
     }
 
     public static class OrderFleetFollowNearbyPlayerInStage implements MissionTrigger.TriggerAction {
-        protected List<Object> stages;
-        protected BaseHubMission mission;
-        protected float maxRange;
+        protected final List<Object> stages;
+        protected final BaseHubMission mission;
+        protected final float maxRange;
 
         public OrderFleetFollowNearbyPlayerInStage(BaseHubMission mission, float maxRange, Object... stages) {
             this.mission = mission;
@@ -614,9 +604,9 @@ public abstract class SEPHubMissionWithBarEvent extends HubMissionWithBarEvent {
     }
 
     public static class EntityNearbyOtherChecker implements ConditionChecker {
-        protected SectorEntityToken entity;
-        protected SectorEntityToken other;
-        protected float range;
+        protected final SectorEntityToken entity;
+        protected final SectorEntityToken other;
+        protected final float range;
 
         public EntityNearbyOtherChecker(SectorEntityToken entity, SectorEntityToken other, float range) {
             this.entity = entity;
@@ -632,9 +622,9 @@ public abstract class SEPHubMissionWithBarEvent extends HubMissionWithBarEvent {
     }
 
     public static class FleetWeakenedChecker implements ConditionChecker {
-        public CampaignFleetAPI fleet;
-        public float fleetPoints;
-        public float damageThreshold;
+        public final CampaignFleetAPI fleet;
+        public final float fleetPoints;
+        public final float damageThreshold;
 
         /**
          * @param damageThreshold from 0.1f to 0.8f only
@@ -659,16 +649,16 @@ public abstract class SEPHubMissionWithBarEvent extends HubMissionWithBarEvent {
     }
 
     public static class SEPCreateFleetAction extends CreateFleetAction {
+        public final boolean freighterIncludeCombatPts = false;
+        public final boolean linerIncludeCombatPts = false;
+        public final boolean utilityIncludeCombatPts = false;
         public Float freighterPts = null;
-        public boolean freighterIncludeCombatPts = false;
         public Float tankerPts = null;
         public boolean tankerIncludeCombatPts = false;
         public Float linerPts = null;
-        public boolean linerIncludeCombatPts = false;
         public Float transportPts = null;
         public boolean transportIncludeCombatPts = false;
         public Float utilityPts = null;
-        public boolean utilityIncludeCombatPts = false;
 
         public SEPCreateFleetAction(String type, Vector2f locInHyper, FleetSize fSize, FleetQuality fQuality, String factionId) {
             super(type, locInHyper, fSize, fQuality, factionId);

@@ -12,9 +12,9 @@ import second_in_command.specs.SCBaseSkillPlugin;
 import java.awt.*;
 
 public class WeaknessMitigation extends SCBaseSkillPlugin {
-    public static float WEAPON_DMG_TAKEN_MULT = 0.15f;
-    public static float ENGINE_DMG_TAKEN_MULT = 0.15f;
-    public static float EMP_DMG_TAKEN_MULT = 0.15f;
+    public static final float WEAPON_DMG_TAKEN_MULT = 0.15f;
+    public static final float ENGINE_DMG_TAKEN_MULT = 0.15f;
+    public static final float EMP_DMG_TAKEN_MULT = 0.15f;
 
     public String getAffectsString() {
         return "all ships";

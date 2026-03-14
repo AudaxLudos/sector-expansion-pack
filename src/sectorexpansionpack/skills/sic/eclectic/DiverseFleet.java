@@ -6,8 +6,8 @@ import second_in_command.SCData;
 import second_in_command.specs.SCBaseSkillPlugin;
 
 public class DiverseFleet extends SCBaseSkillPlugin {
-    public static int DESIGN_TYPE_SHIP_LIMIT = 2;
-    public static float SKILL_EFFECT_MAX_MULT = 2f;
+    public static final int DESIGN_TYPE_SHIP_LIMIT = 2;
+    public static final float SKILL_EFFECT_MAX_MULT = 2f;
 
     @Override
     public String getAffectsString() {

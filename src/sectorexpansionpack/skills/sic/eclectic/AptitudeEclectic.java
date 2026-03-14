@@ -13,11 +13,11 @@ import java.util.Map;
 import java.util.Objects;
 
 public class AptitudeEclectic extends SCBaseAptitudePlugin {
-    public static String ECLECTIC_FLEET_DATA_KEY = "sep_eclectic_fleet_data_key";
-    public static int DESIGN_TYPE_SHIP_LIMIT = 3;
-    public static float SKILL_EFFECT_MAX_MULT = 1f;
-    public static float SKILL_EFFECT_BONUS_PER_DESIGN_TYPE_MULT = 0.2f;
-    public static float SKILL_EFFECT_REDUCTION_MULT = 0.2f;
+    public static final String ECLECTIC_FLEET_DATA_KEY = "sep_eclectic_fleet_data_key";
+    public static final int DESIGN_TYPE_SHIP_LIMIT = 3;
+    public static final float SKILL_EFFECT_MAX_MULT = 1f;
+    public static final float SKILL_EFFECT_BONUS_PER_DESIGN_TYPE_MULT = 0.2f;
+    public static final float SKILL_EFFECT_REDUCTION_MULT = 0.2f;
 
     private static EclecticFleetData computeEclecticFleetData(SCData data) {
         EclecticFleetData eData = new EclecticFleetData();

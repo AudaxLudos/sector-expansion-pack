@@ -13,8 +13,8 @@ import second_in_command.specs.SCBaseSkillPlugin;
 import java.awt.*;
 
 public class ImprovisedRestoration extends SCBaseSkillPlugin {
-    public static float SHIP_RECOVERY_MOD = 2f;
-    public static float INSTANT_REPAIR_MOD = 0.30f;
+    public static final float SHIP_RECOVERY_MOD = 2f;
+    public static final float INSTANT_REPAIR_MOD = 0.30f;
 
     @Override
     public String getAffectsString() {

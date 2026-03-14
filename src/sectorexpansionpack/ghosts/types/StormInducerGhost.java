@@ -12,8 +12,8 @@ import com.fs.starfarer.api.util.IntervalUtil;
 import com.fs.starfarer.api.util.Misc;
 
 public class StormInducerGhost extends BaseSensorGhost {
-    protected IntervalUtil timer = new IntervalUtil(0.2f, 0.3f);
-    protected float radius;
+    protected final IntervalUtil timer = new IntervalUtil(0.2f, 0.3f);
+    protected final float radius;
 
     public StormInducerGhost(SensorGhostManager manager, float radius) {
         super(manager, 20);

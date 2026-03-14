@@ -18,13 +18,13 @@ public class MatrixCatalystDialogDelegate extends BaseCustomDialogDelegate imple
     public static final String SEND_TO_STORAGE_KEY = "$sep_matrix_catalyst_send_to_storage";
     public static final float WIDTH = 400f;
     public static final float HEIGHT = 464f;
-    public static List<AICoreRecipe> AI_CORE_RECIPES = new ArrayList<>();
+    public static final List<AICoreRecipe> AI_CORE_RECIPES = new ArrayList<>();
 
     static {
-        AI_CORE_RECIPES.add(new AICoreRecipe(Commodities.GAMMA_CORE, 4, Commodities.BETA_CORE, 1));
+        AI_CORE_RECIPES.add(new AICoreRecipe(Commodities.GAMMA_CORE, 5, Commodities.BETA_CORE, 1));
         AI_CORE_RECIPES.add(new AICoreRecipe(Commodities.BETA_CORE, 3, Commodities.ALPHA_CORE, 1));
         AI_CORE_RECIPES.add(new AICoreRecipe(Commodities.ALPHA_CORE, 1, Commodities.BETA_CORE, 3));
-        AI_CORE_RECIPES.add(new AICoreRecipe(Commodities.BETA_CORE, 1, Commodities.GAMMA_CORE, 4));
+        AI_CORE_RECIPES.add(new AICoreRecipe(Commodities.BETA_CORE, 1, Commodities.GAMMA_CORE, 5));
     }
 
     private final MarketAPI market;
@@ -64,6 +64,7 @@ public class MatrixCatalystDialogDelegate extends BaseCustomDialogDelegate imple
             TooltipMakerAPI resourceImageElement = resourceElement.beginImageWithText(commoditySpec.getIconName(), 20f);
             resourceImageElement.addPara("× %s", 0f, Misc.getTextColor(), Misc.getTextColor(), Math.round(aiCoreInCargoCount) + "").getPosition().setXAlignOffset(-5f);
             resourceElement.addImageWithText(0f);
+            resourceElement.addTooltipToPrevious(new ItemTooltipCreator(commoditySpec), TooltipMakerAPI.TooltipLocation.RIGHT);
             resourcePanel.addUIElement(resourceElement);
             if (prevElem != null) {
                 resourceElement.getPosition().rightOfMid(prevElem, 0f);
@@ -86,6 +87,7 @@ public class MatrixCatalystDialogDelegate extends BaseCustomDialogDelegate imple
             ingredientImageElement.addPara("× %s", 0f, Misc.getTextColor(), Misc.getTextColor(), recipe.ingredientItemCount + "").getPosition().setXAlignOffset(-5f);
             ingredientElement.addImageWithText(0f);
             ingredientElement.getPosition().inLMid(-10f);
+            ingredientElement.addTooltipToPrevious(new ItemTooltipCreator(ingredientItemSpec), TooltipMakerAPI.TooltipLocation.RIGHT);
             recipePanel.addUIElement(ingredientElement);
 
             TooltipMakerAPI arrowsElement = recipePanel.createUIElement(columnArrowWidth, 0f, false);
@@ -99,6 +101,7 @@ public class MatrixCatalystDialogDelegate extends BaseCustomDialogDelegate imple
             resultImageElement.addPara("× %s", 0f, Misc.getTextColor(), Misc.getTextColor(), recipe.resultItemCount + "").getPosition().setXAlignOffset(-5f);
             resultElement.addImageWithText(0f);
             resultElement.getPosition().rightOfMid(arrowsElement, 0f);
+            resultElement.addTooltipToPrevious(new ItemTooltipCreator(resultItemSpec), TooltipMakerAPI.TooltipLocation.RIGHT);
             recipePanel.addUIElement(resultElement);
 
             TooltipMakerAPI convertButtonElement = recipePanel.createUIElement(columnButtonWidth, 0f, false);
@@ -199,11 +202,29 @@ public class MatrixCatalystDialogDelegate extends BaseCustomDialogDelegate imple
         refreshPanel();
     }
 
+    public static class ItemTooltipCreator extends BaseTooltipCreator {
+        CommoditySpecAPI itemSpec;
+
+        public ItemTooltipCreator(CommoditySpecAPI itemSpec) {
+            this.itemSpec = itemSpec;
+        }
+
+        @Override
+        public float getTooltipWidth(Object tooltipParam) {
+            return 200f;
+        }
+
+        @Override
+        public void createTooltip(TooltipMakerAPI tooltip, boolean expanded, Object tooltipParam) {
+            tooltip.addPara(this.itemSpec.getName(), 0f);
+        }
+    }
+
     public static class AICoreRecipe {
-        String ingredientItemId;
-        int ingredientItemCount;
-        String resultItemId;
-        int resultItemCount;
+        final String ingredientItemId;
+        final int ingredientItemCount;
+        final String resultItemId;
+        final int resultItemCount;
 
         public AICoreRecipe(String ingredientItemId, int ingredientItemCount, String resultItemId, int resultItemCount) {
             this.ingredientItemId = ingredientItemId;
@@ -214,7 +235,7 @@ public class MatrixCatalystDialogDelegate extends BaseCustomDialogDelegate imple
     }
 
     public static class CraftRecipeData {
-        AICoreRecipe recipe;
+        final AICoreRecipe recipe;
         float doCount;
 
         public CraftRecipeData(AICoreRecipe recipe, float doCount) {

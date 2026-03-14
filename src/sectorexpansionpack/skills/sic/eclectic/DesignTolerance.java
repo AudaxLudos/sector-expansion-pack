@@ -6,7 +6,7 @@ import second_in_command.SCData;
 import second_in_command.specs.SCBaseSkillPlugin;
 
 public class DesignTolerance extends SCBaseSkillPlugin {
-    public static int DESIGN_TYPE_SHIP_LIMIT = 5;
+    public static final int DESIGN_TYPE_SHIP_LIMIT = 5;
 
     @Override
     public String getAffectsString() {

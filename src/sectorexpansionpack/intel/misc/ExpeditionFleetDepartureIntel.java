@@ -16,10 +16,10 @@ import java.awt.*;
 import java.util.Set;
 
 public class ExpeditionFleetDepartureIntel extends BaseIntelPlugin {
-    protected RouteManager.RouteData route;
+    protected final RouteManager.RouteData route;
+    protected final FactionAPI faction;
+    protected final MarketAPI source;
     protected Float sinceLaunched;
-    protected FactionAPI faction;
-    protected MarketAPI source;
 
     public ExpeditionFleetDepartureIntel(RouteManager.RouteData route, MarketAPI source) {
         this.route = route;

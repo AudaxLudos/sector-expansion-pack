@@ -8,8 +8,8 @@ import com.fs.starfarer.api.util.Misc;
 import org.lwjgl.util.vector.Vector2f;
 
 public class GBCollideRunScript extends BaseGhostBehavior {
-    protected SectorEntityToken other;
-    protected int maxBurn;
+    protected final SectorEntityToken other;
+    protected final int maxBurn;
     protected Script script;
 
     public GBCollideRunScript(SectorEntityToken other, int maxBurn, Script script) {

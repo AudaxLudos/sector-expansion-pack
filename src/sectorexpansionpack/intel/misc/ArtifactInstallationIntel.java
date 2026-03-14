@@ -15,10 +15,10 @@ import java.awt.*;
 import java.util.Set;
 
 public class ArtifactInstallationIntel extends BaseIntelPlugin {
-    protected MarketAPI market;
-    protected FactionAPI faction;
-    protected Industry industry;
-    protected SpecialItemSpecAPI specialItemSpec;
+    protected final MarketAPI market;
+    protected final FactionAPI faction;
+    protected final Industry industry;
+    protected final SpecialItemSpecAPI specialItemSpec;
 
     public ArtifactInstallationIntel(MarketAPI market, Industry industry, SpecialItemSpecAPI specialItemSpec) {
         this.market = market;
