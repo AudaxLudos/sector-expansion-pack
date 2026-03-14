@@ -7,4 +7,13 @@ public class MatrixCatalyst extends BaseIndustry {
     public void apply() {
         super.apply(false);
     }
+
+    @Override
+    public boolean isAvailableToBuild() {
+        return Global.getSector().getPlayerFaction().knowsIndustry(getId());
+    }
+
+    public boolean showWhenUnavailable() {
+        return Global.getSector().getPlayerFaction().knowsIndustry(getId());
+    }
 }
