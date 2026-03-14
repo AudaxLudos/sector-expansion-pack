@@ -1,5 +1,5 @@
 id,name,cost mult,build time,income,upkeep,downgrade,upgrade,tags,data,image,plugin,desc,order,disruptDanger
-sep_matrix_catalyst,Matrix Catalyst,100,120,,12,,,"matrixcatalyst, structure, codex_unlockable",,graphics/icons/industry/heavy_industry.png,sectorexpansionpack.industries.MatrixCatalyst,(Temp) A massive facility that can combine low tier AI cores into higher tiers or fragment high tier AI cores to lower tiers.,20000,
+sep_matrix_catalyst,Matrix Catalyst,100,120,,12,,,"matrixcatalyst, structure, codex_unlockable",,graphics/sectorexpansionpack/icons/industries/sep_matrix_catalyst.png,sectorexpansionpack.industries.MatrixCatalyst,"A spherical processing chamber built from fragments of an automated infrastructure, lined with industrial arms, precision lasers, and fabrication systems. Its only remaining function is to merge or split AI cores into higher or lower-tier variants. Although its capabilities could theoretically be expanded, most experiments have failed, leaving the structure’s true purpose largely unknown and only partially understood.",20000,
 ,,,,,,,,,,,,,,
 ,,,,,,,,,,,,,,
 ,,,,,,,,,,,,,,

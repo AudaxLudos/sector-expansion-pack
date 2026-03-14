@@ -26,7 +26,7 @@ public class MatrixCatalystOptionProvider extends BaseIndustryOptionProvider {
         }
         List<IndustryOptionData> result = new ArrayList<>();
 
-        IndustryOptionData opt = new IndustryOptionData("Combine or fragment AI cores", CUSTOM_PLUGIN, ind, this);
+        IndustryOptionData opt = new IndustryOptionData("Merge or split AI cores", CUSTOM_PLUGIN, ind, this);
         result.add(opt);
 
         return result;
@@ -35,7 +35,7 @@ public class MatrixCatalystOptionProvider extends BaseIndustryOptionProvider {
     @Override
     public void createTooltip(IndustryOptionData opt, TooltipMakerAPI tooltip, float width) {
         if (opt.id == CUSTOM_PLUGIN) {
-            tooltip.addPara("A specialized structure capable of combining or fragmenting AI cores", 0f);
+            tooltip.addPara("A specialized structure capable of merging or splitting AI cores", 0f);
         }
     }
 
