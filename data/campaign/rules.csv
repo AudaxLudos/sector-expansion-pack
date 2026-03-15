@@ -464,7 +464,8 @@ Afterward, the remains are brought aboard. Though none survived, your crew ensur
 ## SAR3 dialogues,,,,,,
 sep_sar_s3Blurb,SEPSARShowBlurb,$sep_sar_scenarioId == sar3 score:10,,"""An associate of a ranking official was kidnapped and has filed a formal request to rescue said individual.""",,
 sep_sar_s3Option,SEPSARShowOption,$sep_sar_scenarioId == sar3 score:10,,,sep_sar_start:Ask about rescuing an associate of ranking offical,
-sep_sar_s3Offer,SEPSARShowOffer,$sep_sar_scenarioId == sar3 score:10,,"""A pirate terror group raided one of our cargo stations,"" $heOrShe begins. ""They took several hostages, including our associate, $sep_sar_survivorFullName.""
+sep_sar_s3Offer,SEPSARShowOffer,$sep_sar_scenarioId == sar3 score:10,"SetTextHighlightColors h h h h
+SetTextHighlights $sep_sar_survivorFullName $sep_sar_creditRansom $sep_sar_possibleLoc $sep_sar_creditReward","""A pirate terror group raided one of our cargo stations,"" $heOrShe begins. ""They took several hostages, including our associate, $sep_sar_survivorFullName.""
 
 $HeOrShe slides a datapad across the table. ""They’re demanding $sep_sar_creditRansom and want the exchange to happen in $sep_sar_possibleLoc.""
 
