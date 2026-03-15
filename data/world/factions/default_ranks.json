@@ -1,6 +1,7 @@
 {
 	"posts":{
-		"executive_officer_sep_sic_purist": {"name":"Executive Officer (Purist)"}
+      "executive_officer_sep_sic_purist": {"name":"Executive Officer (Purist)"},
+      "executive_officer_sep_sic_eclectic": {"name":"Executive Officer (Eclectic)"}
 	}
 }
 
