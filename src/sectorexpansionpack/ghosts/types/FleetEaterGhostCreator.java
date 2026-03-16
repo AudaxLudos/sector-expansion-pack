@@ -10,10 +10,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class FleetEaterGhostCreator extends BaseSensorGhostCreator {
-    public static void register() {
-        SensorGhostManager.CREATORS.add(new FleetEaterGhostCreator());
-    }
-
     @Override
     public List<SensorGhost> createGhost(SensorGhostManager manager) {
         if (!Global.getSector().getCurrentLocation().isHyperspace()) {

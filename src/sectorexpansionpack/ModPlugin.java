@@ -4,6 +4,7 @@ import com.fs.starfarer.api.BaseModPlugin;
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.campaign.SectorAPI;
 import com.fs.starfarer.api.campaign.listeners.ListenerManagerAPI;
+import com.fs.starfarer.api.impl.campaign.ghosts.SensorGhostManager;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -12,6 +13,7 @@ import sectorexpansionpack.ghosts.types.StormInducerGhostCreator;
 import sectorexpansionpack.ghosts.types.StormPacifierGhostCreator;
 import sectorexpansionpack.intel.ExpeditionFleetManager;
 import sectorexpansionpack.intel.IncursionFleetManager;
+import sectorexpansionpack.listeners.MatrixCatalystBlueprintAdder;
 import sectorexpansionpack.listeners.MatrixCatalystOptionProvider;
 
 import java.io.IOException;
@@ -23,10 +25,10 @@ import java.util.Random;
 public class ModPlugin extends BaseModPlugin {
     @Override
     public void onApplicationLoad() {
-        loadMissionScenarios();
+        addMissionScenarios();
     }
 
-    public void loadMissionScenarios() {
+    public void addMissionScenarios() {
         try {
             JSONArray rows = Global.getSettings().loadCSV("data/campaign/sep_mission_scenarios.csv");
             for (int i = 0; i < rows.length(); i++) {
@@ -68,21 +70,13 @@ public class ModPlugin extends BaseModPlugin {
 
     @Override
     public void onGameLoad(boolean newGame) {
-        loadModSettings();
-        loadNeededScripts();
-        loadNeededListeners();
-
-        StormPacifierGhostCreator.register();
-        StormInducerGhostCreator.register();
-        FleetEaterGhostCreator.register();
+        addScriptsIfNeeded();
     }
 
-    public void loadModSettings() {
+    public void addScriptsIfNeeded() {
         Utils.setRandom(new Random(Long.parseLong(Global.getSector().getSeedString().replaceAll("\\D", ""))));
         Settings.load();
-    }
 
-    public void loadNeededScripts() {
         SectorAPI sector = Global.getSector();
         if (!sector.hasScript(ExpeditionFleetManager.class)) {
             sector.addScript(new ExpeditionFleetManager());
@@ -90,12 +84,20 @@ public class ModPlugin extends BaseModPlugin {
         if (!sector.hasScript(IncursionFleetManager.class)) {
             sector.addScript(new IncursionFleetManager());
         }
-    }
 
-    public void loadNeededListeners() {
-        ListenerManagerAPI listeners = Global.getSector().getListenerManager();
-        if (!listeners.hasListenerOfClass(MatrixCatalystOptionProvider.class)) {
-            listeners.addListener(new MatrixCatalystOptionProvider(), true);
+        // Campaign input listeners
+        ListenerManagerAPI listenerManager = Global.getSector().getListenerManager();
+        if (!listenerManager.hasListenerOfClass(MatrixCatalystOptionProvider.class)) {
+            listenerManager.addListener(new MatrixCatalystOptionProvider(), true);
         }
+
+        // Campaign event listeners
+        if (!Global.getSector().getPlayerFaction().knowsIndustry("sep_matrix_catalyst")) {
+            Global.getSector().addTransientListener(new MatrixCatalystBlueprintAdder());
+        }
+
+        SensorGhostManager.CREATORS.add(new StormPacifierGhostCreator());
+        SensorGhostManager.CREATORS.add(new StormInducerGhostCreator());
+        SensorGhostManager.CREATORS.add(new FleetEaterGhostCreator());
     }
 }
