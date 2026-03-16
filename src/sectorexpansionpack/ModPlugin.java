@@ -74,9 +74,11 @@ public class ModPlugin extends BaseModPlugin {
     }
 
     public void addScriptsIfNeeded() {
+        // Mod settings
         Utils.setRandom(new Random(Long.parseLong(Global.getSector().getSeedString().replaceAll("\\D", ""))));
         Settings.load();
 
+        // Scripts
         SectorAPI sector = Global.getSector();
         if (!sector.hasScript(ExpeditionFleetManager.class)) {
             sector.addScript(new ExpeditionFleetManager());

@@ -1,4 +1,8 @@
-### 0.1.169a
+### 0.2.0-alpha (384)
+- Add matrix catalyst industry
+- Fix search and rescue mission scenario missing highlight texts
+
+### 0.1.169-alpha
 - Fix crash when abandoning search and rescue mission
 - Update second in command aptitude descriptions
 - Add second-in-command eclectic aptitude and skills
@@ -29,7 +33,7 @@
     - Reduce supplies used per month multiplier to 20% from 25%
     - Remove fuel use multiplier
 
-### 0.1.101a
+### 0.1.101-alpha
 - Add second-in-command purist aptitude and skills
 - Fix crash when source market system for expedition is non-existent
 - Fix crash when source market system for incursion is non-existent
@@ -39,7 +43,7 @@
 - Fix escort mission progressing without reaching goto entity
 - Fix escorted fleet following player while in battle
 
-### 0.1.72a
+### 0.1.72-alpha
 - Add accipiter midline ship variants
 - Rebalance accipiter ship stats
     - Increase max flux to 5000 from 4200
@@ -69,13 +73,13 @@
 - Decrease chance for survivor to be a contact for search and rescue missions
 - Fix wrong fleet escort mission dialogue text references
 
-### 0.1.19a
+### 0.1.19-alpha
 - Fix crash when completing a drug smuggling escort mission
 - Fix number format exception error in missions
 - Add blaze ship
 - Add effulgence ship
 
-### 0.1.0a (205)
+### 0.1.0-alpha (205)
 - Fix scenario credit reward not properly applied
 - Fix special item being installed with unmet requirements
 - Add scenarios for fleet escort mission
@@ -94,29 +98,29 @@
 - Fix incursion event fleet count exceeding limit
 - Fix error when looking for market to install colony item
 
-### 0.0.161a
+### 0.0.161-alpha
 - Fix artifact incursion raid target not getting marked
 - Fix crash when abandoning artifact incursion mission
 
-### 0.0.157a
+### 0.0.157-alpha
 - Fix crash if no market was picked for escort mission
 - Fail the mission if escorted fleet turns hostile
 - Properly despawn escorted fleet when mission ends
 - Ensure escorted fleet belongs to the contact's faction
 - Fix colony item installation even when incursion fails
 
-### 0.0.150a
+### 0.0.150-alpha
 - Add colony item whitelist for events and missions
 - Remove hostile market target requirement for artifact incursion mission
 - Fix crash when incursion fleet size is too low
 - Fix unable to decline fleet escort missions
 
-### 0.0.139a
+### 0.0.139-alpha
 - Limit fleet count spawned by incursions or expeditions
 - Add fleet escort mission
 - Fix crash when expedition/incursion event is successful after loading a save
 
-### 0.0.124a
+### 0.0.124-alpha
 - Add fleet defeat triggers for incursion and expedition fleets
 - Remove target colony item when incursion raid succeeds
 - Fix incursion fleet not getting marked if spawned midway
@@ -129,13 +133,13 @@
 - Install colony items when incursion is successful
 - Fix random generators using same seed
 
-### 0.0.93a
+### 0.0.93-alpha
 - Add fleet eater ghost
 - Add hyperspace anomaly research mission
 - Add storm inducer ghost
 - Add storm pacifier ghost
 
-### 0.0.63a
+### 0.0.63-alpha
 - Add artifact installation intel
 - Add leaked artifact location intel
 - Add expedition fleet departure intel
@@ -143,10 +147,10 @@
 - Add artifact incursion mission
 - Add search and rescue mission
 
-### 0.0.10a
+### 0.0.10-alpha
 - Add ship accipiter destroyer with variants
 - Add ship wonder destroyer with variants
 - Add ship hornet frigate with variants
 
-### 0.0.0a
+### 0.0.0-alpha
 - Add initial mod files
