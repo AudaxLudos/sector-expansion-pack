@@ -557,3 +557,48 @@ Afterward, you order your chief security officer to escort the recovered remains
 ,,,,,,
 ,,,,,,
 ,,,,,,
+# Space Research START,,,,,,
+## Contact offer texts,,,,,,
+sep_srm_blurb,sep_srm_blurb,,FireBest SEPSRMShowBlurb true,,,
+sep_srm_offerOption,sep_srm_option,,FireBest SEPSRMShowOption true,,,
+sep_srm_offerTextContact1,DialogOptionSelected,$option == sep_srm_start,"FireBest SEPSRMShowOffer true
+$missionId = sep_srm",,"contact_accept:Accept
+contact_decline:Decline",
+## Bar offer texts,,,,,,
+sep_srm_blurbBar,sep_srm_blurbBar,,FireBest SEPSRMShowBlurbBar true,,,
+sep_srm_offerOptionBar,sep_srm_optionBar,,FireBest SEPSRMShowOptionBar true,,,
+sep_srm_offerTextBar1,DialogOptionSelected,$option == sep_srm_startBar,"FireBest SEPSRMShowOfferBar true
+$missionId = sep_srm",,"contact_acceptBar:Accept
+contact_declineBarNoContinue:Decline",
+## Return data dialogs,,,,,,
+sep_srm_returnDataContact,PickGreeting,"$sep_srm_returnPerson score:1000
+Call $sep_srm_ref updateData
+!$sep_srm_isBarEvent
+FireBest GenericMissionReturn","ShowPersonVisual
+$sep_srm_completed = true
+Call $sep_srm_ref updateStage","You transmit the completed research data to the $personPost.
+
+$HeOrShe thanks you for the data before sending you your reward.",contact_pickAnotherGreeting:Continue,
+sep_srm_returnDataBar,PickGreeting,"$sep_srm_returnPerson score:1000
+Call $sep_srm_ref updateData
+$sep_srm_isBarEvent
+FireBest GenericMissionReturn","ShowPersonVisual
+$sep_srm_completed = true
+Call $sep_srm_ref updateStage","You transmit the completed research data to the $personPost.
+
+$HeOrShe thanks you for the data before getting lost in its details, even forgeting to cut the comm link.",cutCommLink:Cut the comm link,
+## SRM1 dialogues,,,,,,
+sep_srm_s1Blurb,SEPSRMShowBlurb,$sep_srm_scenarioId == srm1 score:10,,SAMPLE CONTACT BLURB,,
+sep_srm_s1Option,SEPSRMShowOption,$sep_srm_scenarioId == srm1 score:10,,,sep_srm_start:SAMPLE CONTACT OPTION,
+sep_srm_s1Offer,SEPSRMShowOffer,$sep_srm_scenarioId == srm1 score:10,,SAMPLE CONTACT OFFER TEXT,,
+sep_srm_s1BlurbBar,SEPSRMShowBlurbBar,$sep_srm_scenarioId == srm1 score:10,,SAMPLE BAR BLURB,,
+sep_srm_s1OptionBar,SEPSRMShowOptionBar,$sep_srm_scenarioId == srm1 score:10,,,sep_srm_startBar:SAMPLE BAR OPTION,
+sep_srm_s1OfferBar,SEPSRMShowOfferBar,$sep_srm_scenarioId == srm1 score:10,,SAMPLE BAR OFFER TEXT,,
+## SRM0 dialogues,,,,,,
+sep_srm_s0Blurb,SEPSRMShowBlurb,,,SAMPLE CONTACT BLURB,,
+sep_srm_s0Option,SEPSRMShowOption,,,,sep_srm_start:SAMPLE CONTACT OPTION,
+sep_srm_s0Offer,SEPSRMShowOffer,,,SAMPLE CONTACT OFFER TEXT,,
+sep_srm_s0BlurbBar,SEPSRMShowBlurbBar,,,SAMPLE BAR BLURB,,
+sep_srm_s0OptionBar,SEPSRMShowOptionBar,,,,sep_srm_startBar:SAMPLE BAR OPTION,
+sep_srm_s0OfferBar,SEPSRMShowOfferBar,,,SAMPLE BAR OFFER TEXT,,
+# Space Research END,,,,,,

@@ -1,4 +1,5 @@
 scenarioId,missionId,frequency,duration,creditReward,type,complications,tags,data1,data2,data3,notes
+# Fleet Escort Missions,,,,,,,,,,,
 fem1,sep_fem,10,,,COMMODITY_DELIVERY,"GOTO,pirates,chanceHIGH,hostile,aggressive,lowRep,nearPlayer,interceptEscort|
 WAIT,pirates,chanceMID,hostile,aggressive,lowRep,interceptEscort|
 WAIT,pirates,chanceLOW,hostile,aggressive,lowRep,interceptEscort",oneWay,,,,
@@ -16,10 +17,24 @@ WAIT,pirates,chanceMID,hostile,aggressive,lowRep,interceptEscort|
 WAIT,pirates,chanceLOW,hostile,aggressive,lowRep,interceptEscort|
 RETURN,pirates,chanceMID,hostile,aggressive,lowRep,hyperspaceOnly,interceptEscort|",,,,,
 ,,,,,,,,,,,
+,,,,,,,,,,,
+,,,,,,,,,,,
+# Search and Rescue Missions,,,,,,,,,,,
 sar1,sep_sar,10,,,STRANDED_IN_WRECK,"FIND,pirates,chanceHIGH,hostile,aggressive,lowRep",,,,,
 sar2,sep_sar,10,,,STRANDED_IN_PLANET,"FIND,pirates,chanceHIGH,hostile,aggressive,lowRep",,,,,
 sar3,sep_sar,10,,,CAPTURED_IN_FLEET,"FIND,pirates,chanceHIGH,hostile,aggressive,lowRep",,,,,
 sar4,sep_sar,10,,,CAPTURED_IN_PLANET,"FIND,pirates,chanceHIGH,hostile,aggressive,lowRep|
 FIND,pirates,chanceMID,hostile,aggressive,lowRep",,,,,
 #sar5,sep_sar,10,,,CAPTURED_IN_MARKET,,,,,,Not implemented
+,,,,,,,,,,,
+,,,,,,,,,,,
+,,,,,,,,,,,
+# Space Research Missions,,,,,,,,,,,
+srm1,sep_srm,10,,VERY_HIGH,BLACK_HOLE_RESEARCH,,,,,,
+srm2,sep_srm,10,,,ASTEROID_IMPACTS_RESEARCH,,,,,,
+srm3,sep_srm,10,,VERY_HIGH,NEUTRON_STAR_RESEARCH,,,,,,
+srm4,sep_srm,10,,,HYPERSPACE_GHOSTS_RESEARCH,,,,,,
+srm5,sep_srm,10,,VERY_HIGH,HYPERSPACE_ABYSS_RESEARCH,,,,,,
+,,,,,,,,,,,
+,,,,,,,,,,,
 ,,,,,,,,,,,
