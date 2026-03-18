@@ -96,6 +96,9 @@ public class SpaceResearchMission extends SEPHubMissionWithScenario {
         if (this.currProgress >= this.maxProgress && this.currentStage == Stage.GATHER_DATA) {
             setCurrentStage(Stage.DELIVER_DATA, null, null);
         }
+        if (this.currProgress >= this.maxProgress && this.currentStage == Stage.DELIVER_DATA && Global.getSector().getIntelManager().isPlayerInRangeOfCommRelay()) {
+            setCurrentStage(Stage.COMPLETED, null, null);
+        }
 
         // Update the player in increments of 20%
         int currUpdateStep = (int) (this.currProgress / (this.maxProgress * 0.2f));
