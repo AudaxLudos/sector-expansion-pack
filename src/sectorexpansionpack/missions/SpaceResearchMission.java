@@ -172,6 +172,7 @@ public class SpaceResearchMission extends SEPHubMissionWithScenario {
 
     @Override
     protected void updateInteractionDataImpl() {
+        set("$sep_srm_scenarioId", this.scenario.getScenarioId());
         set("$sep_srm_dataInDays", getDays(this.maxProgress));
         set("$sep_srm_reward", Misc.getDGSCredits(getCreditsReward()));
         set("$sep_srm_isBarEvent", this.isBarEvent);

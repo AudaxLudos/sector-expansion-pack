@@ -594,6 +594,23 @@ sep_srm_s1Offer,SEPSRMShowOffer,$sep_srm_scenarioId == srm1 score:10,,SAMPLE CON
 sep_srm_s1BlurbBar,SEPSRMShowBlurbBar,$sep_srm_scenarioId == srm1 score:10,,SAMPLE BAR BLURB,,
 sep_srm_s1OptionBar,SEPSRMShowOptionBar,$sep_srm_scenarioId == srm1 score:10,,,sep_srm_startBar:SAMPLE BAR OPTION,
 sep_srm_s1OfferBar,SEPSRMShowOfferBar,$sep_srm_scenarioId == srm1 score:10,,SAMPLE BAR OFFER TEXT,,
+## SRM1 dialogues,,,,,,
+sep_srm_s2Blurb,SEPSRMShowBlurb,$sep_srm_scenarioId == srm2 score:10,,"""A researcher needs your fleet to collect asteroid impact data. The requirement is simple, but the task is... peculiar. The question is whether that bothers you.""",,
+sep_srm_s2Option,SEPSRMShowOption,$sep_srm_scenarioId == srm2 score:10,,,sep_srm_start:Ask about collecting asteroid impact data,
+sep_srm_s2Offer,SEPSRMShowOffer,$sep_srm_scenarioId == srm2 score:10,"SetTextHighlightColors h h
+SetTextHighlights $sep_srm_reward $sep_srm_dataInDays","""A peculiar but simple task. The researcher wants your fleet to fly into some asteroids and gather the telemetry from your drive bubble at the point of impact. But don't worry, you'll be reimbursed for any damage sustained, on top of additional compensation."" $heOrShe pauses and sends a documented contract to you.
+
+On your tripad, the contract details are listed: an estimated reward of $sep_srm_reward, calculated from potential sustained damage and additional compensation; no written deadline; and a requirement to gather $sep_srm_dataInDays days' worth of asteroid impact data.
+
+$HeOrShe clears their throat, drawing your attention back from the tripad. ""So. Interested?""",,
+sep_srm_s2BlurbBar,SEPSRMShowBlurbBar,$sep_srm_scenarioId == srm2 score:10,,A $manOrWoman in $personPost uniform is requesting help from passing captains but is largely rejected or ignored.,,
+sep_srm_s2OptionBar,SEPSRMShowOptionBar,$sep_srm_scenarioId == srm2 score:10,,,sep_srm_startBar:Talk to the $manOrWoman in $personPost uniform and ask what sort of help $heOrShe needs,
+sep_srm_s2OfferBar,SEPSRMShowOfferBar,$sep_srm_scenarioId == srm2 score:10,"SetTextHighlightColors h h
+SetTextHighlights $sep_srm_reward $sep_srm_dataInDays","The $manOrWoman looks at you hesitantly. ""I'll be blunt, Captain. I need your fleet to fly into some asteroids,"" $heOrShe says reluctantly. ""I know how that sounds, but it's for my research, and you'll be more than fairly compensated.""
+
+$HeOrShe pauses and hands over a tripad with a contract. ""As you can see, you'll be reimbursed for any damage sustained, on top of additional compensation, estimated to be around $sep_srm_reward,"" $heOrShe continues. ""There's no deadline, either. I just need $sep_srm_dataInDays days' worth of asteroid impact data.""
+
+$HeOrShe glances down at the tripad, then back at you. ""Interested?""",,
 ## SRM0 dialogues,,,,,,
 sep_srm_s0Blurb,SEPSRMShowBlurb,,,SAMPLE CONTACT BLURB,,
 sep_srm_s0Option,SEPSRMShowOption,,,,sep_srm_start:SAMPLE CONTACT OPTION,
