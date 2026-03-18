@@ -16,7 +16,7 @@ import com.fs.starfarer.api.util.IntervalUtil;
 import com.fs.starfarer.api.util.Misc;
 import org.apache.log4j.Logger;
 import sectorexpansionpack.Utils;
-import sectorexpansionpack.intel.events.ht.HTAnomalyResearchFactor;
+import sectorexpansionpack.intel.events.ht.HTResearchFactor;
 
 import java.awt.*;
 import java.util.List;
@@ -120,7 +120,10 @@ public class HyperspaceAnomalyResearchMission extends HubMissionWithBarEvent {
     @Override
     protected void endSuccessImpl(InteractionDialogAPI dialog, Map<String, MemoryAPI> memoryMap) {
         HyperspaceTopographyEventIntel intel = HyperspaceTopographyEventIntel.get();
-        intel.addFactor(new HTAnomalyResearchFactor(genRoundNumber(HTPoints.HIGH_MIN, HTPoints.HIGH_MAX)), dialog);
+        if (intel == null) {
+            intel = new HyperspaceTopographyEventIntel(null, false);
+        }
+        intel.addFactor(new HTResearchFactor(genRoundNumber(HTPoints.HIGH_MIN, HTPoints.HIGH_MAX), getBaseName()), dialog);
     }
 
     @Override

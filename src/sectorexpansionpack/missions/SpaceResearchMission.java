@@ -12,9 +12,8 @@ import com.fs.starfarer.api.impl.campaign.terrain.*;
 import com.fs.starfarer.api.ui.TooltipMakerAPI;
 import com.fs.starfarer.api.util.Misc;
 import org.apache.log4j.Logger;
-import sectorexpansionpack.MissionScenarioSpec;
 import sectorexpansionpack.Utils;
-import sectorexpansionpack.intel.events.ht.HTAnomalyResearchFactor;
+import sectorexpansionpack.intel.events.ht.HTResearchFactor;
 import sectorexpansionpack.missions.hub.SEPHubMissionWithScenario;
 
 import java.awt.*;
@@ -170,7 +169,10 @@ public class SpaceResearchMission extends SEPHubMissionWithScenario {
     @Override
     protected void endSuccessImpl(InteractionDialogAPI dialog, Map<String, MemoryAPI> memoryMap) {
         HyperspaceTopographyEventIntel intel = HyperspaceTopographyEventIntel.get();
-        intel.addFactor(new HTAnomalyResearchFactor(genRoundNumber(HTPoints.HIGH_MIN, HTPoints.HIGH_MAX)), dialog);
+        if (intel == null) {
+            intel = new HyperspaceTopographyEventIntel(null, false);
+        }
+        intel.addFactor(new HTResearchFactor(genRoundNumber(HTPoints.HIGH_MIN, HTPoints.HIGH_MAX), getBaseName()), dialog);
     }
 
     @Override
@@ -194,7 +196,7 @@ public class SpaceResearchMission extends SEPHubMissionWithScenario {
             }
             return true;
         } else if (this.currentStage == Stage.DELIVER_DATA) {
-            info.addPara("Deliver the completed research data to %s at %s, in the %s.", pad, tc, h,
+            info.addPara("Deliver the completed research data to %s at %s, in the %s. Or head to a nearby comm relay to send the data.", pad, tc, h,
                     getPerson().getName().getFullName(), getPerson().getMarket().getName(),
                     getPerson().getMarket().getStarSystem().getNameWithLowercaseTypeShort());
             return true;
@@ -227,7 +229,7 @@ public class SpaceResearchMission extends SEPHubMissionWithScenario {
             }
             info.addPara(missionTip, oPad, h);
         } else if (this.currentStage == Stage.DELIVER_DATA) {
-            info.addPara("Deliver the completed research data to %s at %s, in the %s.", oPad,
+            info.addPara("Deliver the completed research data to %s at %s, in the %s. Or head to a nearby comm relay to send the data.", oPad,
                     new Color[]{h, h, h},
                     getPerson().getName().getFullName(), getPerson().getMarket().getName(),
                     getPerson().getMarket().getStarSystem().getNameWithLowercaseTypeShort());

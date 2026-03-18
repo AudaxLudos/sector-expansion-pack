@@ -5,14 +5,17 @@ import com.fs.starfarer.api.impl.campaign.intel.events.BaseFactorTooltip;
 import com.fs.starfarer.api.impl.campaign.intel.events.BaseOneTimeFactor;
 import com.fs.starfarer.api.ui.TooltipMakerAPI;
 
-public class HTAnomalyResearchFactor extends BaseOneTimeFactor {
-    public HTAnomalyResearchFactor(int points) {
+public class HTResearchFactor extends BaseOneTimeFactor {
+    protected String text;
+
+    public HTResearchFactor(int points, String text) {
         super(points);
+        this.text = text;
     }
 
     @Override
     public String getDesc(BaseEventIntel intel) {
-        return "Anomaly research data gathered";
+        return this.text + " data gathered";
     }
 
     @Override
@@ -20,7 +23,7 @@ public class HTAnomalyResearchFactor extends BaseOneTimeFactor {
         return new BaseFactorTooltip() {
             @Override
             public void createTooltip(TooltipMakerAPI tooltip, boolean expanded, Object tooltipParam) {
-                tooltip.addPara("Topographic data and sensor readings based on the anomalies encountered", 0f);
+                tooltip.addPara("Topographic data and sensor readings based on completed research missions", 0f);
             }
         };
     }
