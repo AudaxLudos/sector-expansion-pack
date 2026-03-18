@@ -62,9 +62,16 @@ public class SpaceResearchMission extends SEPHubMissionWithScenario {
         this.maxProgress = genRoundNumber(12, 16);
         if (this.scenarioType == ScenarioType.BLACK_HOLE_RESEARCH) {
             this.maxProgress = genRoundNumber(2, 6);
+            this.rewardMult = 2f;
         } else if (this.scenarioType == ScenarioType.ASTEROID_IMPACTS_RESEARCH) {
-            this.maxProgress = genRoundNumber(6, 10);
+            this.maxProgress = genRoundNumber(4, 8);
+            this.rewardMult = 1.2f;
         } else if (this.scenarioType == ScenarioType.NEUTRON_STAR_RESEARCH) {
+            this.maxProgress = genRoundNumber(2, 6);
+            this.rewardMult = 2f;
+        } else if (this.scenarioType == ScenarioType.HYPERSPACE_GHOSTS_RESEARCH) {
+            this.maxProgress = genRoundNumber(2, 6);
+        } else if (this.scenarioType == ScenarioType.HYPERSPACE_ABYSS_RESEARCH) {
             this.maxProgress = genRoundNumber(2, 6);
         }
 

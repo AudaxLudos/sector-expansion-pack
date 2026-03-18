@@ -49,9 +49,9 @@ public abstract class SEPHubMissionWithScenario extends SEPHubMissionWithBarEven
             setCreditReward(CreditReward.valueOf(this.scenario.getCreditReward()));
         } else if (creditReward != null && !creditReward.isBlank() && Utils.isNumeric(creditReward)) {
             int r = Math.abs(Integer.parseInt(creditReward));
-            setCreditReward(r, r + 10000);
+            setCreditReward(r, r + 10000, true);
         } else {
-            setCreditReward(CreditReward.HIGH);
+            setCreditReward(CreditReward.HIGH.min, CreditReward.HIGH.max, true);
         }
     }
 
