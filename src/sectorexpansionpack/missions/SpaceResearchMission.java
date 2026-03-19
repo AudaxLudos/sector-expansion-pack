@@ -6,6 +6,7 @@ import com.fs.starfarer.api.campaign.econ.MarketAPI;
 import com.fs.starfarer.api.campaign.rules.MemoryAPI;
 import com.fs.starfarer.api.impl.campaign.ids.Entities;
 import com.fs.starfarer.api.impl.campaign.ids.Ranks;
+import com.fs.starfarer.api.impl.campaign.ids.StarTypes;
 import com.fs.starfarer.api.impl.campaign.intel.events.ht.HTPoints;
 import com.fs.starfarer.api.impl.campaign.intel.events.ht.HyperspaceTopographyEventIntel;
 import com.fs.starfarer.api.impl.campaign.terrain.*;
@@ -19,6 +20,7 @@ import sectorexpansionpack.missions.hub.SEPHubMissionWithScenario;
 import java.awt.*;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Random;
 
 public class SpaceResearchMission extends SEPHubMissionWithScenario {
@@ -118,9 +120,10 @@ public class SpaceResearchMission extends SEPHubMissionWithScenario {
 
         CampaignFleetAPI playerFleet = Global.getSector().getPlayerFleet();
         LocationAPI playerLocation = playerFleet.getContainingLocation();
+        StarSystemAPI playerSystem = playerFleet.getStarSystem();
         boolean addResearchData = false;
         if (this.scenarioType == ScenarioType.BLACK_HOLE_RESEARCH) {
-            if (!playerFleet.isInHyperspace()) {
+            if (!playerFleet.isInHyperspace() && systemHasStarType(playerSystem, StarTypes.BLACK_HOLE)) {
                 for (CampaignTerrainAPI terrain : playerLocation.getTerrainCopy()) {
                     if (terrain.getPlugin() instanceof EventHorizonPlugin plugin) {
                         addResearchData = plugin.containsEntity(playerFleet);
@@ -132,7 +135,7 @@ public class SpaceResearchMission extends SEPHubMissionWithScenario {
                 addResearchData = playerFleet.getMemoryWithoutUpdate().contains("$recentImpact");
             }
         } else if (this.scenarioType == ScenarioType.NEUTRON_STAR_RESEARCH) {
-            if (!playerFleet.isInHyperspace()) {
+            if (!playerFleet.isInHyperspace() || systemHasStarType(playerSystem, StarTypes.NEUTRON_STAR)) {
                 for (CampaignTerrainAPI terrain : playerLocation.getTerrainCopy()) {
                     if (terrain.getPlugin() instanceof PulsarBeamTerrainPlugin plugin) {
                         addResearchData = plugin.containsEntity(playerFleet);
@@ -146,14 +149,22 @@ public class SpaceResearchMission extends SEPHubMissionWithScenario {
             }
         } else if (this.scenarioType == ScenarioType.HYPERSPACE_ABYSS_RESEARCH) {
             if (playerFleet.isInHyperspace()) {
-                HyperspaceTerrainPlugin hyperspace = (HyperspaceTerrainPlugin) Misc.getHyperspaceTerrain().getPlugin();
-                HyperspaceAbyssPlugin abyss = hyperspace.getAbyssPlugin();
-                addResearchData = abyss.isInAbyss(playerFleet);
+                addResearchData = Misc.isInAbyss(playerFleet);
             }
         }
         if (addResearchData) {
             this.currProgress += days;
         }
+    }
+
+    private boolean systemHasStarType(StarSystemAPI system, String starType) {
+        if (system == null) {
+            return false;
+        }
+        PlanetAPI star1 = system.getStar();
+        PlanetAPI star2 = system.getSecondary();
+        PlanetAPI star3 = system.getTertiary();
+        return Objects.equals(star1.getTypeId(), starType) || Objects.equals(star2.getTypeId(), starType) || Objects.equals(star3.getTypeId(), starType);
     }
 
     @Override
