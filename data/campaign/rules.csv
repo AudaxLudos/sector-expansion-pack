@@ -588,12 +588,22 @@ Call $sep_srm_ref updateStage","You transmit the completed research data to the 
 
 $HeOrShe thanks you for the data before getting lost in its details, even forgeting to cut the comm link.",cutCommLink:Cut the comm link,
 ## SRM1 dialogues,,,,,,
-sep_srm_s1Blurb,SEPSRMShowBlurb,$sep_srm_scenarioId == srm1 score:10,,SAMPLE CONTACT BLURB,,
-sep_srm_s1Option,SEPSRMShowOption,$sep_srm_scenarioId == srm1 score:10,,,sep_srm_start:SAMPLE CONTACT OPTION,
-sep_srm_s1Offer,SEPSRMShowOffer,$sep_srm_scenarioId == srm1 score:10,,SAMPLE CONTACT OFFER TEXT,,
-sep_srm_s1BlurbBar,SEPSRMShowBlurbBar,$sep_srm_scenarioId == srm1 score:10,,SAMPLE BAR BLURB,,
-sep_srm_s1OptionBar,SEPSRMShowOptionBar,$sep_srm_scenarioId == srm1 score:10,,,sep_srm_startBar:SAMPLE BAR OPTION,
-sep_srm_s1OfferBar,SEPSRMShowOfferBar,$sep_srm_scenarioId == srm1 score:10,,SAMPLE BAR OFFER TEXT,,
+sep_srm_s1Blurb,SEPSRMShowBlurb,$sep_srm_scenarioId == srm1 score:10,,"""This one has been on our contract list for a while now, a risky but generous mission. It involves collecting real-time research data from black holes.""",,
+sep_srm_s1Option,SEPSRMShowOption,$sep_srm_scenarioId == srm1 score:10,,,sep_srm_start:Ask about collecting real-time research data from black holes,
+sep_srm_s1Offer,SEPSRMShowOffer,$sep_srm_scenarioId == srm1 score:10,"SetTextHighlightColors h h
+SetTextHighlights $sep_srm_dataInDays $sep_srm_reward","$PersonPost $PersonName pulls up a holographic display. ""A researcher needs real-time data from inside a black hole's event horizon. They want a fleet to stay there for at least $sep_srm_dataInDays days, gathering live data the whole time.""
+
+$HeOrShe continues, ""The payout is around $sep_srm_reward with bonuses and damage compensation included. There's also no deadline, so you can take your time.""
+
+$HeOrShe leans closer to the screen. ""To tell you the truth, Captain, a fleet was already lost on this mission, so if you're still interested, just say the word.""",,
+sep_srm_s1BlurbBar,SEPSRMShowBlurbBar,$sep_srm_scenarioId == srm1 score:10,,A $personPost sits elegantly at the corner of the bar glancing at passing patrons till $heOrShe crosses eyes with you.,,
+sep_srm_s1OptionBar,SEPSRMShowOptionBar,$sep_srm_scenarioId == srm1 score:10,,,sep_srm_startBar:Introduce yourself to the $personPost sitting elegantly at the corner of the bar,
+sep_srm_s1OfferBar,SEPSRMShowOfferBar,$sep_srm_scenarioId == srm1 score:10,"SetTextHighlightColors h h
+SetTextHighlights $sep_srm_dataInDays $sep_srm_reward","""Look, Captain, I've been rejected enough times to tell if someone will possibly say no. So I'll be direct,"" $heOrShe says.
+
+""I need your fleet to go inside an event horizon."" $heOrShe watches your reaction. ""It's for my research about black holes. I need you to stay near one for at least $sep_srm_dataInDays days. Just enough time to gather all the data I need.""
+
+$HeOrShe adds, ""You'll be compensated, of course. No hard deadline, either. Payout is around $sep_srm_reward, adjusted for damages and bonuses."" $HeOrShe pauses and hands over a tripad. ""What do you think?""",,
 ## SRM1 dialogues,,,,,,
 sep_srm_s2Blurb,SEPSRMShowBlurb,$sep_srm_scenarioId == srm2 score:10,,"""A researcher needs your fleet to collect asteroid impact data. The requirement is simple, but the task is... peculiar. The question is whether that bothers you.""",,
 sep_srm_s2Option,SEPSRMShowOption,$sep_srm_scenarioId == srm2 score:10,,,sep_srm_start:Ask about collecting asteroid impact data,
