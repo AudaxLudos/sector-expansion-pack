@@ -682,7 +682,7 @@ public abstract class SEPHubMissionWithBarEvent extends HubMissionWithBarEvent {
             if (this.fSizeOverride != null) {
                 fraction = this.fSizeOverride * (0.95f + random.nextFloat() * 0.1f);
             } else {
-                int numShipsDoctrine = 1;
+                int numShipsDoctrine;
                 if (this.params.doctrineOverride != null) {
                     numShipsDoctrine = this.params.doctrineOverride.getNumShips();
                 } else {

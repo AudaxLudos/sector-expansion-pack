@@ -141,11 +141,6 @@ public class MatrixCatalystDialogDelegate extends BaseCustomDialogDelegate imple
     }
 
     @Override
-    public CustomUIPanelPlugin getCustomPanelPlugin() {
-        return super.getCustomPanelPlugin();
-    }
-
-    @Override
     public void positionChanged(PositionAPI position) {
     }
 
@@ -187,7 +182,6 @@ public class MatrixCatalystDialogDelegate extends BaseCustomDialogDelegate imple
                 Global.getSector().getPlayerFleet().getCargo().removeCommodity(data.recipe.ingredientItemId, needIngredientCount);
             } else {
                 Global.getSector().getPlayerFleet().getCargo().removeCommodity(data.recipe.ingredientItemId, playerStorageIngredientCount);
-                needIngredientCount -= marketStorageIngredientCount;
             }
 
             if (!sendToStorage) {
@@ -203,7 +197,7 @@ public class MatrixCatalystDialogDelegate extends BaseCustomDialogDelegate imple
     }
 
     public static class ItemTooltipCreator extends BaseTooltipCreator {
-        CommoditySpecAPI itemSpec;
+        final CommoditySpecAPI itemSpec;
 
         public ItemTooltipCreator(CommoditySpecAPI itemSpec) {
             this.itemSpec = itemSpec;

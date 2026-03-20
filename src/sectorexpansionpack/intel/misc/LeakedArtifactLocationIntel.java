@@ -77,15 +77,13 @@ public class LeakedArtifactLocationIntel extends BaseIntelPlugin {
     public void addCreatedTimestamp(TooltipMakerAPI info, Color tc, float pad) {
         Color h = Misc.getHighlightColor();
 
-        long ts = this.queuedTimestamp;
-
         long msPerMin = 60L * 1000L;
         long msPerHour = msPerMin * 60L;
         long msPerDay = msPerHour * 24L;
         long msPerMonth = msPerDay * 30L;
         long msPerCycle = msPerDay * 365L;
 
-        long diff = Global.getSector().getClock().getTimestamp() - ts;
+        long diff = Global.getSector().getClock().getTimestamp() - this.queuedTimestamp;
 
         String agoStr;
         List<String> highlights = new ArrayList<>();

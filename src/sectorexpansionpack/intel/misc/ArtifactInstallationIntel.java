@@ -78,7 +78,6 @@ public class ArtifactInstallationIntel extends BaseIntelPlugin {
             initPad = 0f;
             info.addPara("%s installed " + this.market.getOnOrAt() + " %s", initPad, tc, h,
                     this.specialItemSpec.getName(), this.market.getName());
-            initPad = 0f;
         }
 
         unindent(info);

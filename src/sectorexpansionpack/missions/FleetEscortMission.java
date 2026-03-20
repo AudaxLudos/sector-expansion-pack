@@ -226,7 +226,7 @@ public class FleetEscortMission extends SEPHubMissionWithScenario {
         if (fSizeOverride != null) {
             fraction = fSizeOverride * (0.95f + getGenRandom().nextFloat() * 0.1f);
         } else {
-            int numShipsDoctrine = 1;
+            int numShipsDoctrine;
             if (doctrineOverride != null) {
                 numShipsDoctrine = doctrineOverride.getNumShips();
             } else {

@@ -6,7 +6,7 @@ import com.fs.starfarer.api.impl.campaign.intel.events.BaseOneTimeFactor;
 import com.fs.starfarer.api.ui.TooltipMakerAPI;
 
 public class HTResearchFactor extends BaseOneTimeFactor {
-    protected String text;
+    protected final String text;
 
     public HTResearchFactor(int points, String text) {
         super(points);
