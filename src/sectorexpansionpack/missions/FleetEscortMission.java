@@ -20,6 +20,7 @@ import java.util.*;
 import java.util.List;
 
 public class FleetEscortMission extends SEPHubMissionWithScenario {
+    public static final int BONUS_CREDITS_PER_LY = 2000;
     public static final float MISSION_DURATION = 120f;
     public static final float BAR_MILITARY_CHANCE = 0.4f;
     public static final Logger log = Global.getLogger(FleetEscortMission.class);
@@ -198,7 +199,13 @@ public class FleetEscortMission extends SEPHubMissionWithScenario {
             setTimeLimit(Stage.FAILED, MISSION_DURATION, null);
         }
 
+        int distToTargetLY = (int) Math.ceil(Misc.getDistanceLY(getPerson().getMarket().getLocationInHyperspace(), market.getLocationInHyperspace()));
+        if (!this.scenario.getTags().contains("oneWay")) {
+            distToTargetLY *= 2;
+        }
+
         setScenarioCreditReward(this.scenario.getCreditReward());
+        this.creditReward += distToTargetLY * BONUS_CREDITS_PER_LY;
         setRepChanges(0.05f, 0.1f, 0.05f, 0.1f);
         setScenarioComplications(Stage.class, log);
 
