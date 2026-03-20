@@ -114,6 +114,44 @@ public class MissionFleetFollowPlayerIfNearby implements EveryFrameScript {
                     assignmentType = FleetAssignment.GO_TO_LOCATION;
                     target = playerFleet.getContainingLocation().createToken(playerFleet.getLocation());
                     assignmentText = "following your fleet";
+
+                    // Hyperspace jump points are different from system jump points
+                    List<SectorEntityToken> jumpPoints = new ArrayList<>();
+                    if (this.fleet.isInHyperspace()) {
+                        jumpPoints.addAll(Utils.getHyperspaceJumpPoints(playerFleet.getStarSystem()));
+                    } else {
+                        jumpPoints.addAll(this.fleet.getContainingLocation().getJumpPoints());
+                    }
+
+                    // Find jump points that will lead to the players current layer e.g. in hyperspace or in star system
+                    List<JumpPointAPI.JumpDestination> jumpDestinations = new ArrayList<>();
+                    for (SectorEntityToken e : jumpPoints) {
+                        JumpPointAPI jp = (JumpPointAPI) e;
+                        for (JumpPointAPI.JumpDestination jd : jp.getDestinations()) {
+                            if (jd.getDestination() == null) {
+                                continue;
+                            }
+                            if (jd.getDestination().getContainingLocation() == playerFleet.getContainingLocation()) {
+                                jumpDestinations.add(jd);
+                            }
+                        }
+                    }
+
+                    // Find the closest jump point of for the escorted fleet to travel through
+                    JumpPointAPI.JumpDestination closestJumpDestination = null;
+                    float min = Float.MAX_VALUE;
+                    for (JumpPointAPI.JumpDestination jd : jumpDestinations) {
+                        float dist = Misc.getDistance(playerFleet, jd.getDestination());
+                        if (min > dist) {
+                            min = dist;
+                            closestJumpDestination = jd;
+                        }
+                    }
+
+                    if (closestJumpDestination != null) {
+                        this.fleet.updateFleetView();
+                        Global.getSector().doHyperspaceTransition(this.fleet, null, closestJumpDestination);
+                    }
                 } else {
                     assignmentType = FleetAssignment.ORBIT_PASSIVE;
                     target = Utils.getClosestJumpPoint(this.fleet);
