@@ -52,6 +52,8 @@ public class MissionFleetFollowPlayerIfNearby implements EveryFrameScript {
             Misc.giveStandardReturnToSourceAssignments(this.fleet);
             this.done = true;
             return;
+        } else {
+            this.fleet.getStats().getFleetwideMaxBurnMod().modifyFlat("sep_fleet_follow_script", 20);
         }
         if (this.fleet.getBattle() != null) {
             return;
