@@ -621,6 +621,35 @@ SetTextHighlights $sep_srm_reward $sep_srm_dataInDays","The $manOrWoman looks at
 $HeOrShe pauses and hands over a tripad with a contract. ""As you can see, you'll be reimbursed for any damage sustained, on top of additional compensation, estimated to be around $sep_srm_reward,"" $heOrShe continues. ""There's no deadline, either. I just need $sep_srm_dataInDays days' worth of asteroid impact data.""
 
 $HeOrShe glances down at the tripad, then back at you. ""Interested?""",,
+## SRM3 dialogues,,,,,,
+sep_srm_s3Blurb,SEPSRMShowBlurb,$sep_srm_scenarioId == srm3 score:10,,SAMPLE CONTACT BLURB,,
+sep_srm_s3Option,SEPSRMShowOption,$sep_srm_scenarioId == srm3 score:10,,,sep_srm_start:SAMPLE CONTACT OPTION,
+sep_srm_s3Offer,SEPSRMShowOffer,$sep_srm_scenarioId == srm3 score:10,,SAMPLE CONTACT OFFER TEXT,,
+sep_srm_s3BlurbBar,SEPSRMShowBlurbBar,$sep_srm_scenarioId == srm3 score:10,,SAMPLE BAR BLURB,,
+sep_srm_s3OptionBar,SEPSRMShowOptionBar,$sep_srm_scenarioId == srm3 score:10,,,sep_srm_startBar:SAMPLE BAR OPTION,
+sep_srm_s3OfferBar,SEPSRMShowOfferBar,$sep_srm_scenarioId == srm3 score:10,,SAMPLE BAR OFFER TEXT,,
+## SRM4 dialogues,,,,,,
+sep_srm_s4Blurb,SEPSRMShowBlurb,$sep_srm_scenarioId == srm4 score:10,,"""A researcher is throwing credits at anyone willing to fly out to the fringes of hyperspace and run sensor sweeps. Says they're looking for 'ghosts.'""",,
+sep_srm_s4Option,SEPSRMShowOption,$sep_srm_scenarioId == srm4 score:10,,,"sep_srm_start:Ask about running sensor sweeps in hyperspace to look for ""ghosts""",
+sep_srm_s4Offer,SEPSRMShowOffer,$sep_srm_scenarioId == srm4 score:10,"SetTextHighlightColors h h
+SetTextHighlights $sep_srm_dataInDays $sep_srm_reward","""The researcher needs about $sep_srm_dataInDays days' worth of hyperspace sensor data. Specifically, and I quote, data about 'Hyperspace Ghosts,'"" $heOrShe says skeptically. ""Can't say much about this other than rumors of strange sensor readings when traveling deep in hyperspace.""
+
+$HeOrShe continues, transmitting the full mission briefing. ""There's no set deadline for this assignment. Just gather the required data and send it directly to the researcher. Once done, you'll be awarded $sep_srm_reward. Interested?""",,
+sep_srm_s4BlurbBar,SEPSRMShowBlurbBar,$sep_srm_scenarioId == srm4 score:10,,A lone $personPost sits in front of what looks like sensor logs while being ignored by fellow $personPosts.,,
+sep_srm_s4OptionBar,SEPSRMShowOptionBar,$sep_srm_scenarioId == srm4 score:10,,,sep_srm_startBar:Approach the lone $personPost sitting in front of what looks like sensor logs,
+sep_srm_s4OfferBar,SEPSRMShowOfferBar,$sep_srm_scenarioId == srm4 score:10,"SetTextHighlightColors h h
+SetTextHighlights $sep_srm_dataInDays $sep_srm_reward","The $manOrWoman observes you before gesturing for you to sit. ""Have you heard of sensor ghosts? Strange readings, impossible blips. Things that appear on sensors but aren't there."" $HeOrShe pauses.
+
+""I'm investigating them,"" $HeOrShe says. ""My only issue now is that witness reports and official records don't seem to match."" $heOrShe emphasizes, ""So now I need a different way to get unobstructed data."" $HeOrShe continues.
+
+""That's where you come in, Captain,"" $heOrShe says with certainty. ""I need live data on these ghosts. At least $sep_srm_dataInDays days' worth."" $heOrShe adds, ""I'll let you take your time. Just get me the data, and I'll pay you $sep_srm_reward."" $HeOrShe leans forward. ""Do we have a deal?""",,
+## SRM5 dialogues,,,,,,
+sep_srm_s5Blurb,SEPSRMShowBlurb,$sep_srm_scenarioId == srm5 score:10,,SAMPLE CONTACT BLURB,,
+sep_srm_s5Option,SEPSRMShowOption,$sep_srm_scenarioId == srm5 score:10,,,sep_srm_start:SAMPLE CONTACT OPTION,
+sep_srm_s5Offer,SEPSRMShowOffer,$sep_srm_scenarioId == srm5 score:10,,SAMPLE CONTACT OFFER TEXT,,
+sep_srm_s5BlurbBar,SEPSRMShowBlurbBar,$sep_srm_scenarioId == srm5 score:10,,SAMPLE BAR BLURB,,
+sep_srm_s5OptionBar,SEPSRMShowOptionBar,$sep_srm_scenarioId == srm5 score:10,,,sep_srm_startBar:SAMPLE BAR OPTION,
+sep_srm_s5OfferBar,SEPSRMShowOfferBar,$sep_srm_scenarioId == srm5 score:10,,SAMPLE BAR OFFER TEXT,,
 ## SRM0 dialogues,,,,,,
 sep_srm_s0Blurb,SEPSRMShowBlurb,,,SAMPLE CONTACT BLURB,,
 sep_srm_s0Option,SEPSRMShowOption,,,,sep_srm_start:SAMPLE CONTACT OPTION,
