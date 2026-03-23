@@ -1,3 +1,12 @@
+### 0.2.18-alpha
+- Fix expedition intel crash when market star system is null
+- Discontinue hyperspace anomaly research
+- Add space research mission and scenarios
+- Make escort fleet jump AI more responsive
+- Increase escorted fleet burn speed to 20
+- Increase credit reward based on distance to target in fleet escort missions
+- Fix crash due to topgraphic intel not existing
+
 ### 0.2.0-alpha (384)
 - Add matrix catalyst industry
 - Fix search and rescue mission scenario missing highlight texts
