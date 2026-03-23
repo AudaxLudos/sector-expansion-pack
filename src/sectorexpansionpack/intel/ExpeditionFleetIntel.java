@@ -345,10 +345,12 @@ public class ExpeditionFleetIntel extends FleetGroupIntel {
             if (Utils.rollProbability(this.revealChance)) {
                 this.isLeaked = true;
 
-                new LeakedArtifactLocationIntel(action.getId(), this.source, this.target, this);
-                log.info(String.format("Leaking %s expedition intel at %s in the %s",
-                        getFaction().getDisplayName(), this.source.getName(),
-                        this.source.getStarSystem().getNameWithLowercaseTypeShort()));
+                if (this.source.getStarSystem() != null) {
+                    new LeakedArtifactLocationIntel(action.getId(), this.source, this.target, this);
+                    log.info(String.format("Leaking %s expedition intel at %s in the %s",
+                            getFaction().getDisplayName(), this.source.getName(),
+                            this.source.getStarSystem().getNameWithLowercaseTypeShort()));
+                }
             } else {
                 this.revealChance += 0.2f;
             }
