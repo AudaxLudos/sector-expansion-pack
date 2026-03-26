@@ -1,3 +1,8 @@
+### 0.2.23-alpha
+- Add abyss research scenario to space research mission
+- Add neutron star research scenario to space research mission
+- Fix crash when checking for multi-star star system in space research mission
+
 ### 0.2.18-alpha
 - Fix expedition intel crash when market star system is null
 - Discontinue hyperspace anomaly research
