@@ -652,12 +652,21 @@ SetTextHighlights $sep_srm_dataInDays $sep_srm_reward","The $manOrWoman observes
 
 ""That's where you come in, Captain,"" $heOrShe says with certainty. ""I need live data on these ghosts. At least $sep_srm_dataInDays days' worth."" $heOrShe adds, ""I'll let you take your time. Just get me the data, and I'll pay you $sep_srm_reward."" $HeOrShe leans forward. ""Do we have a deal?""",,
 ## SRM5 dialogues,,,,,,
-sep_srm_s5Blurb,SEPSRMShowBlurb,$sep_srm_scenarioId == srm5 score:10,,SAMPLE CONTACT BLURB,,
-sep_srm_s5Option,SEPSRMShowOption,$sep_srm_scenarioId == srm5 score:10,,,sep_srm_start:SAMPLE CONTACT OPTION,
-sep_srm_s5Offer,SEPSRMShowOffer,$sep_srm_scenarioId == srm5 score:10,,SAMPLE CONTACT OFFER TEXT,,
-sep_srm_s5BlurbBar,SEPSRMShowBlurbBar,$sep_srm_scenarioId == srm5 score:10,,SAMPLE BAR BLURB,,
-sep_srm_s5OptionBar,SEPSRMShowOptionBar,$sep_srm_scenarioId == srm5 score:10,,,sep_srm_startBar:SAMPLE BAR OPTION,
-sep_srm_s5OfferBar,SEPSRMShowOfferBar,$sep_srm_scenarioId == srm5 score:10,,SAMPLE BAR OFFER TEXT,,
+sep_srm_s5Blurb,SEPSRMShowBlurb,$sep_srm_scenarioId == srm5 score:10,,"""An associate of ours has requested for you personally, something about a research project invloving the Abyss""",,
+sep_srm_s5Option,SEPSRMShowOption,$sep_srm_scenarioId == srm5 score:10,,,sep_srm_start:Ask about the research project involving the Abyss,
+sep_srm_s5Offer,SEPSRMShowOffer,$sep_srm_scenarioId == srm5 score:10,,"$PersonPost $PersonName sends you the mission briefing before starting. ""The associate wants to collect telemetry for their research project. They're offering $sep_srm_reward in exchange for $sep_srm_dataInDays days' worth of telemetry,"" $heOrShe pauses. ""Telemetry only found in the Abyss.""
+
+""Due to the risks involved, the associate has placed no deadline for this mission. Just ensure that the data is collected and sent,"" $heOrShe adds. ""And if you have any other questions, refer to the mission briefing."" $HeOrShe asks, ""What do you think, Captain?""
+
+According to the mission briefing, the Abyss is the space between our galaxy's spirals, and reaching it requires going beyond this sector.",,
+sep_srm_s5BlurbBar,SEPSRMShowBlurbBar,$sep_srm_scenarioId == srm5 score:10,,"A message titled ""Abyss Research"" appears on your tripad. The sender asks to meet you in one of the bar's private rooms, $personPostAOrAn $personPost apparently.",,
+sep_srm_s5OptionBar,SEPSRMShowOptionBar,$sep_srm_scenarioId == srm5 score:10,,,"sep_srm_startBar:Meet the sender of the ""Abyss Research"" message",
+sep_srm_s5OfferBar,SEPSRMShowOfferBar,$sep_srm_scenarioId == srm5 score:10,"SetTextHighlightColors h h
+SetTextHighlights $sep_srm_dataInDays $sep_srm_reward","""It's finally nice to meet you, Captain. I'm $personName."" $HeOrShe extends a hand for a handshake. You oblige and introduce yourself before $heOrShe continues.
+
+""I've heard you're reliable, Captain. Someone who can do things outside standard purview."" $heOrShe hands over a tripad. ""We've been trying to collect data for our research project. A project involving the Abyss,"" $heOrShe emphasizes, ""the seams between our galaxy's spirals.""
+
+""The task is simple. Go to the Abyss and gather $sep_srm_dataInDays days' worth of telemetry."" $heOrShe adds, ""Due to the risks and distance, there will be no deadline. In exchange, once the data is collected and received, you'll be paid $sep_srm_reward for your services."" $HeOrShe looks at you expectantly. ""So, Captain, do we have a deal?""",,
 ## SRM0 dialogues,,,,,,
 sep_srm_s0Blurb,SEPSRMShowBlurb,,,SAMPLE CONTACT BLURB,,
 sep_srm_s0Option,SEPSRMShowOption,,,,sep_srm_start:SAMPLE CONTACT OPTION,
