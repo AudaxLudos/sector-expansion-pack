@@ -622,12 +622,20 @@ $HeOrShe pauses and hands over a tripad with a contract. ""As you can see, you'l
 
 $HeOrShe glances down at the tripad, then back at you. ""Interested?""",,
 ## SRM3 dialogues,,,,,,
-sep_srm_s3Blurb,SEPSRMShowBlurb,$sep_srm_scenarioId == srm3 score:10,,SAMPLE CONTACT BLURB,,
-sep_srm_s3Option,SEPSRMShowOption,$sep_srm_scenarioId == srm3 score:10,,,sep_srm_start:SAMPLE CONTACT OPTION,
-sep_srm_s3Offer,SEPSRMShowOffer,$sep_srm_scenarioId == srm3 score:10,,SAMPLE CONTACT OFFER TEXT,,
-sep_srm_s3BlurbBar,SEPSRMShowBlurbBar,$sep_srm_scenarioId == srm3 score:10,,SAMPLE BAR BLURB,,
-sep_srm_s3OptionBar,SEPSRMShowOptionBar,$sep_srm_scenarioId == srm3 score:10,,,sep_srm_startBar:SAMPLE BAR OPTION,
-sep_srm_s3OfferBar,SEPSRMShowOfferBar,$sep_srm_scenarioId == srm3 score:10,,SAMPLE BAR OFFER TEXT,,
+sep_srm_s3Blurb,SEPSRMShowBlurb,$sep_srm_scenarioId == srm3 score:10,,"""A research contract was recently posted requiring the collection of telemetry from neutron stars, but due to the inherent risks, FleetComm has allowed third-party captains to accept.""",,
+sep_srm_s3Option,SEPSRMShowOption,$sep_srm_scenarioId == srm3 score:10,,,sep_srm_start:Ask about collecting telemetry from neutron stars,
+sep_srm_s3Offer,SEPSRMShowOffer,$sep_srm_scenarioId == srm3 score:10,"SetTextHighlightColors h h
+SetTextHighlights $sep_srm_dataInDays $sep_srm_reward","""The task is quite simple,"" $heOrShe explains. ""Go to a neutron star, enter its rotating pulsar beam, and stay there for at least $sep_srm_dataInDays days. Just enough time to collect as much telemetry as we need."" $HeOrShe pauses. ""You Take as much time as you need. There's no deadline on this.""
+
+$HeOrShe continues, ""Once the data is collected and sent, a credit reward of $sep_srm_reward will be issued. That includes compensation for any sustained damage during operations."" $HeOrShe looks at you expectantly. ""So, Captain. Do you think you're up for the task?""",,
+sep_srm_s3BlurbBar,SEPSRMShowBlurbBar,$sep_srm_scenarioId == srm3 score:10,,A table filled with a research papers is being logged by $personPostAOrAn $personPost. A piece of paper falls from that table and slides next to your feet.,,
+sep_srm_s3OptionBar,SEPSRMShowOptionBar,$sep_srm_scenarioId == srm3 score:10,,,sep_srm_startBar:Pick the paper on your feet and approach the $personPost logging research papers,
+sep_srm_s3OfferBar,SEPSRMShowOfferBar,$sep_srm_scenarioId == srm3 score:10,"SetTextHighlightColors h h
+SetTextHighlights $sep_srm_dataInDays $sep_srm_reward","You hand the paper back to the $personPost. The two of you exchange brief pleasantries, and after a moment, $heOrShe lays $hisOrHer tripad down to talk.
+
+""I could use your help, Captain,"" $heOrShe says. ""I want to complete my research on neutron stars, but I still need $sep_srm_dataInDays days' worth of live telemetry about pulsar beams."" $heOrShe continues, ""The public archives are insufficient, and anything important is locked behind clearance I don't have.""
+
+$HeOrShe pulls up a star chart on $hisOrHer tripad. ""So the only thing I can do now is request someone to get it."" $heOrShe slides the tripad toward you. ""I know it's a risky job, but I'll compensate you for it, $sep_srm_reward to be precise. I don't mind if it takes a long time. Just get me the data, and the credits are yours."" $heOrShe says while waiting for your reply.",,
 ## SRM4 dialogues,,,,,,
 sep_srm_s4Blurb,SEPSRMShowBlurb,$sep_srm_scenarioId == srm4 score:10,,"""A researcher is throwing credits at anyone willing to fly out to the fringes of hyperspace and run sensor sweeps. Says they're looking for 'ghosts.'""",,
 sep_srm_s4Option,SEPSRMShowOption,$sep_srm_scenarioId == srm4 score:10,,,"sep_srm_start:Ask about running sensor sweeps in hyperspace to look for ""ghosts""",
