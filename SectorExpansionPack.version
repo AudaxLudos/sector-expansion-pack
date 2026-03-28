@@ -1,0 +1,12 @@
+{
+    "masterVersionFile": "https://raw.githubusercontent.com/AudaxLudos/sector-expansion-pack/main/SectorExpansionPack.version",
+    "modName": "Sector Expansion Pack",
+    "modVersion": {
+            "major": "0",
+            "minor": "2",
+            "patch": "23-alpha"
+    },
+    "modThreadId": 29441,
+    "directDownloadURL": "https://github.com/AudaxLudos/sector-expansion-pack/releases/latest/download/SectorExpansionPack.zip",
+    "changelogURL": "https://raw.githubusercontent.com/AudaxLudos/sector-expansion-pack/main/CHANGELOG.txt"
+}
