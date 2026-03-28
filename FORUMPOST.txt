@@ -1,0 +1,61 @@
+[center]
+[size=36pt]Sector Expansion Pack [color=blue]0.2.23-alpha[/color][/size]
+
+[url=https://www.patreon.com/posts/104646187][img]https://img.shields.io/github/downloads/audaxludos/sector-expansion-pack/total?style=for-the-badge&label=Download%20Latest[/img][/url] [url=https://raw.githubusercontent.com/AudaxLudos/sector-expansion-pack/main/CHANGELOG.txt][img]https://img.shields.io/github/v/release/AudaxLudos/sector-expansion-pack?style=for-the-badge&label=Changelog[/img][/url] [url=https://github.com/AudaxLudos/sector-expansion-pack/releases][img]https://img.shields.io/badge/Releases%20-%20GitHub%20-%20light%20green?style=for-the-badge[/img][/url]
+
+[size=12pt][color=red]Warning:[/color][/size]
+Due to its alpha state some features may not be fully fleshed out,
+crashes may happen from time to time, dialogues maybe inconsistent,
+and finally mod updates may not be compatible with each other
+
+[size=12pt][color=red]Compatibility:[/color][/size]
+Should be compatible with most mods
+Safe to add from an ongoing campaign
+Unsafe to remove from an ongoing campaign
+
+[size=12pt][color=red]Integrations:[/color][/size]
+Second-In-Command - Adds 2 new aptitudes
+LunaLib - Has native support for mod settings
+
+[hr]
+[size=24pt]Features[/size]
+[size=16pt]Quests[/size]
+[size=2pt]ㅤ[/size]
+- Adds 4 new repeatable quests to find and complete
+- Certain repeatable quests can have different scenarios or objectives
+- Certain repeatable quests can reward more than just credits
+[size=4pt]ㅤ[/size]
+[spoiler][img width=600]https://i.imgur.com/5onfjSp.jpeg[/img] [img width=600]https://i.imgur.com/5YGXCbL.jpeg[/img][br][img width=600]https://i.imgur.com/c5iHJUp.jpeg[/img] [img width=600]https://i.imgur.com/cxPycMH.jpeg[/img][/spoiler]
+[size=16pt]Events[/size]
+[size=2pt]ㅤ[/size]
+- Adds 2 new faction events to witness and interact with
+- These events can broadly change a strength of faction
+[size=4pt]ㅤ[/size]
+[spoiler][img width=600]https://i.imgur.com/hz6tKzW.jpeg[/img] [img width=600]https://i.imgur.com/7lvUOwJ.jpeg[/img][/spoiler]
+[size=16pt]Structures[/size]
+[size=2pt]ㅤ[/size]
+- Adds 1 new structure with unique effects to build
+[size=4pt]ㅤ[/size]
+[spoiler][img width=600]https://i.imgur.com/Rl4Wiw8.jpeg[/img][/spoiler]
+[size=16pt]Mod Integrations[/size]
+[size=2pt]ㅤ[/size]
+- Adds 2 new aptitudes to second-in-command mod
+[size=4pt]ㅤ[/size]
+[spoiler][img width=600]https://i.imgur.com/cva70Hg.jpeg[/img] [img width=600]https://i.imgur.com/SZ2zKJ3.jpeg[/img][/spoiler]
+[size=16pt]Miscellaneous[/size]
+[size=2pt]ㅤ[/size]
+- Adds 3 new anomalies that can only be witnessed in hyperspace
+[size=4pt]ㅤ[/size]
+[hr]
+[size=24pt]Credits[/size]
+[b][url=https://fractalsoftworks.com/forum/index.php?action=profile;u=7678]Wispborne[/url][/b] - for the starsector intellij mod template and the github action script.
+[b][url=https://discord.com/invite/a8AWVcPCPr]starsector community[/url][/b] - for many resources in regard to modding and spriting.
+[b][url=https://fractalsoftworks.com/]Alex and Co[/url][/b] - for making a great game and community.
+
+[size=24pt]Support[/size]
+If you need any help you can message me here on the forums,
+on my patreon page or on the unofficial starsector discord server.
+If you want to support my work feel free to follow me on patreon.
+
+[url=https://www.patreon.com/audaxludos/][img]https://img.shields.io/badge/patreon-%23f96854?style=for-the-badge&logo=patreon[/img][/url]
+[/center]

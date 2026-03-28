@@ -1,3 +1,4 @@
+FORUMPOST.txt
 .psd$
 .ai$
 .afphoto$
