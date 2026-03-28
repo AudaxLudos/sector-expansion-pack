@@ -1,3 +1,6 @@
+### 0.2.25-alpha
+- Add mod version checker files
+
 ### 0.2.23-alpha
 - Add abyss research scenario to space research mission
 - Add neutron star research scenario to space research mission

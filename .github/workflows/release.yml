@@ -46,7 +46,7 @@ jobs:
         with:
           name: ${{ env.VERSION }}
           tag: ${{ env.VERSION }}
-          body: "View CHANGELOG.txt for changes"
+          body: "View changes here: [CHANGELOG](https://raw.githubusercontent.com/AudaxLudos/sector-expansion-pack/main/CHANGELOG.txt)"
           draft: false
           prerelease: '${{ env.IS_PRERELEASE }}'
           token: ${{ secrets.GITHUB_TOKEN }}
