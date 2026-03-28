@@ -55,7 +55,7 @@ $personName looks at you eagerly.
 sep_survivorOfficerMentored,PopulateOptionsHire,"$sep_survivor score:1000
 $askedSkills == true
 $mentored == true","SetTextHighlightColors storyOptionColor
-SetTextHighlights Mentored",The officer will to learn more than usual. $HeOrShe will earn more experience in combat and can select more skills when leveling up.,,
+SetTextHighlights Mentored",The officer will learn more than usual. $HeOrShe will earn more experience in combat and can select more skills when leveling up.,,
 sep_survivorOfficerMaxLevel,PopulateOptionsHire,"$sep_survivor score:1000
 $askedSkills == true
 $officerMaxLevel > 5","SetTextHighlightColors hColor hColor
