@@ -675,3 +675,11 @@ sep_srm_s0BlurbBar,SEPSRMShowBlurbBar,,,SAMPLE BAR BLURB,,
 sep_srm_s0OptionBar,SEPSRMShowOptionBar,,,,sep_srm_startBar:SAMPLE BAR OPTION,
 sep_srm_s0OfferBar,SEPSRMShowOfferBar,,,SAMPLE BAR OFFER TEXT,,
 # Space Research END,,,,,,
+,,,,,,
+,,,,,,
+,,,,,,
+# Clear Debris Fields START,,,,,,
+sep_cdf_clearDebris,DialogOptionSelected,"$option == salSalvage
+$sep_cdf_target score:100","Call $sep_cdf_eventRef clearDebris
+SalvageEntity checkAccidents",,,
+# Clear Debris Fields END,,,,,,

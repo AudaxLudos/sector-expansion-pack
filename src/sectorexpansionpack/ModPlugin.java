@@ -5,12 +5,14 @@ import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.campaign.SectorAPI;
 import com.fs.starfarer.api.campaign.listeners.ListenerManagerAPI;
 import com.fs.starfarer.api.impl.campaign.ghosts.SensorGhostManager;
+import com.fs.starfarer.api.impl.campaign.intel.GenericMissionManager;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import sectorexpansionpack.ghosts.types.FleetEaterGhostCreator;
 import sectorexpansionpack.ghosts.types.StormInducerGhostCreator;
 import sectorexpansionpack.ghosts.types.StormPacifierGhostCreator;
+import sectorexpansionpack.intel.ClearDebrisFieldsIntelCreator;
 import sectorexpansionpack.intel.ExpeditionFleetManager;
 import sectorexpansionpack.intel.IncursionFleetManager;
 import sectorexpansionpack.listeners.MatrixCatalystBlueprintAdder;
@@ -85,6 +87,11 @@ public class ModPlugin extends BaseModPlugin {
         }
         if (!sector.hasScript(IncursionFleetManager.class)) {
             sector.addScript(new IncursionFleetManager());
+        }
+
+        GenericMissionManager genericMissionManager = GenericMissionManager.getInstance();
+        if (!genericMissionManager.hasMissionCreator(ClearDebrisFieldsIntelCreator.class)) {
+            genericMissionManager.addMissionCreator(new ClearDebrisFieldsIntelCreator());
         }
 
         // Campaign input listeners

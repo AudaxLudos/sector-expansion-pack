@@ -171,10 +171,7 @@ public class SpaceResearchMission extends SEPHubMissionWithScenario {
             return true;
         }
         PlanetAPI star3 = system.getTertiary();
-        if (star3 != null && Objects.equals(star3.getTypeId(), starType)) {
-            return true;
-        }
-        return false;
+        return star3 != null && Objects.equals(star3.getTypeId(), starType);
     }
 
     @Override
