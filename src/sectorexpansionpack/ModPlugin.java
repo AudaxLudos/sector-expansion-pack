@@ -12,9 +12,7 @@ import org.json.JSONObject;
 import sectorexpansionpack.ghosts.types.FleetEaterGhostCreator;
 import sectorexpansionpack.ghosts.types.StormInducerGhostCreator;
 import sectorexpansionpack.ghosts.types.StormPacifierGhostCreator;
-import sectorexpansionpack.intel.ClearDebrisFieldsIntelCreator;
-import sectorexpansionpack.intel.ExpeditionFleetManager;
-import sectorexpansionpack.intel.IncursionFleetManager;
+import sectorexpansionpack.intel.*;
 import sectorexpansionpack.listeners.MatrixCatalystBlueprintAdder;
 import sectorexpansionpack.listeners.MatrixCatalystOptionProvider;
 
@@ -92,6 +90,9 @@ public class ModPlugin extends BaseModPlugin {
         GenericMissionManager genericMissionManager = GenericMissionManager.getInstance();
         if (!genericMissionManager.hasMissionCreator(ClearDebrisFieldsIntelCreator.class)) {
             genericMissionManager.addMissionCreator(new ClearDebrisFieldsIntelCreator());
+        }
+        if (!genericMissionManager.hasMissionCreator(ConstructObjectiveIntelCreator.class)) {
+            genericMissionManager.addMissionCreator(new ConstructObjectiveIntelCreator());
         }
 
         // Campaign input listeners
