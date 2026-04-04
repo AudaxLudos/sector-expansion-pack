@@ -168,12 +168,12 @@ public class ClearDebrisFieldsMissionIntel extends BaseMissionIntel {
                 opad, this.faction.getBaseUIColor(), Misc.ucFirst(this.faction.getPersonNamePrefix()));
 
         if (isPosted() || isAccepted()) {
+            addBulletPoints(info, ListInfoMode.IN_DESC);
+
             if (isAccepted()) {
                 info.addPara("Their is currently %s out of %s debris fields cleared.",
                         opad, this.faction.getBaseUIColor(), this.clearedDebris + "", this.debrisFields.size() + "");
             }
-
-            addBulletPoints(info, ListInfoMode.IN_DESC);
 
             addGenericMissionState(info);
 

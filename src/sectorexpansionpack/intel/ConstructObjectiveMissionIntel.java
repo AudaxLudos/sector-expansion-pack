@@ -173,7 +173,7 @@ public class ConstructObjectiveMissionIntel extends BaseMissionIntel {
         info.addImage(this.faction.getLogo(), width, 128, opad);
 
         info.addPara("%s authorities have posted a reward for constructing " + objSpec.getAOrAn() + " makeshift "
-                        + objSpec.getNameInText() + " in the " + this.market.getStarSystem().getNameWithLowercaseType() + ".",
+                        + objSpec.getNameInText() + " in the " + this.system.getNameWithLowercaseType() + ".",
                 opad, this.faction.getBaseUIColor(), Misc.ucFirst(this.faction.getPersonNamePrefix()));
 
         if (isPosted() || isAccepted()) {
