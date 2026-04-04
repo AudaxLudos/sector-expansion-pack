@@ -32,7 +32,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Random;
 
-// TODO: Integrate with Nexerlin
 public class IncursionFleetIntel extends GenericRaidFGI {
     public static final String EVENT_KEY = "$sep_ifi_ref";
     public static final String FACTION_KEY = "$sep_ifi_sourceFaction";

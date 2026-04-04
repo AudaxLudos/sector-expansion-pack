@@ -12,8 +12,6 @@ import second_in_command.specs.SCBaseSkillPlugin;
 import java.awt.*;
 import java.util.Objects;
 
-// TODO: Reduce sensor profile mult to 15%
-// TODO: Reduce sensor range mult to 15%
 public class HarmonizedSensors extends SCBaseSkillPlugin {
     public static final float SENSOR_PROFILE_MULT = 0.20f;
     public static final float SENSOR_RANGE_MULT = 0.20f;

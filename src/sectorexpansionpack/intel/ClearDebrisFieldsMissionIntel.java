@@ -14,7 +14,6 @@ import com.fs.starfarer.api.impl.campaign.terrain.DebrisFieldTerrainPlugin;
 import com.fs.starfarer.api.ui.SectorMapAPI;
 import com.fs.starfarer.api.ui.TooltipMakerAPI;
 import com.fs.starfarer.api.util.Misc;
-import com.fs.starfarer.api.util.WeightedRandomPicker;
 import org.apache.log4j.Logger;
 import org.lwjgl.util.vector.Vector2f;
 import sectorexpansionpack.Utils;
@@ -28,25 +27,15 @@ import java.util.Set;
 public class ClearDebrisFieldsMissionIntel extends BaseMissionIntel {
     public static Logger log = Global.getLogger(ClearDebrisFieldsMissionIntel.class);
     protected MarketAPI market;
+    protected StarSystemAPI system;
     protected FactionAPI faction;
     protected int reward;
     protected int numDebris;
     protected int clearedDebris = 0;
     protected List<SectorEntityToken> debrisFields = new ArrayList<>();
 
-    public ClearDebrisFieldsMissionIntel() {
-        WeightedRandomPicker<MarketAPI> marketPicker = new WeightedRandomPicker<>();
-        for (MarketAPI market : Global.getSector().getEconomy().getMarketsCopy()) {
-            if (market.isHidden()) {
-                continue;
-            }
-            if (market.getFaction().isPlayerFaction()) {
-                continue;
-            }
-            marketPicker.add(market, market.getSize());
-        }
-
-        this.market = marketPicker.pick();
+    public ClearDebrisFieldsMissionIntel(MarketAPI market) {
+        this.market = market;
         if (this.market == null) {
             endImmediately();
             return;
@@ -293,5 +282,9 @@ public class ClearDebrisFieldsMissionIntel extends BaseMissionIntel {
         }
 
         return true;
+    }
+
+    public MarketAPI getMarket() {
+        return this.market;
     }
 }
