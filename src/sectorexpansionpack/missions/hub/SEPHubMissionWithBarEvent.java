@@ -545,7 +545,12 @@ public abstract class SEPHubMissionWithBarEvent extends HubMissionWithBarEvent {
         }
     }
 
-    public record FactionTurnedHostileChecker(FactionAPI faction) implements ConditionChecker {
+    public static class FactionTurnedHostileChecker implements ConditionChecker {
+        protected final FactionAPI faction;
+
+        public FactionTurnedHostileChecker(FactionAPI faction) {
+            this.faction = faction;
+        }
 
         @Override
         public boolean conditionsMet() {
@@ -554,8 +559,8 @@ public abstract class SEPHubMissionWithBarEvent extends HubMissionWithBarEvent {
     }
 
     public static class PlanetBooleanMemoryFlag implements PlanetRequirement {
-        final String flag;
-        final boolean negate;
+        protected final String flag;
+        protected final boolean negate;
 
         public PlanetBooleanMemoryFlag(String flag, boolean negate) {
             this.flag = flag;
