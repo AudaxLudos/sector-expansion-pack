@@ -22,7 +22,7 @@ public class ExpeditionFleetManager extends BaseEventManager {
     @Override
     protected float getBaseInterval() {
         // Do this every 4 months
-        return 94f;
+        return Settings.EXPEDITIONS_TIMER;
     }
 
     @Override

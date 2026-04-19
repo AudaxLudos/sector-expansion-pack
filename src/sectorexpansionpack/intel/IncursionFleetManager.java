@@ -22,7 +22,7 @@ public class IncursionFleetManager extends BaseEventManager {
     @Override
     protected float getBaseInterval() {
         // Do this every 6 months
-        return 183f;
+        return Settings.INCURSIONS_TIMER;
     }
 
     @Override

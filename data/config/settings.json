@@ -1,6 +1,9 @@
 {
-  "sep_expeditions_enabled": true,
-  "sep_incursions_enabled": true,
+  "sep_expeditions_enabled": true, # Sets whether or not expeditions can happen in a campaign. Default true
+  "sep_expeditions_timer": 94, # Sets the interval between each expedition in days as well as the grace period for the first expedition. Default 94
+  "sep_incursions_enabled": true, # Sets whether or not incursions can happen in a campaign. Default true
+  "sep_incursions_timer": 183, # Sets the interval between each incursion in days as well as the grace period for the first incursion. Default 183
+
   "graphics": {
     "intel": {
       "sep_expeditionFleet": "graphics/sectorexpansionpack/icons/expedition_fleet.png",
