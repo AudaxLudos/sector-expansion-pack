@@ -12,7 +12,10 @@ import org.json.JSONObject;
 import sectorexpansionpack.ghosts.types.FleetEaterGhostCreator;
 import sectorexpansionpack.ghosts.types.StormInducerGhostCreator;
 import sectorexpansionpack.ghosts.types.StormPacifierGhostCreator;
-import sectorexpansionpack.intel.*;
+import sectorexpansionpack.intel.ClearDebrisFieldsIntelCreator;
+import sectorexpansionpack.intel.ConstructObjectiveIntelCreator;
+import sectorexpansionpack.intel.ExpeditionFleetManager;
+import sectorexpansionpack.intel.IncursionFleetManager;
 import sectorexpansionpack.listeners.MatrixCatalystBlueprintAdder;
 import sectorexpansionpack.listeners.MatrixCatalystOptionProvider;
 

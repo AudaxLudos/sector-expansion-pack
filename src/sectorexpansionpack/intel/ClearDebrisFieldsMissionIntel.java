@@ -9,6 +9,7 @@ import com.fs.starfarer.api.impl.campaign.ids.Factions;
 import com.fs.starfarer.api.impl.campaign.ids.MemFlags;
 import com.fs.starfarer.api.impl.campaign.ids.Tags;
 import com.fs.starfarer.api.impl.campaign.intel.BaseMissionIntel;
+import com.fs.starfarer.api.impl.campaign.procgen.SalvageEntityGenDataSpec;
 import com.fs.starfarer.api.impl.campaign.procgen.themes.BaseThemeGenerator;
 import com.fs.starfarer.api.impl.campaign.terrain.DebrisFieldTerrainPlugin;
 import com.fs.starfarer.api.ui.SectorMapAPI;
@@ -86,7 +87,7 @@ public class ClearDebrisFieldsMissionIntel extends BaseMissionIntel {
     @Override
     public void missionAccepted() {
         for (int i = 0; i < this.numDebris; ) {
-            float radius = 150f + Utils.random.nextFloat() * 300f;
+            float radius = 150f + (Utils.random.nextFloat() * 300f);
             DebrisFieldTerrainPlugin.DebrisFieldParams params = new DebrisFieldTerrainPlugin.DebrisFieldParams(
                     radius, -1f, 10000000f, 0f);
             params.source = DebrisFieldTerrainPlugin.DebrisFieldSource.PLAYER_SALVAGE;
@@ -104,6 +105,40 @@ public class ClearDebrisFieldsMissionIntel extends BaseMissionIntel {
                 debris.setOrbit(null);
                 debris.getLocation().set(loc.location);
             }
+
+            debris.getDropValue().clear();
+            debris.getDropRandom().clear();
+
+            SalvageEntityGenDataSpec.DropData d = new SalvageEntityGenDataSpec.DropData();
+            d.chances = 1;
+            d.group = "blueprints_low";
+            debris.addDropRandom(d);
+
+            d = new SalvageEntityGenDataSpec.DropData();
+            d.chances = 1;
+            d.group = "rare_tech_low";
+            d.valueMult = 0.1f;
+            debris.addDropRandom(d);
+
+            d = new SalvageEntityGenDataSpec.DropData();
+            d.chances = 1;
+            d.group = "ai_cores3";
+            debris.addDropRandom(d);
+
+            d = new SalvageEntityGenDataSpec.DropData();
+            d.chances = 1;
+            d.group = "any_hullmod_low";
+            debris.addDropRandom(d);
+
+            d = new SalvageEntityGenDataSpec.DropData();
+            d.chances = 5;
+            d.group = "weapons2";
+            debris.addDropRandom(d);
+
+            d = new SalvageEntityGenDataSpec.DropData();
+            d.group = "basic";
+            d.value = (int) ((1000 + params.bandWidthInEngine) * Utils.random.nextInt(5, 10));
+            debris.addDropValue(d);
 
             debris.getMemoryWithoutUpdate().set("$sep_cdf_target", true, getDuration());
             debris.getMemoryWithoutUpdate().set("$sep_cdf_eventRef", this, getDuration());

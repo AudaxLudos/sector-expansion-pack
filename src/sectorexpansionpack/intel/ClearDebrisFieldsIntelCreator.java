@@ -20,7 +20,7 @@ public class ClearDebrisFieldsIntelCreator implements GenericMissionManager.Gene
         if (market == null) {
             return null;
         }
-        
+
         return new ClearDebrisFieldsMissionIntel(market);
     }
 
