@@ -1,11 +1,16 @@
 package sectorexpansionpack.missions;
 
+import com.fs.starfarer.api.EveryFrameScript;
 import com.fs.starfarer.api.Global;
+import com.fs.starfarer.api.Script;
 import com.fs.starfarer.api.campaign.*;
+import com.fs.starfarer.api.campaign.ai.FleetAssignmentDataAPI;
 import com.fs.starfarer.api.campaign.econ.*;
 import com.fs.starfarer.api.campaign.rules.MemoryAPI;
 import com.fs.starfarer.api.impl.campaign.fleets.FleetFactoryV3;
 import com.fs.starfarer.api.impl.campaign.ids.*;
+import com.fs.starfarer.api.impl.campaign.missions.hub.BaseHubMission;
+import com.fs.starfarer.api.impl.campaign.missions.hub.MissionTrigger;
 import com.fs.starfarer.api.impl.campaign.rulecmd.salvage.MarketCMD;
 import com.fs.starfarer.api.ui.SectorMapAPI;
 import com.fs.starfarer.api.ui.TooltipMakerAPI;
@@ -149,8 +154,21 @@ public class FleetEscortMission extends SEPHubMissionWithScenario {
         beginStageTrigger(Stage.WAIT);
         triggerRunScriptAfterDelay(0f, () -> {
             this.fleet.clearAssignments();
-            this.fleet.addAssignmentAtStart(FleetAssignment.ORBIT_PASSIVE, this.gotoEntity, 999999f, "Completing objectives at " + this.gotoEntity.getName(), null);
+            // May not match the countdown for the main condition checker
+            // But works for the time being
+            this.fleet.addAssignmentAtStart(FleetAssignment.ORBIT_PASSIVE, this.gotoEntity, 7f, "Offloading cargo at " + this.gotoEntity.getName().toLowerCase(), null);
         });
+        triggerRunContinuousScriptAfterDelay(0f, () -> {
+            FleetAssignmentDataAPI data = this.fleet.getCurrentAssignment();
+            if (data == null) {
+                return;
+            }
+            int daysLeft = Math.round(data.getElapsedDays() - data.getMaxDurationInDays());
+            String daysText = daysLeft == 1 ? "day" : "days";
+            data.setActionText("offloading cargo at " + this.gotoEntity.getName().toLowerCase() + ", " +
+                    Math.max(1, Math.round(data.getMaxDurationInDays() - data.getElapsedDays())) + " " +
+                    daysText + " left");
+        }, Stage.WAIT);
         endTrigger();
 
         beginStageTrigger(Stage.RETURN, Stage.COMPLETED);
@@ -430,6 +448,10 @@ public class FleetEscortMission extends SEPHubMissionWithScenario {
         return result;
     }
 
+    public void triggerRunContinuousScriptAfterDelay(float delay, Script script, Object... stages) {
+        triggerCustomAction(new RunContinuousScriptAfterDelay(delay, script, stages));
+    }
+
     public enum Stage {
         GOTO,
         WAIT,
@@ -445,5 +467,53 @@ public class FleetEscortMission extends SEPHubMissionWithScenario {
         DRUG_SMUGGLING,
         REBELLION_SUPPORT,
         VIP_ESCORT
+    }
+
+    public static class RunContinuousScriptAfterDelay implements MissionTrigger.TriggerAction, EveryFrameScript {
+        protected boolean done = false;
+        protected BaseHubMission mission;
+        protected float delay;
+        protected Script script;
+        protected Set<Object> stages = new HashSet<>();
+
+        public RunContinuousScriptAfterDelay(float delay, Script script, Object... stages) {
+            this.delay = delay;
+            this.script = script;
+            this.stages.addAll(List.of(stages));
+        }
+
+        public void doAction(MissionTrigger.TriggerActionContext context) {
+            this.mission = (BaseHubMission) context.mission;
+            Global.getSector().addScript(this);
+        }
+
+        public boolean isDone() {
+            return this.done;
+        }
+
+        public boolean runWhilePaused() {
+            return false;
+        }
+
+        public void advance(float amount) {
+            if (this.mission == null) {
+                this.done = true;
+                return;
+            }
+            if (this.script == null) {
+                this.done = true;
+                return;
+            }
+            Object stage = this.mission.getCurrentStage();
+            if (!this.stages.contains(stage)) {
+                this.done = true;
+                return;
+            }
+
+            float days = Global.getSector().getClock().convertToDays(amount);
+            this.delay += days;
+
+            this.script.run();
+        }
     }
 }
