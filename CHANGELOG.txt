@@ -1,3 +1,6 @@
+### 0.2.43-alpha
+- Fix crash due to wrong reference ID in settings
+
 ### 0.2.41-alpha
 - Add settings to modify interval between incursions or expeditions
 - Add days left text when escorted fleet is offloading cargo
