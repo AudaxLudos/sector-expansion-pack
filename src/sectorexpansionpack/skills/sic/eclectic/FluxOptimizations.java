@@ -49,7 +49,7 @@ public class FluxOptimizations extends SCBaseSkillPlugin {
     public void applyEffectsBeforeShipCreation(SCData data, MutableShipStatsAPI stats, ShipVariantAPI variant, ShipAPI.HullSize hullSize, String id) {
         AptitudeEclectic.EclecticFleetData eData = AptitudeEclectic.getEclecticFleetData(data);
 
-        stats.getFuelMod().modifyMult(getId(), 1f + eData.totalMult * FLUX_DISSIPATION_MULT);
-        stats.getCargoMod().modifyMult(getId(), 1f + eData.totalMult * FLUX_CAPACITY_MULT);
+        stats.getFluxDissipation().modifyMult(getId(), 1f + eData.totalMult * FLUX_DISSIPATION_MULT);
+        stats.getFluxCapacity().modifyMult(getId(), 1f + eData.totalMult * FLUX_CAPACITY_MULT);
     }
 }
