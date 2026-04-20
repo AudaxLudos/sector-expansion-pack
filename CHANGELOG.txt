@@ -1,3 +1,11 @@
+### 0.2.41-alpha
+- Add settings to modify interval between incursions or expeditions
+- Add days left text when escorted fleet is offloading cargo
+- Fix save load error when a fleet escort mission is in-progress
+- Add construct objective mission intel
+- Add clear debris fields mission intel
+- Fix grammar for rescued officer dialogue
+
 ### 0.2.25-alpha
 - Add mod version checker files
 
