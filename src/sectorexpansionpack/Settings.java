@@ -52,10 +52,10 @@ public class Settings implements LunaSettingsListener {
 
     public static void setSettings() {
         EXPEDITIONS_ENABLED = getBoolean("sep_expeditions_enabled");
-        EXPEDITIONS_TIMER = getInt("sep_expeditions_interval");
+        EXPEDITIONS_TIMER = getInt("sep_expeditions_timer");
 
         INCURSIONS_ENABLED = getBoolean("sep_incursions_enabled");
-        INCURSIONS_TIMER = getInt("sep_incursions_interval");
+        INCURSIONS_TIMER = getInt("sep_incursions_timer");
     }
 
     public static boolean getBoolean(String settingId) {
