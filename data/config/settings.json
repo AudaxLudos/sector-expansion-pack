@@ -9,6 +9,9 @@
   "sep_acquisitions_timer": 183, # Sets the interval between acquisitions in days as well as the grace period for the first acquisition. Default 183
 
   "graphics": {
+    "fx": {
+      "sep_tractor_beam_stream": "graphics/sectorexpansionpack/fx/tractor_beam_wave.png"
+    },
     "intel": {
       "sep_expeditionFleet": "graphics/sectorexpansionpack/icons/expedition_fleet.png",
       "sep_toArtifact": "graphics/sectorexpansionpack/icons/to_artifact.png",

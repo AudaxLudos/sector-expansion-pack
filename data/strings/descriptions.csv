@@ -1,6 +1,13 @@
 id,type,text1,text2,text3,text4,text5,notes
+# weapons,,,,,,,
+sep_tractor_beam,WEAPON,"Fires a stream of shield particles that solidify within crevices of a target's hull, forming hardened hooks capable of displacing the target.",,,,,
+,,,,,,,
+,,,,,,,
+,,,,,,,
 sep_hornet,SHIP,Approval Status: Pending,,,,,
 sep_wonder,SHIP,Approval Status: Pending,,,,,
+,,,,,,,
+,,,,,,,
 ,,,,,,,
 # lowtech,,,,,,,
 sep_springer,SHIP,"The Springer-class frigate is a rare Hegemony engineering achievement that pushes low-tech design beyond accepted limits. Built around a permanently integrated Thermal Pulse Cannon, normally reserved for larger hulls, the ship relies on a reinforced forward structure filled with heavy bracing, enlarged flux conduits, and advanced coolant systems. These compromises leave little space for secondary systems or crew comfort, but they allow the weapon to operate reliably on a frigate frame.
@@ -17,6 +24,8 @@ sep_persecutor,SHIP,"Dating back to the rise of the Domain era, this capital-cla
 
 In service, the Persecutor was most commonly deployed as a response asset against rebellions and pirate activity. Its even distribution of firepower, protection, and mobility made it well suited to enforcing order across newly consolidated systems, favoring reliability and adaptability over specialization.",,,,,
 ,,,,,,,
+,,,,,,,
+,,,,,,,
 # midline,,,,,,,
 sep_impetuous,SHIP,"The Impetuous missile frigate is a mobile fire-support platform designed to escort larger hulls. It was primarily used to secure early victories and was outfitted to engage heavily shielded or armored targets.
 
@@ -31,6 +40,8 @@ Early production was discontinued in favor of other fast designs offering simila
 sep_requital,SHIP,"Taking the doctrines of firepower and mobility beyond their limits, the Requital is a capital ship built around extreme speed. Designed by Altair Biotech during the height of the “cruiser school” trend before the Collapse, it prioritizes rapid strikes and maneuverability over armor or redundancy. Its sleek hull can outpace most vessels of comparable size, but its fragility leaves it vulnerable if isolated from support.
 
 The capital excels when paired with escort fleets that can absorb fire and protect its lightly armored frame. On its own, it struggles against sustained enemy fire, and early deployments revealed the design’s limitations. While it demonstrated the potential of speed-focused capital ships, Altair Biotech ultimately moved toward more balanced designs in later projects, favoring survivability alongside mobility.",,,,,
+,,,,,,,
+,,,,,,,
 ,,,,,,,
 # remnant,,,,,,,
 sep_effulgence,SHIP,"A remnant of the autonomous AI fleets developed by the Tri-Tachyon Corporation. Illegal under Domain (and Hegemony) law, and an abomination to the Church of Galactic Redemption, the First AI War saw these creations purged from the Sector. So the official histories say.
@@ -48,3 +59,6 @@ sep_blaze,SHIP,"A remnant of the autonomous AI fleets developed by the Tri-Tachy
 A design rarely witnessed during the First AI War, the Blaze drone gunship occupies an unusual place in recorded history. Historians describe it as inefficient, its raw strength undermined by flawed engineering, which may explain why so few were ever encountered. Yet despite its obscurity, whispers about the hull persisted. Some claim it was the precursor that paved the way for a far more terrifying design. Others insist it served as the template for a certain gunship, though such theories are officially dismissed.
 
 Even so, the uncanny similarities and coincidences are enough to make one question its origins.",,,,,
+,,,,,,,
+,,,,,,,
+,,,,,,,
