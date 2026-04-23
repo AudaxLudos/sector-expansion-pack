@@ -5,3 +5,4 @@
 - [x] Add settings to modify expeditions and incursions intervals
 - [x] Add days left text to escorted fleet when offloading cargo
 - [x] Add chance for rare item to drop for clear debris fields mission intel when clearing debris
+- [ ] Update incursion fleets difficulty scaling 

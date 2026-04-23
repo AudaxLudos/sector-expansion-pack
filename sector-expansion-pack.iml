@@ -10,5 +10,6 @@
     <orderEntry type="library" name="starfarer.api" level="project" />
     <orderEntry type="library" name="lunalib.api" level="project" />
     <orderEntry type="library" name="secondincommand.api" level="project" />
+    <orderEntry type="library" name="consolecommand.api" level="project" />
   </component>
 </module>

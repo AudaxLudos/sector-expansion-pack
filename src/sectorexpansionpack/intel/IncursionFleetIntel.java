@@ -29,7 +29,6 @@ import sectorexpansionpack.missions.EntityFinderMission;
 import java.awt.*;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Random;
 
 public class IncursionFleetIntel extends GenericRaidFGI {
@@ -47,48 +46,54 @@ public class IncursionFleetIntel extends GenericRaidFGI {
     protected SpecialItemSpecAPI specialItemSpec;
     protected SpecialItemData specialItemData;
 
-    public IncursionFleetIntel(String sourceMarketName, String targetMarketName, String colonyItemId) {
+    public IncursionFleetIntel(Object source, Object target, SpecialItemSpecAPI item) {
         super(null);
         this.efm = new EntityFinderMission();
 
-        List<MarketAPI> markets = Global.getSector().getEconomy().getMarketsCopy();
-        MarketAPI source = null;
-        for (MarketAPI market : markets) {
-            if (Objects.equals(market.getName().toLowerCase(), sourceMarketName)) {
-                source = market;
-                break;
+        if (source instanceof MarketAPI sourceMarket) {
+            this.source = sourceMarket;
+        } else if (source instanceof FactionAPI sourceFaction) {
+            setFaction(sourceFaction);
+            pickSource();
+        } else {
+            pickFaction();
+            if (isDone()) {
+                log.info("Failed to find source faction");
+                return;
             }
+            pickSource();
         }
-        this.source = source;
-        if (this.source == null) {
+        if (this.source == null || isDone()) {
             log.info("Failed to find source market");
             endImmediately();
             return;
         }
-
         setFaction(this.source.getFactionId());
 
-        MarketAPI target = null;
-        for (MarketAPI market : markets) {
-            if (Objects.equals(market.getName().toLowerCase(), targetMarketName)) {
-                target = market;
-                break;
-            }
+        if (target instanceof MarketAPI targetMarket) {
+            this.target = targetMarket;
+        } else if (target instanceof FactionAPI targetFaction) {
+            pickTarget(targetFaction);
+        } else {
+            pickTarget(null);
         }
-        this.target = target;
-        if (target == null) {
+        if (this.target == null || isDone()) {
             log.info("Failed to find target market");
             endImmediately();
             return;
         }
 
-        this.specialItemSpec = Global.getSettings().getSpecialItemSpec(colonyItemId);
-        if (this.specialItemSpec == null) {
+        if (item != null) {
+            this.specialItemSpec = item;
+        } else {
+            pickSpecialItem();
+        }
+        if (this.specialItemSpec == null || isDone()) {
             log.info("Failed to find colony item to take");
             endImmediately();
             return;
         }
-        this.specialItemData = new SpecialItemData(colonyItemId, null);
+        this.specialItemData = new SpecialItemData(this.specialItemSpec.getId(), null);
 
         this.params = new GenericRaidParams(getRandom(), true);
         this.params.makeFleetsHostile = false; // will be made hostile when they arrive, not before
@@ -165,7 +170,7 @@ public class IncursionFleetIntel extends GenericRaidFGI {
             log.info("Failed to find source market");
             return;
         }
-        pickTarget();
+        pickTarget(null);
         if (isDone()) {
             log.info("Failed to find target market");
             return;
@@ -266,8 +271,12 @@ public class IncursionFleetIntel extends GenericRaidFGI {
         }
     }
 
-    public void pickTarget() {
-        this.efm.requireMarketFactionHostileTo(this.source.getFactionId());
+    public void pickTarget(FactionAPI targetFaction) {
+        if (targetFaction != null) {
+            this.efm.requireMarketFaction(targetFaction.getId());
+        } else {
+            this.efm.requireMarketFactionHostileTo(this.source.getFactionId());
+        }
         this.efm.requireMarketFactionNot(this.source.getFactionId());
         this.efm.requireMarketFactionNotPlayer();
         this.efm.requireMarketNotHidden();
