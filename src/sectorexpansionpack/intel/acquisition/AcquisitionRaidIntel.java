@@ -1,24 +1,31 @@
 package sectorexpansionpack.intel.acquisition;
 
 import com.fs.starfarer.api.Global;
-import com.fs.starfarer.api.campaign.FactionAPI;
-import com.fs.starfarer.api.campaign.SectorEntityToken;
-import com.fs.starfarer.api.campaign.SpecialItemSpecAPI;
+import com.fs.starfarer.api.campaign.*;
 import com.fs.starfarer.api.campaign.econ.Industry;
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
 import com.fs.starfarer.api.impl.campaign.command.WarSimScript;
+import com.fs.starfarer.api.impl.campaign.fleets.FleetFactoryV3;
+import com.fs.starfarer.api.impl.campaign.fleets.FleetParamsV3;
 import com.fs.starfarer.api.impl.campaign.fleets.RouteLocationCalculator;
+import com.fs.starfarer.api.impl.campaign.fleets.RouteManager;
 import com.fs.starfarer.api.impl.campaign.ids.Factions;
+import com.fs.starfarer.api.impl.campaign.ids.MemFlags;
+import com.fs.starfarer.api.impl.campaign.ids.Ranks;
 import com.fs.starfarer.api.impl.campaign.intel.raid.*;
+import com.fs.starfarer.api.ui.Alignment;
+import com.fs.starfarer.api.ui.LabelAPI;
 import com.fs.starfarer.api.ui.TooltipMakerAPI;
 import com.fs.starfarer.api.util.Misc;
 import org.apache.log4j.Logger;
+import org.lwjgl.util.vector.Vector2f;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
+import java.awt.*;
+import java.util.*;
+import java.util.List;
 
 public class AcquisitionRaidIntel extends RaidIntel {
+    public static final String FLEET_KEY = "$sep_ari_fleet";
     public static final String EVENT_KEY = "$sep_ari_eventRef";
     public static final String SOURCE_KEY = "$sep_ari_source";
     public static final String TARGET_KEY = "$sep_ari_target";
@@ -44,7 +51,7 @@ public class AcquisitionRaidIntel extends RaidIntel {
             removeFPPerFleet = 70f; // Pirate factions have around 70 additional fp per fleet
         }
 
-        float neededFP = WarSimScript.getEnemyStrength(getFaction().getId(), this.target.getStarSystem());
+        float neededFP = this.defenderStr;
         float desireMult = getSpecialItemsDesireMult(getFaction().getId());
         float randomMult = 0.6f + (this.random.nextFloat() * 0.6f);
         float approxNumFleets = neededFP / getLargeFleetSize();
@@ -142,12 +149,265 @@ public class AcquisitionRaidIntel extends RaidIntel {
 
     @Override
     public void createSmallDescription(TooltipMakerAPI info, float width, float height) {
-        super.createSmallDescription(info, width, height);
+        addBasicDescription(info, width, height);
+        addAssessmentSection(info, width, height);
+        addStatusSection(info, width, height);
+        addBulletPoints(info, ListInfoMode.IN_DESC);
+    }
+
+    protected void addBasicDescription(TooltipMakerAPI info, float width, float height) {
+        float opad = 10f;
+
+        info.addImage(getFaction().getLogo(), width, 128, opad);
+
+        info.addPara(Misc.ucFirst(getFaction().getPersonNamePrefixAOrAn()) + " %s operation to take a " +
+                        "special item found in the " + getSystem().getNameWithLowercaseTypeShort() + ".", opad,
+                getFaction().getBaseUIColor(), getFaction().getPersonNamePrefix());
+    }
+
+    protected void addAssessmentSection(TooltipMakerAPI info, float width, float height) {
+        float opad = 10f;
+
+        Color h = Misc.getHighlightColor();
+        Color bad = Misc.getNegativeHighlightColor();
+
+        FactionAPI faction = getFaction();
+        String raidNoun = getRaidNoun();
+        String forcesNoun = getForcesNoun();
+
+        AssembleStage assembleStage = getAssembleStage();
+        ActionStage actionStage = getActionStage();
+        MarketAPI source = getFirstSource();
+
+        float raidStr = assembleStage.getOrigSpawnFP();
+        String strDesc = Misc.getStrengthDesc(raidStr);
+        float numFleets = getNumFleets();
+        String fleetNoun = "fleet";
+        if (numFleets > 1) {
+            fleetNoun = "fleets";
+        }
+
+        String defenderHighlight = "";
+        Color defenderHighlightColor = h;
+        String outcomeText = "";
+        boolean potentialDanger = false;
+
+        if (this.outcome == null && actionStage.getStatus() == RaidStageStatus.SUCCESS) {
+            float ratio = raidStr / this.defenderStr;
+            if (ratio < 0.75f) {
+                defenderHighlight = "superior";
+                defenderHighlightColor = Misc.getPositiveHighlightColor();
+                outcomeText = "the " + raidNoun + " is unlikely to find success";
+            } else if (ratio < 1.25f) {
+                defenderHighlight = "evenly matched";
+                outcomeText = "the outcome of the " + raidNoun + " is uncertain";
+                potentialDanger = true;
+            } else if (ratio > 1f) {
+                defenderHighlight = "outmatched";
+                defenderHighlightColor = bad;
+                outcomeText = "the " + raidNoun + " is likely to find success";
+                potentialDanger = true;
+            }
+        }
+
+        String assessment = "The " + forcesNoun + " are projected to be " + strDesc + " and likely comprised of " + numFleets + " " + fleetNoun + ".";
+        if (!defenderHighlight.isBlank()) {
+            assessment += " The defending fleets are " + defenderHighlight + ", and " + outcomeText + ".";
+        }
+        if (actionStage.getStatus() == RaidStageStatus.SUCCESS) {
+            assessment += " The " + forcesNoun + " is likely carrying a special item.";
+        }
+
+        info.addSectionHeading("Assessment", this.faction.getBaseUIColor(), this.faction.getDarkUIColor(), Alignment.MID, opad);
+
+        LabelAPI label = info.addPara(assessment, opad, faction.getBaseUIColor());
+        label.setHighlight(strDesc, numFleets + "", defenderHighlight);
+        label.setHighlightColors(faction.getBaseUIColor(), h, defenderHighlightColor);
+
+        if (this.outcome != null && actionStage.getStatus() == RaidStageStatus.SUCCESS) {
+            List<MarketAPI> targets = new ArrayList<>();
+            List<MarketAPI> safe = new ArrayList<>();
+            List<MarketAPI> unsafe = new ArrayList<>();
+
+            for (MarketAPI market : Misc.getMarketsInLocation(this.target.getStarSystem())) {
+                boolean hasSpecialItems = false;
+                for (Industry industry : market.getIndustries()) {
+                    if (industry.getSpecialItem() != null) {
+                        hasSpecialItems = true;
+                        break;
+                    }
+                }
+                if (hasSpecialItems) {
+                    targets.add(market);
+                    float stationStr = WarSimScript.getStationStrength(market.getFaction(), this.target.getStarSystem(), market.getPrimaryEntity());
+                    float totalDefense = this.defenderStr + stationStr;
+                    if (totalDefense > raidStr * 1.25f) {
+                        safe.add(market);
+                    } else {
+                        unsafe.add(market);
+                    }
+                }
+            }
+
+            if (safe.size() == targets.size()) {
+                info.addPara("However, all colonies should be safe from the " + raidNoun + ", owing to their orbital defenses.", opad);
+            } else if (potentialDanger && !unsafe.isEmpty()) {
+                String isOrAre = "are";
+                String colonyNoun = "colonies ";
+                if (unsafe.size() == 1) {
+                    isOrAre = "is";
+                    colonyNoun = "colony ";
+                }
+                String riskTxt = isOrAre + " at risk of losing a used special item:";
+                info.addPara("The following " + colonyNoun + riskTxt, opad, bad, "losing a used special item");
+                FactionAPI f = Global.getSector().getPlayerFaction();
+                addMarketTable(info, f.getBaseUIColor(), f.getDarkUIColor(), f.getBrightUIColor(), unsafe, width, opad);
+            }
+        }
+    }
+
+    protected void addStatusSection(TooltipMakerAPI info, float width, float height) {
+        float opad = 10f;
+
+        info.addSectionHeading("Status", this.faction.getBaseUIColor(), this.faction.getDarkUIColor(), Alignment.MID, opad);
+
+        if (this.outcome == null) {
+            for (RaidStage stage : this.stages) {
+                stage.showStageInfo(info);
+                if (getStageIndex(stage) == this.failStage) {
+                    break;
+                }
+            }
+        } else {
+            String status = getOutcomeDescription();
+            info.addPara(status, opad);
+        }
     }
 
     @Override
-    public void createIntelInfo(TooltipMakerAPI info, ListInfoMode mode) {
-        super.createIntelInfo(info, mode);
+    protected void addBulletPoints(TooltipMakerAPI info, ListInfoMode mode) {
+        super.addBulletPoints(info, mode); // Replace this with my own implementation
+    }
+
+    protected String getOutcomeDescription() {
+        String forces = getForcesNoun();
+        String raid = getRaidNoun();
+        String desc = "The " + raid + " was successful and the command fleet carrying a special item has safely returned";
+        switch (this.outcome) {
+            // Failure outcomes
+            case TASK_FORCE_DEFEATED ->
+                    desc = "The" + forces + " was mostly defeated. Any surviving fleets are retreating in disarray.";
+            case NOT_ENOUGH_MADE_IT ->
+                    desc = "The" + forces + " retreated before they could conduct any military operations.";
+            case FAILED ->
+                    desc = "The" + forces + " failed to complete there objective. Any remaining fleets are retreating";
+            // Cancelled outcomes but still failure
+            case SOURCE_MARKET_LOST ->
+                    desc = "The " + raid + " was cancelled as the " + this.source.getName() + " colony no longer exists.";
+            case TARGET_MARKET_LOST ->
+                    desc = "The " + raid + " was cancelled as the " + this.target.getName() + " colony no longer exists.";
+            case NO_LONGER_HOSTILE ->
+                    desc = "The " + raid + " was cancelled as " + this.faction.getDisplayNameWithArticle() +
+                            " is no longer hostile with " + this.target.getFaction().getDisplayNameWithArticle() + ".";
+            case ABORTED_IN_PLANNING ->
+                    desc = "The " + raid + " was cancelled during the planning stage and will not happen.";
+            // Succeeded outcomes
+            case SUCCEEDED ->
+                    desc = "The " + raid + " was successful and the acquired special item is now in the hands of " +
+                            this.faction.getDisplayNameWithArticle();
+        }
+        return desc;
+    }
+
+    public String getRaidNoun() {
+        return "acquisition";
+    }
+
+    public String getForcesNoun() {
+        return getRaidNoun() + " forces";
+    }
+
+    @Override
+    public CampaignFleetAPI createFleet(String factionId, RouteManager.RouteData route, MarketAPI market, Vector2f locInHyper, Random random) {
+        RouteManager.OptionalFleetData extra = route.getExtra();
+
+        // Command fleet type is set during assemble stage
+        boolean isPirate = getFaction().getCustomBoolean(Factions.CUSTOM_PIRATE_BEHAVIOR);
+        float combat = extra.fp;
+        float tanker = extra.fp * (0.1f + random.nextFloat() * 0.05f);
+        float transport = extra.fp * (0.1f + random.nextFloat() * 0.05f);
+        float freighter = 0f;
+        combat -= tanker;
+        combat -= transport;
+
+        FleetParamsV3 params = new FleetParamsV3(
+                market,
+                locInHyper,
+                factionId,
+                route == null ? null : route.getQualityOverride(),
+                extra.fleetType,
+                combat, // combatPts
+                freighter, // freighterPts
+                tanker, // tankerPts
+                transport, // transportPts
+                0f, // linerPts
+                0f, // utilityPts
+                0f // qualityMod, won't get used since routes mostly have quality override set
+        );
+
+        // Remove spawning strength variability
+        params.ignoreMarketFleetSizeMult = true;
+        params.modeOverride = FactionAPI.ShipPickMode.PRIORITY_THEN_ALL;
+        params.qualityOverride = 1f;
+        FactionDoctrineAPI doctrineOverride = this.faction.getDoctrine().clone();
+        if (!isPirate) {
+            doctrineOverride.setOfficerQuality(3);
+        }
+        doctrineOverride.setShipQuality(3);
+        doctrineOverride.setNumShips(3);
+        params.doctrineOverride = doctrineOverride;
+        // params.doNotAddShipsBeforePruning = true;
+
+        if (route != null) {
+            params.timestamp = route.getTimestamp();
+        }
+
+        params.random = random;
+
+        CampaignFleetAPI fleet = FleetFactoryV3.createFleet(params);
+
+        if (fleet == null || fleet.isEmpty()) {
+            return null;
+        }
+
+        fleet.getMemoryWithoutUpdate().set(MemFlags.MEMORY_KEY_WAR_FLEET, true);
+        fleet.getMemoryWithoutUpdate().set(MemFlags.MEMORY_KEY_RAIDER, true);
+
+        if (fleet.getFaction().getCustomBoolean(Factions.CUSTOM_PIRATE_BEHAVIOR)) {
+            fleet.getMemoryWithoutUpdate().set(MemFlags.MEMORY_KEY_PIRATE, true);
+        }
+
+        String postId = Ranks.POST_PATROL_COMMANDER;
+        String rankId = Ranks.SPACE_COMMANDER;
+
+        fleet.getCommander().setPostId(postId);
+        fleet.getCommander().setRankId(rankId);
+
+        fleet.setName("Grand Acquisitions Fleet");
+        fleet.getMemoryWithoutUpdate().set(FLEET_KEY, true);
+        fleet.getMemoryWithoutUpdate().set(EVENT_KEY, this);
+
+        // TODO: Add special item to 1 fleet when raid action is successful.
+
+        return fleet;
+    }
+
+    @Override
+    protected float getBaseDaysAfterEnd() {
+        if (this.outcome != null && this.outcome == AcquisitionOutcome.SUCCEEDED) {
+            return 14f;
+        }
+        return 7f;
     }
 
     public float getLargeFleetSize() {
