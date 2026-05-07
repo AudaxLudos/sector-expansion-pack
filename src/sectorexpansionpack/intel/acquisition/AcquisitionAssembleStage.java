@@ -60,7 +60,10 @@ public class AcquisitionAssembleStage extends AssembleStage {
         float fp = getFP(extra.fleetType);
 
         extra.fp = fp;
-        extra.strength = Misc.getAdjustedStrength(fp, market); // TODO: Will possibly change this
+        // Add back removed fp per fleet values
+        //  during the computation of baseFP
+        //  for autoresolve calculations
+        extra.strength = fp + this.acquisitionIntel.getBonusStrengthPerFleet();
 
 
         float prepDays = 3f + 3f * (float) Math.random();

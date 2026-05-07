@@ -47,18 +47,12 @@ public class AcquisitionRaidIntel extends RaidIntel {
         this.specialItem = specialItem;
         this.random = new Random();
 
-        boolean isSourcePirate = this.faction.getCustomBoolean(Factions.CUSTOM_PIRATE_BEHAVIOR);
-
-        float removeFPPerFleet = 120f; // Major factions have around 120 additional fp per fleet
-        if (isSourcePirate) {
-            removeFPPerFleet = 70f; // Pirate factions have around 70 additional fp per fleet
-        }
-
         float neededFP = this.defenderStr;
         float desireMult = getSpecialItemsDesireMult(getFaction().getId());
-        float randomMult = 0.6f + (this.random.nextFloat() * 0.6f);
+        float randomMult = 0.6f + this.random.nextFloat() * 0.6f;
         float approxNumFleets = neededFP / getLargeFleetSize();
-        float baseFP = neededFP - (approxNumFleets * removeFPPerFleet) * desireMult * randomMult;
+        float bonusStrengthPerFleet = getBonusStrengthPerFleet();
+        float baseFP = (neededFP - (approxNumFleets * bonusStrengthPerFleet)) * desireMult * randomMult;
 
         addStage(new AcquisitionOrganizeStage(this, this.source, getPrepDays(baseFP)));
 
@@ -97,11 +91,7 @@ public class AcquisitionRaidIntel extends RaidIntel {
         log.info(String.format("Starting %s acquisition at %s in the %s, targeting %s in the %s",
                 getFaction().getDisplayName(),
                 this.source.getName(), this.source.getStarSystem().getNameWithLowercaseTypeShort(),
-                this.target.getName(), this.target.getStarSystem().getNameWithLowercaseTypeShort()));
-        log.info(String.format("%s acquisition at %s has %s attack strength, enemies at %s has %s defense strength",
-                this.faction.getDisplayName(),
-                this.source.getStarSystem().getNameWithLowercaseTypeShort(), baseFP,
-                this.target.getStarSystem().getNameWithLowercaseTypeShort(), neededFP));
+                this.target.getName(), getSystem().getNameWithLowercaseTypeShort()));
     }
 
     /**
@@ -153,6 +143,8 @@ public class AcquisitionRaidIntel extends RaidIntel {
 
     @Override
     protected void advanceImpl(float amount) {
+        checkForTermination();
+
         RaidStage stage = this.stages.get(this.currentStage);
 
         stage.advance(amount);
@@ -174,12 +166,49 @@ public class AcquisitionRaidIntel extends RaidIntel {
         }
     }
 
+    public void checkForTermination() {
+        if (this.outcome != null) {
+            return;
+        }
+        if (!this.source.isInEconomy()) {
+            terminateEvent(AcquisitionOutcome.SOURCE_MARKET_LOST);
+        } else if (!this.target.isInEconomy() && getActionStage() != null && getActionStage().getStatus() == RaidStageStatus.ONGOING) {
+            terminateEvent(AcquisitionOutcome.TARGET_MARKET_LOST);
+        } else if (!this.faction.isHostileTo(this.target.getFaction()) && getActionStage() != null && getActionStage().getStatus() == RaidStageStatus.ONGOING) {
+            terminateEvent(AcquisitionOutcome.NO_LONGER_HOSTILE);
+        }
+    }
+
     @Override
     public void createSmallDescription(TooltipMakerAPI info, float width, float height) {
+        logDebugInformation();
         addBasicDescription(info, width, height);
         addAssessmentSection(info, width, height);
         addStatusSection(info, width, height);
-        addBulletPoints(info, ListInfoMode.IN_DESC);
+        // addBulletPoints(info, ListInfoMode.IN_DESC);
+    }
+
+    protected void logDebugInformation() {
+        float raidStr = (float) RouteManager.getInstance().getRoutesForSource(getRouteSourceId()).stream()
+                .mapToDouble(r -> {
+                    if (r.getActiveFleet() != null) {
+                        return r.getActiveFleet().getEffectiveStrength();
+                    } else {
+                        return r.getExtra().getStrengthModifiedByDamage();
+                    }
+                }).sum();
+        float defenderStr = WarSimScript.getEnemyStrength(getFaction(), getSystem()) +
+                WarSimScript.getStationStrength(this.target.getFaction(), getSystem(), this.target.getPrimaryEntity());
+        float ratio = raidStr / defenderStr;
+
+        log.info(Misc.ucFirst(this.faction.getDisplayName()) + " raid info: ");
+        log.info("  Initial enemy strength  : " + this.defenderStr);
+        log.info("  Active raid strength    : " + raidStr);
+        log.info("  Active enemy strength   : " + defenderStr);
+        log.info("  Attacker strength ratio : " + ratio);
+        log.info("  Defenders are superior  : " + (ratio < 0.75f));
+        log.info("  Defenders are equal     : " + (ratio < 1.25f));
+        log.info("  Defenders are outmatched: " + (ratio > 1f));
     }
 
     protected void addBasicDescription(TooltipMakerAPI info, float width, float height) {
@@ -204,22 +233,22 @@ public class AcquisitionRaidIntel extends RaidIntel {
 
         AssembleStage assembleStage = getAssembleStage();
         ActionStage actionStage = getActionStage();
-        MarketAPI source = getFirstSource();
 
-        float raidStr = assembleStage.getOrigSpawnFP();
-        String strDesc = Misc.getStrengthDesc(raidStr);
-        float numFleets = getNumFleets();
+        int numFleets = (int) getNumFleets();
         String fleetNoun = "fleet";
         if (numFleets > 1) {
             fleetNoun = "fleets";
         }
+        float raidStr = assembleStage.getOrigSpawnFP();
+        raidStr += (numFleets * getBonusStrengthPerFleet());
+        String strDesc = Misc.getStrengthDesc(raidStr);
 
         String defenderHighlight = "";
         Color defenderHighlightColor = h;
         String outcomeText = "";
         boolean potentialDanger = false;
 
-        if (this.outcome == null && actionStage.getStatus() == RaidStageStatus.SUCCESS) {
+        if (this.outcome == null && actionStage.getStatus() != RaidStageStatus.SUCCESS) {
             float ratio = raidStr / this.defenderStr;
             if (ratio < 0.75f) {
                 defenderHighlight = "superior";
@@ -251,12 +280,12 @@ public class AcquisitionRaidIntel extends RaidIntel {
         label.setHighlight(strDesc, numFleets + "", defenderHighlight);
         label.setHighlightColors(faction.getBaseUIColor(), h, defenderHighlightColor);
 
-        if (this.outcome != null && actionStage.getStatus() == RaidStageStatus.SUCCESS) {
+        if (this.outcome == null && actionStage.getStatus() != RaidStageStatus.SUCCESS) {
             List<MarketAPI> targets = new ArrayList<>();
             List<MarketAPI> safe = new ArrayList<>();
             List<MarketAPI> unsafe = new ArrayList<>();
 
-            for (MarketAPI market : Misc.getMarketsInLocation(this.target.getStarSystem())) {
+            for (MarketAPI market : Misc.getMarketsInLocation(getSystem())) {
                 boolean hasSpecialItems = false;
                 for (Industry industry : market.getIndustries()) {
                     if (industry.getSpecialItem() != null) {
@@ -266,7 +295,7 @@ public class AcquisitionRaidIntel extends RaidIntel {
                 }
                 if (hasSpecialItems) {
                     targets.add(market);
-                    float stationStr = WarSimScript.getStationStrength(market.getFaction(), this.target.getStarSystem(), market.getPrimaryEntity());
+                    float stationStr = WarSimScript.getStationStrength(market.getFaction(), getSystem(), market.getPrimaryEntity());
                     float totalDefense = this.defenderStr + stationStr;
                     if (totalDefense > raidStr * 1.25f) {
                         safe.add(market);
@@ -276,21 +305,32 @@ public class AcquisitionRaidIntel extends RaidIntel {
                 }
             }
 
-            if (safe.size() == targets.size()) {
-                info.addPara("However, all colonies should be safe from the " + raidNoun + ", owing to their orbital defenses.", opad);
-            } else if (potentialDanger && !unsafe.isEmpty()) {
-                String isOrAre = "are";
-                String colonyNoun = "colonies ";
-                if (unsafe.size() == 1) {
-                    isOrAre = "is";
-                    colonyNoun = "colony ";
+            if (potentialDanger) {
+                if (safe.size() == targets.size()) {
+                    info.addPara("However, all colonies should be safe from the " + raidNoun + ", owing to their orbital defenses.", opad);
+                } else if (!unsafe.isEmpty()) {
+                    String isOrAre = "are";
+                    String colonyNoun = "colonies ";
+                    if (unsafe.size() == 1) {
+                        isOrAre = "is";
+                        colonyNoun = "colony ";
+                    }
+                    String riskTxt = isOrAre + " at risk of losing a used special item:";
+                    info.addPara("The following " + colonyNoun + riskTxt, opad, bad, "losing a used special item");
+                    FactionAPI f = Global.getSector().getPlayerFaction();
+                    addMarketTable(info, f.getBaseUIColor(), f.getDarkUIColor(), f.getBrightUIColor(), unsafe, width, opad);
                 }
-                String riskTxt = isOrAre + " at risk of losing a used special item:";
-                info.addPara("The following " + colonyNoun + riskTxt, opad, bad, "losing a used special item");
-                FactionAPI f = Global.getSector().getPlayerFaction();
-                addMarketTable(info, f.getBaseUIColor(), f.getDarkUIColor(), f.getBrightUIColor(), unsafe, width, opad);
             }
         }
+    }
+
+    public float getBonusStrengthPerFleet() {
+        boolean isPirate = getFaction().getCustomBoolean(Factions.CUSTOM_PIRATE_BEHAVIOR);
+        float bonusFP = 120f; // Fleets from major factions have around 120 additional fp per fleet
+        if (isPirate) {
+            bonusFP = 70f; // Fleets from pirate factions have around 70 additional fp per fleet
+        }
+        return bonusFP;
     }
 
     protected void addStatusSection(TooltipMakerAPI info, float width, float height) {
@@ -439,7 +479,6 @@ public class AcquisitionRaidIntel extends RaidIntel {
 
     public void terminateEvent(AcquisitionOutcome outcome) {
         this.outcome = outcome;
-        forceFail(true);
     }
 
     public AcquisitionOutcome getOutcome() {
