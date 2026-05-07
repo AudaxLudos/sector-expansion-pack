@@ -1,4 +1,4 @@
-package sectorexpansionpack.intel.acquisition;
+package sectorexpansionpack.intel.raid;
 
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
 import com.fs.starfarer.api.impl.campaign.ids.MemFlags;
@@ -18,7 +18,6 @@ public class AcquisitionOrganizeStage extends OrganizeStage {
     public void advance(float amount) {
         if (this.status == RaidIntel.RaidStageStatus.ONGOING &&
                 (!this.market.isInEconomy() || (!this.market.getMemoryWithoutUpdate().getBoolean(MemFlags.MARKET_MILITARY) && this.wasMilitary))) {
-            this.acquisitionIntel.terminateEvent(AcquisitionRaidIntel.AcquisitionOutcome.ABORTED_IN_PLANNING);
             abort();
             return;
         }

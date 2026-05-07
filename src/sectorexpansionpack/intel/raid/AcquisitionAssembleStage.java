@@ -1,4 +1,4 @@
-package sectorexpansionpack.intel.acquisition;
+package sectorexpansionpack.intel.raid;
 
 import com.fs.starfarer.api.campaign.SectorEntityToken;
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
@@ -10,9 +10,6 @@ import com.fs.starfarer.api.impl.campaign.intel.raid.AssembleStage;
 import com.fs.starfarer.api.impl.campaign.intel.raid.RaidIntel;
 import com.fs.starfarer.api.ui.TooltipMakerAPI;
 import com.fs.starfarer.api.util.Misc;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class AcquisitionAssembleStage extends AssembleStage {
     protected AcquisitionRaidIntel acquisitionIntel;
@@ -36,7 +33,6 @@ public class AcquisitionAssembleStage extends AssembleStage {
         }
 
         if (this.sources.isEmpty()) {
-            this.acquisitionIntel.terminateEvent(AcquisitionRaidIntel.AcquisitionOutcome.ABORTED_IN_PLANNING);
             this.status = RaidIntel.RaidStageStatus.FAILURE;
             return;
         }
@@ -49,7 +45,6 @@ public class AcquisitionAssembleStage extends AssembleStage {
 
         this.currSource++;
         this.currSource %= this.sources.size();
-
 
         RouteManager.OptionalFleetData extra = new RouteManager.OptionalFleetData(market);
 
@@ -115,6 +110,11 @@ public class AcquisitionAssembleStage extends AssembleStage {
     }
 
     @Override
+    protected float getLargeSize(boolean limitToSpawnFP) {
+        return this.acquisitionIntel.getLargeFleetSize();
+    }
+
+    @Override
     protected float getFPLarge() {
         return this.acquisitionIntel.getLargeFleetSize();
     }
@@ -127,55 +127,6 @@ public class AcquisitionAssembleStage extends AssembleStage {
     @Override
     protected float getFPSmall() {
         return this.acquisitionIntel.getSmallFleetSize();
-    }
-
-    // Same as vanilla but sets acquisition outcomes when stage fails
-    @Override
-    protected void abortIfNeededBasedOnFP(boolean giveReturnOrders) {
-        List<RouteManager.RouteData> routes = getRoutes();
-        List<RouteManager.RouteData> stragglers = new ArrayList<RouteManager.RouteData>();
-
-        boolean enoughMadeIt = enoughMadeIt(routes, stragglers);
-        if (!enoughMadeIt) {
-            this.acquisitionIntel.terminateEvent(AcquisitionRaidIntel.AcquisitionOutcome.TASK_FORCE_DEFEATED);
-            this.status = RaidIntel.RaidStageStatus.FAILURE;
-            if (giveReturnOrders) {
-                giveReturnOrdersToStragglers(routes);
-            }
-        }
-    }
-
-    // Same as vanilla but sets acquisition outcomes when stage fails
-    @Override
-    protected void updateStatusBasedOnReaching(SectorEntityToken dest, boolean giveReturnOrders, boolean requireNearTarget) {
-        List<RouteManager.RouteData> routes = getRoutes();
-        float maxRange = 2000f;
-        if (!requireNearTarget) {
-            maxRange = 10000000f;
-        }
-        List<RouteManager.RouteData> stragglers = getStragglers(routes, dest, maxRange);
-
-        boolean enoughMadeIt = enoughMadeIt(routes, stragglers);
-
-        if (stragglers.isEmpty() && enoughMadeIt) {
-            this.status = RaidIntel.RaidStageStatus.SUCCESS;
-            return;
-        }
-
-        if (this.elapsed > this.maxDays + this.intel.getExtraDays()) {
-            if (enoughMadeIt) {
-                this.status = RaidIntel.RaidStageStatus.SUCCESS;
-                if (giveReturnOrders) {
-                    giveReturnOrdersToStragglers(stragglers);
-                }
-            } else {
-                this.acquisitionIntel.terminateEvent(AcquisitionRaidIntel.AcquisitionOutcome.NOT_ENOUGH_MADE_IT);
-                this.status = RaidIntel.RaidStageStatus.FAILURE;
-                if (giveReturnOrders) {
-                    giveReturnOrdersToStragglers(routes);
-                }
-            }
-        }
     }
 
     @Override

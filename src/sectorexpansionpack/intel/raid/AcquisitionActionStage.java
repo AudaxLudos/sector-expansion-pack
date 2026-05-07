@@ -1,4 +1,4 @@
-package sectorexpansionpack.intel.acquisition;
+package sectorexpansionpack.intel.raid;
 
 import com.fs.starfarer.api.campaign.CampaignFleetAPI;
 import com.fs.starfarer.api.campaign.SectorEntityToken;
@@ -26,10 +26,11 @@ public class AcquisitionActionStage extends ActionStage implements BaseAssignmen
     protected MarketAPI target;
     protected boolean sentOrders = false;
 
-    public AcquisitionActionStage(RaidIntel raid, MarketAPI target) {
+    public AcquisitionActionStage(RaidIntel raid, MarketAPI target, float durDays) {
         super(raid);
         this.acquisitionIntel = (AcquisitionRaidIntel) raid;
         this.target = target;
+        this.maxDays = durDays;
     }
 
     @Override
@@ -104,7 +105,6 @@ public class AcquisitionActionStage extends ActionStage implements BaseAssignmen
         }
 
         if (this.target == null) {
-            this.acquisitionIntel.terminateEvent(AcquisitionRaidIntel.AcquisitionOutcome.FAILED);
             this.status = RaidIntel.RaidStageStatus.FAILURE;
             removeMilScripts();
             giveReturnOrdersToStragglers(getRoutes());
@@ -124,25 +124,9 @@ public class AcquisitionActionStage extends ActionStage implements BaseAssignmen
                 this.status = RaidIntel.RaidStageStatus.SUCCESS;
                 removeMilScripts();
             } else {
-                this.acquisitionIntel.terminateEvent(AcquisitionRaidIntel.AcquisitionOutcome.FAILED);
                 this.status = RaidIntel.RaidStageStatus.FAILURE;
                 giveReturnOrdersToStragglers(getRoutes());
                 removeMilScripts();
-            }
-        }
-    }
-
-    @Override
-    protected void abortIfNeededBasedOnFP(boolean giveReturnOrders) {
-        List<RouteManager.RouteData> routes = getRoutes();
-        List<RouteManager.RouteData> stragglers = new ArrayList<RouteManager.RouteData>();
-
-        boolean enoughMadeIt = enoughMadeIt(routes, stragglers);
-        if (!enoughMadeIt) {
-            this.acquisitionIntel.terminateEvent(AcquisitionRaidIntel.AcquisitionOutcome.TASK_FORCE_DEFEATED);
-            this.status = RaidIntel.RaidStageStatus.FAILURE;
-            if (giveReturnOrders) {
-                giveReturnOrdersToStragglers(routes);
             }
         }
     }
@@ -176,7 +160,16 @@ public class AcquisitionActionStage extends ActionStage implements BaseAssignmen
 
     @Override
     public void showStageInfo(TooltipMakerAPI info) {
-        super.showStageInfo(info);
+        int curr = this.intel.getCurrentStage();
+        int index = this.intel.getStageIndex(this);
+
+        float opad = 10f;
+
+        if (curr == index) {
+            info.addPara("The raiding forces are currently operating in the " +
+                    this.intel.getSystem().getNameWithLowercaseType() + ".", opad);
+
+        }
     }
 
     @Override
