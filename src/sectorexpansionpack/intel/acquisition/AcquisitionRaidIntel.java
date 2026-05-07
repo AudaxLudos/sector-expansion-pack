@@ -12,7 +12,10 @@ import com.fs.starfarer.api.impl.campaign.fleets.RouteManager;
 import com.fs.starfarer.api.impl.campaign.ids.Factions;
 import com.fs.starfarer.api.impl.campaign.ids.MemFlags;
 import com.fs.starfarer.api.impl.campaign.ids.Ranks;
-import com.fs.starfarer.api.impl.campaign.intel.raid.*;
+import com.fs.starfarer.api.impl.campaign.intel.raid.ActionStage;
+import com.fs.starfarer.api.impl.campaign.intel.raid.AssembleStage;
+import com.fs.starfarer.api.impl.campaign.intel.raid.RaidIntel;
+import com.fs.starfarer.api.impl.campaign.intel.raid.TravelStage;
 import com.fs.starfarer.api.ui.Alignment;
 import com.fs.starfarer.api.ui.LabelAPI;
 import com.fs.starfarer.api.ui.TooltipMakerAPI;
@@ -57,9 +60,10 @@ public class AcquisitionRaidIntel extends RaidIntel {
         float approxNumFleets = neededFP / getLargeFleetSize();
         float baseFP = neededFP - (approxNumFleets * removeFPPerFleet) * desireMult * randomMult;
 
-        addStage(new OrganizeStage(this, this.source, getPrepDays(baseFP)));
+        addStage(new AcquisitionOrganizeStage(this, this.source, getPrepDays(baseFP)));
 
-        AssembleStage assembleStage = new AssembleStage(this, this.source.getPrimaryEntity());
+        AssembleStage assembleStage = new AcquisitionAssembleStage(this, this.source.getPrimaryEntity());
+        assembleStage.addSource(this.source);
         assembleStage.setSpawnFP(baseFP);
         assembleStage.setAbortFP(baseFP * getFleetFPAbortFraction());
         addStage(assembleStage);
@@ -70,15 +74,15 @@ public class AcquisitionRaidIntel extends RaidIntel {
             return;
         }
 
-        TravelStage travelStage = new TravelStage(this, this.source.getPrimaryEntity(), raidJumpPoint, true);
+        TravelStage travelStage = new AcquisitionTravelStage(this, this.source.getPrimaryEntity(), raidJumpPoint, true);
         travelStage.setAbortFP(baseFP * getFleetFPAbortFraction());
         addStage(travelStage);
 
-        ActionStage actionStage = new PirateRaidActionStage(this, this.target.getStarSystem());
+        ActionStage actionStage = new AcquisitionActionStage(this, this.target);
         actionStage.setAbortFP(baseFP * getFleetFPAbortFraction());
         addStage(actionStage);
 
-        TravelStage returnStage = new TravelStage(this, raidJumpPoint, this.source.getPrimaryEntity(), true);
+        TravelStage returnStage = new AcquisitionReturnStage(this, raidJumpPoint, this.source.getPrimaryEntity(), true);
         returnStage.setAbortFP(baseFP * getFleetFPAbortFraction());
         addStage(returnStage);
 
@@ -145,6 +149,29 @@ public class AcquisitionRaidIntel extends RaidIntel {
 
     protected float getFleetFPAbortFraction() {
         return 0.33f;
+    }
+
+    @Override
+    protected void advanceImpl(float amount) {
+        RaidStage stage = this.stages.get(this.currentStage);
+
+        stage.advance(amount);
+
+        RaidStageStatus status = stage.getStatus();
+        if (status == RaidStageStatus.SUCCESS) {
+            this.currentStage++;
+            setExtraDays(Math.max(0, getExtraDays() - stage.getExtraDaysUsed()));
+            if (this.currentStage < this.stages.size()) {
+                this.stages.get(this.currentStage).notifyStarted();
+            }
+        } else if (status == RaidStageStatus.FAILURE) {
+            failedAtStage(stage);
+            this.failStage = this.currentStage;
+            endAfterDelay();
+            if (shouldSendUpdate()) {
+                sendUpdateIfPlayerHasIntel(UPDATE_FAILED, false);
+            }
+        }
     }
 
     @Override
@@ -408,6 +435,15 @@ public class AcquisitionRaidIntel extends RaidIntel {
             return 14f;
         }
         return 7f;
+    }
+
+    public void terminateEvent(AcquisitionOutcome outcome) {
+        this.outcome = outcome;
+        forceFail(true);
+    }
+
+    public AcquisitionOutcome getOutcome() {
+        return this.outcome;
     }
 
     public float getLargeFleetSize() {
