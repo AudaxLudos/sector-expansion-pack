@@ -81,12 +81,6 @@ public class AcquisitionActionStage extends ActionStage implements BaseAssignmen
     }
 
     @Override
-    public void notifyStarted() {
-        super.notifyStarted();
-        this.intel.sendUpdateIfPlayerHasIntel(RaidIntel.ENTERED_SYSTEM_UPDATE, false);
-    }
-
-    @Override
     protected void updateRoutes() {
         resetRoutes();
 
@@ -165,10 +159,9 @@ public class AcquisitionActionStage extends ActionStage implements BaseAssignmen
 
         float opad = 10f;
 
+        // Failure descriptions are handled in acquisition raid intel
         if (curr == index) {
-            info.addPara("The raiding forces are currently operating in the " +
-                    this.intel.getSystem().getNameWithLowercaseType() + ".", opad);
-
+            info.addPara("Conducting operations in the " + this.intel.getSystem().getNameWithLowercaseType() + ".", opad);
         }
     }
 

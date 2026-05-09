@@ -4,6 +4,8 @@ import com.fs.starfarer.api.campaign.econ.MarketAPI;
 import com.fs.starfarer.api.impl.campaign.ids.MemFlags;
 import com.fs.starfarer.api.impl.campaign.intel.raid.OrganizeStage;
 import com.fs.starfarer.api.impl.campaign.intel.raid.RaidIntel;
+import com.fs.starfarer.api.impl.campaign.missions.hub.BaseHubMission;
+import com.fs.starfarer.api.ui.TooltipMakerAPI;
 import com.fs.starfarer.api.util.Misc;
 
 public class AcquisitionOrganizeStage extends OrganizeStage {
@@ -28,6 +30,19 @@ public class AcquisitionOrganizeStage extends OrganizeStage {
         this.statusInterval.advance(days);
         if (this.statusInterval.intervalElapsed()) {
             updateStatus();
+        }
+    }
+
+    @Override
+    public void showStageInfo(TooltipMakerAPI info) {
+        int curr = this.intel.getCurrentStage();
+        int index = this.intel.getStageIndex(this);
+
+        float opad = 10f;
+
+        // Failure descriptions are handled in acquisition raid intel
+        if (curr == index) {
+            BaseHubMission.addStandardMarketDesc("Making preparations in orbit around", getMarket(), info, opad);
         }
     }
 

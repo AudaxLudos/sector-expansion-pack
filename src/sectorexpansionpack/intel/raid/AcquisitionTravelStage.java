@@ -19,11 +19,19 @@ public class AcquisitionTravelStage extends TravelStage {
         int index = this.intel.getStageIndex(this);
 
         float opad = 10f;
-        String forces = this.acquisitionIntel.getForcesNoun();
 
+        // Failure descriptions are handled in acquisition raid intel
         if (curr == index) {
-            info.addPara("The " + forces + " are currently travelling to the " +
+            info.addPara("Travelling to the " +
                     this.intel.getSystem().getNameWithLowercaseType() + ".", opad);
         }
+    }
+
+    public SectorEntityToken getFrom() {
+        return this.from;
+    }
+
+    public SectorEntityToken getTo() {
+        return this.to;
     }
 }

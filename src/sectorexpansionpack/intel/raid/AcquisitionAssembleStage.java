@@ -2,21 +2,36 @@ package sectorexpansionpack.intel.raid;
 
 import com.fs.starfarer.api.campaign.SectorEntityToken;
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
-import com.fs.starfarer.api.impl.campaign.DebugFlags;
 import com.fs.starfarer.api.impl.campaign.fleets.RouteLocationCalculator;
 import com.fs.starfarer.api.impl.campaign.fleets.RouteManager;
 import com.fs.starfarer.api.impl.campaign.ids.FleetTypes;
 import com.fs.starfarer.api.impl.campaign.intel.raid.AssembleStage;
 import com.fs.starfarer.api.impl.campaign.intel.raid.RaidIntel;
+import com.fs.starfarer.api.impl.campaign.missions.hub.BaseHubMission;
 import com.fs.starfarer.api.ui.TooltipMakerAPI;
 import com.fs.starfarer.api.util.Misc;
 
 public class AcquisitionAssembleStage extends AssembleStage {
     protected AcquisitionRaidIntel acquisitionIntel;
+    protected float prepDays;
+    protected float travelDays;
 
-    public AcquisitionAssembleStage(RaidIntel raid, SectorEntityToken gatheringPoint) {
+    public AcquisitionAssembleStage(RaidIntel raid, SectorEntityToken gatheringPoint, MarketAPI ...sources) {
         super(raid, gatheringPoint);
         this.acquisitionIntel = (AcquisitionRaidIntel) raid;
+        for (MarketAPI source : sources) {
+            addSource(source);
+        }
+        if (this.sources.isEmpty()) {
+            this.status = RaidIntel.RaidStageStatus.FAILURE;
+            return;
+        }
+        for (MarketAPI source : this.sources) {
+            this.prepDays = 3f + 3f * (float) Math.random();
+            this.travelDays = RouteLocationCalculator.getTravelDays(source.getPrimaryEntity(), this.gatheringPoint);
+
+            this.maxDays = Math.max(this.maxDays, this.prepDays + this.travelDays);
+        }
     }
 
     @Override
@@ -60,20 +75,9 @@ public class AcquisitionAssembleStage extends AssembleStage {
         //  for autoresolve calculations
         extra.strength = fp + this.acquisitionIntel.getBonusStrengthPerFleet();
 
-
-        float prepDays = 3f + 3f * (float) Math.random();
-        float travelDays = RouteLocationCalculator.getTravelDays(market.getPrimaryEntity(), this.gatheringPoint);
-
-        if (DebugFlags.RAID_DEBUG || DebugFlags.FAST_RAIDS) {
-            prepDays *= 0.1f;
-            travelDays *= 0.1f;
-        }
-
-        route.addSegment(new RouteManager.RouteSegment(prepDays, market.getPrimaryEntity(), PREP_STAGE));
-        route.addSegment(new RouteManager.RouteSegment(travelDays, market.getPrimaryEntity(), this.gatheringPoint));
+        route.addSegment(new RouteManager.RouteSegment(this.prepDays, market.getPrimaryEntity(), PREP_STAGE));
+        route.addSegment(new RouteManager.RouteSegment(this.travelDays, market.getPrimaryEntity(), this.gatheringPoint));
         route.addSegment(new RouteManager.RouteSegment(1000f, this.gatheringPoint, WAIT_STAGE));
-
-        this.maxDays = Math.max(this.maxDays, prepDays + travelDays);
     }
 
     @Override
@@ -135,15 +139,10 @@ public class AcquisitionAssembleStage extends AssembleStage {
         int index = this.intel.getStageIndex(this);
 
         float opad = 10f;
-        String forces = this.acquisitionIntel.getForcesNoun();
 
         // Failure descriptions are handled in acquisition raid intel
         if (curr == index) {
-            if (isSourceKnown()) {
-                info.addPara("The " + forces + " is currently assembling in the " + this.gatheringPoint.getContainingLocation().getNameWithLowercaseType() + ".", opad);
-            } else {
-                info.addPara("The " + forces + " is currently assembling at an unknown location.", opad);
-            }
+            BaseHubMission.addStandardMarketDesc("Making preparations in orbit around", this.gatheringPoint.getMarket(), info, opad);
         }
     }
 }

@@ -12,12 +12,15 @@ import com.fs.starfarer.api.impl.campaign.fleets.RouteManager;
 import com.fs.starfarer.api.impl.campaign.ids.Factions;
 import com.fs.starfarer.api.impl.campaign.ids.MemFlags;
 import com.fs.starfarer.api.impl.campaign.ids.Ranks;
+import com.fs.starfarer.api.impl.campaign.intel.group.FGAction;
+import com.fs.starfarer.api.impl.campaign.intel.group.GenericRaidFGI;
 import com.fs.starfarer.api.impl.campaign.intel.raid.*;
 import com.fs.starfarer.api.ui.Alignment;
 import com.fs.starfarer.api.ui.LabelAPI;
 import com.fs.starfarer.api.ui.TooltipMakerAPI;
 import com.fs.starfarer.api.util.Misc;
 import org.apache.log4j.Logger;
+import org.lwjgl.Sys;
 import org.lwjgl.util.vector.Vector2f;
 import sectorexpansionpack.Utils;
 import sectorexpansionpack.missions.EntityFinderMission;
@@ -32,7 +35,7 @@ public class AcquisitionRaidIntel extends RaidIntel {
     public static final String SOURCE_KEY = "$sep_ari_source";
     public static final String TARGET_KEY = "$sep_ari_target";
     public static final Logger log = Global.getLogger(AcquisitionRaidIntel.class);
-    public static Object RETURNED_SAFELY = new Object();
+    public static Object RETURNED_UPDATE = new Object();
     protected AcquisitionOutcome outcome;
     protected MarketAPI source;
     protected MarketAPI target;
@@ -56,8 +59,7 @@ public class AcquisitionRaidIntel extends RaidIntel {
 
         addStage(new AcquisitionOrganizeStage(this, this.source, getPrepDays(baseFP)));
 
-        AssembleStage assembleStage = new AcquisitionAssembleStage(this, this.source.getPrimaryEntity());
-        assembleStage.addSource(this.source);
+        AssembleStage assembleStage = new AcquisitionAssembleStage(this, this.source.getPrimaryEntity(), this.source);
         assembleStage.setSpawnFP(baseFP);
         assembleStage.setAbortFP(baseFP * getFleetFPAbortFraction());
         addStage(assembleStage);
@@ -185,7 +187,6 @@ public class AcquisitionRaidIntel extends RaidIntel {
         } else if (status == RaidStageStatus.FAILURE) {
             failedAtStage(stage);
             this.failStage = this.currentStage;
-            endAfterDelay();
             if (shouldSendUpdate()) {
                 sendUpdateIfPlayerHasIntel(UPDATE_FAILED, false);
             }
@@ -193,29 +194,37 @@ public class AcquisitionRaidIntel extends RaidIntel {
     }
 
     protected void successAtStage(RaidStage stage) {
-        if (stage instanceof AcquisitionActionStage) {
-            SpecialItemData data = new SpecialItemData(this.specialItem.getId(), this.specialItem.getParams());
-            for (Industry ind : this.target.getIndustries()) {
-                if (ind.getSpecialItem() != null && Objects.equals(ind.getSpecialItem().getId(), data.getId())) {
-                    log.info(String.format("Removing %s from %s at %s in the %s due to an incursion",
-                            this.specialItem.getName(), ind.getCurrentName(), this.target.getName(),
-                            this.target.getStarSystem().getNameWithLowercaseTypeShort()));
-                    ind.setSpecialItem(null);
-                    break;
-                }
-            }
-            log.info(String.format("The %s incursion is successful at %s in the %s",
-                    this.faction.getDisplayName(), this.target.getName(),
-                    this.target.getStarSystem().getNameWithLowercaseTypeShort()));
-        } else if (stage instanceof AcquisitionReturnStage stage1) {
+        if (stage instanceof AcquisitionReturnStage stage1) {
+            // Do this first as acquisition return stage extends acquisition travel stage
             SpecialItemData data = new SpecialItemData(this.specialItem.getId(), this.specialItem.getParams());
             Utils.findMarketToInstallSpecialItem(new EntityFinderMission(), getFaction().getId(), this.source, data, log);
             setOutcome(AcquisitionOutcome.SUCCEEDED);
             stage1.giveReturnOrdersToStragglers(stage1.getRoutes()); // Order fleets to return home and despawn
             endAfterDelay();
             if (shouldSendUpdate()) {
-                sendUpdateIfPlayerHasIntel(RETURNED_SAFELY, false);
+                sendUpdateIfPlayerHasIntel(RETURNED_UPDATE, false);
             }
+        } else if (stage instanceof AcquisitionTravelStage) {
+            if (shouldSendUpdate()) {
+                sendUpdateIfPlayerHasIntel(RaidIntel.ENTERED_SYSTEM_UPDATE, false);
+            }
+        } else if (stage instanceof AcquisitionActionStage) {
+            SpecialItemData data = new SpecialItemData(this.specialItem.getId(), this.specialItem.getParams());
+            for (Industry ind : this.target.getIndustries()) {
+                if (ind.getSpecialItem() != null && Objects.equals(ind.getSpecialItem().getId(), data.getId())) {
+                    log.info(String.format("Removing %s from %s at %s in the %s due to an incursion",
+                            this.specialItem.getName(), ind.getCurrentName(), this.target.getName(),
+                            getSystem().getNameWithLowercaseTypeShort()));
+                    ind.setSpecialItem(null);
+                    break;
+                }
+            }
+            if (shouldSendUpdate()) {
+                sendUpdateIfPlayerHasIntel(RaidIntel.UPDATE_RETURNING, false);
+            }
+            log.info(String.format("The %s incursion is successful at %s in the %s",
+                    this.faction.getDisplayName(), this.target.getName(),
+                    getSystem().getNameWithLowercaseTypeShort()));
         }
     }
 
@@ -225,18 +234,20 @@ public class AcquisitionRaidIntel extends RaidIntel {
             if (stage instanceof AcquisitionOrganizeStage) {
                 setOutcome(AcquisitionOutcome.ABORTED_IN_PLANNING);
             } else if (stage instanceof AcquisitionAssembleStage) {
-                setOutcome(AcquisitionOutcome.TASK_FORCE_DEFEATED);
-            } else if (stage instanceof AcquisitionTravelStage) {
+                setOutcome(AcquisitionOutcome.ASSEMBLING_DISRUPTED);
+            } else if (stage instanceof AcquisitionReturnStage) {
+                // Do this first as acquisition return stage extends acquisition travel stage
                 setOutcome(AcquisitionOutcome.NOT_ENOUGH_MADE_IT);
             } else if (stage instanceof AcquisitionActionStage) {
                 setOutcome(AcquisitionOutcome.FAILED);
-            } else if (stage instanceof AcquisitionReturnStage) {
+            } else if (stage instanceof AcquisitionTravelStage) {
                 setOutcome(AcquisitionOutcome.NOT_ENOUGH_MADE_IT);
             }
         }
         if (stage instanceof BaseRaidStage stage1) {
             stage1.giveReturnOrdersToStragglers(stage1.getRoutes()); // Order fleets to return home and despawn
         }
+        endAfterDelay();
     }
 
     public void addMemoryFlagsToFleets(List<RouteManager.RouteData> routes, Map<String, Object> memories) {
@@ -269,7 +280,7 @@ public class AcquisitionRaidIntel extends RaidIntel {
         addBasicDescription(info, width, height);
         addAssessmentSection(info, width, height);
         addStatusSection(info, width, height);
-        // addBulletPoints(info, ListInfoMode.IN_DESC);
+        addBulletPoints(info, ListInfoMode.IN_DESC);
         info.addSpacer(10f);
     }
 
@@ -440,31 +451,149 @@ public class AcquisitionRaidIntel extends RaidIntel {
 
     @Override
     protected void addBulletPoints(TooltipMakerAPI info, ListInfoMode mode) {
-        super.addBulletPoints(info, mode); // Replace this with my own implementation
+        float pad = 3f;
+        float opad = 10f;
+
+        float initPad = pad;
+        if (mode == ListInfoMode.IN_DESC) initPad = opad;
+
+        Color tc = getBulletColorForMode(mode);
+
+        bullet(info);
+        Object param = getListInfoParam();
+        boolean isUpdate = param != null;
+
+        FactionAPI targetFaction = this.target.getFaction();
+
+        if (mode != ListInfoMode.IN_DESC) {
+            // info.addPara("Faction: " + getFaction().getDisplayName(), initPad, tc, getFaction().getBaseUIColor(), getFaction().getDisplayName());
+            // initPad = 0f;
+            info.addPara("Target: " + targetFaction.getDisplayName(), initPad, tc, targetFaction.getBaseUIColor(), targetFaction.getDisplayName());
+            initPad = 0f;
+            // info.addPara("Location: " + getSystem().getNameWithLowercaseTypeShort(), tc, initPad);
+            // initPad = 0f;
+        }
+
+        if (!isUpdate) {
+            addNonUpdateBulletPoints(info, tc, param, mode, initPad);
+        } else {
+            addUpdateBulletPoints(info, tc, param, mode, initPad);
+        }
+        unindent(info);
+    }
+
+    public void addNonUpdateBulletPoints(TooltipMakerAPI info, Color tc, Object param, ListInfoMode mode, float initPad) {
+        if (this.outcome != null) {
+            return;
+        }
+        Color h = Misc.getHighlightColor();
+        // Color s = raidAction.getSystemNameHighlightColor();
+        // FGAction curr = getCurrentAction();
+        // StarSystemAPI system = raidAction.getWhere();
+        String forces = getForcesNoun();
+        RaidStage stage = this.stages.get(this.currentStage);
+
+        float etaOrganize = getETAAtStage(OrganizeStage.class);
+        float etaAssemble = getETAAtStage(AssembleStage.class) + etaOrganize;
+        float etaTravel = getETAAtStage(TravelStage.class) + etaAssemble;
+        float etaAction = getETAAtStage(ActionStage.class);
+        float etaReturn = getETAAtStage(TravelStage.class);
+
+        if (etaAssemble > 0) {
+            if ((int) etaAssemble <= 0f) {
+                info.addPara("Departure imminent", tc, initPad);
+            } else {
+                String days = (int)etaAssemble == 1 ? "day" : "days";
+                info.addPara("Estimated %s " + days + " until departure",
+                        initPad, tc, h, "" + (int) etaAssemble);
+            }
+            initPad = 0f;
+        }
+        if (etaTravel > 0) {
+            if ((int) etaAction <= 0f) {
+                info.addPara("Arrival imminent", tc, initPad);
+            } else {
+                String days = (int)etaTravel == 1 ? "day" : "days";
+                String locName = "";
+                if (mode == ListInfoMode.IN_DESC) {
+                    locName = " at " + getSystem().getNameWithLowercaseTypeShort();
+                }
+                info.addPara("Estimated %s " + days + " until arrival" + locName,
+                        initPad, tc, h, "" + (int) etaTravel);
+            }
+            initPad = 0f;
+        }
+        if (stage instanceof AcquisitionActionStage && (mode == ListInfoMode.MESSAGES || mode == ListInfoMode.INTEL)) {
+            info.addPara("Operating in the " + getSystem().getNameWithLowercaseTypeShort(), tc, initPad);
+        }
+        if (etaReturn > 0 && stage instanceof AcquisitionReturnStage) {
+            if ((int) etaReturn <= 0f) {
+                info.addPara("Return imminent", tc, initPad);
+            } else {
+                String days = (int)etaTravel == 1 ? "day" : "days";
+                String locName = "";
+                if (mode == ListInfoMode.IN_DESC) {
+                    locName = " at " + getSystem().getNameWithLowercaseTypeShort();
+                }
+                info.addPara("Estimated %s " + days + " until return" + locName,
+                        initPad, tc, h, "" + (int) etaTravel);
+            }
+        }
+    }
+
+    public float getETAAtStage(Class<?> classObject) {
+        for (RaidStage stage : this.stages) {
+            if (stage.getStatus() == RaidStageStatus.ONGOING){
+                continue;
+            }
+            if (classObject.isInstance(stage)) {
+                if (stage instanceof AcquisitionTravelStage ats) {
+                    float travelDays = RouteLocationCalculator.getTravelDays(ats.getFrom(), ats.getTo());
+                    return Math.max(0f, travelDays - stage.getElapsed());
+                }
+                return Math.max(0f, stage.getMaxDays() - stage.getElapsed());
+            }
+        }
+        return 0f;
+    }
+
+    public void addUpdateBulletPoints(TooltipMakerAPI info, Color tc, Object param, ListInfoMode mode, float initPad) {
+        if (ENTERED_SYSTEM_UPDATE.equals(param)) {
+            info.addPara("Arrived at " + getSystem().getNameWithLowercaseTypeShort(), tc, initPad);
+        } else if (UPDATE_RETURNING.equals(param)) {
+            info.addPara("Returning to " + this.source.getStarSystem().getNameWithLowercaseTypeShort() + " with a special item", tc, initPad);
+        } else if (RETURNED_UPDATE.equals(param)) {
+            info.addPara("Docking safely " + this.source.getOnOrAt() + " " + this.source.getName() + " with a special item", tc, initPad);
+        } else if (UPDATE_FAILED.equals(param)) {
+            info.addPara("The " + getRaidNoun() + " in the " + getSystem().getNameWithLowercaseType() + " has failed", tc, initPad);
+        }
     }
 
     protected String getOutcomeDescription() {
         String forces = getForcesNoun();
         String raid = getRaidNoun();
-        String desc = "The " + raid + " was successful and the command fleet carrying a special item has safely returned";
+        String desc = "";
         switch (this.outcome) {
             // Failure outcomes
-            case TASK_FORCE_DEFEATED ->
-                    desc = "The" + forces + " were defeated, and any surviving fleets are retreating in disarray.";
+            case ASSEMBLING_DISRUPTED ->
+                    desc = "The" + forces + " failed to fully assemble. Any deployed fleets are retreating in disarray.";
             case NOT_ENOUGH_MADE_IT ->
-                    desc = "The " + forces + " failed to reach their objective, and any remaining fleets are retreating in disarray.";
+                    desc = "The " + forces + " failed to reach their objective. Any remaining fleets are retreating in disarray.";
             case FAILED ->
-                    desc = "The " + forces + " failed to complete their objective, and any remaining fleets are retreating in disarray.";
+                    desc = "The " + forces + " failed to complete their objective. Any surviving fleets are retreating in disarray.";
             // Cancelled outcomes but still failure
             case SOURCE_MARKET_LOST ->
-                    desc = "The " + raid + " was cancelled as the " + this.source.getName() + " colony no longer exists.";
+                    desc = "The " + raid + " was cancelled as the " + this.source.getName() + " colony no longer exists. " +
+                            "Any deployed fleets are returning to their port of origin";
             case TARGET_MARKET_LOST ->
-                    desc = "The " + raid + " was cancelled as the " + this.target.getName() + " colony no longer exists.";
+                    desc = "The " + raid + " was cancelled as the " + this.target.getName() + " colony no longer exists. " +
+                            "Any deployed fleets are returning to their port of origin";
             case NO_LONGER_HOSTILE ->
                     desc = "The " + raid + " was cancelled as " + this.faction.getDisplayNameWithArticle() +
-                            " is no longer hostile with " + this.target.getFaction().getDisplayNameWithArticle() + ".";
+                            " is no longer hostile with " + this.target.getFaction().getDisplayNameWithArticle() + ". " +
+                            "Any deployed fleets are returning to their port of origin";
             case ABORTED_IN_PLANNING ->
-                    desc = "The " + raid + " was cancelled during the planning stage and will not happen.";
+                    desc = "The " + raid + " was cancelled during the planning stage and will no longer happen.";
             // Succeeded outcomes
             case SUCCEEDED ->
                     desc = "The " + raid + " was successful and the acquired special item is now in the hands of " +
@@ -552,6 +681,9 @@ public class AcquisitionRaidIntel extends RaidIntel {
         fleet.getMemoryWithoutUpdate().set(EVENT_KEY, this);
 
         fleet.getMemoryWithoutUpdate().set(MemFlags.MEMORY_KEY_FLEET_DO_NOT_GET_SIDETRACKED, true);
+        fleet.getMemoryWithoutUpdate().set(MemFlags.DO_NOT_TRY_TO_AVOID_NEARBY_FLEETS, true);
+        fleet.getMemoryWithoutUpdate().set(MemFlags.FLEET_NO_MILITARY_RESPONSE, true);
+        fleet.getMemoryWithoutUpdate().set(MemFlags.FLEET_IGNORES_OTHER_FLEETS, true);
 
         // TODO: Add special item to 1 fleet when raid action is successful.
 
@@ -591,7 +723,8 @@ public class AcquisitionRaidIntel extends RaidIntel {
     }
 
     public enum AcquisitionOutcome {
-        TASK_FORCE_DEFEATED,
+        SPECIAL_ITEM_LOST,
+        ASSEMBLING_DISRUPTED,
         NOT_ENOUGH_MADE_IT,
         FAILED,
 
@@ -603,7 +736,7 @@ public class AcquisitionRaidIntel extends RaidIntel {
         SUCCEEDED;
 
         public boolean isFailed() {
-            return this == TASK_FORCE_DEFEATED || this == NOT_ENOUGH_MADE_IT || this == FAILED || isCancelled();
+            return this == ASSEMBLING_DISRUPTED || this == NOT_ENOUGH_MADE_IT || this == FAILED || isCancelled();
         }
 
         public boolean isCancelled() {
