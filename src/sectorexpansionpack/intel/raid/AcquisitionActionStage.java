@@ -172,6 +172,13 @@ public class AcquisitionActionStage extends ActionStage implements BaseAssignmen
 
     @Override
     public boolean canRaid(CampaignFleetAPI fleet, MarketAPI market) {
+        if (market.getFaction().isHostileTo(this.intel.getFaction())){
+            return false;
+        }
+        if (Misc.flagHasReason(market.getMemoryWithoutUpdate(),
+                MemFlags.RECENTLY_RAIDED, this.intel.getFaction().getId())) {
+            return false;
+        }
         return this.acquisitionIntel.getOutcome() == null;
     }
 
@@ -199,16 +206,16 @@ public class AcquisitionActionStage extends ActionStage implements BaseAssignmen
 
     @Override
     public String getRaidPrepText(CampaignFleetAPI fleet, SectorEntityToken from) {
-        return "preparing for " + this.acquisitionIntel.getRaidNoun();
+        return "orbiting " + from.getName();
     }
 
     @Override
     public String getRaidInSystemText(CampaignFleetAPI fleet) {
-        return "acquiring a special item";
+        return "attacking " + this.target.getContainingLocation().getNameWithLowercaseTypeShort();
     }
 
     @Override
     public String getRaidDefaultText(CampaignFleetAPI fleet) {
-        return "acquiring a special item";
+        return "travelling to " + this.target.getName();
     }
 }

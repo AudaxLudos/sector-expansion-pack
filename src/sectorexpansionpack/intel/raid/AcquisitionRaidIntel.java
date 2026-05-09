@@ -4,6 +4,7 @@ import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.campaign.*;
 import com.fs.starfarer.api.campaign.econ.Industry;
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
+import com.fs.starfarer.api.impl.campaign.JumpPointInteractionDialogPluginImpl;
 import com.fs.starfarer.api.impl.campaign.command.WarSimScript;
 import com.fs.starfarer.api.impl.campaign.fleets.FleetFactoryV3;
 import com.fs.starfarer.api.impl.campaign.fleets.FleetParamsV3;
@@ -56,15 +57,16 @@ public class AcquisitionRaidIntel extends RaidIntel {
         float approxNumFleets = neededFP / getLargeFleetSize();
         float bonusStrengthPerFleet = getBonusStrengthPerFleet();
         float baseFP = (neededFP - (approxNumFleets * bonusStrengthPerFleet)) * desireMult * randomMult;
+        float prepDays = getPrepDays(baseFP) / 2f;
 
-        addStage(new AcquisitionOrganizeStage(this, this.source, getPrepDays(baseFP)));
+        addStage(new AcquisitionOrganizeStage(this, this.source, prepDays));
 
-        AssembleStage assembleStage = new AcquisitionAssembleStage(this, this.source.getPrimaryEntity(), this.source);
+        AssembleStage assembleStage = new AcquisitionAssembleStage(this, this.source.getPrimaryEntity(), prepDays, this.source);
         assembleStage.setSpawnFP(baseFP);
         assembleStage.setAbortFP(baseFP * getFleetFPAbortFraction());
         addStage(assembleStage);
 
-        SectorEntityToken raidJumpPoint = RouteLocationCalculator.findJumpPointToUse(getFaction(), target.getPrimaryEntity());
+        SectorEntityToken raidJumpPoint = findHyperspaceJumpPointToUse();
         if (raidJumpPoint == null) {
             endImmediately();
             return;
@@ -142,6 +144,38 @@ public class AcquisitionRaidIntel extends RaidIntel {
         return 7f + (fp / getLargeFleetSize());
     }
 
+    protected SectorEntityToken findHyperspaceJumpPointToUse() {
+        List<JumpPointAPI> hyperJumpPoints = Utils.getHyperspaceJumpPoints(getSystem());
+
+        float min = Float.MAX_VALUE;
+        JumpPointAPI closest = null;
+        for (JumpPointAPI jumpPoint : hyperJumpPoints) {
+            for (JumpPointAPI.JumpDestination destination : jumpPoint.getDestinations()) {
+                if (jumpPoint.isWormhole()) {
+                    continue;
+                }
+                if (jumpPoint.getMemoryWithoutUpdate().getBoolean(JumpPointInteractionDialogPluginImpl.UNSTABLE_KEY)) {
+                    continue;
+                }
+                SectorEntityToken destEntity = destination.getDestination();
+                if (destEntity == null) {
+                    continue;
+                }
+                if (destEntity.isStar()) {
+                    continue;
+                }
+
+                float dist = Misc.getDistance(destEntity.getLocation(), this.target.getLocation());
+                if (dist < min) {
+                    min = dist;
+                    closest = jumpPoint;
+                }
+            }
+        }
+
+        return closest;
+    }
+
     protected float getRaidDays(float fp) {
         if (Global.getSettings().isDevMode()) {
             return 7f;
@@ -194,6 +228,7 @@ public class AcquisitionRaidIntel extends RaidIntel {
     }
 
     protected void successAtStage(RaidStage stage) {
+        setFleetsMemoryAtStage(stage, true);
         if (stage instanceof AcquisitionReturnStage stage1) {
             // Do this first as acquisition return stage extends acquisition travel stage
             SpecialItemData data = new SpecialItemData(this.specialItem.getId(), this.specialItem.getParams());
@@ -250,17 +285,6 @@ public class AcquisitionRaidIntel extends RaidIntel {
         endAfterDelay();
     }
 
-    public void addMemoryFlagsToFleets(List<RouteManager.RouteData> routes, Map<String, Object> memories) {
-        for (RouteManager.RouteData route : routes) {
-            CampaignFleetAPI fleet = route.getActiveFleet();
-            if (fleet != null) {
-                for (Map.Entry<String, Object> entry : memories.entrySet()) {
-                    fleet.getMemoryWithoutUpdate().set(entry.getKey(), entry.getValue());
-                }
-            }
-        }
-    }
-
     @Override
     public String getName() {
         String base = Misc.ucFirst(getFaction().getPersonNamePrefix()) + " " + Misc.ucFirst(getRaidNoun());
@@ -299,6 +323,7 @@ public class AcquisitionRaidIntel extends RaidIntel {
 
         log.info(Misc.ucFirst(this.faction.getDisplayName()) + " raid info: ");
         log.info("  Final raid outcome      : " + this.outcome);
+        log.info("  Fail raid stage         : " + this.failStage);
         log.info("  Initial enemy strength  : " + this.defenderStr);
         log.info("  Active raid strength    : " + raidStr);
         log.info("  Active enemy strength   : " + defenderStr);
@@ -486,11 +511,8 @@ public class AcquisitionRaidIntel extends RaidIntel {
         if (this.outcome != null) {
             return;
         }
+
         Color h = Misc.getHighlightColor();
-        // Color s = raidAction.getSystemNameHighlightColor();
-        // FGAction curr = getCurrentAction();
-        // StarSystemAPI system = raidAction.getWhere();
-        String forces = getForcesNoun();
         RaidStage stage = this.stages.get(this.currentStage);
 
         float etaOrganize = getETAAtStage(OrganizeStage.class);
@@ -543,7 +565,7 @@ public class AcquisitionRaidIntel extends RaidIntel {
 
     public float getETAAtStage(Class<?> classObject) {
         for (RaidStage stage : this.stages) {
-            if (stage.getStatus() == RaidStageStatus.ONGOING){
+            if (stage.getStatus() != RaidStageStatus.ONGOING){
                 continue;
             }
             if (classObject.isInstance(stage)) {
@@ -614,7 +636,6 @@ public class AcquisitionRaidIntel extends RaidIntel {
     public CampaignFleetAPI createFleet(String factionId, RouteManager.RouteData route, MarketAPI market, Vector2f locInHyper, Random random) {
         RouteManager.OptionalFleetData extra = route.getExtra();
 
-        // Command fleet type is set during assemble stage
         boolean isPirate = getFaction().getCustomBoolean(Factions.CUSTOM_PIRATE_BEHAVIOR);
         float combat = extra.fp;
         float tanker = extra.fp * (0.1f + random.nextFloat() * 0.05f);
@@ -666,7 +687,7 @@ public class AcquisitionRaidIntel extends RaidIntel {
         fleet.getMemoryWithoutUpdate().set(MemFlags.MEMORY_KEY_WAR_FLEET, true);
         fleet.getMemoryWithoutUpdate().set(MemFlags.MEMORY_KEY_RAIDER, true);
 
-        if (fleet.getFaction().getCustomBoolean(Factions.CUSTOM_PIRATE_BEHAVIOR)) {
+        if (isPirate) {
             fleet.getMemoryWithoutUpdate().set(MemFlags.MEMORY_KEY_PIRATE, true);
         }
 
@@ -680,14 +701,64 @@ public class AcquisitionRaidIntel extends RaidIntel {
         fleet.getMemoryWithoutUpdate().set(FLEET_KEY, true);
         fleet.getMemoryWithoutUpdate().set(EVENT_KEY, this);
 
-        fleet.getMemoryWithoutUpdate().set(MemFlags.MEMORY_KEY_FLEET_DO_NOT_GET_SIDETRACKED, true);
-        fleet.getMemoryWithoutUpdate().set(MemFlags.DO_NOT_TRY_TO_AVOID_NEARBY_FLEETS, true);
-        fleet.getMemoryWithoutUpdate().set(MemFlags.FLEET_NO_MILITARY_RESPONSE, true);
-        fleet.getMemoryWithoutUpdate().set(MemFlags.FLEET_IGNORES_OTHER_FLEETS, true);
+        RaidStage stage = this.stages.get(this.currentStage);
+        setFleetsMemoryAtStage(stage, false);
 
         // TODO: Add special item to 1 fleet when raid action is successful.
 
         return fleet;
+    }
+
+    public void setFleetsMemoryAtStage(RaidStage stage, boolean useNextStage) {
+        RaidStage currStage = stage;
+        int index = getStageIndex(stage);
+        if (useNextStage) {
+            index += 1;
+            if (index > this.stages.size()) {
+                return;
+            }
+            currStage = this.stages.get(index);
+        }
+        List<RouteManager.RouteData> routes = RouteManager.getInstance().getRoutesForSource(getRouteSourceId());
+        for (RouteManager.RouteData route : routes) {
+            CampaignFleetAPI fleet = route.getActiveFleet();
+            if (route.getActiveFleet() == null) {
+                continue;
+            }
+            if (currStage.getStatus() == RaidStageStatus.FAILURE) {
+                fleet.getMemoryWithoutUpdate().unset(MemFlags.MEMORY_KEY_FLEET_DO_NOT_GET_SIDETRACKED);
+                fleet.getMemoryWithoutUpdate().unset(MemFlags.DO_NOT_TRY_TO_AVOID_NEARBY_FLEETS);
+                fleet.getMemoryWithoutUpdate().unset(MemFlags.FLEET_NO_MILITARY_RESPONSE);
+                fleet.getMemoryWithoutUpdate().unset(MemFlags.FLEET_IGNORES_OTHER_FLEETS);
+                continue;
+            }
+            if (currStage instanceof AcquisitionReturnStage) {
+                fleet.getMemoryWithoutUpdate().set(MemFlags.MEMORY_KEY_FLEET_DO_NOT_GET_SIDETRACKED, true);
+                fleet.getMemoryWithoutUpdate().set(MemFlags.DO_NOT_TRY_TO_AVOID_NEARBY_FLEETS, true);
+                fleet.getMemoryWithoutUpdate().set(MemFlags.FLEET_NO_MILITARY_RESPONSE, true);
+                fleet.getMemoryWithoutUpdate().set(MemFlags.FLEET_IGNORES_OTHER_FLEETS, true);
+            } else if (currStage instanceof AcquisitionActionStage) {
+                fleet.getMemoryWithoutUpdate().unset(MemFlags.MEMORY_KEY_FLEET_DO_NOT_GET_SIDETRACKED);
+                fleet.getMemoryWithoutUpdate().unset(MemFlags.DO_NOT_TRY_TO_AVOID_NEARBY_FLEETS);
+                fleet.getMemoryWithoutUpdate().unset(MemFlags.FLEET_NO_MILITARY_RESPONSE);
+                fleet.getMemoryWithoutUpdate().unset(MemFlags.FLEET_IGNORES_OTHER_FLEETS);
+            } else if (currStage instanceof AcquisitionTravelStage) {
+                fleet.getMemoryWithoutUpdate().set(MemFlags.MEMORY_KEY_FLEET_DO_NOT_GET_SIDETRACKED, true);
+                fleet.getMemoryWithoutUpdate().set(MemFlags.DO_NOT_TRY_TO_AVOID_NEARBY_FLEETS, true);
+                fleet.getMemoryWithoutUpdate().set(MemFlags.FLEET_NO_MILITARY_RESPONSE, true);
+                fleet.getMemoryWithoutUpdate().set(MemFlags.FLEET_IGNORES_OTHER_FLEETS, true);
+            } else if (currStage instanceof AcquisitionAssembleStage) {
+                fleet.getMemoryWithoutUpdate().set(MemFlags.MEMORY_KEY_FLEET_DO_NOT_GET_SIDETRACKED, true);
+                fleet.getMemoryWithoutUpdate().set(MemFlags.DO_NOT_TRY_TO_AVOID_NEARBY_FLEETS, true);
+                fleet.getMemoryWithoutUpdate().set(MemFlags.FLEET_NO_MILITARY_RESPONSE, true);
+                fleet.getMemoryWithoutUpdate().set(MemFlags.FLEET_IGNORES_OTHER_FLEETS, true);
+            } else if (currStage instanceof AcquisitionOrganizeStage) {
+                fleet.getMemoryWithoutUpdate().set(MemFlags.MEMORY_KEY_FLEET_DO_NOT_GET_SIDETRACKED, true);
+                fleet.getMemoryWithoutUpdate().set(MemFlags.DO_NOT_TRY_TO_AVOID_NEARBY_FLEETS, true);
+                fleet.getMemoryWithoutUpdate().set(MemFlags.FLEET_NO_MILITARY_RESPONSE, true);
+                fleet.getMemoryWithoutUpdate().set(MemFlags.FLEET_IGNORES_OTHER_FLEETS, true);
+            }
+        }
     }
 
     @Override
