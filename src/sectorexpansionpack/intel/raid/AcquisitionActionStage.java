@@ -11,6 +11,7 @@ import com.fs.starfarer.api.impl.campaign.econ.impl.OrbitalStation;
 import com.fs.starfarer.api.impl.campaign.fleets.RouteManager;
 import com.fs.starfarer.api.impl.campaign.ids.MemFlags;
 import com.fs.starfarer.api.impl.campaign.intel.raid.ActionStage;
+import com.fs.starfarer.api.impl.campaign.intel.raid.RaidAssignmentAI;
 import com.fs.starfarer.api.impl.campaign.intel.raid.RaidIntel;
 import com.fs.starfarer.api.impl.campaign.procgen.themes.BaseAssignmentAI;
 import com.fs.starfarer.api.impl.campaign.rulecmd.salvage.MarketCMD;
@@ -86,7 +87,10 @@ public class AcquisitionActionStage extends ActionStage implements BaseAssignmen
 
         List<RouteManager.RouteData> routes = RouteManager.getInstance().getRoutesForSource(this.intel.getRouteSourceId());
         for (RouteManager.RouteData route : routes) {
-            route.addSegment(new RouteManager.RouteSegment(1000f, this.intel.getSystem().getCenter()));
+            if (this.target.getStarSystem() != null) {
+                route.addSegment(new RouteManager.RouteSegment(3f, this.target.getStarSystem().getCenter(), this.target.getPrimaryEntity()));
+            }
+            route.addSegment(new RouteManager.RouteSegment(1000f, this.target.getPrimaryEntity()));
         }
     }
 
@@ -172,7 +176,7 @@ public class AcquisitionActionStage extends ActionStage implements BaseAssignmen
 
     @Override
     public boolean canRaid(CampaignFleetAPI fleet, MarketAPI market) {
-        if (market.getFaction().isHostileTo(this.intel.getFaction())){
+        if (!market.getFaction().isHostileTo(this.intel.getFaction())){
             return false;
         }
         if (Misc.flagHasReason(market.getMemoryWithoutUpdate(),

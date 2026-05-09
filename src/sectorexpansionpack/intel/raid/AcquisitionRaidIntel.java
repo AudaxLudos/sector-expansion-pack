@@ -13,15 +13,14 @@ import com.fs.starfarer.api.impl.campaign.fleets.RouteManager;
 import com.fs.starfarer.api.impl.campaign.ids.Factions;
 import com.fs.starfarer.api.impl.campaign.ids.MemFlags;
 import com.fs.starfarer.api.impl.campaign.ids.Ranks;
-import com.fs.starfarer.api.impl.campaign.intel.group.FGAction;
-import com.fs.starfarer.api.impl.campaign.intel.group.GenericRaidFGI;
 import com.fs.starfarer.api.impl.campaign.intel.raid.*;
+import com.fs.starfarer.api.impl.campaign.procgen.themes.BaseAssignmentAI;
+import com.fs.starfarer.api.impl.campaign.procgen.themes.RouteFleetAssignmentAI;
 import com.fs.starfarer.api.ui.Alignment;
 import com.fs.starfarer.api.ui.LabelAPI;
 import com.fs.starfarer.api.ui.TooltipMakerAPI;
 import com.fs.starfarer.api.util.Misc;
 import org.apache.log4j.Logger;
-import org.lwjgl.Sys;
 import org.lwjgl.util.vector.Vector2f;
 import sectorexpansionpack.Utils;
 import sectorexpansionpack.missions.EntityFinderMission;
@@ -35,6 +34,7 @@ public class AcquisitionRaidIntel extends RaidIntel {
     public static final String EVENT_KEY = "$sep_ari_eventRef";
     public static final String SOURCE_KEY = "$sep_ari_source";
     public static final String TARGET_KEY = "$sep_ari_target";
+    public static final String HAS_ARTIFACT_KEY = "$sep_ari_hasArtifact";
     public static final Logger log = Global.getLogger(AcquisitionRaidIntel.class);
     public static Object RETURNED_UPDATE = new Object();
     protected AcquisitionOutcome outcome;
@@ -56,7 +56,7 @@ public class AcquisitionRaidIntel extends RaidIntel {
         float randomMult = 0.6f + this.random.nextFloat() * 0.6f;
         float approxNumFleets = neededFP / getLargeFleetSize();
         float bonusStrengthPerFleet = getBonusStrengthPerFleet();
-        float baseFP = (neededFP - (approxNumFleets * bonusStrengthPerFleet)) * desireMult * randomMult;
+        float baseFP = (neededFP - (approxNumFleets * bonusStrengthPerFleet)) * desireMult * randomMult * 2f;
         float prepDays = getPrepDays(baseFP) / 2f;
 
         addStage(new AcquisitionOrganizeStage(this, this.source, prepDays));
@@ -633,6 +633,16 @@ public class AcquisitionRaidIntel extends RaidIntel {
     }
 
     @Override
+    public RouteFleetAssignmentAI createAssignmentAI(CampaignFleetAPI fleet, RouteManager.RouteData route) {
+        ActionStage action = getActionStage();
+        BaseAssignmentAI.FleetActionDelegate delegate = null;
+        if (action instanceof BaseAssignmentAI.FleetActionDelegate) {
+            delegate = (BaseAssignmentAI.FleetActionDelegate) action;
+        }
+        return new AcquisitionAssignmentAI(fleet, route, delegate);
+    }
+
+    @Override
     public CampaignFleetAPI createFleet(String factionId, RouteManager.RouteData route, MarketAPI market, Vector2f locInHyper, Random random) {
         RouteManager.OptionalFleetData extra = route.getExtra();
 
@@ -704,8 +714,6 @@ public class AcquisitionRaidIntel extends RaidIntel {
         RaidStage stage = this.stages.get(this.currentStage);
         setFleetsMemoryAtStage(stage, false);
 
-        // TODO: Add special item to 1 fleet when raid action is successful.
-
         return fleet;
     }
 
@@ -714,15 +722,24 @@ public class AcquisitionRaidIntel extends RaidIntel {
         int index = getStageIndex(stage);
         if (useNextStage) {
             index += 1;
-            if (index > this.stages.size()) {
+            if (index + 1> this.stages.size()) {
                 return;
             }
             currStage = this.stages.get(index);
         }
+        boolean specialItemGiven = false;
         List<RouteManager.RouteData> routes = RouteManager.getInstance().getRoutesForSource(getRouteSourceId());
         for (RouteManager.RouteData route : routes) {
             CampaignFleetAPI fleet = route.getActiveFleet();
-            if (route.getActiveFleet() == null) {
+            if (fleet != null) {
+                if (fleet.getMemoryWithoutUpdate().getBoolean(HAS_ARTIFACT_KEY)) {
+                    specialItemGiven = true;
+                }
+            }
+        }
+        for (RouteManager.RouteData route : routes) {
+            CampaignFleetAPI fleet = route.getActiveFleet();
+            if (fleet == null) {
                 continue;
             }
             if (currStage.getStatus() == RaidStageStatus.FAILURE) {
@@ -737,6 +754,13 @@ public class AcquisitionRaidIntel extends RaidIntel {
                 fleet.getMemoryWithoutUpdate().set(MemFlags.DO_NOT_TRY_TO_AVOID_NEARBY_FLEETS, true);
                 fleet.getMemoryWithoutUpdate().set(MemFlags.FLEET_NO_MILITARY_RESPONSE, true);
                 fleet.getMemoryWithoutUpdate().set(MemFlags.FLEET_IGNORES_OTHER_FLEETS, true);
+                if (!specialItemGiven) {
+                    // TODO: Remove this memory flags when mission end
+                    Misc.makeImportant(fleet, "sep_ari_hasArtifact");
+                    Misc.addDefeatTrigger(fleet, "SEPARIDefeatTrigger");
+                    fleet.getMemoryWithoutUpdate().set(HAS_ARTIFACT_KEY, true);
+                    specialItemGiven = true;
+                }
             } else if (currStage instanceof AcquisitionActionStage) {
                 fleet.getMemoryWithoutUpdate().unset(MemFlags.MEMORY_KEY_FLEET_DO_NOT_GET_SIDETRACKED);
                 fleet.getMemoryWithoutUpdate().unset(MemFlags.DO_NOT_TRY_TO_AVOID_NEARBY_FLEETS);
