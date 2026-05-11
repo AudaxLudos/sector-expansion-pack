@@ -140,13 +140,6 @@ public class AcquisitionRaidIntel extends RaidIntel {
         return mult;
     }
 
-    protected Object readResolve() {
-        if (this.target != null) {
-            this.targetFaction = this.target.getFaction();
-        }
-        return this;
-    }
-
     protected float getPrepDays(float fp) {
         if (Global.getSettings().isDevMode()) {
             return 7f;

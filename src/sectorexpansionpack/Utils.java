@@ -20,8 +20,8 @@ import java.util.Random;
 public class Utils {
     public static Random random = new Random();
 
-    public static void setRandom(Random random) {
-        Utils.random = random;
+    public static void setRandom() {
+        Utils.random = new Random(Long.parseLong(Global.getSector().getSeedString().replaceAll("\\D", "")));
     }
 
     public static boolean rollProbability(float p) {

@@ -16,6 +16,7 @@ import sectorexpansionpack.intel.ClearDebrisFieldsIntelCreator;
 import sectorexpansionpack.intel.ConstructObjectiveIntelCreator;
 import sectorexpansionpack.intel.ExpeditionFleetManager;
 import sectorexpansionpack.intel.IncursionFleetManager;
+import sectorexpansionpack.intel.raid.AcquisitionRaidManager;
 import sectorexpansionpack.listeners.MatrixCatalystBlueprintAdder;
 import sectorexpansionpack.listeners.MatrixCatalystOptionProvider;
 
@@ -78,7 +79,7 @@ public class ModPlugin extends BaseModPlugin {
 
     public void addScriptsIfNeeded() {
         // Mod settings
-        Utils.setRandom(new Random(Long.parseLong(Global.getSector().getSeedString().replaceAll("\\D", ""))));
+        Utils.setRandom();
         Settings.load();
 
         // Scripts
@@ -86,8 +87,12 @@ public class ModPlugin extends BaseModPlugin {
         if (!sector.hasScript(ExpeditionFleetManager.class)) {
             sector.addScript(new ExpeditionFleetManager());
         }
-        if (!sector.hasScript(IncursionFleetManager.class)) {
-            sector.addScript(new IncursionFleetManager());
+        // incursions deprecated
+        // if (!sector.hasScript(IncursionFleetManager.class)) {
+        //     sector.addScript(new IncursionFleetManager());
+        // }
+        if (!sector.hasScript(AcquisitionRaidManager.class)) {
+            sector.addScript(new AcquisitionRaidManager());
         }
 
         GenericMissionManager genericMissionManager = GenericMissionManager.getInstance();

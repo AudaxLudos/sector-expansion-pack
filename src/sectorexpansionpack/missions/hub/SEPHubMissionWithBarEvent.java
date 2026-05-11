@@ -70,6 +70,10 @@ public abstract class SEPHubMissionWithBarEvent extends HubMissionWithBarEvent {
         this.search.marketReqs.add(new MarketCanUseSpecialItemReq(specialItemData));
     }
 
+    public void requireMarketFactionNoMemoryFlag(String flag) {
+        this.search.marketReqs.add(new MarketFactionBooleanMemoryFlag(flag, true));
+    }
+
     public void requireMarketUsesSpecialItems() {
         this.search.marketReqs.add(new MarketUsesSpecialItems());
     }
@@ -257,7 +261,6 @@ public abstract class SEPHubMissionWithBarEvent extends HubMissionWithBarEvent {
         triggerSetFleetOfficers(oNum, oQuality);
     }
 
-
     public void triggerSetFleetToQuantityFleet(int difficulty) {
         FleetSize size;
         FleetQuality quality;
@@ -414,6 +417,28 @@ public abstract class SEPHubMissionWithBarEvent extends HubMissionWithBarEvent {
         STANDARD,
         QUALITY,
         QUANTITY
+    }
+
+    public static class MarketFactionBooleanMemoryFlag implements MarketRequirement {
+        final String flag;
+        final boolean negate;
+
+        public MarketFactionBooleanMemoryFlag(String flag, boolean negate) {
+            this.flag = flag;
+            this.negate = negate;
+        }
+
+        @Override
+        public boolean marketMatchesRequirement(MarketAPI market) {
+            if (market.getFaction() == null) {
+                return false;
+            }
+            boolean memVal = market.getMemoryWithoutUpdate().getBoolean(this.flag);
+            if (this.negate) {
+                return !memVal;
+            }
+            return memVal;
+        }
     }
 
     public static class PlanetNoSpecialSalvage implements PlanetRequirement {

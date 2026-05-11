@@ -14,9 +14,11 @@ import java.util.List;
 public class Settings implements LunaSettingsListener {
     public static final String MOD_ID = "sectorexpansionpack";
     public static boolean EXPEDITIONS_ENABLED;
-    public static float EXPEDITIONS_TIMER;
+    public static int EXPEDITIONS_TIMER;
     public static boolean INCURSIONS_ENABLED;
-    public static float INCURSIONS_TIMER;
+    public static int INCURSIONS_TIMER;
+    public static boolean ACQUISITIONS_ENABLED;
+    public static int ACQUISITIONS_TIMER;
     public static List<String> COLONY_ITEM_WHITELIST = new ArrayList<>();
 
     public static void load() {
@@ -54,8 +56,11 @@ public class Settings implements LunaSettingsListener {
         EXPEDITIONS_ENABLED = getBoolean("sep_expeditions_enabled");
         EXPEDITIONS_TIMER = getInt("sep_expeditions_timer");
 
-        INCURSIONS_ENABLED = getBoolean("sep_incursions_enabled");
-        INCURSIONS_TIMER = getInt("sep_incursions_timer");
+        INCURSIONS_ENABLED = false; // incursions deprecated
+        INCURSIONS_TIMER = 731; // incursions deprecated
+
+        ACQUISITIONS_ENABLED = getBoolean("sep_acquisitions_enabled");
+        ACQUISITIONS_TIMER = getInt("sep_acquisitions_timer");
     }
 
     public static boolean getBoolean(String settingId) {
@@ -68,7 +73,7 @@ public class Settings implements LunaSettingsListener {
         return Global.getSettings().getBoolean(settingId);
     }
 
-    public static float getInt(String settingId) {
+    public static int getInt(String settingId) {
         if (isLunaLibEnabled()) {
             Integer val = LunaSettings.getInt(MOD_ID, settingId);
             if (val != null) {
