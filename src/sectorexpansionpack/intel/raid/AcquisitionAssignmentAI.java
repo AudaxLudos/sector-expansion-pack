@@ -10,57 +10,16 @@ import com.fs.starfarer.api.impl.campaign.ids.MemFlags;
 import com.fs.starfarer.api.impl.campaign.intel.raid.RaidAssignmentAI;
 import com.fs.starfarer.api.util.Misc;
 
-import java.util.List;
-
+/**
+ * Replaces the colony action script for a single target.
+ * AI will try to clear out the system before doing raid action.
+ * May need to replace that functionality with a no wander AI.
+ * Current implementation works but high chance of the raid
+ * failing due to raid not taking actions in time
+ */
 public class AcquisitionAssignmentAI extends RaidAssignmentAI {
     public AcquisitionAssignmentAI(CampaignFleetAPI fleet, RouteManager.RouteData route, FleetActionDelegate delegate) {
         super(fleet, route, delegate);
-    }
-
-    @Override
-    protected void pickNext(boolean justSpawned) {
-        RouteManager.RouteSegment current = route.getCurrent();
-        if (current == null) return;
-
-        List<RouteManager.RouteSegment> segments = route.getSegments();
-        int index = route.getSegments().indexOf(route.getCurrent());
-
-
-        if (index == 0 && route.getMarket() != null && !current.isTravel()) {
-            System.out.println("SHOULD NOT HAPPEN");
-            if (current.getFrom() != null && (current.getFrom().isSystemCenter() || current.getFrom().getMarket() != route.getMarket())) {
-                addLocalAssignment(current, justSpawned);
-            } else {
-                addStartingAssignment(current, justSpawned);
-            }
-            return;
-        }
-
-        if (index == segments.size() - 1 && route.getMarket() != null && !current.isTravel()
-                && (current.elapsed >= current.daysMax || current.getFrom() == route.getMarket().getPrimaryEntity())) {
-            System.out.println("SHOULD NOT HAPPEN");
-            addEndingAssignment(current, justSpawned);
-            return;
-        }
-
-        // transiting from current to next; may or may not be in the same star system
-        if (current.isTravel()) {
-            System.out.println("SHOULD HAPPEN");
-            if (index == segments.size() - 1 &&
-                    fleet.getContainingLocation() == current.to.getContainingLocation() &&
-                    current.elapsed >= current.daysMax) {
-                addEndingAssignment(current, justSpawned);
-            } else {
-                System.out.println("SHOULD HAPPEN");
-                addTravelAssignment(current, justSpawned);
-            }
-            return;
-        }
-
-        // in a system or in a hyperspace location for some time
-        if (!current.isTravel()) {
-            addLocalAssignment(current, justSpawned);
-        }
     }
 
     @Override

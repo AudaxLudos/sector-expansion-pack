@@ -11,7 +11,6 @@ import com.fs.starfarer.api.impl.campaign.econ.impl.OrbitalStation;
 import com.fs.starfarer.api.impl.campaign.fleets.RouteManager;
 import com.fs.starfarer.api.impl.campaign.ids.MemFlags;
 import com.fs.starfarer.api.impl.campaign.intel.raid.ActionStage;
-import com.fs.starfarer.api.impl.campaign.intel.raid.RaidAssignmentAI;
 import com.fs.starfarer.api.impl.campaign.intel.raid.RaidIntel;
 import com.fs.starfarer.api.impl.campaign.procgen.themes.BaseAssignmentAI;
 import com.fs.starfarer.api.impl.campaign.rulecmd.salvage.MarketCMD;
@@ -176,7 +175,7 @@ public class AcquisitionActionStage extends ActionStage implements BaseAssignmen
 
     @Override
     public boolean canRaid(CampaignFleetAPI fleet, MarketAPI market) {
-        if (!market.getFaction().isHostileTo(this.intel.getFaction())){
+        if (!market.getFaction().isHostileTo(this.intel.getFaction())) {
             return false;
         }
         if (Misc.flagHasReason(market.getMemoryWithoutUpdate(),

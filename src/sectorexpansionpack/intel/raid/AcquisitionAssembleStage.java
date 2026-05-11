@@ -16,7 +16,7 @@ public class AcquisitionAssembleStage extends AssembleStage {
     protected float prepDays;
     protected float travelDays;
 
-    public AcquisitionAssembleStage(RaidIntel raid, SectorEntityToken gatheringPoint, float durDays, MarketAPI ...sources) {
+    public AcquisitionAssembleStage(RaidIntel raid, SectorEntityToken gatheringPoint, float durDays, MarketAPI... sources) {
         super(raid, gatheringPoint);
         this.acquisitionIntel = (AcquisitionRaidIntel) raid;
         for (MarketAPI source : sources) {
@@ -76,7 +76,7 @@ public class AcquisitionAssembleStage extends AssembleStage {
         //  for autoresolve calculations
         extra.strength = fp + this.acquisitionIntel.getBonusStrengthPerFleet();
 
-        route.addSegment(new RouteManager.RouteSegment(this.minDays, market.getPrimaryEntity(), PREP_STAGE));
+        route.addSegment(new RouteManager.RouteSegment(this.minDays, market.getPrimaryEntity(), WAIT_STAGE));
         route.addSegment(new RouteManager.RouteSegment(this.travelDays, market.getPrimaryEntity(), this.gatheringPoint));
         route.addSegment(new RouteManager.RouteSegment(1000f, this.gatheringPoint, WAIT_STAGE));
     }
