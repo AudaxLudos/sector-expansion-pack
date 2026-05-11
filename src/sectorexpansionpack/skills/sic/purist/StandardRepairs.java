@@ -54,7 +54,7 @@ public class StandardRepairs extends SCBaseSkillPlugin {
 
         if (Objects.equals(variantType, pData.primary) || (pData.hasDesignCompromise && Objects.equals(variantType, pData.secondary))) {
             stats.getRepairRatePercentPerDay().modifyPercent(id, pData.totalMult * REPAIR_RATE_PER_DAY_MULT);
-            stats.getBaseCRRecoveryRatePercentPerDay().modifyFlat(id, pData.totalMult * CR_RECOVERY_RATE_PER_DAY_MOD);
+            stats.getBaseCRRecoveryRatePercentPerDay().modifyFlat(id, pData.totalMult * CR_RECOVERY_RATE_PER_DAY_MOD * 100f);
         }
     }
 }
