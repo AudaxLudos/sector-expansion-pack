@@ -36,7 +36,7 @@ public class AcquisitionRaidIntel extends RaidIntel {
     public static final String TARGET_KEY = "$sep_ari_target";
     public static final String EVENT_KEY = "$sep_ari_eventRef";
     public static final String FLEET_KEY = "$sep_ari_fleet";
-    public static final String FLEET_DEFEAT_TRIGGER = "SEPARIDefeatTrigger";
+    public static final String FLEET_DEFEAT_TRIGGER = "SEPARIFleetDefeatTrigger";
     public static final String HAS_SPECIAL_ITEM_KEY = "$sep_ari_hasSpecialItem";
     public static final String HAS_SPECIAL_ITEM_REASON = "sep_ari_hasSpecialItem";
     public static final Logger log = Global.getLogger(AcquisitionRaidIntel.class);

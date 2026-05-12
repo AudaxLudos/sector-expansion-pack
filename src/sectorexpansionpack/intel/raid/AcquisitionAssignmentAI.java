@@ -1,10 +1,14 @@
 package sectorexpansionpack.intel.raid;
 
+import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.campaign.CampaignFleetAPI;
+import com.fs.starfarer.api.campaign.FleetAssignment;
 import com.fs.starfarer.api.campaign.SectorEntityToken;
+import com.fs.starfarer.api.campaign.StarSystemAPI;
 import com.fs.starfarer.api.campaign.ai.ModularFleetAIAPI;
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
 import com.fs.starfarer.api.campaign.rules.MemoryAPI;
+import com.fs.starfarer.api.impl.campaign.fleets.RouteLocationCalculator;
 import com.fs.starfarer.api.impl.campaign.fleets.RouteManager;
 import com.fs.starfarer.api.impl.campaign.ids.MemFlags;
 import com.fs.starfarer.api.impl.campaign.intel.raid.RaidAssignmentAI;
@@ -20,6 +24,42 @@ import com.fs.starfarer.api.util.Misc;
 public class AcquisitionAssignmentAI extends RaidAssignmentAI {
     public AcquisitionAssignmentAI(CampaignFleetAPI fleet, RouteManager.RouteData route, FleetActionDelegate delegate) {
         super(fleet, route, delegate);
+    }
+
+    @Override
+    protected void addLocalAssignment(RouteManager.RouteSegment current, boolean justSpawned) {
+        if (justSpawned) {
+            float progress = current.getProgress();
+            RouteLocationCalculator.setLocation(this.fleet, progress,
+                    current.from, current.getDestination());
+        }
+
+        if (current.from != null && current.to == null && !current.isFromSystemCenter()) {
+            this.fleet.addAssignment(FleetAssignment.ORBIT_AGGRESSIVE, current.from,
+                    current.daysMax - current.elapsed, getInSystemActionText(current),
+                    goNextScript(current));
+            return;
+        }
+
+        if (current.daysMax - current.elapsed <= 0) {
+            this.route.goToAtLeastNext(current);
+            return;
+        }
+
+        SectorEntityToken target = null;
+        if (current.from.getContainingLocation() instanceof StarSystemAPI) {
+            target = ((StarSystemAPI) current.from.getContainingLocation()).getCenter();
+        } else {
+            target = Global.getSector().getHyperspace().createToken(current.from.getLocation().x, current.from.getLocation().y);
+        }
+
+        if (this.fleet.getContainingLocation() == target.getContainingLocation()) {
+            this.fleet.addAssignment(FleetAssignment.ORBIT_AGGRESSIVE, target,
+                    current.daysMax - current.elapsed, getInSystemActionText(current));
+        } else {
+            this.fleet.addAssignment(FleetAssignment.DELIVER_CREW, target, // force fleet to goto location
+                    0.5f, getTravelActionText(current), null);
+        }
     }
 
     @Override

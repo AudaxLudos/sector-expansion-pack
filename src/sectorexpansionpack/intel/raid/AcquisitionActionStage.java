@@ -87,7 +87,7 @@ public class AcquisitionActionStage extends ActionStage implements BaseAssignmen
         List<RouteManager.RouteData> routes = RouteManager.getInstance().getRoutesForSource(this.intel.getRouteSourceId());
         for (RouteManager.RouteData route : routes) {
             if (this.target.getStarSystem() != null) {
-                route.addSegment(new RouteManager.RouteSegment(3f, this.target.getStarSystem().getCenter(), this.target.getPrimaryEntity()));
+                route.addSegment(new RouteManager.RouteSegment(3f, this.target.getStarSystem().getCenter()));
             }
             route.addSegment(new RouteManager.RouteSegment(1000f, this.target.getPrimaryEntity()));
         }
