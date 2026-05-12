@@ -1,3 +1,10 @@
+### 0.2.58-alpha
+- Fix cr recovery rate not applied correctly for standard repairs skill
+- Add StartAcquisitionEvent console command
+- Replace incursions to acquisitions
+- Add acquisition raid intel
+- Add StartIncursionEvent console command
+
 ### 0.2.45-alpha
 - Fix flux optimizations eclectic skill modifying wrong stats
 

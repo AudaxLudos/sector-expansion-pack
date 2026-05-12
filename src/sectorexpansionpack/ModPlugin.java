@@ -15,7 +15,6 @@ import sectorexpansionpack.ghosts.types.StormPacifierGhostCreator;
 import sectorexpansionpack.intel.ClearDebrisFieldsIntelCreator;
 import sectorexpansionpack.intel.ConstructObjectiveIntelCreator;
 import sectorexpansionpack.intel.ExpeditionFleetManager;
-import sectorexpansionpack.intel.IncursionFleetManager;
 import sectorexpansionpack.intel.raid.AcquisitionRaidManager;
 import sectorexpansionpack.listeners.MatrixCatalystBlueprintAdder;
 import sectorexpansionpack.listeners.MatrixCatalystOptionProvider;
@@ -24,7 +23,6 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Random;
 
 public class ModPlugin extends BaseModPlugin {
     @Override
