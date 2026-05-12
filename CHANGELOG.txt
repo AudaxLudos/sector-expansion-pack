@@ -1,3 +1,9 @@
+### 0.2.64-alpha
+- Update acquisition assignment AI
+- Add special item given failure condition
+- Add dialogues to acquisition fleet with special item
+- Fix crash when acquisition event starts
+
 ### 0.2.58-alpha
 - Fix cr recovery rate not applied correctly for standard repairs skill
 - Add StartAcquisitionEvent console command
