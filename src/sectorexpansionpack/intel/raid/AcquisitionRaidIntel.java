@@ -54,12 +54,11 @@ public class AcquisitionRaidIntel extends RaidIntel {
         this.specialItem = specialItem;
         this.random = new Random();
 
-        float neededFP = this.defenderStr;
         float desireMult = getSpecialItemsDesireMult(getFaction().getId());
         float randomMult = 0.6f + this.random.nextFloat() * 0.6f;
-        float approxNumFleets = neededFP / getLargeFleetSize();
+        float approxNumFleets = this.defenderStr / getLargeFleetSize();
         float bonusStrengthPerFleet = getBonusStrengthPerFleet();
-        float baseFP = (neededFP - (approxNumFleets * bonusStrengthPerFleet)) * desireMult * randomMult;
+        float baseFP = (this.defenderStr - (approxNumFleets * bonusStrengthPerFleet)) * desireMult * randomMult;
         float prepDays = getPrepDays(baseFP) / 2f;
 
         addStage(new AcquisitionOrganizeStage(this, this.source, prepDays));
@@ -390,6 +389,7 @@ public class AcquisitionRaidIntel extends RaidIntel {
         float raidStr = assembleStage.getOrigSpawnFP();
         raidStr += (numFleets * getBonusStrengthPerFleet());
         String strDesc = Misc.getStrengthDesc(raidStr);
+        float defenderStr = WarSimScript.getEnemyStrength(getFaction(), getSystem());
 
         String defenderHighlight = "";
         Color defenderHighlightColor = h;
@@ -397,7 +397,7 @@ public class AcquisitionRaidIntel extends RaidIntel {
         boolean potentialDanger = false;
 
         if (this.outcome == null && actionStage.getStatus() != RaidStageStatus.SUCCESS) {
-            float ratio = raidStr / this.defenderStr;
+            float ratio = raidStr / defenderStr;
             if (ratio < 0.75f) {
                 defenderHighlight = "superior";
                 defenderHighlightColor = Misc.getPositiveHighlightColor();
