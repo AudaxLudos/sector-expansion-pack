@@ -10,6 +10,7 @@ import com.fs.starfarer.api.util.Misc;
 import com.fs.starfarer.api.util.WeightedRandomPicker;
 import org.apache.log4j.Logger;
 import sectorexpansionpack.intel.misc.ArtifactInstallationIntel;
+import sectorexpansionpack.missions.EntityFinderMission;
 import sectorexpansionpack.missions.hub.SEPHubMissionWithBarEvent;
 
 import java.util.ArrayList;
@@ -55,6 +56,9 @@ public class Utils {
 
     public static void findMarketToInstallSpecialItem(SEPHubMissionWithBarEvent efm, String factionId, MarketAPI source, SpecialItemData data, Logger log) {
         SpecialItemSpecAPI spec = Global.getSettings().getSpecialItemSpec(data.getId());
+        if (efm == null) {
+            efm = new EntityFinderMission();
+        }
         efm.resetSearch();
         efm.requireMarketFaction(factionId);
         efm.requireMarketNotHidden();

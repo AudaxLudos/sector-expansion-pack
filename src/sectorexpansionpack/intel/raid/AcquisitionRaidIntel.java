@@ -512,7 +512,7 @@ public class AcquisitionRaidIntel extends RaidIntel {
         Object param = getListInfoParam();
         boolean isUpdate = param != null;
 
-        if (mode != ListInfoMode.IN_DESC) {
+        if (this.outcome == null && mode != ListInfoMode.IN_DESC) {
             // info.addPara("Faction: " + getFaction().getDisplayName(), initPad, tc, getFaction().getBaseUIColor(), getFaction().getDisplayName());
             // initPad = 0f;
             info.addPara("Target: " + this.targetFaction.getDisplayName(), initPad, tc, this.targetFaction.getBaseUIColor(), this.targetFaction.getDisplayName());
@@ -543,7 +543,7 @@ public class AcquisitionRaidIntel extends RaidIntel {
         float etaAction = getETAAtStage(AcquisitionActionStage.class);
         float etaReturn = getETAAtStage(AcquisitionReturnStage.class);
 
-        if (etaAssemble > 0) {
+        if (etaAssemble > 0 || stage.getClass() == AcquisitionAssembleStage.class && stage.getStatus() == RaidStageStatus.ONGOING) {
             if ((int) etaAssemble <= 0f) {
                 info.addPara("Departure imminent", tc, initPad);
             } else {
@@ -553,7 +553,7 @@ public class AcquisitionRaidIntel extends RaidIntel {
             }
             initPad = 0f;
         }
-        if (etaTravel > 0) {
+        if (etaTravel > 0 || stage.getClass() == AcquisitionTravelStage.class && stage.getStatus() == RaidStageStatus.ONGOING) {
             if ((int) etaTravel <= 0f) {
                 info.addPara("Arrival imminent", tc, initPad);
             } else {
@@ -567,11 +567,11 @@ public class AcquisitionRaidIntel extends RaidIntel {
         if (stage instanceof AcquisitionActionStage && (mode == ListInfoMode.MESSAGES || mode == ListInfoMode.INTEL)) {
             info.addPara("Operating in the " + getSystem().getNameWithLowercaseTypeShort(), tc, initPad);
         }
-        if (etaReturn > 0 && stage instanceof AcquisitionReturnStage) {
+        if (etaReturn > 0 && stage.getClass() == AcquisitionReturnStage.class && stage.getStatus() == RaidStageStatus.ONGOING) {
             if ((int) etaReturn <= 0f) {
                 info.addPara("Return imminent", tc, initPad);
             } else {
-                String days = (int) etaTravel == 1 ? "day" : "days";
+                String days = (int) etaReturn == 1 ? "day" : "days";
                 info.addPara("Estimated %s " + days + " until return" + " to " +
                                 this.source.getStarSystem().getNameWithLowercaseTypeShort(),
                         initPad, tc, h, "" + (int) etaReturn);
@@ -748,6 +748,8 @@ public class AcquisitionRaidIntel extends RaidIntel {
         fleet.setName("Grand Acquisitions Fleet");
         fleet.getMemoryWithoutUpdate().set(FLEET_KEY, true);
         fleet.getMemoryWithoutUpdate().set(EVENT_KEY, this);
+        fleet.getMemoryWithoutUpdate().set(MemFlags.FLEET_NO_MILITARY_RESPONSE, true);
+        fleet.getMemoryWithoutUpdate().set(MemFlags.DO_NOT_TRY_TO_AVOID_NEARBY_FLEETS, true);
 
         RaidStage stage = this.stages.get(this.currentStage);
         setFleetsMemoryAtStage(stage, false);
@@ -768,7 +770,7 @@ public class AcquisitionRaidIntel extends RaidIntel {
             }
         }
 
-        boolean nextStageSelected = false;
+        boolean isNextStage = false;
         boolean isFailure = false;
         boolean isReturnStage = false;
         boolean isActionStage = false;
@@ -780,8 +782,8 @@ public class AcquisitionRaidIntel extends RaidIntel {
                 continue;
             }
 
-            if (useNextStage && !nextStageSelected) {
-                nextStageSelected = true;
+            if (useNextStage && !isNextStage) {
+                isNextStage = true;
                 index++;
                 if (index + 1 > this.stages.size()) {
                     clearFleetMemory(fleet);
@@ -831,15 +833,11 @@ public class AcquisitionRaidIntel extends RaidIntel {
 
     private void setFleetCombatMemory(CampaignFleetAPI fleet) {
         fleet.getMemoryWithoutUpdate().set(MemFlags.MEMORY_KEY_FLEET_DO_NOT_GET_SIDETRACKED, true);
-        fleet.getMemoryWithoutUpdate().set(MemFlags.DO_NOT_TRY_TO_AVOID_NEARBY_FLEETS, true);
-        fleet.getMemoryWithoutUpdate().set(MemFlags.FLEET_NO_MILITARY_RESPONSE, true);
         fleet.getMemoryWithoutUpdate().set(MemFlags.FLEET_IGNORES_OTHER_FLEETS, true);
     }
 
     private void clearFleetCombatMemory(CampaignFleetAPI fleet) {
         fleet.getMemoryWithoutUpdate().unset(MemFlags.MEMORY_KEY_FLEET_DO_NOT_GET_SIDETRACKED);
-        fleet.getMemoryWithoutUpdate().unset(MemFlags.DO_NOT_TRY_TO_AVOID_NEARBY_FLEETS);
-        fleet.getMemoryWithoutUpdate().unset(MemFlags.FLEET_NO_MILITARY_RESPONSE);
         fleet.getMemoryWithoutUpdate().unset(MemFlags.FLEET_IGNORES_OTHER_FLEETS);
     }
 

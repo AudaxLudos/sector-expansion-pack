@@ -286,6 +286,7 @@ public class ExpeditionFleetIntel extends FleetGroupIntel {
     }
 
     public void pickMarket() {
+        this.efm.resetSearch();
         this.efm.requireMarketFaction(getFaction().getId());
         this.efm.requireMarketNotHidden();
         this.efm.requireMarketFactionNotPlayer();
@@ -297,6 +298,7 @@ public class ExpeditionFleetIntel extends FleetGroupIntel {
     }
 
     public void pickTarget() {
+        this.efm.resetSearch();
         if (this.efm.rollProbability(WRECK_CHANCE)) {
             this.efm.requireEntityNoMemoryFlag(ExpeditionFleetIntel.TARGET_KEY);
             this.efm.requireEntityNoSpecialSalvage();

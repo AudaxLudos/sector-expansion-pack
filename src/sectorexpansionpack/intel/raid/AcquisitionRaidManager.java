@@ -75,6 +75,7 @@ public class AcquisitionRaidManager extends BaseEventManager {
     }
 
     protected MarketAPI pickSource() {
+        this.efm.resetSearch();
         this.efm.requireMarketNotHidden();
         this.efm.requireMarketFactionNotPlayer();
         this.efm.requireMarketFactionNoMemoryFlag(AcquisitionRaidIntel.SOURCE_KEY);
@@ -83,6 +84,7 @@ public class AcquisitionRaidManager extends BaseEventManager {
     }
 
     protected MarketAPI pickTargetWithCompatibleSpecialItems(MarketAPI other) {
+        this.efm.resetSearch();
         this.efm.requireMarketNotHidden();
         this.efm.requireMarketFactionNot(other.getFactionId());
         this.efm.requireMarketFactionNotPlayer();
