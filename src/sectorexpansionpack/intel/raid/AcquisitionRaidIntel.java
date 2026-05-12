@@ -156,26 +156,27 @@ public class AcquisitionRaidIntel extends RaidIntel {
         float min = Float.MAX_VALUE;
         JumpPointAPI closest = null;
         for (JumpPointAPI jumpPoint : hyperJumpPoints) {
-            for (JumpPointAPI.JumpDestination destination : jumpPoint.getDestinations()) {
-                if (jumpPoint.isWormhole()) {
-                    continue;
-                }
-                if (jumpPoint.getMemoryWithoutUpdate().getBoolean(JumpPointInteractionDialogPluginImpl.UNSTABLE_KEY)) {
-                    continue;
-                }
-                SectorEntityToken destEntity = destination.getDestination();
-                if (destEntity == null) {
-                    continue;
-                }
-                if (destEntity.isStar()) {
-                    continue;
-                }
-
-                float dist = Misc.getDistance(destEntity.getLocation(), this.target.getLocation());
-                if (dist < min) {
-                    min = dist;
-                    closest = jumpPoint;
-                }
+            if (jumpPoint.isWormhole()) {
+                continue;
+            }
+            if (jumpPoint.getMemoryWithoutUpdate().getBoolean(JumpPointInteractionDialogPluginImpl.UNSTABLE_KEY)) {
+                continue;
+            }
+            if (jumpPoint.getDestinations() == null || jumpPoint.getDestinations().isEmpty()) {
+                continue;
+            }
+            JumpPointAPI.JumpDestination jumpDest = jumpPoint.getDestinations().get(0);
+            SectorEntityToken jumpEntity = jumpDest.getDestination();
+            if (jumpEntity == null) {
+                continue;
+            }
+            if (jumpEntity.isStar()) {
+                continue;
+            }
+            float dist = Misc.getDistance(jumpEntity, this.target.getPrimaryEntity());
+            if (dist < min) {
+                min = dist;
+                closest = jumpPoint;
             }
         }
 
@@ -635,7 +636,7 @@ public class AcquisitionRaidIntel extends RaidIntel {
             String desc = "";
             switch (this.outcome) {
                 // Failure outcomes
-                case SPECIAL_ITEM_LOST -> desc = "The " + forces + " failed to keep the special item safe";
+                case SPECIAL_ITEM_LOST, SPECIAL_ITEM_GIVEN -> desc = "The " + forces + " failed to keep the special item safe";
                 case ASSEMBLING_DISRUPTED -> desc = "The " + forces + " failed to fully assemble";
                 case NOT_ENOUGH_MADE_IT -> desc = "The " + forces + " failed to reach their target";
                 case FAILED -> desc = "The " + forces + " failed to achieve their objective";
@@ -655,7 +656,7 @@ public class AcquisitionRaidIntel extends RaidIntel {
         String desc = "";
         switch (this.outcome) {
             // Failure outcomes
-            case SPECIAL_ITEM_LOST ->
+            case SPECIAL_ITEM_LOST, SPECIAL_ITEM_GIVEN ->
                     desc = "The " + forces + " failed to return with the special item. Any surviving fleets are retreating in disarray.";
             case ASSEMBLING_DISRUPTED ->
                     desc = "The" + forces + " failed to fully assemble. Any deployed fleets are retreating in disarray.";
