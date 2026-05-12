@@ -4,6 +4,7 @@ import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.campaign.*;
 import com.fs.starfarer.api.campaign.econ.Industry;
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
+import com.fs.starfarer.api.campaign.rules.MemoryAPI;
 import com.fs.starfarer.api.impl.campaign.JumpPointInteractionDialogPluginImpl;
 import com.fs.starfarer.api.impl.campaign.command.WarSimScript;
 import com.fs.starfarer.api.impl.campaign.fleets.FleetFactoryV3;
@@ -16,6 +17,7 @@ import com.fs.starfarer.api.impl.campaign.ids.Ranks;
 import com.fs.starfarer.api.impl.campaign.intel.raid.*;
 import com.fs.starfarer.api.impl.campaign.procgen.themes.BaseAssignmentAI;
 import com.fs.starfarer.api.impl.campaign.procgen.themes.RouteFleetAssignmentAI;
+import com.fs.starfarer.api.impl.campaign.rulecmd.AddRemoveCommodity;
 import com.fs.starfarer.api.ui.Alignment;
 import com.fs.starfarer.api.ui.LabelAPI;
 import com.fs.starfarer.api.ui.TooltipMakerAPI;
@@ -30,11 +32,13 @@ import java.util.*;
 import java.util.List;
 
 public class AcquisitionRaidIntel extends RaidIntel {
-    public static final String FLEET_KEY = "$sep_ari_fleet";
-    public static final String EVENT_KEY = "$sep_ari_eventRef";
     public static final String SOURCE_KEY = "$sep_ari_source";
     public static final String TARGET_KEY = "$sep_ari_target";
-    public static final String HAS_ARTIFACT_KEY = "$sep_ari_hasArtifact";
+    public static final String EVENT_KEY = "$sep_ari_eventRef";
+    public static final String FLEET_KEY = "$sep_ari_fleet";
+    public static final String FLEET_DEFEAT_TRIGGER = "SEPARIDefeatTrigger";
+    public static final String HAS_SPECIAL_ITEM_KEY = "$sep_ari_hasSpecialItem";
+    public static final String HAS_SPECIAL_ITEM_REASON = "sep_ari_hasSpecialItem";
     public static final Logger log = Global.getLogger(AcquisitionRaidIntel.class);
     public static Object RETURNED_UPDATE = new Object();
     protected AcquisitionOutcome outcome;
@@ -206,7 +210,7 @@ public class AcquisitionRaidIntel extends RaidIntel {
                 for (RouteManager.RouteData data : raidStage.getRoutes()) {
                     CampaignFleetAPI fleet = data.getActiveFleet();
                     if (fleet != null) {
-                        if (fleet.getMemoryWithoutUpdate().getBoolean(HAS_ARTIFACT_KEY)) {
+                        if (fleet.getMemoryWithoutUpdate().getBoolean(HAS_SPECIAL_ITEM_KEY)) {
                             specialItemLost = false;
                             break;
                         }
@@ -298,6 +302,24 @@ public class AcquisitionRaidIntel extends RaidIntel {
             stage1.giveReturnOrdersToStragglers(stage1.getRoutes()); // Order fleets to return home and despawn
         }
         endAfterDelay();
+    }
+
+    @Override
+    protected float getBaseDaysAfterEnd() {
+        if (this.outcome != null && this.outcome == AcquisitionOutcome.SUCCEEDED) {
+            return 14f;
+        }
+        return 7f;
+    }
+
+    @Override
+    protected void notifyEnding() {
+        super.notifyEnding();
+
+        getFaction().getMemoryWithoutUpdate().unset(SOURCE_KEY);
+        this.target.getMemoryWithoutUpdate().unset(TARGET_KEY);
+        this.target.getMemoryWithoutUpdate().unset(EVENT_KEY);
+        clearFleetsMemory();
     }
 
     @Override
@@ -441,7 +463,7 @@ public class AcquisitionRaidIntel extends RaidIntel {
                 if (hasSpecialItems) {
                     targets.add(market);
                     float stationStr = WarSimScript.getStationStrength(market.getFaction(), getSystem(), market.getPrimaryEntity());
-                    float totalDefense = this.defenderStr + stationStr;
+                    float totalDefense = defenderStr + stationStr;
                     if (totalDefense > raidStr * 1.25f) {
                         safe.add(market);
                     } else {
@@ -671,6 +693,24 @@ public class AcquisitionRaidIntel extends RaidIntel {
     }
 
     @Override
+    public boolean callEvent(String ruleId, InteractionDialogAPI dialog, List<Misc.Token> params, Map<String, MemoryAPI> memoryMap) {
+        String action = params.get(0).getString(memoryMap);
+
+        if ("endEvent".equals(action)) {
+            setOutcome(AcquisitionOutcome.SPECIAL_ITEM_GIVEN);
+            forceFail(true);
+            return true;
+        } else if ("giveArtifact".equals(action)) {
+            SpecialItemData specialItemData = new SpecialItemData(this.specialItem.getId(), this.specialItem.getParams());
+            Global.getSector().getPlayerFleet().getCargo().addSpecial(specialItemData, 1f);
+            AddRemoveCommodity.addItemGainText(specialItemData, 1, dialog.getTextPanel());
+            return true;
+        }
+
+        return super.callEvent(ruleId, dialog, params, memoryMap);
+    }
+
+    @Override
     public RouteFleetAssignmentAI createAssignmentAI(CampaignFleetAPI fleet, RouteManager.RouteData route) {
         ActionStage action = getActionStage();
         BaseAssignmentAI.FleetActionDelegate delegate = null;
@@ -764,7 +804,7 @@ public class AcquisitionRaidIntel extends RaidIntel {
 
         for (RouteManager.RouteData route : routes) {
             CampaignFleetAPI fleet = route.getActiveFleet();
-            if (fleet != null && fleet.getMemoryWithoutUpdate().getBoolean(HAS_ARTIFACT_KEY)) {
+            if (fleet != null && fleet.getMemoryWithoutUpdate().getBoolean(HAS_SPECIAL_ITEM_KEY)) {
                 this.specialItemGiven = true;
                 break;
             }
@@ -809,9 +849,9 @@ public class AcquisitionRaidIntel extends RaidIntel {
                 fleet.setNoAutoDespawn(true);
                 setFleetCombatMemory(fleet);
                 if (!this.specialItemGiven) {
-                    Misc.makeImportant(fleet, "sep_ari_hasArtifact");
-                    Misc.addDefeatTrigger(fleet, "SEPARIDefeatTrigger");
-                    fleet.getMemoryWithoutUpdate().set(HAS_ARTIFACT_KEY, true);
+                    Misc.makeImportant(fleet, HAS_SPECIAL_ITEM_REASON);
+                    Misc.addDefeatTrigger(fleet, FLEET_DEFEAT_TRIGGER);
+                    fleet.getMemoryWithoutUpdate().set(HAS_SPECIAL_ITEM_KEY, true);
                     this.specialItemGiven = true;
                 }
             } else if (isActionStage) {
@@ -822,13 +862,23 @@ public class AcquisitionRaidIntel extends RaidIntel {
         }
     }
 
+    public void clearFleetsMemory() {
+        List<RouteManager.RouteData> routes = RouteManager.getInstance().getRoutesForSource(getRouteSourceId());
+        for (RouteManager.RouteData route : routes) {
+            CampaignFleetAPI fleet = route.getActiveFleet();
+            if (fleet != null) {
+                clearFleetMemory(fleet);
+            }
+        }
+    }
+
     private void clearFleetMemory(CampaignFleetAPI fleet) {
         clearFleetCombatMemory(fleet);
         fleet.getMemoryWithoutUpdate().unset(FLEET_KEY);
         fleet.getMemoryWithoutUpdate().unset(EVENT_KEY);
-        Misc.makeUnimportant(fleet, "sep_ari_hasArtifact");
-        Misc.removeDefeatTrigger(fleet, "SEPARIDefeatTrigger");
-        fleet.getMemoryWithoutUpdate().unset(HAS_ARTIFACT_KEY);
+        Misc.makeUnimportant(fleet, HAS_SPECIAL_ITEM_REASON);
+        Misc.removeDefeatTrigger(fleet, FLEET_DEFEAT_TRIGGER);
+        fleet.getMemoryWithoutUpdate().unset(HAS_SPECIAL_ITEM_KEY);
     }
 
     private void setFleetCombatMemory(CampaignFleetAPI fleet) {
@@ -847,14 +897,6 @@ public class AcquisitionRaidIntel extends RaidIntel {
             return;
         }
         this.specialItemGiven = false;
-    }
-
-    @Override
-    protected float getBaseDaysAfterEnd() {
-        if (this.outcome != null && this.outcome == AcquisitionOutcome.SUCCEEDED) {
-            return 14f;
-        }
-        return 7f;
     }
 
     public AcquisitionOutcome getOutcome() {
@@ -882,6 +924,7 @@ public class AcquisitionRaidIntel extends RaidIntel {
     }
 
     public enum AcquisitionOutcome {
+        SPECIAL_ITEM_GIVEN,
         SPECIAL_ITEM_LOST,
         ASSEMBLING_DISRUPTED,
         NOT_ENOUGH_MADE_IT,
@@ -895,7 +938,7 @@ public class AcquisitionRaidIntel extends RaidIntel {
         SUCCEEDED;
 
         public boolean isFailed() {
-            return this == SPECIAL_ITEM_LOST || this == ASSEMBLING_DISRUPTED || this == NOT_ENOUGH_MADE_IT || this == FAILED || isCancelled();
+            return this == SPECIAL_ITEM_GIVEN || this == SPECIAL_ITEM_LOST || this == ASSEMBLING_DISRUPTED || this == NOT_ENOUGH_MADE_IT || this == FAILED || isCancelled();
         }
 
         public boolean isCancelled() {
