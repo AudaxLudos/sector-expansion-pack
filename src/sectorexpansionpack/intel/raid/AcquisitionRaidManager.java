@@ -55,10 +55,19 @@ public class AcquisitionRaidManager extends BaseEventManager {
     @Override
     protected EveryFrameScript createEvent() {
         MarketAPI source = pickSource();
-        MarketAPI target = pickTargetWithCompatibleSpecialItems(source);
-        SpecialItemSpecAPI specialItem = pickSpecialItem(null, source, target);
-        AcquisitionRaidIntel event = new AcquisitionRaidIntel(source, target, specialItem);
-        if (event.isDone()) {
+        MarketAPI target = null;
+        if (source != null) {
+            target = pickTargetWithCompatibleSpecialItems(source);
+        }
+        SpecialItemSpecAPI specialItem = null;
+        if (target != null) {
+            specialItem = pickSpecialItem(null, source, target);
+        }
+        AcquisitionRaidIntel event = null;
+        if (source != null && target != null && specialItem != null) {
+            event = new AcquisitionRaidIntel(source, target, specialItem);
+        }
+        if (event != null && event.isDone()) {
             event = null;
         }
 
@@ -85,6 +94,7 @@ public class AcquisitionRaidManager extends BaseEventManager {
 
     protected MarketAPI pickTargetWithCompatibleSpecialItems(MarketAPI other) {
         this.efm.resetSearch();
+        this.efm.requireMarketFactionHostileTo(other.getFactionId());
         this.efm.requireMarketNotHidden();
         this.efm.requireMarketFactionNot(other.getFactionId());
         this.efm.requireMarketFactionNotPlayer();
