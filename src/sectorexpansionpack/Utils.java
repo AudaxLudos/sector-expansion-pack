@@ -6,9 +6,11 @@ import com.fs.starfarer.api.campaign.econ.Industry;
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
 import com.fs.starfarer.api.impl.campaign.econ.impl.InstallableItemEffect;
 import com.fs.starfarer.api.impl.campaign.econ.impl.ItemEffectsRepo;
+import com.fs.starfarer.api.impl.campaign.ids.Tags;
 import com.fs.starfarer.api.util.Misc;
 import com.fs.starfarer.api.util.WeightedRandomPicker;
 import org.apache.log4j.Logger;
+import org.lazywizard.console.commands.Jump;
 import sectorexpansionpack.intel.misc.ArtifactInstallationIntel;
 import sectorexpansionpack.missions.EntityFinderMission;
 import sectorexpansionpack.missions.hub.SEPHubMissionWithBarEvent;
@@ -105,8 +107,8 @@ public class Utils {
     }
 
     public static List<JumpPointAPI> getHyperspaceJumpPoints(StarSystemAPI system) {
-        List<JumpPointAPI> results = new ArrayList<>();
-        for (SectorEntityToken entity : Global.getSector().getHyperspace().getJumpPoints()) {
+        List<JumpPointAPI> results = new ArrayList<JumpPointAPI>();
+        for (SectorEntityToken entity : Global.getSector().getHyperspace().getEntitiesWithTag(Tags.JUMP_POINT)) {
             JumpPointAPI jumpPoint = (JumpPointAPI) entity;
             if (jumpPoint.getDestinationStarSystem() == system) {
                 results.add(jumpPoint);

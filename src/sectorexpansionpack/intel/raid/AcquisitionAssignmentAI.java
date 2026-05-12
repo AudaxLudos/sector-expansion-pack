@@ -57,8 +57,8 @@ public class AcquisitionAssignmentAI extends RaidAssignmentAI {
             this.fleet.addAssignment(FleetAssignment.ORBIT_AGGRESSIVE, target,
                     current.daysMax - current.elapsed, getInSystemActionText(current));
         } else {
-            this.fleet.addAssignment(FleetAssignment.DELIVER_CREW, target, // force fleet to goto location
-                    0.5f, getTravelActionText(current), null);
+            this.fleet.addAssignment(FleetAssignment.DELIVER_MARINES, target, // force fleet to goto location
+                    0.1f, getTravelActionText(current), null);
         }
     }
 
