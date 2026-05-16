@@ -1,3 +1,6 @@
+### 0.2.66-alpha
+- Fix crash when fleet escort mission commodity delivery item id is null
+
 ### 0.2.64-alpha
 - Update acquisition assignment AI
 - Add special item given failure condition
