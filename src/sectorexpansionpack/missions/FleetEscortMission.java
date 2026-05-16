@@ -150,6 +150,10 @@ public class FleetEscortMission extends SEPHubMissionWithScenario {
             log.info("Failed to create fleet to escort");
             return false;
         }
+        if (this.scenarioType == ScenarioType.COMMODITY_DELIVERY && (this.itemId == null || this.itemId.isBlank())) {
+            log.info("Failed to find commodity for commodity delivery scenario");
+            return false;
+        }
 
         beginStageTrigger(Stage.WAIT);
         triggerRunScriptAfterDelay(0f, () -> {
@@ -335,6 +339,9 @@ public class FleetEscortMission extends SEPHubMissionWithScenario {
             return;
         }
         if (this.scenarioType == ScenarioType.COMMODITY_DELIVERY) {
+            if (this.itemId == null || this.itemId.isBlank()) {
+                return; // For existing saves with a null itemId before the crash fix
+            }
             int cargoCap = (int) this.fleet.getCargo().getMaxCapacity();
             CommodityOnMarketAPI commodityOnMarket = market.getCommodityData(this.itemId);
             CommoditySpecAPI commoditySpec = Global.getSector().getEconomy().getCommoditySpec(commodityOnMarket.getId());
