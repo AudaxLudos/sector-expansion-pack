@@ -36,7 +36,7 @@ public class TechFamiliarity extends SCBaseSkillPlugin {
         tooltip.addPara("%s minimum crew requirements (%s × skill efficiency)", 10f, Misc.getHighlightColor(), Misc.getHighlightColor(),
                 "-" + Math.round(pData.totalMult * CREW_MIN_REQ_MULT * 100f) + "%", Math.round(CREW_MIN_REQ_MULT * 100f) + "%");
         tooltip.addPara("%s seconds peak operating time (%s × skill efficiency)", 0f, Misc.getHighlightColor(), Misc.getHighlightColor(),
-                "+" + Math.round(pData.totalMult * PEAK_PERFORMANCE_TIME_MOD * 100f) + "%", Math.round(PEAK_PERFORMANCE_TIME_MOD * 100f) + "%");
+                "+" + Math.round(pData.totalMult * PEAK_PERFORMANCE_TIME_MOD) + "%", Math.round(PEAK_PERFORMANCE_TIME_MOD) + "%");
         tooltip.addPara("%s max combat readiness (%s × skill efficiency)", 0f, Misc.getHighlightColor(), Misc.getHighlightColor(),
                 "+" + Math.round(pData.totalMult * MAX_COMBAT_READINESS_MOD * 100f) + "%", Math.round(MAX_COMBAT_READINESS_MOD * 100f) + "%");
 
