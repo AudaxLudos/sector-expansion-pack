@@ -17,6 +17,8 @@ public class Settings implements LunaSettingsListener {
     public static int EXPEDITIONS_TIMER;
     public static boolean INCURSIONS_ENABLED;
     public static int INCURSIONS_TIMER;
+    public static boolean EXCAVATIONS_ENABLED;
+    public static int EXCAVATIONS_TIMER;
     public static boolean ACQUISITIONS_ENABLED;
     public static int ACQUISITIONS_TIMER;
     public static List<String> COLONY_ITEM_WHITELIST = new ArrayList<>();
@@ -58,6 +60,9 @@ public class Settings implements LunaSettingsListener {
 
         INCURSIONS_ENABLED = false; // incursions deprecated
         INCURSIONS_TIMER = 731; // incursions deprecated
+
+        EXCAVATIONS_ENABLED = true;
+        EXCAVATIONS_TIMER = 183;
 
         ACQUISITIONS_ENABLED = getBoolean("sep_acquisitions_enabled");
         ACQUISITIONS_TIMER = getInt("sep_acquisitions_timer");
