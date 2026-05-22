@@ -12,7 +12,7 @@ public class ConstructObjectiveIntelCreator implements GenericMissionManager.Gen
 
     @Override
     public float getMissionFrequencyWeight() {
-        return 10f;
+        return 15f;
     }
 
     @Override
