@@ -1,4 +1,7 @@
 command,class,tags,syntax,help,
 StartIncursionEvent,sectorexpansionpack.commands.StartIncursionEvent,campaign,StartIncursionEvent (noArguments)|<optionalSourceMarketName>|<optionalSourceFactionId> <optionalTargetMarketName>|<optionalTargetFactionId> <optionalColonyItemId>,Starts an incursion event,
 StartAcquisitionEvent,sectorexpansionpack.commands.StartAcquisitionEvent,campaign,StartAcquisitionEvent (noArguments)|<optionalSourceMarketName>|<optionalSourceFactionId> <optionalTargetMarketName>|<optionalTargetFactionId> <optionalColonyItemId>,Starts an acquisition event,
+StartExcavationEvent,sectorexpansionpack.commands.StartExcavationEvent,campaign,StartExcavationEvent (noArguments)|<optionalSourceMarketName>|<optionalSourceFactionId> <optionalColonyItemId>,Starts an excavation event,
+,,,,,
+,,,,,
 ,,,,,
