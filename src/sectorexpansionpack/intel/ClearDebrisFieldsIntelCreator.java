@@ -11,7 +11,7 @@ public class ClearDebrisFieldsIntelCreator implements GenericMissionManager.Gene
 
     @Override
     public float getMissionFrequencyWeight() {
-        return 10f;
+        return 15f;
     }
 
     @Override
