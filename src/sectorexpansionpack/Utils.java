@@ -4,21 +4,20 @@ import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.campaign.*;
 import com.fs.starfarer.api.campaign.econ.Industry;
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
+import com.fs.starfarer.api.impl.campaign.JumpPointInteractionDialogPluginImpl;
 import com.fs.starfarer.api.impl.campaign.econ.impl.InstallableItemEffect;
 import com.fs.starfarer.api.impl.campaign.econ.impl.ItemEffectsRepo;
 import com.fs.starfarer.api.impl.campaign.ids.Tags;
 import com.fs.starfarer.api.util.Misc;
 import com.fs.starfarer.api.util.WeightedRandomPicker;
+import com.fs.starfarer.campaign.Hyperspace;
 import org.apache.log4j.Logger;
 import org.lazywizard.console.commands.Jump;
 import sectorexpansionpack.intel.misc.ArtifactInstallationIntel;
 import sectorexpansionpack.missions.EntityFinderMission;
 import sectorexpansionpack.missions.hub.SEPHubMissionWithBarEvent;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Random;
+import java.util.*;
 
 public class Utils {
     public static Random random = new Random();
@@ -170,5 +169,81 @@ public class Utils {
             return unmet == null || unmet.isEmpty();
         }
         return true;
+    }
+
+    /**
+     * Calculates how much a source faction wants a colony item
+     *
+     * @return a float number between 0 and 1
+     */
+    public static float getSpecialItemsDesireMult(String factionId) {
+        int totalColonyItemsUsed = 0;
+        Map<String, Integer> itemsUsedPerFaction = new HashMap<String, Integer>(); // will include hidden or dead factions
+        for (FactionAPI faction : Global.getSector().getAllFactions()) {
+            int itemsUsedByFaction = 0;
+            for (MarketAPI market : Misc.getFactionMarkets(faction)) {
+                for (Industry industry : market.getIndustries()) {
+                    if (industry.getSpecialItem() != null) {
+                        totalColonyItemsUsed += 1;
+                        itemsUsedByFaction += 1;
+                    }
+                }
+            }
+            itemsUsedPerFaction.put(faction.getId(), itemsUsedByFaction);
+        }
+
+        float meanAllFactions = (float) totalColonyItemsUsed / itemsUsedPerFaction.size();
+        int sourceItemsUsed = itemsUsedPerFaction.get(factionId);
+        // float itemUseFraction = (float) sourceItemsUsed / totalColonyItemsUsed;
+        float mult = 1f;
+        if (sourceItemsUsed > 0) {
+            mult = meanAllFactions / sourceItemsUsed;
+        }
+        // mult += itemUseFraction;
+
+        if (mult < 0.5f) {
+            mult = 0.5f;
+        } else if (mult < 0.75f) {
+            mult = 0.75f;
+        }
+
+        return mult;
+    }
+
+    public static SectorEntityToken findNearestHyperspaceJumpPoint(SectorEntityToken from) {
+        if (!(from.getContainingLocation() instanceof StarSystemAPI system)) {
+            return null;
+        }
+
+        List<JumpPointAPI> hyperJumpPoints = Utils.getHyperspaceJumpPoints(system);
+
+        float min = Float.MAX_VALUE;
+        JumpPointAPI closest = null;
+        for (JumpPointAPI jumpPoint : hyperJumpPoints) {
+            if (jumpPoint.isWormhole()) {
+                continue;
+            }
+            if (jumpPoint.getMemoryWithoutUpdate().getBoolean(JumpPointInteractionDialogPluginImpl.UNSTABLE_KEY)) {
+                continue;
+            }
+            if (jumpPoint.getDestinations() == null || jumpPoint.getDestinations().isEmpty()) {
+                continue;
+            }
+            JumpPointAPI.JumpDestination jumpDest = jumpPoint.getDestinations().get(0);
+            SectorEntityToken jumpEntity = jumpDest.getDestination();
+            if (jumpEntity == null) {
+                continue;
+            }
+            if (jumpEntity.isStar()) {
+                continue;
+            }
+            float dist = Misc.getDistance(from, jumpEntity);
+            if (dist < min) {
+                min = dist;
+                closest = jumpPoint;
+            }
+        }
+
+        return closest;
     }
 }

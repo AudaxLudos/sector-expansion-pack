@@ -58,7 +58,7 @@ public class AcquisitionRaidIntel extends RaidIntel {
         this.specialItem = specialItem;
         this.random = new Random();
 
-        float desireMult = getSpecialItemsDesireMult(getFaction().getId());
+        float desireMult = Utils.getSpecialItemsDesireMult(getFaction().getId());
         float randomMult = 0.6f + this.random.nextFloat() * 0.6f;
         float approxNumFleets = this.defenderStr / getLargeFleetSize();
         float bonusStrengthPerFleet = getBonusStrengthPerFleet();
@@ -102,45 +102,6 @@ public class AcquisitionRaidIntel extends RaidIntel {
                 getFaction().getDisplayName(),
                 this.source.getName(), this.source.getStarSystem().getNameWithLowercaseTypeShort(),
                 this.target.getName(), getSystem().getNameWithLowercaseTypeShort()));
-    }
-
-    /**
-     * Calculates how much a source faction wants a colony item
-     *
-     * @return a float number between 0 and 1
-     */
-    public static float getSpecialItemsDesireMult(String factionId) {
-        int totalColonyItemsUsed = 0;
-        Map<String, Integer> itemsUsedPerFaction = new HashMap<String, Integer>(); // will include hidden or dead factions
-        for (FactionAPI faction : Global.getSector().getAllFactions()) {
-            int itemsUsedByFaction = 0;
-            for (MarketAPI market : Misc.getFactionMarkets(faction)) {
-                for (Industry industry : market.getIndustries()) {
-                    if (industry.getSpecialItem() != null) {
-                        totalColonyItemsUsed += 1;
-                        itemsUsedByFaction += 1;
-                    }
-                }
-            }
-            itemsUsedPerFaction.put(faction.getId(), itemsUsedByFaction);
-        }
-
-        float meanAllFactions = (float) totalColonyItemsUsed / itemsUsedPerFaction.size();
-        int sourceItemsUsed = itemsUsedPerFaction.get(factionId);
-        // float itemUseFraction = (float) sourceItemsUsed / totalColonyItemsUsed;
-        float mult = 1f;
-        if (sourceItemsUsed > 0) {
-            mult = meanAllFactions / sourceItemsUsed;
-        }
-        // mult += itemUseFraction;
-
-        if (mult < 0.5f) {
-            mult = 0.5f;
-        } else if (mult < 0.75f) {
-            mult = 0.75f;
-        }
-
-        return mult;
     }
 
     protected float getPrepDays(float fp) {
@@ -636,7 +597,8 @@ public class AcquisitionRaidIntel extends RaidIntel {
             String desc = "";
             switch (this.outcome) {
                 // Failure outcomes
-                case SPECIAL_ITEM_LOST, SPECIAL_ITEM_GIVEN -> desc = "The " + forces + " failed to keep the special item safe";
+                case SPECIAL_ITEM_LOST, SPECIAL_ITEM_GIVEN ->
+                        desc = "The " + forces + " failed to keep the special item safe";
                 case ASSEMBLING_DISRUPTED -> desc = "The " + forces + " failed to fully assemble";
                 case NOT_ENOUGH_MADE_IT -> desc = "The " + forces + " failed to reach their target";
                 case FAILED -> desc = "The " + forces + " failed to achieve their objective";
