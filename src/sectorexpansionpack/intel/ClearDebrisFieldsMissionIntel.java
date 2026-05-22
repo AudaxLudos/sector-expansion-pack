@@ -144,6 +144,9 @@ public class ClearDebrisFieldsMissionIntel extends BaseMissionIntel {
             debris.getMemoryWithoutUpdate().set("$sep_cdf_eventRef", this, getDuration());
             Misc.setFlagWithReason(debris.getMemoryWithoutUpdate(), MemFlags.ENTITY_MISSION_IMPORTANT, "sep_cdf", true, getDuration());
 
+            debris.setDiscoverable(null);
+            debris.setSensorProfile(null);
+
             this.debrisFields.add(debris);
             i++; // Increment here to ensure the amount of debris spawns
         }
