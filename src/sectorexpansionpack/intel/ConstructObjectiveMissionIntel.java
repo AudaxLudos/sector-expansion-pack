@@ -282,7 +282,7 @@ public class ConstructObjectiveMissionIntel extends BaseMissionIntel {
 
     @Override
     public String getIcon() {
-        return Global.getSettings().getSpriteName("campaignMissions", "survey_planet");
+        return Global.getSettings().getSpriteName("campaignMissions", "sep_construct_objectives");
     }
 
     @Override

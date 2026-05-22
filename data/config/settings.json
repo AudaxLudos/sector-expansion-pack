@@ -11,6 +11,10 @@
       "sep_expeditionFleet": "graphics/sectorexpansionpack/icons/expedition_fleet.png",
       "sep_toArtifact": "graphics/sectorexpansionpack/icons/to_artifact.png",
       "sep_artifactInstallation": "graphics/sectorexpansionpack/icons/artifact_installation.png"
+    },
+    "campaignMissions": {
+      "sep_clear_debris_fields": "graphics/sectorexpansionpack/icons/intel/clear_debris_fields.png",
+      "sep_construct_objectives": "graphics/sectorexpansionpack/icons/intel/construct_objectives.png"
     }
   }
 }

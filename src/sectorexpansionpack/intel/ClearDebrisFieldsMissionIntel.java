@@ -284,7 +284,7 @@ public class ClearDebrisFieldsMissionIntel extends BaseMissionIntel {
 
     @Override
     public String getIcon() {
-        return Global.getSettings().getSpriteName("campaignMissions", "survey_planet");
+        return Global.getSettings().getSpriteName("campaignMissions", "sep_clear_debris_fields");
     }
 
     @Override
