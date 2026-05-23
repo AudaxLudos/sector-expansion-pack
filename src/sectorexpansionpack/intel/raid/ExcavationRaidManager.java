@@ -14,8 +14,6 @@ import sectorexpansionpack.Settings;
 import sectorexpansionpack.Utils;
 import sectorexpansionpack.missions.EntityFinderMission;
 
-import java.util.Objects;
-
 public class ExcavationRaidManager extends BaseEventManager {
     public static final String KEY = "$sep_core_excavationRaidManager";
     protected EntityFinderMission efm;

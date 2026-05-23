@@ -48,6 +48,8 @@ public class ExcavationRaidIntel extends RaidIntel implements GenericOrganizeSta
     protected SectorEntityToken target;
     protected SpecialItemSpecAPI specialItem;
     protected Random random;
+    protected float leakChance = 0.3f;
+    protected boolean leaked = false;
     protected boolean specialItemGiven = false;
 
     public ExcavationRaidIntel(MarketAPI source, SectorEntityToken target, SpecialItemSpecAPI specialItem) {
@@ -99,8 +101,6 @@ public class ExcavationRaidIntel extends RaidIntel implements GenericOrganizeSta
         // Mark the target for player and give it the special item
         Misc.makeImportant(this.target, HAS_ARTIFACT_REASON);
         Misc.setSalvageSpecial(this.target, new SEPHiddenItemSpecial.HiddenSpecialItemSpecialData(this.specialItem.getId()));
-
-        Global.getSector().getIntelManager().queueIntel(this);
 
         log.info(String.format("Starting %s excavation at %s in the %s, targeting %s in the %s",
                 getFaction().getDisplayName(),
@@ -189,6 +189,22 @@ public class ExcavationRaidIntel extends RaidIntel implements GenericOrganizeSta
             if (shouldSendUpdate()) {
                 sendUpdateIfPlayerHasIntel(RETURNED_UPDATE, false);
             }
+        }
+
+        if (!this.leaked && !(stage instanceof GenericReturnStage)) {
+            if (Utils.rollProbability(this.leakChance)) {
+                this.leaked = true;
+
+                if (this.source.getStarSystem() != null) {
+                    new ExcavationLeakedIntel(this.source, this.target, this.specialItem, stage, this);
+                    log.info(String.format("Leaking artifact location at %s by unknown contact %s %s in the %s",
+                            this.target.getStarSystem().getNameWithLowercaseType(), this.source.getOnOrAt(),
+                            this.source.getName(), this.source.getStarSystem().getNameWithLowercaseType()));
+                }
+                return;
+            }
+
+            this.leakChance += 0.2f;
         }
     }
 
