@@ -539,7 +539,12 @@ public abstract class SEPHubMissionWithBarEvent extends HubMissionWithBarEvent {
         }
     }
 
-    public record MarketCanUseSpecialItemReq(SpecialItemData specialItemData) implements MarketRequirement {
+    public static class MarketCanUseSpecialItemReq implements MarketRequirement {
+        final SpecialItemData specialItemData;
+
+        public MarketCanUseSpecialItemReq(SpecialItemData specialItemData) {
+            this.specialItemData = specialItemData;
+        }
 
         @Override
         public boolean marketMatchesRequirement(MarketAPI market) {

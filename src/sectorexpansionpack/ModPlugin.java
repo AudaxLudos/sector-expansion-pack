@@ -16,6 +16,7 @@ import sectorexpansionpack.intel.ClearDebrisFieldsIntelCreator;
 import sectorexpansionpack.intel.ConstructObjectiveIntelCreator;
 import sectorexpansionpack.intel.ExpeditionFleetManager;
 import sectorexpansionpack.intel.raid.AcquisitionRaidManager;
+import sectorexpansionpack.intel.raid.ExcavationRaidManager;
 import sectorexpansionpack.listeners.MatrixCatalystBlueprintAdder;
 import sectorexpansionpack.listeners.MatrixCatalystOptionProvider;
 
@@ -82,13 +83,17 @@ public class ModPlugin extends BaseModPlugin {
 
         // Scripts
         SectorAPI sector = Global.getSector();
-        if (!sector.hasScript(ExpeditionFleetManager.class)) {
-            sector.addScript(new ExpeditionFleetManager());
-        }
+        // expeditions deprecated
+        // if (!sector.hasScript(ExpeditionFleetManager.class)) {
+        //     sector.addScript(new ExpeditionFleetManager());
+        // }
         // incursions deprecated
         // if (!sector.hasScript(IncursionFleetManager.class)) {
         //     sector.addScript(new IncursionFleetManager());
         // }
+        if (!sector.hasScript(ExcavationRaidManager.class)) {
+            sector.addScript(new ExcavationRaidManager());
+        }
         if (!sector.hasScript(AcquisitionRaidManager.class)) {
             sector.addScript(new AcquisitionRaidManager());
         }

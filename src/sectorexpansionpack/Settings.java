@@ -55,14 +55,14 @@ public class Settings implements LunaSettingsListener {
     }
 
     public static void setSettings() {
-        EXPEDITIONS_ENABLED = getBoolean("sep_expeditions_enabled");
-        EXPEDITIONS_TIMER = getInt("sep_expeditions_timer");
+        EXPEDITIONS_ENABLED = false; // expeditions deprecated
+        EXPEDITIONS_TIMER = 731; // expeditions deprecated
 
         INCURSIONS_ENABLED = false; // incursions deprecated
         INCURSIONS_TIMER = 731; // incursions deprecated
 
-        EXCAVATIONS_ENABLED = true;
-        EXCAVATIONS_TIMER = 183;
+        EXCAVATIONS_ENABLED = getBoolean("sep_excavations_enabled");
+        EXCAVATIONS_TIMER = getInt("sep_excavations_timer");
 
         ACQUISITIONS_ENABLED = getBoolean("sep_acquisitions_enabled");
         ACQUISITIONS_TIMER = getInt("sep_acquisitions_timer");
