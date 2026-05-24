@@ -173,6 +173,6 @@ public class ExcavationLeakedIntel extends BaseIntelPlugin {
 
     @Override
     public SectorEntityToken getMapLocation(SectorMapAPI map) {
-        return this.target;
+        return this.target.getStarSystem().getCenter();
     }
 }
