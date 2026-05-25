@@ -27,17 +27,12 @@ import java.awt.Color;
 import java.util.List;
 import java.util.Random;
 
-public class GenericExpeditionIntel extends RaidIntel implements GenericOrganizeStage.ShowStageInfoDelegate, GenericAssembleStage.AssembleStageDelegate {
+public abstract class GenericExpeditionIntel extends RaidIntel implements GenericOrganizeStage.ShowStageInfoDelegate, GenericAssembleStage.AssembleStageDelegate {
     protected Outcome outcome;
     protected MarketAPI source;
 
-    public GenericExpeditionIntel(MarketAPI source, SectorEntityToken target) {
-        super(target.getStarSystem(), source.getFaction(), null);
-
-        init(source, target);
-    }
-
-    public void init(MarketAPI source, SectorEntityToken target) {
+    public GenericExpeditionIntel(StarSystemAPI system, FactionAPI faction, RaidDelegate delegate) {
+        super(system, faction, delegate);
     }
 
     protected float getPrepDays(float fp) {
@@ -376,7 +371,7 @@ public class GenericExpeditionIntel extends RaidIntel implements GenericOrganize
                 isNextStage = true;
                 index++;
                 if (index + 1 > this.stages.size()) {
-                    clearFleetMemory(fleet.getMemoryWithoutUpdate());
+                    clearFleetMemory(fleet);
                     continue;
                 }
                 currStage = this.stages.get(index);
@@ -384,6 +379,9 @@ public class GenericExpeditionIntel extends RaidIntel implements GenericOrganize
 
             setFleetMemoryAtStage(fleet, currStage);
         }
+    }
+
+    protected void clearFleetMemory(CampaignFleetAPI fleet) {
     }
 
     public Outcome getOutcome() {
@@ -401,6 +399,15 @@ public class GenericExpeditionIntel extends RaidIntel implements GenericOrganize
     @Override
     public float getAdjustedFleetStrength(float fp) {
         return fp + getBonusStrengthPerFleet();
+    }
+
+    public float getBonusStrengthPerFleet() {
+        boolean isPirate = getFaction().getCustomBoolean(Factions.CUSTOM_PIRATE_BEHAVIOR);
+        float bonusFP = 120f;
+        if (isPirate) {
+            bonusFP = 70f;
+        }
+        return bonusFP;
     }
 
     @Override
@@ -458,18 +465,6 @@ public class GenericExpeditionIntel extends RaidIntel implements GenericOrganize
     @Override
     public float getFPSmall() {
         return getFPMedium() / 2f;
-    }
-
-    public float getBonusStrengthPerFleet() {
-        boolean isPirate = getFaction().getCustomBoolean(Factions.CUSTOM_PIRATE_BEHAVIOR);
-        float bonusFP = 120f;
-        if (isPirate) {
-            bonusFP = 70f;
-        }
-        return bonusFP;
-    }
-
-    protected void clearFleetMemory(MemoryAPI memory) {
     }
 
     public enum Outcome {

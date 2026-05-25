@@ -6,24 +6,15 @@ import com.fs.starfarer.api.campaign.econ.Industry;
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
 import com.fs.starfarer.api.campaign.rules.MemoryAPI;
 import com.fs.starfarer.api.impl.campaign.command.WarSimScript;
-import com.fs.starfarer.api.impl.campaign.fleets.FleetFactoryV3;
-import com.fs.starfarer.api.impl.campaign.fleets.FleetParamsV3;
-import com.fs.starfarer.api.impl.campaign.fleets.RouteLocationCalculator;
 import com.fs.starfarer.api.impl.campaign.fleets.RouteManager;
-import com.fs.starfarer.api.impl.campaign.ids.Factions;
-import com.fs.starfarer.api.impl.campaign.ids.FleetTypes;
-import com.fs.starfarer.api.impl.campaign.ids.MemFlags;
-import com.fs.starfarer.api.impl.campaign.ids.Ranks;
 import com.fs.starfarer.api.impl.campaign.intel.raid.*;
 import com.fs.starfarer.api.impl.campaign.missions.hub.BaseHubMission;
-import com.fs.starfarer.api.impl.campaign.procgen.themes.RouteFleetAssignmentAI;
 import com.fs.starfarer.api.impl.campaign.rulecmd.AddRemoveCommodity;
 import com.fs.starfarer.api.ui.Alignment;
 import com.fs.starfarer.api.ui.LabelAPI;
 import com.fs.starfarer.api.ui.TooltipMakerAPI;
 import com.fs.starfarer.api.util.Misc;
 import org.apache.log4j.Logger;
-import org.lwjgl.util.vector.Vector2f;
 import sectorexpansionpack.Utils;
 import sectorexpansionpack.missions.EntityFinderMission;
 
@@ -31,7 +22,7 @@ import java.awt.*;
 import java.util.*;
 import java.util.List;
 
-public class AcquisitionRaidIntelV2 extends RaidIntel implements GenericOrganizeStage.ShowStageInfoDelegate, GenericAssembleStage.AssembleStageDelegate {
+public class AcquisitionRaidIntelV2 extends GenericExpeditionIntel {
     public static final String SOURCE_KEY = "$sep_ari_source";
     public static final String TARGET_KEY = "$sep_ari_target";
     public static final String EVENT_KEY = "$sep_ari_eventRef";
@@ -42,8 +33,6 @@ public class AcquisitionRaidIntelV2 extends RaidIntel implements GenericOrganize
     public static final Logger log = Global.getLogger(AcquisitionRaidIntelV2.class);
     public static Object RETURNED_UPDATE = new Object();
 
-    protected Outcome outcome;
-    protected MarketAPI source;
     protected MarketAPI target;
     protected FactionAPI targetFaction;
     protected SpecialItemSpecAPI artifact;
@@ -103,60 +92,14 @@ public class AcquisitionRaidIntelV2 extends RaidIntel implements GenericOrganize
                 this.target.getName(), getSystem().getNameWithLowercaseTypeShort()));
     }
 
-    protected float getPrepDays(float fp) {
-        if (Global.getSettings().isDevMode()) {
-            return 7f;
-        }
-        return 7f + (fp / getFPLarge());
-    }
-
-    protected float getRaidDays(float fp) {
-        return 28f + (14f * (fp / this.defenderStr));
-    }
-
-    protected float getFleetFPAbortFraction() {
-        return 0.33f;
-    }
-
     @Override
-    protected void advanceImpl(float amount) {
-        if (this.outcome != null) {
-            return;
-        }
-
-        RaidStage stage = this.stages.get(this.currentStage);
-
-        if (checkFailureConditions(stage)) {
-            forceFail(true);
-            return;
-        }
-
-        stage.advance(amount);
-
-        RaidStageStatus status = stage.getStatus();
-        if (status == RaidStageStatus.SUCCESS) {
-            succeededAtStage(stage);
-            this.currentStage++;
-            setExtraDays(Math.max(0, getExtraDays() - stage.getExtraDaysUsed()));
-            if (this.currentStage < this.stages.size()) {
-                this.stages.get(this.currentStage).notifyStarted();
-            }
-        } else if (status == RaidStageStatus.FAILURE) {
-            failedAtStage(stage);
-            this.failStage = this.currentStage;
-            if (shouldSendUpdate()) {
-                sendUpdateIfPlayerHasIntel(UPDATE_FAILED, false);
-            }
-        }
-    }
-
     protected boolean checkFailureConditions(RaidStage stage) {
         if (!this.source.isInEconomy()) {
             setOutcome(Outcome.SOURCE_MARKET_LOST);
         } else if (!this.target.isInEconomy() && getActionStage() != null && getActionStage().getStatus() == RaidStageStatus.ONGOING) {
-            setOutcome(Outcome.TARGET_MARKET_LOST);
+            setOutcome(Outcome.CANCELLED_OTHER1);
         } else if (!this.faction.isHostileTo(this.targetFaction) && getActionStage() != null && getActionStage().getStatus() == RaidStageStatus.ONGOING) {
-            setOutcome(Outcome.NO_LONGER_HOSTILE);
+            setOutcome(Outcome.CANCELLED_OTHER2);
         } else if (this.artifactGiven && getActionStage().getStatus() == RaidStageStatus.SUCCESS && stage instanceof BaseRaidStage raidStage) {
             boolean artifactLost = true;
             for (RouteManager.RouteData data : raidStage.getRoutes()) {
@@ -167,13 +110,14 @@ public class AcquisitionRaidIntelV2 extends RaidIntel implements GenericOrganize
                 }
             }
             if (artifactLost) {
-                setOutcome(Outcome.ARTIFACT_LOST);
+                setOutcome(Outcome.FAILED_OTHER1);
             }
         }
 
         return this.outcome != null && this.outcome.isFailed();
     }
 
+    @Override
     protected void succeededAtStage(RaidStage stage) {
         setFleetsMemoryAtStage(getStageIndex(stage), true);
         if (stage instanceof TravelStage && !(stage instanceof GenericReturnStage)) {
@@ -207,67 +151,12 @@ public class AcquisitionRaidIntelV2 extends RaidIntel implements GenericOrganize
     }
 
     @Override
-    protected void failedAtStage(RaidStage stage) {
-        if (this.outcome == null) {
-            if (stage instanceof OrganizeStage) {
-                setOutcome(Outcome.ABORTED_IN_PLANNING);
-            } else if (stage instanceof AssembleStage) {
-                setOutcome(Outcome.ASSEMBLING_DISRUPTED);
-            } else if (stage instanceof TravelStage && !(stage instanceof GenericReturnStage)) {
-                setOutcome(Outcome.NOT_ENOUGH_MADE_IT);
-            } else if (stage instanceof ActionStage) {
-                setOutcome(Outcome.FAILED);
-            } else if (stage instanceof GenericReturnStage) {
-                setOutcome(Outcome.NOT_ENOUGH_MADE_IT);
-            }
-        }
-        if (stage instanceof BaseRaidStage stage1) {
-            stage1.giveReturnOrdersToStragglers(stage1.getRoutes());
-        }
-        endAfterDelay();
-    }
-
-    @Override
-    protected float getBaseDaysAfterEnd() {
-        if (this.outcome != null && this.outcome == Outcome.SUCCEEDED) {
-            return 14f;
-        }
-        return 7f;
-    }
-
-    @Override
     protected void notifyEnding() {
         super.notifyEnding();
 
         getFaction().getMemoryWithoutUpdate().unset(SOURCE_KEY);
         this.target.getMemoryWithoutUpdate().unset(TARGET_KEY);
         this.target.getMemoryWithoutUpdate().unset(EVENT_KEY);
-    }
-
-    @Override
-    public String getName() {
-        String base = Misc.ucFirst(getFaction().getPersonNamePrefix()) + " " + Misc.ucFirst(getRaidNoun());
-        if (isEnding()) {
-            if (this.outcome != null && this.outcome.isSucceeded()) {
-                return base + " - Completed";
-            } else if (this.outcome != null && this.outcome.isCancelled()) {
-                return base + " - Cancelled";
-            } else if (this.outcome != null && this.outcome.isFailed()) {
-                return base + " - Failed";
-            }
-        } else if (getActionStage().getStatus() == RaidStageStatus.SUCCESS) {
-            return base + " - Successful";
-        }
-        return base;
-    }
-
-    @Override
-    public void createSmallDescription(TooltipMakerAPI info, float width, float height) {
-        addBasicDescription(info, width, height);
-        addAssessmentSection(info, width, height);
-        addStatusSection(info, width, height);
-        addBulletPoints(info, ListInfoMode.IN_DESC);
-        info.addSpacer(10f);
     }
 
     protected void addBasicDescription(TooltipMakerAPI info, float width, float height) {
@@ -369,39 +258,8 @@ public class AcquisitionRaidIntelV2 extends RaidIntel implements GenericOrganize
         }
     }
 
-    protected void addStatusSection(TooltipMakerAPI info, float width, float height) {
-        float opad = 10f;
-
-        info.addSectionHeading("Status", this.faction.getBaseUIColor(), this.faction.getDarkUIColor(), Alignment.MID, opad);
-
-        if (this.outcome == null) {
-            for (RaidStage stage : this.stages) {
-                stage.showStageInfo(info);
-                if (getStageIndex(stage) == this.failStage) {
-                    break;
-                }
-            }
-        } else {
-            info.addPara(getOutcomeDescription(false), opad);
-        }
-    }
-
     @Override
-    protected void addBulletPoints(TooltipMakerAPI info, ListInfoMode mode) {
-        float initPad = mode == ListInfoMode.IN_DESC ? 10f : 3f;
-        Color tc = getBulletColorForMode(mode);
-        Object param = getListInfoParam();
-
-        bullet(info);
-        if (param == null) {
-            addNonUpdateBulletPoints(info, tc, mode, initPad);
-        } else {
-            addUpdateBulletPoints(info, tc, param, initPad);
-        }
-        unindent(info);
-    }
-
-    public void addNonUpdateBulletPoints(TooltipMakerAPI info, Color tc, ListInfoMode mode, float initPad) {
+    public void addNonUpdateBulletPoints(TooltipMakerAPI info, Color tc, Object param, ListInfoMode mode, float initPad) {
         if (this.outcome != null) {
             return;
         }
@@ -452,70 +310,33 @@ public class AcquisitionRaidIntelV2 extends RaidIntel implements GenericOrganize
         }
     }
 
-    public float getETAAtStage(Class<?> stageClass) {
-        for (RaidStage stage : this.stages) {
-            if (stage.getStatus() != RaidStageStatus.ONGOING) {
-                continue;
-            }
-            if (stage.getClass() == stageClass) {
-                float travelDays = 0f;
-                boolean isTravelStage = false;
-
-                if (stage instanceof GenericTravelStage travelStage) {
-                    travelDays = RouteLocationCalculator.getTravelDays(travelStage.getFrom(), travelStage.getTo());
-                    isTravelStage = true;
-                }
-
-                float remaining = isTravelStage ? travelDays - stage.getElapsed() : stage.getMaxDays() - stage.getElapsed();
-                return Math.max(0f, remaining);
-            }
-        }
-        return 0f;
-    }
-
-    public void addUpdateBulletPoints(TooltipMakerAPI info, Color tc, Object param, float initPad) {
-        if (ENTERED_SYSTEM_UPDATE.equals(param)) {
-            info.addPara("Arrived at " + getSystem().getNameWithLowercaseTypeShort(), tc, initPad);
-        } else if (UPDATE_RETURNING.equals(param)) {
-            info.addPara("Returning to " + this.source.getStarSystem().getNameWithLowercaseTypeShort() + " with an artifact", tc, initPad);
-        } else if (RETURNED_UPDATE.equals(param)) {
+    @Override
+    public void addUpdateBulletPoints(TooltipMakerAPI info, Color tc, Object param, ListInfoMode mode, float initPad) {
+        if (RETURNED_UPDATE.equals(param)) {
             info.addPara("Docking safely " + this.source.getOnOrAt() + " " + this.source.getName() + " with an artifact", tc, initPad);
-        } else if (UPDATE_FAILED.equals(param)) {
-            info.addPara(getOutcomeDescription(true), tc, initPad);
+        } else {
+            super.addUpdateBulletPoints(info, tc, param, mode, initPad);
         }
     }
 
+    @Override
     protected String getOutcomeDescription(boolean isUpdate) {
         String forces = getForcesNoun();
         String raid = getRaidNoun();
         return switch (this.outcome) {
-            case ARTIFACT_LOST -> isUpdate ? "The " + forces + " failed to keep the artifact safe" :
+            case FAILED_OTHER1 -> isUpdate ? "The " + forces + " failed to keep the artifact safe" :
                     "The " + forces + " failed to return with the artifact. Any surviving fleets are retreating in disarray.";
-            case ASSEMBLING_DISRUPTED -> isUpdate ? "The " + forces + " failed to fully assemble" :
-                    "The " + forces + " failed to fully assemble. Any deployed fleets are retreating in disarray.";
-            case NOT_ENOUGH_MADE_IT -> isUpdate ? "The " + forces + " failed to reach their target" :
-                    "The " + forces + " failed to reach their objective. Any remaining fleets are retreating in disarray.";
-            case FAILED -> isUpdate ? "The " + forces + " failed to achieve their objective" :
-                    "The " + forces + " failed to complete their objective. Any surviving fleets are retreating in disarray.";
-            case SOURCE_MARKET_LOST -> isUpdate ? "The " + raid + "'s colony no longer exists" :
-                    "The " + raid + " was cancelled as the " + this.source.getName() + " colony no longer exists. Any deployed fleets are returning to their port of origin";
-            case TARGET_MARKET_LOST -> isUpdate ? "The " + raid + "'s target colony no longer exists" :
+            case CANCELLED_OTHER1 -> isUpdate ? "The " + raid + "'s target colony no longer exists" :
                     "The " + raid + " was cancelled as the " + this.target.getName() + " colony no longer exists. Any deployed fleets are returning to their port of origin";
-            case NO_LONGER_HOSTILE -> isUpdate ? "The " + raid + "'s faction is no longer hostile with the target" :
+            case CANCELLED_OTHER2 -> isUpdate ? "The " + raid + "'s faction is no longer hostile with the target" :
                     "The " + raid + " was cancelled as " + this.faction.getDisplayNameWithArticle() + " is no longer hostile with " + this.targetFaction.getDisplayNameWithArticle() + ". Any deployed fleets are returning to their port of origin";
-            case ABORTED_IN_PLANNING -> isUpdate ? "The " + raid + " was cancelled during the planning stage." :
-                    "The " + raid + " was cancelled during the planning stage and will no longer happen.";
-            case SUCCEEDED -> isUpdate ? "The " + forces + " successfully returned with an artifact" :
-                    "The " + raid + " was successful and the acquired artifact is now in the hands of " + this.faction.getDisplayNameWithArticle();
+            default -> super.getOutcomeDescription(isUpdate);
         };
     }
 
+    @Override
     public String getRaidNoun() {
         return "acquisition";
-    }
-
-    public String getForcesNoun() {
-        return getRaidNoun() + " forces";
     }
 
     @Override
@@ -523,7 +344,7 @@ public class AcquisitionRaidIntelV2 extends RaidIntel implements GenericOrganize
         String action = params.get(0).getString(memoryMap);
 
         if ("endEvent".equals(action)) {
-            setOutcome(Outcome.ARTIFACT_LOST);
+            setOutcome(Outcome.FAILED_OTHER1);
             forceFail(true);
             sendUpdateIfPlayerHasIntel(UPDATE_FAILED, dialog.getTextPanel());
             return true;
@@ -538,88 +359,13 @@ public class AcquisitionRaidIntelV2 extends RaidIntel implements GenericOrganize
     }
 
     @Override
-    public RouteFleetAssignmentAI createAssignmentAI(CampaignFleetAPI fleet, RouteManager.RouteData route) {
-        ActionStage action = getActionStage();
-        ActionAssignmentAI.SEPFleetActionDelegate delegate = null;
-        if (action instanceof ActionAssignmentAI.SEPFleetActionDelegate) {
-            delegate = (ActionAssignmentAI.SEPFleetActionDelegate) action;
-        }
-        return new ActionAssignmentAI(fleet, route, delegate, false);
+    public void configureFleet(CampaignFleetAPI fleet, float fp) {
+        super.configureFleet(fleet, fp);
+        fleet.getMemoryWithoutUpdate().set(FLEET_KEY, true);
+        fleet.getMemoryWithoutUpdate().set(EVENT_KEY, this);
     }
 
     @Override
-    public CampaignFleetAPI createFleet(String factionId, RouteManager.RouteData route, MarketAPI market, Vector2f locInHyper, Random random) {
-        RouteManager.OptionalFleetData extra = route.getExtra();
-
-        boolean isPirate = getFaction().getCustomBoolean(Factions.CUSTOM_PIRATE_BEHAVIOR);
-        float combat = extra.fp;
-        float tanker = extra.fp * (0.1f + random.nextFloat() * 0.05f);
-        float transport = extra.fp * (0.1f + random.nextFloat() * 0.05f);
-        float freighter = 0f;
-        combat -= tanker;
-        combat -= transport;
-
-        FleetParamsV3 params = new FleetParamsV3(
-                market,
-                locInHyper,
-                factionId,
-                null,
-                extra.fleetType,
-                combat,
-                freighter,
-                tanker,
-                transport,
-                0f,
-                0f,
-                0f
-        );
-
-        params.ignoreMarketFleetSizeMult = true;
-        params.modeOverride = FactionAPI.ShipPickMode.PRIORITY_THEN_ALL;
-        params.qualityOverride = 1f;
-        FactionDoctrineAPI doctrineOverride = this.faction.getDoctrine().clone();
-        if (!isPirate) {
-            doctrineOverride.setOfficerQuality(3);
-        }
-        doctrineOverride.setShipQuality(3);
-        doctrineOverride.setNumShips(3);
-        params.doctrineOverride = doctrineOverride;
-
-        params.timestamp = route.getTimestamp();
-        params.random = random;
-
-        CampaignFleetAPI fleet = FleetFactoryV3.createFleet(params);
-        if (fleet == null || fleet.isEmpty()) {
-            return null;
-        }
-
-        fleet.getMemoryWithoutUpdate().set(MemFlags.MEMORY_KEY_WAR_FLEET, true);
-        fleet.getMemoryWithoutUpdate().set(MemFlags.MEMORY_KEY_RAIDER, true);
-        fleet.getMemoryWithoutUpdate().set(MemFlags.FLEET_NO_MILITARY_RESPONSE, true);
-        fleet.getMemoryWithoutUpdate().set(FLEET_KEY, true);
-        fleet.getMemoryWithoutUpdate().set(EVENT_KEY, this);
-
-        if (isPirate) {
-            fleet.getMemoryWithoutUpdate().set(MemFlags.MEMORY_KEY_PIRATE, true);
-        }
-
-        RaidStage stage = this.stages.get(this.currentStage);
-        setFleetMemoryAtStage(fleet, stage);
-
-        fleet.setName("Grand Acquisitions Fleet");
-        fleet.getCommander().setRankId(Ranks.SPACE_ADMIRAL);
-        if (extra.fp <= getFPSmall()) {
-            fleet.setName("Minor Acquisitions Fleet");
-            fleet.getCommander().setRankId(Ranks.SPACE_COMMANDER);
-        } else if (extra.fp <= getFPMedium()) {
-            fleet.setName("Major Acquisitions Fleet");
-            fleet.getCommander().setRankId(Ranks.SPACE_CAPTAIN);
-        }
-        fleet.getCommander().setPostId(Ranks.POST_PATROL_COMMANDER);
-
-        return fleet;
-    }
-
     public void setFleetMemoryAtStage(CampaignFleetAPI fleet, RaidStage stage) {
         if (stage instanceof GenericReturnStage) {
             fleet.setNoAutoDespawn(true);
@@ -632,33 +378,13 @@ public class AcquisitionRaidIntelV2 extends RaidIntel implements GenericOrganize
         }
     }
 
-    public void setFleetsMemoryAtStage(int index, boolean useNextStage) {
-        RaidStage currStage = this.stages.get(index);
-        List<RouteManager.RouteData> routes = RouteManager.getInstance().getRoutesForSource(getRouteSourceId());
-
-        boolean isNextStage = false;
-        for (RouteManager.RouteData route : routes) {
-            CampaignFleetAPI fleet = route.getActiveFleet();
-            if (fleet == null) {
-                continue;
-            }
-
-            if (useNextStage && !isNextStage) {
-                isNextStage = true;
-                index++;
-                if (index + 1 > this.stages.size()) {
-                    fleet.getMemoryWithoutUpdate().unset(FLEET_KEY);
-                    fleet.getMemoryWithoutUpdate().unset(EVENT_KEY);
-                    fleet.getMemoryWithoutUpdate().unset(HAS_ARTIFACT_KEY);
-                    Misc.makeUnimportant(fleet, HAS_ARTIFACT_REASON);
-                    Misc.removeDefeatTrigger(fleet, FLEET_DEFEAT_TRIGGER);
-                    continue;
-                }
-                currStage = this.stages.get(index);
-            }
-
-            setFleetMemoryAtStage(fleet, currStage);
-        }
+    @Override
+    protected void clearFleetMemory(CampaignFleetAPI fleet) {
+        fleet.getMemoryWithoutUpdate().unset(FLEET_KEY);
+        fleet.getMemoryWithoutUpdate().unset(EVENT_KEY);
+        fleet.getMemoryWithoutUpdate().unset(HAS_ARTIFACT_KEY);
+        Misc.makeUnimportant(fleet, HAS_ARTIFACT_REASON);
+        Misc.removeDefeatTrigger(fleet, FLEET_DEFEAT_TRIGGER);
     }
 
     @Override
@@ -667,14 +393,6 @@ public class AcquisitionRaidIntelV2 extends RaidIntel implements GenericOrganize
             return;
         }
         this.artifactGiven = false;
-    }
-
-    public Outcome getOutcome() {
-        return this.outcome;
-    }
-
-    public void setOutcome(Outcome outcome) {
-        this.outcome = outcome;
     }
 
     @Override
@@ -695,102 +413,6 @@ public class AcquisitionRaidIntelV2 extends RaidIntel implements GenericOrganize
                         this.source.getStarSystem().getNameWithLowercaseTypeShort() +
                         " and is currently carrying an artifact.", opad);
             }
-        }
-    }
-
-    @Override
-    public float getAdjustedFleetStrength(float fp) {
-        return fp + getBonusStrengthPerFleet();
-    }
-
-    @Override
-    public String pickFleetType(float remainingFP) {
-        if (remainingFP >= getFPLarge()) {
-            return FleetTypes.PATROL_LARGE;
-        } else if (remainingFP >= getFPMedium()) {
-            return FleetTypes.PATROL_MEDIUM;
-        }
-        return FleetTypes.PATROL_SMALL;
-    }
-
-    @Override
-    public float getFP(String fleetType, float remainingFP) {
-        float base = getFPSmall();
-        if (FleetTypes.PATROL_LARGE.equals(fleetType)) {
-            base = getFPLarge();
-        } else if (FleetTypes.PATROL_MEDIUM.equals(fleetType)) {
-            base = getFPMedium();
-        }
-
-        if (base > remainingFP) {
-            base = remainingFP;
-        }
-
-        remainingFP -= base;
-
-        if (remainingFP < getFPSmall() * 0.5f) {
-            base += remainingFP;
-        }
-
-        return base;
-    }
-
-    @Override
-    public float getLargeSize(boolean limitToSpawnFP) {
-        return getFPLarge();
-    }
-
-    @Override
-    public float getFPLarge() {
-        float fp = getFaction().getApproximateMaxFPPerFleet(FactionAPI.ShipPickMode.PRIORITY_THEN_ALL);
-        if (fp < 300f) {
-            fp = 300f;
-        }
-        return fp;
-    }
-
-    @Override
-    public float getFPMedium() {
-        return getFPLarge() / 2f;
-    }
-
-    @Override
-    public float getFPSmall() {
-        return getFPMedium() / 2f;
-    }
-
-    public float getBonusStrengthPerFleet() {
-        boolean isPirate = getFaction().getCustomBoolean(Factions.CUSTOM_PIRATE_BEHAVIOR);
-        float bonusFP = 120f;
-        if (isPirate) {
-            bonusFP = 70f;
-        }
-        return bonusFP;
-    }
-
-    public enum Outcome {
-        ARTIFACT_LOST,
-        ASSEMBLING_DISRUPTED,
-        NOT_ENOUGH_MADE_IT,
-        FAILED,
-
-        SOURCE_MARKET_LOST,
-        TARGET_MARKET_LOST,
-        NO_LONGER_HOSTILE,
-        ABORTED_IN_PLANNING,
-
-        SUCCEEDED;
-
-        public boolean isFailed() {
-            return this == ARTIFACT_LOST || this == ASSEMBLING_DISRUPTED || this == NOT_ENOUGH_MADE_IT || this == FAILED || isCancelled();
-        }
-
-        public boolean isCancelled() {
-            return this == SOURCE_MARKET_LOST || this == TARGET_MARKET_LOST || this == NO_LONGER_HOSTILE || this == ABORTED_IN_PLANNING;
-        }
-
-        public boolean isSucceeded() {
-            return this == SUCCEEDED;
         }
     }
 }
