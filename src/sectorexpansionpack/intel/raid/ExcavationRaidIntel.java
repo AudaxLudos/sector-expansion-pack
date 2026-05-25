@@ -43,22 +43,23 @@ public class ExcavationRaidIntel extends RaidIntel implements GenericOrganizeSta
     public static final String HAS_ARTIFACT_REASON = "sep_eri";
     public static final Logger log = Global.getLogger(ExcavationRaidIntel.class);
     public static Object RETURNED_UPDATE = new Object();
+
     protected Outcome outcome;
     protected MarketAPI source;
     protected SectorEntityToken target;
-    protected SpecialItemSpecAPI specialItem;
+    protected SpecialItemSpecAPI artifact;
     protected Random random;
     protected float leakChance = 0.3f;
     protected boolean leaked = false;
-    protected boolean specialItemGiven = false;
+    protected boolean artifactGiven = false;
 
-    public ExcavationRaidIntel(MarketAPI source, SectorEntityToken target, SpecialItemSpecAPI specialItem) {
+    public ExcavationRaidIntel(MarketAPI source, SectorEntityToken target, SpecialItemSpecAPI artifact) {
         super(target.getStarSystem(), source.getFaction(), null);
 
         this.defenderStr = getLargeSize(false);
         this.source = source;
         this.target = target;
-        this.specialItem = specialItem;
+        this.artifact = artifact;
         this.random = new Random();
 
         float desireMult = Utils.getSpecialItemsDesireMult(getFaction().getId());
@@ -100,7 +101,7 @@ public class ExcavationRaidIntel extends RaidIntel implements GenericOrganizeSta
 
         // Mark the target for player and give it the special item
         Misc.makeImportant(this.target, HAS_ARTIFACT_REASON);
-        Misc.setSalvageSpecial(this.target, new SEPHiddenItemSpecial.HiddenSpecialItemSpecialData(this.specialItem.getId()));
+        Misc.setSalvageSpecial(this.target, new SEPHiddenItemSpecial.HiddenSpecialItemSpecialData(this.artifact.getId()));
 
         log.info(String.format("Starting %s excavation at %s in the %s, targeting %s in the %s",
                 getFaction().getDisplayName(),
@@ -131,25 +132,7 @@ public class ExcavationRaidIntel extends RaidIntel implements GenericOrganizeSta
 
         RaidStage stage = this.stages.get(this.currentStage);
 
-        if (!this.source.isInEconomy()) {
-            setOutcome(Outcome.SOURCE_MARKET_LOST);
-        } else {
-            if (this.specialItemGiven && getActionStage().getStatus() == RaidStageStatus.SUCCESS && stage instanceof BaseRaidStage raidStage) {
-                boolean specialItemLost = true;
-                for (RouteManager.RouteData data : raidStage.getRoutes()) {
-                    CampaignFleetAPI fleet = data.getActiveFleet();
-                    if (fleet != null && fleet.getMemoryWithoutUpdate().getBoolean(HAS_ARTIFACT_KEY)) {
-                        specialItemLost = false;
-                        break;
-                    }
-                }
-                if (specialItemLost) {
-                    setOutcome(Outcome.SPECIAL_ITEM_LOST);
-                }
-            }
-        }
-
-        if (this.outcome != null) {
+        if (checkFailureConditions(stage)) {
             forceFail(true);
             return;
         }
@@ -173,6 +156,28 @@ public class ExcavationRaidIntel extends RaidIntel implements GenericOrganizeSta
         }
     }
 
+    protected boolean checkFailureConditions(RaidStage stage) {
+        if (!this.source.isInEconomy()) {
+            setOutcome(Outcome.SOURCE_MARKET_LOST);
+        } else {
+            if (this.artifactGiven && getActionStage().getStatus() == RaidStageStatus.SUCCESS && stage instanceof BaseRaidStage raidStage) {
+                boolean artifactLost = true;
+                for (RouteManager.RouteData data : raidStage.getRoutes()) {
+                    CampaignFleetAPI fleet = data.getActiveFleet();
+                    if (fleet != null && fleet.getMemoryWithoutUpdate().getBoolean(HAS_ARTIFACT_KEY)) {
+                        artifactLost = false;
+                        break;
+                    }
+                }
+                if (artifactLost) {
+                    setOutcome(Outcome.SPECIAL_ITEM_LOST);
+                }
+            }
+        }
+
+        return this.outcome != null && this.outcome.isFailed();
+    }
+
     protected void succeededAtStage(RaidStage stage) {
         setFleetsMemoryAtStage(getStageIndex(stage), true);
         if (stage instanceof ActionStage) {
@@ -181,7 +186,7 @@ public class ExcavationRaidIntel extends RaidIntel implements GenericOrganizeSta
             this.target.getMemoryWithoutUpdate().unset(EVENT_KEY);
             this.target.getMemoryWithoutUpdate().unset(MemFlags.SALVAGE_SPECIAL_DATA);
         } else if (stage instanceof GenericReturnStage stage1) {
-            SpecialItemData data = new SpecialItemData(this.specialItem.getId(), this.specialItem.getParams());
+            SpecialItemData data = new SpecialItemData(this.artifact.getId(), this.artifact.getParams());
             Utils.findMarketToInstallSpecialItem(new EntityFinderMission(), getFaction().getId(), this.source, data, log);
             setOutcome(Outcome.SUCCEEDED);
             stage1.giveReturnOrdersToStragglers(stage1.getRoutes()); // Order fleets to return home and despawn
@@ -196,7 +201,7 @@ public class ExcavationRaidIntel extends RaidIntel implements GenericOrganizeSta
                 this.leaked = true;
 
                 if (this.source.getStarSystem() != null) {
-                    new ExcavationLeakedIntel(this.source, this.target, this.specialItem, stage, this);
+                    new ExcavationLeakedIntel(this.source, this.target, this.artifact, stage, this);
                     log.info(String.format("Leaking artifact location at %s by unknown contact %s %s in the %s",
                             this.target.getStarSystem().getNameWithLowercaseType(), this.source.getOnOrAt(),
                             this.source.getName(), this.source.getStarSystem().getNameWithLowercaseType()));
@@ -536,7 +541,7 @@ public class ExcavationRaidIntel extends RaidIntel implements GenericOrganizeSta
             sendUpdateIfPlayerHasIntel(UPDATE_FAILED, dialog.getTextPanel());
             return true;
         } else if ("giveArtifact".equals(action)) {
-            SpecialItemData specialItemData = new SpecialItemData(this.specialItem.getId(), this.specialItem.getParams());
+            SpecialItemData specialItemData = new SpecialItemData(this.artifact.getId(), this.artifact.getParams());
             Global.getSector().getPlayerFleet().getCargo().addSpecial(specialItemData, 1f);
             AddRemoveCommodity.addItemGainText(specialItemData, 1, dialog.getTextPanel());
             return true;
@@ -635,11 +640,11 @@ public class ExcavationRaidIntel extends RaidIntel implements GenericOrganizeSta
     public void setFleetMemoryAtStage(CampaignFleetAPI fleet, RaidStage stage) {
         if (stage instanceof GenericReturnStage) {
             fleet.setNoAutoDespawn(true);
-            if (!this.specialItemGiven) {
+            if (!this.artifactGiven) {
                 fleet.getMemoryWithoutUpdate().set(HAS_ARTIFACT_KEY, true);
                 Misc.makeImportant(fleet, HAS_ARTIFACT_REASON);
                 Misc.addDefeatTrigger(fleet, FLEET_DEFEAT_TRIGGER);
-                this.specialItemGiven = true;
+                this.artifactGiven = true;
             }
         }
     }
@@ -678,7 +683,7 @@ public class ExcavationRaidIntel extends RaidIntel implements GenericOrganizeSta
         if (!Objects.equals(route.getSource(), getRouteSourceId())) {
             return;
         }
-        this.specialItemGiven = false;
+        this.artifactGiven = false;
     }
 
     public void setOutcome(Outcome outcome) {

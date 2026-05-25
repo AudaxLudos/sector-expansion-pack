@@ -16,29 +16,6 @@ Call $entity.sep_ifi_ref endEvent
 MakeOtherFleetAllowDisengage sep_ifi true
 MakeOtherFleetNonHostile sep_ifi true",Your sensors officer detects a unique energy signature among the floating debris. You send your salvage crews to recover it.,,
 # Incursion Fleet Event END,,,,,,
-,,,,,,
-,,,,,,
-# Acquisition Raid Event START,,,,,,
-sep_ari_fleetHasArtifact,OpenCommLink,"$entity.sep_ari_fleet score:1000
-$entity.sep_ari_hasSpecialItem score:1000","ShowDefaultVisual
-SetStoryOption sep_ari_persuadeToGive ui_char_spent_story_point ""Persuade the fleet to give the artifact""
-$entity.ignorePlayerCommRequests = true","""Captain,"" $heOrShe says in a clipped tone. ""I’m currently busy and can’t afford distractions. If this isn’t urgent, you’ve got one chance, make it quick.""","sep_ari_persuadeToGive:Persuade to give cargo
-cutCommLink:Cut the comm link",
-sep_ari_fleetPersuadeToGive,DialogOptionSelected,$option == sep_ari_persuadeToGive,"Call $entity.sep_ari_eventRef giveArtifact
-Call $entity.sep_ari_eventRef endEvent
-MakeOtherFleetAllowDisengage sep_ifi true
-MakeOtherFleetNonHostile sep_ifi true","The captain blinks, momentarily taken aback by your request. ""You’re serious about this?"" $heOrShe asks, studying you for a moment before letting out a quiet sigh. ""Fine… you’ve made your point, Captain. I’ll authorize the transfer. Just make sure it’s worth the trouble.""",cutCommLink:Cut the comm link,
-sep_ari_fleetDefeated,SEPARIFleetDefeatTrigger,"$sep_ari_fleet score:1000
-$sep_ari_hasSpecialItem score:1000
-$someShipsDestroyed","Call $entity.sep_ari_eventRef giveArtifact
-Call $entity.sep_ari_eventRef endEvent
-MakeOtherFleetAllowDisengage sep_ifi true
-MakeOtherFleetNonHostile sep_ifi true",Your sensors officer detects a unique energy signature among the floating debris. You send your salvage crews to recover it.,,
-# Acquisition Raid Event END,,,,,,
-,,,,,,
-,,,,,,
-,,,,,,
-,,,,,,
 # Expedition Fleet Intel START,,,,,,
 sep_efi_targetGuarded,OpenInteractionDialog,"$sep_efi_target score:1000
 $sep_efi_targetGuarded score:1000
@@ -61,6 +38,26 @@ Call $entity.sep_efi_ref endEvent
 MakeOtherFleetAllowDisengage sep_efi true
 MakeOtherFleetNonHostile sep_efi true",Your sensors officer detects a unique energy signature among the floating debris. You send your salvage crews to recover it.,,
 # Expedition Fleet Intel END,,,,,,
+,,,,,,
+,,,,,,
+,,,,,,
+# Acquisition Raid Event START,,,,,,
+sep_ari_fleetHasArtifact,OpenCommLink,"$entity.sep_ari_fleet score:1000
+$entity.sep_ari_hasArtifact score:1000","ShowDefaultVisual
+SetStoryOption sep_ari_persuadeToGive ui_char_spent_story_point ""Persuade the fleet to give the artifact""
+$entity.ignorePlayerCommRequests = true","""Captain,"" $heOrShe says in a clipped tone. ""I’m currently busy and can’t afford distractions. If this isn’t urgent, you’ve got one chance, make it quick.""","sep_ari_persuadeToGive:Persuade to give cargo
+cutCommLink:Cut the comm link",
+sep_ari_fleetPersuadeToGive,DialogOptionSelected,$option == sep_ari_persuadeToGive,"Call $entity.sep_ari_eventRef giveArtifact
+Call $entity.sep_ari_eventRef endEvent
+MakeOtherFleetAllowDisengage sep_ari true
+MakeOtherFleetNonHostile sep_ari true","The captain blinks, momentarily taken aback by your request. ""You’re serious about this?"" $heOrShe asks, studying you for a moment before letting out a quiet sigh. ""Fine… you’ve made your point, Captain. I’ll authorize the transfer. Just make sure it’s worth the trouble.""",cutCommLink:Cut the comm link,
+sep_ari_fleetDefeated,SEPARIFleetDefeated,"$sep_ari_fleet score:1000
+$sep_ari_hasArtifact score:1000
+$someShipsDestroyed","Call $sep_ari_eventRef giveArtifact
+Call $sep_ari_eventRef endEvent
+MakeOtherFleetAllowDisengage sep_ari true
+MakeOtherFleetNonHostile sep_ari true",Your sensors officer detects a unique energy signature among the floating debris. You send your salvage crews to recover it.,,
+# Acquisition Raid Event END,,,,,,
 ,,,,,,
 ,,,,,,
 ,,,,,,
