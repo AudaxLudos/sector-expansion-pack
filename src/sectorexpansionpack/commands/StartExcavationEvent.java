@@ -7,7 +7,6 @@ import com.fs.starfarer.api.campaign.SpecialItemData;
 import com.fs.starfarer.api.campaign.SpecialItemSpecAPI;
 import com.fs.starfarer.api.campaign.econ.Industry;
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
-import com.fs.starfarer.api.impl.campaign.econ.impl.InstallableItemEffect;
 import com.fs.starfarer.api.impl.campaign.econ.impl.ItemEffectsRepo;
 import com.fs.starfarer.api.impl.campaign.ids.Entities;
 import com.fs.starfarer.api.util.WeightedRandomPicker;
@@ -16,14 +15,12 @@ import org.lazywizard.console.CommandUtils;
 import org.lazywizard.console.Console;
 import sectorexpansionpack.Settings;
 import sectorexpansionpack.Utils;
-import sectorexpansionpack.intel.ExpeditionFleetIntel;
-import sectorexpansionpack.intel.raid.AcquisitionRaidIntel;
 import sectorexpansionpack.intel.raid.ExcavationRaidIntel;
+import sectorexpansionpack.intel.raid.ExcavationRaidIntelV2;
 import sectorexpansionpack.missions.EntityFinderMission;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 public class StartExcavationEvent implements BaseCommandWithSuggestion {
     @Override
@@ -82,7 +79,7 @@ public class StartExcavationEvent implements BaseCommandWithSuggestion {
             return CommandResult.ERROR;
         }
 
-        new ExcavationRaidIntel(sourceM, targetM, specialItem);
+        new ExcavationRaidIntelV2(sourceM, targetM, specialItem);
 
         return CommandResult.SUCCESS;
     }

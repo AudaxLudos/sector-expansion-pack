@@ -31,12 +31,12 @@ public class AcquisitionRaidIntelV2 extends GenericExpeditionIntel {
     public static final String HAS_ARTIFACT_KEY = "$sep_ari_hasArtifact";
     public static final String HAS_ARTIFACT_REASON = "sep_ari";
     public static final Logger log = Global.getLogger(AcquisitionRaidIntelV2.class);
-    public static Object RETURNED_UPDATE = new Object();
+    public static final Object RETURNED_UPDATE = new Object();
 
-    protected MarketAPI target;
-    protected FactionAPI targetFaction;
-    protected SpecialItemSpecAPI artifact;
-    protected Random random;
+    protected final MarketAPI target;
+    protected final FactionAPI targetFaction;
+    protected final SpecialItemSpecAPI artifact;
+    protected final Random random;
     protected boolean artifactGiven = false;
 
     public AcquisitionRaidIntelV2(MarketAPI source, MarketAPI target, SpecialItemSpecAPI artifact) {
@@ -307,6 +307,14 @@ public class AcquisitionRaidIntelV2 extends GenericExpeditionIntel {
                 info.addPara("Estimated %s " + days + " until return to " + this.source.getStarSystem().getNameWithLowercaseTypeShort(),
                         initPad, tc, h, "" + (int) etaReturn);
             }
+        }
+    }
+
+    @Override
+    public void addBulletPointsBeforeUpdate(TooltipMakerAPI info, Color tc, Object param, ListInfoMode mode, float initPad) {
+        if (this.outcome == null && mode != ListInfoMode.IN_DESC) {
+            info.addPara("Target: " + this.targetFaction.getDisplayName(), initPad, tc, this.targetFaction.getBaseUIColor(), this.targetFaction.getDisplayName());
+            initPad = 0f;
         }
     }
 

@@ -10,7 +10,7 @@ import com.fs.starfarer.api.ui.TooltipMakerAPI;
 import com.fs.starfarer.api.util.Misc;
 
 public class GenericAssembleStage extends AssembleStage {
-    protected Object delegate;
+    protected final Object delegate;
     protected float prepDays;
     protected float travelDays;
 

@@ -8,8 +8,12 @@ import com.fs.starfarer.api.impl.campaign.missions.hub.BaseHubMission;
 import com.fs.starfarer.api.ui.TooltipMakerAPI;
 import com.fs.starfarer.api.util.Misc;
 
+/**
+ * @deprecated
+ */
+@Deprecated(forRemoval = true)
 public class AcquisitionOrganizeStage extends OrganizeStage {
-    protected AcquisitionRaidIntel acquisitionIntel;
+    protected final AcquisitionRaidIntel acquisitionIntel;
 
     public AcquisitionOrganizeStage(RaidIntel raid, MarketAPI market, float durDays) {
         super(raid, market, durDays);

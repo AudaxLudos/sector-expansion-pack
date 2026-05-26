@@ -23,13 +23,13 @@ import java.awt.*;
 import java.util.Set;
 
 public class ConstructObjectiveMissionIntel extends BaseMissionIntel {
-    public static Logger log = Global.getLogger(ClearDebrisFieldsMissionIntel.class);
+    public static final Logger log = Global.getLogger(ClearDebrisFieldsMissionIntel.class);
+    protected final StarSystemAPI system;
+    protected final IntervalUtil timer = new IntervalUtil(0.1f, 0.3f);
     protected MarketAPI market;
-    protected StarSystemAPI system;
     protected String objectiveType;
     protected FactionAPI faction;
     protected int reward;
-    protected IntervalUtil timer = new IntervalUtil(0.1f, 0.3f);
 
     public ConstructObjectiveMissionIntel(StarSystemAPI system) {
         this.system = system;

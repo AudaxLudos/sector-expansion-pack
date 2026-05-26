@@ -63,10 +63,10 @@ public class AcquisitionRaidManager extends BaseEventManager {
         if (target != null) {
             specialItem = pickSpecialItem(null, source, target);
         }
-        AcquisitionRaidIntel event = null;
+        AcquisitionRaidIntelV2 event = null;
         if (source != null && target != null && specialItem != null) {
             if (source.getStarSystem() != null) {
-                event = new AcquisitionRaidIntel(source, target, specialItem);
+                event = new AcquisitionRaidIntelV2(source, target, specialItem);
             }
         }
         if (event != null && event.isDone()) {
@@ -89,7 +89,7 @@ public class AcquisitionRaidManager extends BaseEventManager {
         this.efm.resetSearch();
         this.efm.requireMarketNotHidden();
         this.efm.requireMarketFactionNotPlayer();
-        this.efm.requireMarketFactionNoMemoryFlag(AcquisitionRaidIntel.SOURCE_KEY);
+        this.efm.requireMarketFactionNoMemoryFlag(AcquisitionRaidIntelV2.SOURCE_KEY);
         this.efm.preferMarketMilitary();
         return this.efm.pickMarket();
     }
@@ -100,7 +100,7 @@ public class AcquisitionRaidManager extends BaseEventManager {
         this.efm.requireMarketNotHidden();
         this.efm.requireMarketFactionNot(other.getFactionId());
         this.efm.requireMarketFactionNotPlayer();
-        this.efm.requireMarketNoMemoryFlag(AcquisitionRaidIntel.TARGET_KEY);
+        this.efm.requireMarketNoMemoryFlag(AcquisitionRaidIntelV2.TARGET_KEY);
         this.efm.requireMarketHasCompatibleSpecialItemsWithOther(other);
         return this.efm.pickMarket();
     }

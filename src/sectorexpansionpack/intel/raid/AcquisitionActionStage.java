@@ -20,10 +20,14 @@ import com.fs.starfarer.api.util.Misc;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * @deprecated
+ */
+@Deprecated(forRemoval = true)
 public class AcquisitionActionStage extends ActionStage implements BaseAssignmentAI.FleetActionDelegate {
-    protected AcquisitionRaidIntel acquisitionIntel;
-    protected List<MilitaryResponseScript> scripts = new ArrayList<>();
-    protected MarketAPI target;
+    protected final AcquisitionRaidIntel acquisitionIntel;
+    protected final List<MilitaryResponseScript> scripts = new ArrayList<>();
+    protected final MarketAPI target;
     protected boolean sentOrders = false;
 
     public AcquisitionActionStage(RaidIntel raid, MarketAPI target, float durDays) {

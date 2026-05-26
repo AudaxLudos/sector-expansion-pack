@@ -5,6 +5,10 @@ import com.fs.starfarer.api.impl.campaign.intel.raid.ActionStage;
 import com.fs.starfarer.api.impl.campaign.intel.raid.RaidIntel;
 import com.fs.starfarer.api.ui.TooltipMakerAPI;
 
+/**
+ * @deprecated
+ */
+@Deprecated(forRemoval = true)
 public class AcquisitionReturnStage extends AcquisitionTravelStage {
     public AcquisitionReturnStage(RaidIntel raid, SectorEntityToken from, SectorEntityToken to, boolean requireNearTarget) {
         super(raid, from, to, requireNearTarget);

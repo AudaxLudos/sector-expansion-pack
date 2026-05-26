@@ -19,9 +19,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AcquisitionActionStageV2 extends ActionStage implements ActionAssignmentAI.SEPFleetActionDelegate {
-    protected AcquisitionRaidIntelV2 acquisitionIntel;
-    protected List<MilitaryResponseScript> scripts = new ArrayList<>();
-    protected MarketAPI target;
+    protected final AcquisitionRaidIntelV2 acquisitionIntel;
+    protected final List<MilitaryResponseScript> scripts = new ArrayList<>();
+    protected final MarketAPI target;
     protected boolean sentOrders = false;
 
     public AcquisitionActionStageV2(RaidIntel raid, MarketAPI target, float durDays) {

@@ -15,12 +15,9 @@ import com.fs.starfarer.api.impl.campaign.intel.raid.RaidAssignmentAI;
 import com.fs.starfarer.api.util.Misc;
 
 /**
- * Replaces the colony action script for a single target.
- * AI will try to clear out the system before doing raid action.
- * May need to replace that functionality with a no wander AI.
- * Current implementation works but high chance of the raid
- * failing due to raid not taking actions in time
+ * @deprecated
  */
+@Deprecated(forRemoval = true)
 public class AcquisitionAssignmentAI extends RaidAssignmentAI {
     public AcquisitionAssignmentAI(CampaignFleetAPI fleet, RouteManager.RouteData route, FleetActionDelegate delegate) {
         super(fleet, route, delegate);

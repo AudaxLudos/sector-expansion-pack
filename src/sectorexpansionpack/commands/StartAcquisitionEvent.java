@@ -11,7 +11,7 @@ import org.lazywizard.console.BaseCommandWithSuggestion;
 import org.lazywizard.console.CommandUtils;
 import org.lazywizard.console.Console;
 import sectorexpansionpack.Settings;
-import sectorexpansionpack.intel.raid.AcquisitionRaidIntel;
+import sectorexpansionpack.intel.raid.AcquisitionRaidIntelV2;
 import sectorexpansionpack.missions.EntityFinderMission;
 
 import java.util.ArrayList;
@@ -91,7 +91,7 @@ public class StartAcquisitionEvent implements BaseCommandWithSuggestion {
         }
 
 
-        new AcquisitionRaidIntel(sourceM, targetM, specialItem);
+        new AcquisitionRaidIntelV2(sourceM, targetM, specialItem);
 
         return CommandResult.SUCCESS;
     }

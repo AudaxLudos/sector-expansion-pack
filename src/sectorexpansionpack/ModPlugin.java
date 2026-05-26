@@ -14,7 +14,6 @@ import sectorexpansionpack.ghosts.types.StormInducerGhostCreator;
 import sectorexpansionpack.ghosts.types.StormPacifierGhostCreator;
 import sectorexpansionpack.intel.ClearDebrisFieldsIntelCreator;
 import sectorexpansionpack.intel.ConstructObjectiveIntelCreator;
-import sectorexpansionpack.intel.ExpeditionFleetManager;
 import sectorexpansionpack.intel.raid.AcquisitionRaidManager;
 import sectorexpansionpack.intel.raid.ExcavationRaidManager;
 import sectorexpansionpack.listeners.MatrixCatalystBlueprintAdder;

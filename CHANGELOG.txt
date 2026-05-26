@@ -46,7 +46,7 @@
 - Make escort fleet jump AI more responsive
 - Increase escorted fleet burn speed to 20
 - Increase credit reward based on distance to target in fleet escort missions
-- Fix crash due to topgraphic intel not existing
+- Fix crash due to topographic intel not existing
 
 ### 0.2.0-alpha (384)
 - Add matrix catalyst industry

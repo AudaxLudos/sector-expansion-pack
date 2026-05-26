@@ -18,9 +18,9 @@ import org.lwjgl.util.vector.Vector2f;
 public class ActionAssignmentAI extends RouteFleetAssignmentAI implements FleetActionTextProvider {
     public static final String RECENTLY_ACTED_KEY = "$sep_eri_recentlyActedAnAction";
     public static final String RECENTLY_AFFECTED_KEY = "$sep_eri_recentlyAffectedByAction";
+    protected final SEPFleetActionDelegate delegate;
     protected IntervalUtil assistTracker;
     protected IntervalUtil actionTracker;
-    protected SEPFleetActionDelegate delegate;
     protected boolean captureObjectives = false;
 
     public ActionAssignmentAI(CampaignFleetAPI fleet, RouteManager.RouteData route, SEPFleetActionDelegate delegate, boolean captureObjectives) {

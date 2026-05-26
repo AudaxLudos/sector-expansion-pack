@@ -1,8 +1,10 @@
 package sectorexpansionpack.intel.raid;
 
-import com.fs.starfarer.api.campaign.*;
+import com.fs.starfarer.api.campaign.CampaignFleetAPI;
+import com.fs.starfarer.api.campaign.FactionAPI;
+import com.fs.starfarer.api.campaign.FactionDoctrineAPI;
+import com.fs.starfarer.api.campaign.StarSystemAPI;
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
-import com.fs.starfarer.api.campaign.rules.MemoryAPI;
 import com.fs.starfarer.api.impl.campaign.fleets.FleetFactoryV3;
 import com.fs.starfarer.api.impl.campaign.fleets.FleetParamsV3;
 import com.fs.starfarer.api.impl.campaign.fleets.RouteLocationCalculator;
@@ -11,19 +13,14 @@ import com.fs.starfarer.api.impl.campaign.ids.Factions;
 import com.fs.starfarer.api.impl.campaign.ids.FleetTypes;
 import com.fs.starfarer.api.impl.campaign.ids.MemFlags;
 import com.fs.starfarer.api.impl.campaign.ids.Ranks;
-import com.fs.starfarer.api.impl.campaign.intel.raid.ActionStage;
-import com.fs.starfarer.api.impl.campaign.intel.raid.AssembleStage;
-import com.fs.starfarer.api.impl.campaign.intel.raid.BaseRaidStage;
-import com.fs.starfarer.api.impl.campaign.intel.raid.OrganizeStage;
-import com.fs.starfarer.api.impl.campaign.intel.raid.RaidIntel;
-import com.fs.starfarer.api.impl.campaign.intel.raid.TravelStage;
+import com.fs.starfarer.api.impl.campaign.intel.raid.*;
 import com.fs.starfarer.api.impl.campaign.procgen.themes.RouteFleetAssignmentAI;
 import com.fs.starfarer.api.ui.Alignment;
 import com.fs.starfarer.api.ui.TooltipMakerAPI;
 import com.fs.starfarer.api.util.Misc;
 import org.lwjgl.util.vector.Vector2f;
 
-import java.awt.Color;
+import java.awt.*;
 import java.util.List;
 import java.util.Random;
 
@@ -186,7 +183,7 @@ public abstract class GenericExpeditionIntel extends RaidIntel implements Generi
         Object param = getListInfoParam();
         boolean isUpdate = param != null;
 
-        addBulletPointsBeforeUpdate();
+        addBulletPointsBeforeUpdate(info, tc, param, mode, initPad);
 
         if (!isUpdate) {
             addNonUpdateBulletPoints(info, tc, param, mode, initPad);
@@ -196,7 +193,7 @@ public abstract class GenericExpeditionIntel extends RaidIntel implements Generi
         unindent(info);
     }
 
-    public void addBulletPointsBeforeUpdate() {
+    public void addBulletPointsBeforeUpdate(TooltipMakerAPI info, Color tc, Object param, ListInfoMode mode, float initPad) {
     }
 
     public void addNonUpdateBulletPoints(TooltipMakerAPI info, Color tc, Object param, ListInfoMode mode, float initPad) {

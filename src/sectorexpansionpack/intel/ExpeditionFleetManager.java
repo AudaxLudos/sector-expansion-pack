@@ -5,6 +5,10 @@ import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.impl.campaign.intel.BaseEventManager;
 import sectorexpansionpack.Settings;
 
+/**
+ * @deprecated
+ */
+@Deprecated(forRemoval = true)
 public class ExpeditionFleetManager extends BaseEventManager {
     public static final String KEY = "$sep_core_artifactExpeditionManager";
     protected int counter = 0;

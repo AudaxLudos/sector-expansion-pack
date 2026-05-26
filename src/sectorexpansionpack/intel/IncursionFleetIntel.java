@@ -31,6 +31,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+/**
+ * @deprecated
+ */
+@Deprecated(forRemoval = true)
 public class IncursionFleetIntel extends GenericRaidFGI {
     public static final String EVENT_KEY = "$sep_ifi_ref";
     public static final String FACTION_KEY = "$sep_ifi_sourceFaction";

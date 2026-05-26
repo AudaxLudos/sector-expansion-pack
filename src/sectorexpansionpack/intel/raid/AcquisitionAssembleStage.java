@@ -11,8 +11,12 @@ import com.fs.starfarer.api.impl.campaign.missions.hub.BaseHubMission;
 import com.fs.starfarer.api.ui.TooltipMakerAPI;
 import com.fs.starfarer.api.util.Misc;
 
+/**
+ * @deprecated
+ */
+@Deprecated(forRemoval = true)
 public class AcquisitionAssembleStage extends AssembleStage {
-    protected AcquisitionRaidIntel acquisitionIntel;
+    protected final AcquisitionRaidIntel acquisitionIntel;
     protected float prepDays;
     protected float travelDays;
 

@@ -477,11 +477,11 @@ public class FleetEscortMission extends SEPHubMissionWithScenario {
     }
 
     public static class RunContinuousScriptAfterDelay implements MissionTrigger.TriggerAction, EveryFrameScript {
+        protected final Script script;
+        protected final Set<Object> stages = new HashSet<>();
         protected boolean done = false;
         protected BaseHubMission mission;
         protected float delay;
-        protected Script script;
-        protected Set<Object> stages = new HashSet<>();
 
         public RunContinuousScriptAfterDelay(float delay, Script script, Object... stages) {
             this.delay = delay;

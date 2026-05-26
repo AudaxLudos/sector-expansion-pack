@@ -12,8 +12,8 @@ import com.fs.starfarer.api.util.Misc;
 import java.util.List;
 
 public class ExcavationActionStage extends ActionStage implements ActionAssignmentAI.SEPFleetActionDelegate {
-    protected Object delegate;
-    protected SectorEntityToken target;
+    protected final Object delegate;
+    protected final SectorEntityToken target;
 
     public ExcavationActionStage(RaidIntel raid, SectorEntityToken target, float durDays) {
         super(raid);

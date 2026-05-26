@@ -31,6 +31,10 @@ import java.awt.*;
 import java.util.*;
 import java.util.List;
 
+/**
+ * @deprecated
+ */
+@Deprecated(forRemoval = true)
 public class AcquisitionRaidIntel extends RaidIntel {
     public static final String SOURCE_KEY = "$sep_ari_source";
     public static final String TARGET_KEY = "$sep_ari_target";
@@ -40,13 +44,13 @@ public class AcquisitionRaidIntel extends RaidIntel {
     public static final String HAS_SPECIAL_ITEM_KEY = "$sep_ari_hasSpecialItem";
     public static final String HAS_SPECIAL_ITEM_REASON = "sep_ari_hasSpecialItem";
     public static final Logger log = Global.getLogger(AcquisitionRaidIntel.class);
-    public static Object RETURNED_UPDATE = new Object();
+    public static final Object RETURNED_UPDATE = new Object();
+    protected final MarketAPI source;
+    protected final MarketAPI target;
+    protected final FactionAPI targetFaction;
+    protected final SpecialItemSpecAPI specialItem;
+    protected final Random random;
     protected AcquisitionOutcome outcome;
-    protected MarketAPI source;
-    protected MarketAPI target;
-    protected FactionAPI targetFaction;
-    protected SpecialItemSpecAPI specialItem;
-    protected Random random;
     protected boolean specialItemGiven = false;
 
     public AcquisitionRaidIntel(MarketAPI source, MarketAPI target, SpecialItemSpecAPI specialItem) {

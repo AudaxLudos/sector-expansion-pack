@@ -26,14 +26,14 @@ import java.util.Map;
 import java.util.Set;
 
 public class ClearDebrisFieldsMissionIntel extends BaseMissionIntel {
-    public static Logger log = Global.getLogger(ClearDebrisFieldsMissionIntel.class);
-    protected MarketAPI market;
+    public static final Logger log = Global.getLogger(ClearDebrisFieldsMissionIntel.class);
+    protected final MarketAPI market;
+    protected final List<SectorEntityToken> debrisFields = new ArrayList<>();
     protected StarSystemAPI system;
     protected FactionAPI faction;
     protected int reward;
     protected int numDebris;
     protected int clearedDebris = 0;
-    protected List<SectorEntityToken> debrisFields = new ArrayList<>();
 
     public ClearDebrisFieldsMissionIntel(MarketAPI market) {
         this.market = market;

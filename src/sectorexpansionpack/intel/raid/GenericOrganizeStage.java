@@ -6,7 +6,7 @@ import com.fs.starfarer.api.impl.campaign.intel.raid.RaidIntel;
 import com.fs.starfarer.api.ui.TooltipMakerAPI;
 
 public class GenericOrganizeStage extends OrganizeStage {
-    protected Object delegate;
+    protected final Object delegate;
 
     public GenericOrganizeStage(RaidIntel raid, MarketAPI market, float durDays) {
         super(raid, market, durDays);

@@ -5,8 +5,12 @@ import com.fs.starfarer.api.impl.campaign.intel.raid.RaidIntel;
 import com.fs.starfarer.api.impl.campaign.intel.raid.TravelStage;
 import com.fs.starfarer.api.ui.TooltipMakerAPI;
 
+/**
+ * @deprecated
+ */
+@Deprecated(forRemoval = true)
 public class AcquisitionTravelStage extends TravelStage {
-    protected AcquisitionRaidIntel acquisitionIntel;
+    protected final AcquisitionRaidIntel acquisitionIntel;
 
     public AcquisitionTravelStage(RaidIntel raid, SectorEntityToken from, SectorEntityToken to, boolean requireNearTarget) {
         super(raid, from, to, requireNearTarget);

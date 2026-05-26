@@ -25,9 +25,9 @@ public class ExcavationRaidManager extends BaseEventManager {
         Global.getSector().getMemoryWithoutUpdate().set(KEY, this);
     }
 
-    public static ExcavationRaidManager getInstance() {
+    public static ExcavationRaidIntelV2 getInstance() {
         Object test = Global.getSector().getMemoryWithoutUpdate().get(KEY);
-        return (ExcavationRaidManager) test;
+        return (ExcavationRaidIntelV2) test;
     }
 
     protected Object readResolve() {
@@ -63,9 +63,9 @@ public class ExcavationRaidManager extends BaseEventManager {
             specialItem = pickSpecialItem(source);
         }
 
-        ExcavationRaidIntel event = null;
+        ExcavationRaidIntelV2 event = null;
         if (source != null && target != null && specialItem != null) {
-            event = new ExcavationRaidIntel(source, target, specialItem);
+            event = new ExcavationRaidIntelV2(source, target, specialItem);
         }
 
         if (event != null && event.isDone()) {
@@ -88,15 +88,15 @@ public class ExcavationRaidManager extends BaseEventManager {
         this.efm.resetSearch();
         this.efm.requireMarketNotHidden();
         this.efm.requireMarketFactionNotPlayer();
-        this.efm.requireMarketFactionNoMemoryFlag(ExcavationRaidIntel.SOURCE_KEY);
+        this.efm.requireMarketFactionNoMemoryFlag(ExcavationRaidIntelV2.SOURCE_KEY);
         this.efm.preferMarketMilitary();
         return this.efm.pickMarket();
     }
 
     protected SectorEntityToken pickTarget() {
         this.efm.resetSearch();
-        if (this.efm.rollProbability(ExcavationRaidIntel.WRECK_CHANCE)) {
-            this.efm.requireEntityNoMemoryFlag(ExcavationRaidIntel.TARGET_KEY);
+        if (this.efm.rollProbability(ExcavationRaidIntelV2.WRECK_CHANCE)) {
+            this.efm.requireEntityNoMemoryFlag(ExcavationRaidIntelV2.TARGET_KEY);
             this.efm.requireEntityNoSpecialSalvage();
             this.efm.requireEntityType(Entities.WRECK);
             this.efm.preferEntityInDirectionOfOtherMissions();
@@ -104,7 +104,7 @@ public class ExcavationRaidManager extends BaseEventManager {
             return this.efm.pickEntity();
         }
 
-        this.efm.requirePlanetNoMemoryFlag(ExcavationRaidIntel.TARGET_KEY);
+        this.efm.requirePlanetNoMemoryFlag(ExcavationRaidIntelV2.TARGET_KEY);
         this.efm.requirePlanetWithRuins();
         this.efm.requirePlanetUnexploredRuins();
         this.efm.preferPlanetInDirectionOfOtherMissions();

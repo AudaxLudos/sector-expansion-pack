@@ -6,7 +6,7 @@ import com.fs.starfarer.api.impl.campaign.intel.raid.TravelStage;
 import com.fs.starfarer.api.ui.TooltipMakerAPI;
 
 public class GenericTravelStage extends TravelStage {
-    protected Object delegate;
+    protected final Object delegate;
 
     public GenericTravelStage(RaidIntel raid, SectorEntityToken from, SectorEntityToken to, boolean requireNearTarget) {
         super(raid, from, to, requireNearTarget);
