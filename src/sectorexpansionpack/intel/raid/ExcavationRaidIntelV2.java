@@ -143,7 +143,7 @@ public class ExcavationRaidIntelV2 extends GenericExpeditionIntel {
         }
 
         if (!this.leaked && !(stage instanceof GenericReturnStage)) {
-            if (Utils.rollProbability(this.leakChance)) {
+            if (this.random.nextFloat() < this.leakChance) {
                 this.leaked = true;
 
                 if (this.source.getStarSystem() != null) {
