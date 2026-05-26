@@ -11,8 +11,6 @@ import com.fs.starfarer.api.util.WeightedRandomPicker;
 import sectorexpansionpack.Settings;
 import sectorexpansionpack.missions.EntityFinderMission;
 
-import java.util.Objects;
-
 public class AcquisitionRaidManager extends BaseEventManager {
     public static final String KEY = "$sep_core_acquisitionRaidManager";
     protected EntityFinderMission efm;
@@ -54,21 +52,18 @@ public class AcquisitionRaidManager extends BaseEventManager {
 
     @Override
     protected EveryFrameScript createEvent() {
-        MarketAPI source = pickSource();
-        MarketAPI target = null;
-        if (source != null) {
-            target = pickTargetWithCompatibleSpecialItems(source);
-        }
-        SpecialItemSpecAPI specialItem = null;
-        if (target != null) {
-            specialItem = pickSpecialItem(null, source, target);
-        }
         AcquisitionRaidIntelV2 event = null;
-        if (source != null && target != null && specialItem != null) {
-            if (source.getStarSystem() != null) {
-                event = new AcquisitionRaidIntelV2(source, target, specialItem);
+        MarketAPI source = pickSource();
+        if (source != null && source.getStarSystem() != null) {
+            MarketAPI target = pickTargetWithCompatibleSpecialItems(source);
+            if (target != null && target.getStarSystem() != null) {
+                SpecialItemSpecAPI specialItem = pickSpecialItem(target, source);
+                if (specialItem != null) {
+                    event = new AcquisitionRaidIntelV2(source, target, specialItem);
+                }
             }
         }
+
         if (event != null && event.isDone()) {
             event = null;
         }
@@ -105,17 +100,14 @@ public class AcquisitionRaidManager extends BaseEventManager {
         return this.efm.pickMarket();
     }
 
-    public SpecialItemSpecAPI pickSpecialItem(String specialItemId, MarketAPI source, MarketAPI target) {
+    public SpecialItemSpecAPI pickSpecialItem(MarketAPI from, MarketAPI to) {
         WeightedRandomPicker<SpecialItemData> picker = new WeightedRandomPicker<>();
-        for (Industry targetInd : target.getIndustries()) {
+        for (Industry targetInd : from.getIndustries()) {
             SpecialItemData otherData = targetInd.getSpecialItem();
             if (otherData != null) {
-                for (Industry ind : source.getIndustries()) {
+                for (Industry ind : to.getIndustries()) {
                     if (!Settings.COLONY_ITEM_WHITELIST.contains(otherData.getId())) {
                         continue;
-                    }
-                    if (Objects.equals(otherData.getId(), specialItemId)) {
-                        return Global.getSettings().getSpecialItemSpec(otherData.getId());
                     }
                     if (ind.wantsToUseSpecialItem(otherData)) {
                         picker.add(otherData);

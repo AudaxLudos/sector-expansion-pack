@@ -55,17 +55,16 @@ public class ExcavationRaidManager extends BaseEventManager {
 
     @Override
     protected EveryFrameScript createEvent() {
-        MarketAPI source = pickSource();
-        SectorEntityToken target = pickTarget();
-
-        SpecialItemSpecAPI specialItem = null;
-        if (source != null) {
-            specialItem = pickSpecialItem(source);
-        }
-
         ExcavationRaidIntelV2 event = null;
-        if (source != null && target != null && specialItem != null) {
-            event = new ExcavationRaidIntelV2(source, target, specialItem);
+        MarketAPI source = pickSource();
+        if (source != null && source.getStarSystem() != null) {
+            SectorEntityToken target = pickTarget();
+            if (target != null && target.getStarSystem() != null) {
+                SpecialItemSpecAPI specialItem = pickSpecialItem(source);
+                if (specialItem != null) {
+                    event = new ExcavationRaidIntelV2(source, target, specialItem);
+                }
+            }
         }
 
         if (event != null && event.isDone()) {

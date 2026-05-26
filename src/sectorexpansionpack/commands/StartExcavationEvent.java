@@ -15,7 +15,6 @@ import org.lazywizard.console.CommandUtils;
 import org.lazywizard.console.Console;
 import sectorexpansionpack.Settings;
 import sectorexpansionpack.Utils;
-import sectorexpansionpack.intel.raid.ExcavationRaidIntel;
 import sectorexpansionpack.intel.raid.ExcavationRaidIntelV2;
 import sectorexpansionpack.missions.EntityFinderMission;
 
