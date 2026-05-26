@@ -249,13 +249,25 @@ public class AcquisitionRaidIntelV2 extends GenericExpeditionIntel {
                 } else if (!unsafe.isEmpty()) {
                     String isOrAre = unsafe.size() == 1 ? "is" : "are";
                     String colonyNoun = unsafe.size() == 1 ? "colony " : "colonies ";
-                    String riskTxt = isOrAre + " at risk of losing a used special item:";
-                    info.addPara("The following " + colonyNoun + riskTxt, opad, bad, "losing a used special item");
+                    String riskTxt = isOrAre + " at risk of losing a used artifact:";
+                    info.addPara("The following " + colonyNoun + riskTxt, opad, bad, "losing a used artifact");
                     FactionAPI f = Global.getSector().getPlayerFaction();
                     addMarketTable(info, f.getBaseUIColor(), f.getDarkUIColor(), f.getBrightUIColor(), unsafe, width, opad);
                 }
             }
         }
+    }
+
+    @Override
+    public float addBulletPointsBeforeUpdate(TooltipMakerAPI info, Color tc, Object param, ListInfoMode mode, float initPad) {
+        float pad = initPad;
+
+        if (this.outcome == null && mode != ListInfoMode.IN_DESC) {
+            info.addPara("Target: " + this.targetFaction.getDisplayName(), pad, tc, this.targetFaction.getBaseUIColor(), this.targetFaction.getDisplayName());
+            pad = 0f;
+        }
+
+        return pad;
     }
 
     @Override
@@ -272,10 +284,6 @@ public class AcquisitionRaidIntelV2 extends GenericExpeditionIntel {
         float etaTravel = getETAAtStage(GenericTravelStage.class) + etaAssemble;
         float etaReturn = getETAAtStage(GenericReturnStage.class);
 
-        if (mode != ListInfoMode.IN_DESC) {
-            info.addPara("Target: " + this.targetFaction.getDisplayName(), initPad, tc, this.targetFaction.getBaseUIColor(), this.targetFaction.getDisplayName());
-            initPad = 0f;
-        }
         if (etaAssemble > 0 || stage.getClass() == GenericAssembleStage.class && stage.getStatus() == RaidStageStatus.ONGOING) {
             if ((int) etaAssemble <= 0f) {
                 info.addPara("Departure imminent", tc, initPad);
@@ -307,14 +315,6 @@ public class AcquisitionRaidIntelV2 extends GenericExpeditionIntel {
                 info.addPara("Estimated %s " + days + " until return to " + this.source.getStarSystem().getNameWithLowercaseTypeShort(),
                         initPad, tc, h, "" + (int) etaReturn);
             }
-        }
-    }
-
-    @Override
-    public void addBulletPointsBeforeUpdate(TooltipMakerAPI info, Color tc, Object param, ListInfoMode mode, float initPad) {
-        if (this.outcome == null && mode != ListInfoMode.IN_DESC) {
-            info.addPara("Target: " + this.targetFaction.getDisplayName(), initPad, tc, this.targetFaction.getBaseUIColor(), this.targetFaction.getDisplayName());
-            initPad = 0f;
         }
     }
 

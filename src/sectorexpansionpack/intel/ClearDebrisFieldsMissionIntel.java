@@ -260,8 +260,7 @@ public class ClearDebrisFieldsMissionIntel extends BaseMissionIntel {
 
                 if (this.missionResult.rep1 != null) {
                     CoreReputationPlugin.addAdjustmentMessage(this.missionResult.rep1.delta, this.faction, null,
-                            null, null, info, tc, isUpdate, initPad);
-                    initPad = 0f;
+                            null, null, info, tc, false, initPad);
                 }
             } else {
                 float betweenPad = 0f;

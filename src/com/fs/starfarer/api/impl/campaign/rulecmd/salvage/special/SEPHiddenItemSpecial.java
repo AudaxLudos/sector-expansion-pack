@@ -45,12 +45,12 @@ public class SEPHiddenItemSpecial extends BaseSalvageSpecial {
             Misc.makeUnimportant(this.entity, ExcavationRaidIntel.HAS_ARTIFACT_REASON);
             this.entity.getMemoryWithoutUpdate().unset(ExcavationRaidIntel.TARGET_KEY);
             this.entity.getMemoryWithoutUpdate().unset(ExcavationRaidIntel.EVENT_KEY);
-        } else if (this.entity.getMemoryWithoutUpdate().get(ExcavationRaidIntel.EVENT_KEY) instanceof ExcavationRaidIntelV2 intel) {
+        } else if (this.entity.getMemoryWithoutUpdate().get(ExcavationRaidIntelV2.EVENT_KEY) instanceof ExcavationRaidIntelV2 intel) {
             intel.setOutcome(GenericExpeditionIntel.Outcome.FAILED);
             intel.forceFail(true);
-            Misc.makeUnimportant(this.entity, ExcavationRaidIntel.HAS_ARTIFACT_REASON);
-            this.entity.getMemoryWithoutUpdate().unset(ExcavationRaidIntel.TARGET_KEY);
-            this.entity.getMemoryWithoutUpdate().unset(ExcavationRaidIntel.EVENT_KEY);
+            Misc.makeUnimportant(this.entity, ExcavationRaidIntelV2.HAS_ARTIFACT_REASON);
+            this.entity.getMemoryWithoutUpdate().unset(ExcavationRaidIntelV2.TARGET_KEY);
+            this.entity.getMemoryWithoutUpdate().unset(ExcavationRaidIntelV2.EVENT_KEY);
         }
 
         SpecialItemData specialItemData = new SpecialItemData(this.data.specialItemId, null);

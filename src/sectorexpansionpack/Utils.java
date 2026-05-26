@@ -28,6 +28,7 @@ public class Utils {
         return random.nextFloat() >= p;
     }
 
+    @Deprecated(forRemoval = true)
     public static boolean rollProbability(Random random, float p) {
         return random.nextFloat() >= p;
     }
@@ -104,7 +105,7 @@ public class Utils {
     }
 
     public static List<JumpPointAPI> getHyperspaceJumpPoints(StarSystemAPI system) {
-        List<JumpPointAPI> results = new ArrayList<JumpPointAPI>();
+        List<JumpPointAPI> results = new ArrayList<>();
         for (SectorEntityToken entity : Global.getSector().getHyperspace().getEntitiesWithTag(Tags.JUMP_POINT)) {
             JumpPointAPI jumpPoint = (JumpPointAPI) entity;
             if (jumpPoint.getDestinationStarSystem() == system) {
@@ -176,7 +177,7 @@ public class Utils {
      */
     public static float getSpecialItemsDesireMult(String factionId) {
         int totalColonyItemsUsed = 0;
-        Map<String, Integer> itemsUsedPerFaction = new HashMap<String, Integer>(); // will include hidden or dead factions
+        Map<String, Integer> itemsUsedPerFaction = new HashMap<>(); // will include hidden or dead factions
         for (FactionAPI faction : Global.getSector().getAllFactions()) {
             int itemsUsedByFaction = 0;
             for (MarketAPI market : Misc.getFactionMarkets(faction)) {

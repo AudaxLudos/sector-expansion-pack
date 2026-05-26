@@ -183,17 +183,18 @@ public abstract class GenericExpeditionIntel extends RaidIntel implements Generi
         Object param = getListInfoParam();
         boolean isUpdate = param != null;
 
-        addBulletPointsBeforeUpdate(info, tc, param, mode, initPad);
+        initPad = addBulletPointsBeforeUpdate(info, tc, param, mode, initPad);
 
         if (!isUpdate) {
-            addNonUpdateBulletPoints(info, tc, param, mode, initPad);
+            addNonUpdateBulletPoints(info, tc, null, mode, initPad);
         } else {
             addUpdateBulletPoints(info, tc, param, mode, initPad);
         }
         unindent(info);
     }
 
-    public void addBulletPointsBeforeUpdate(TooltipMakerAPI info, Color tc, Object param, ListInfoMode mode, float initPad) {
+    public float addBulletPointsBeforeUpdate(TooltipMakerAPI info, Color tc, Object param, ListInfoMode mode, float initPad) {
+        return initPad;
     }
 
     public void addNonUpdateBulletPoints(TooltipMakerAPI info, Color tc, Object param, ListInfoMode mode, float initPad) {
@@ -434,7 +435,6 @@ public abstract class GenericExpeditionIntel extends RaidIntel implements Generi
 
         if (remainingFP < getFPSmall() * 0.5f) {
             base += remainingFP;
-            remainingFP = 0f;
         }
 
         return base;

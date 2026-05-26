@@ -25,9 +25,9 @@ public class ExcavationRaidManager extends BaseEventManager {
         Global.getSector().getMemoryWithoutUpdate().set(KEY, this);
     }
 
-    public static ExcavationRaidIntelV2 getInstance() {
+    public static ExcavationRaidManager getInstance() {
         Object test = Global.getSector().getMemoryWithoutUpdate().get(KEY);
-        return (ExcavationRaidIntelV2) test;
+        return (ExcavationRaidManager) test;
     }
 
     protected Object readResolve() {

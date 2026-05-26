@@ -178,11 +178,7 @@ public class MatrixCatalystDialogDelegate extends BaseCustomDialogDelegate imple
                 Misc.getStorageCargo(this.market).removeCommodity(data.recipe.ingredientItemId, marketStorageIngredientCount);
                 needIngredientCount -= marketStorageIngredientCount;
             }
-            if (playerStorageIngredientCount > needIngredientCount) {
-                Global.getSector().getPlayerFleet().getCargo().removeCommodity(data.recipe.ingredientItemId, needIngredientCount);
-            } else {
-                Global.getSector().getPlayerFleet().getCargo().removeCommodity(data.recipe.ingredientItemId, playerStorageIngredientCount);
-            }
+            Global.getSector().getPlayerFleet().getCargo().removeCommodity(data.recipe.ingredientItemId, Math.min(playerStorageIngredientCount, needIngredientCount));
 
             if (!sendToStorage) {
                 Global.getSector().getPlayerFleet().getCargo().addCommodity(data.recipe.resultItemId, data.doCount * data.recipe.resultItemCount);

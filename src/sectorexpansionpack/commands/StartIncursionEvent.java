@@ -12,6 +12,10 @@ import sectorexpansionpack.intel.IncursionFleetIntel;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * @deprecated
+ */
+@Deprecated(forRemoval = true)
 public class StartIncursionEvent implements BaseCommandWithSuggestion {
     @Override
     public List<String> getSuggestions(int i, List<String> prevSuggestions, CommandContext context) {

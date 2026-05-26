@@ -32,6 +32,10 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Random;
 
+/**
+ * @deprecated
+ */
+@Deprecated(forRemoval = true)
 public class ExcavationRaidIntel extends RaidIntel implements GenericOrganizeStage.ShowStageInfoDelegate, GenericAssembleStage.AssembleStageDelegate {
     public static final float WRECK_CHANCE = 0.5f;
     public static final String SOURCE_KEY = "$sep_eri_source";

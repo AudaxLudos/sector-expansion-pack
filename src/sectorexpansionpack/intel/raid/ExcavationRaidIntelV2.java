@@ -33,7 +33,7 @@ public class ExcavationRaidIntelV2 extends GenericExpeditionIntel {
     public static final String FLEET_DEFEAT_TRIGGER = "SEPERIFleetDefeated";
     public static final String HAS_ARTIFACT_KEY = "$sep_eri_hasArtifact";
     public static final String HAS_ARTIFACT_REASON = "sep_eri";
-    public static final Logger log = Global.getLogger(ExcavationRaidIntel.class);
+    public static final Logger log = Global.getLogger(ExcavationRaidIntelV2.class);
     public static final Object RETURNED_UPDATE = new Object();
 
     protected final MarketAPI source;

@@ -16,6 +16,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * @deprecated
+ */
+@Deprecated(forRemoval = true)
 public class LeakedArtifactLocationIntel extends BaseIntelPlugin {
     protected final String actionId;
     protected final MarketAPI source;

@@ -101,15 +101,15 @@ public class StartExcavationEvent implements BaseCommandWithSuggestion {
     protected SectorEntityToken pickTarget(MarketAPI source) {
         EntityFinderMission efm = new EntityFinderMission();
         efm.requireSystemWithinRangeOf(source.getLocation(), 15);
-        if (efm.rollProbability(ExcavationRaidIntel.WRECK_CHANCE)) {
-            efm.requireEntityNoMemoryFlag(ExcavationRaidIntel.TARGET_KEY);
+        if (efm.rollProbability(ExcavationRaidIntelV2.WRECK_CHANCE)) {
+            efm.requireEntityNoMemoryFlag(ExcavationRaidIntelV2.TARGET_KEY);
             efm.requireEntityNoSpecialSalvage();
             efm.requireEntityType(Entities.WRECK);
             efm.preferEntityInDirectionOfOtherMissions();
             efm.preferEntityUndiscovered();
             return efm.pickEntity();
         } else {
-            efm.requirePlanetNoMemoryFlag(ExcavationRaidIntel.TARGET_KEY);
+            efm.requirePlanetNoMemoryFlag(ExcavationRaidIntelV2.TARGET_KEY);
             efm.requirePlanetWithRuins();
             efm.requirePlanetUnexploredRuins();
             efm.preferPlanetInDirectionOfOtherMissions();
