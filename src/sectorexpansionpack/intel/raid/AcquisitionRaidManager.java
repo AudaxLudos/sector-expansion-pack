@@ -65,7 +65,9 @@ public class AcquisitionRaidManager extends BaseEventManager {
         }
         AcquisitionRaidIntel event = null;
         if (source != null && target != null && specialItem != null) {
-            event = new AcquisitionRaidIntel(source, target, specialItem);
+            if (source.getStarSystem() != null) {
+                event = new AcquisitionRaidIntel(source, target, specialItem);
+            }
         }
         if (event != null && event.isDone()) {
             event = null;
