@@ -1,3 +1,15 @@
+### 0.2.94-alpha
+- Fix leak chance being higher than normal for excavation raid intel v2
+- Update acquisition raid intel implementation
+- Relace expedition fleet intel with excavation raid intel
+- Add excavation intel
+- Add icon for clear debris fields intel mission
+- Add icon for construct objectives intel mission
+- Reveal all debris in clear debris fields intel mission on accepted
+- Increase construct objective intel mission frequency
+- Increase clear debris field intel mission frequency
+- Fix stat description of tech familiarity purist skill
+
 ### 0.2.68-alpha
 - Fix source system null crash for acquisition raid intel v1
 
