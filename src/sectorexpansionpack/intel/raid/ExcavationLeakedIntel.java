@@ -36,14 +36,21 @@ public class ExcavationLeakedIntel extends BaseIntelPlugin {
         this.intel = intel;
         this.queuedTimestamp = Global.getSector().getClock().getTimestamp();
 
+        Global.getSector().addScript(this);
         Global.getSector().getIntelManager().queueIntel(this);
     }
 
     @Override
     protected void advanceImpl(float amount) {
-        if (this.intel.isEnding()) {
+        if (this.intel == null || this.intel.isEnding() || this.intel.isEnded()) {
             endAfterDelay();
         }
+    }
+
+    @Override
+    protected void notifyEnded() {
+        super.notifyEnded();
+        Global.getSector().removeScript(this);
     }
 
     @Override
@@ -59,6 +66,9 @@ public class ExcavationLeakedIntel extends BaseIntelPlugin {
         addBasicDescription(info, width, height);
         addDetailsSection(info, width, height);
         addCreatedTimestamp(info, tc, opad);
+        if (this.intel == null || this.intel.isEnding() || this.intel.isEnded()) {
+            addDeleteButton(info, width);
+        }
     }
 
     public void addBasicDescription(TooltipMakerAPI info, float width, float height) {
@@ -148,6 +158,11 @@ public class ExcavationLeakedIntel extends BaseIntelPlugin {
             agoStr += " and " + months + " " + (months == 1 ? "month" : "months");
             highlights.add("" + cycles);
             highlights.add("" + months);
+        }
+
+        if (this.intel == null || this.intel.isEnding() || this.intel.isEnded()) {
+            info.addPara("Intel has expired and no longer reliable.", pad, tc);
+            return;
         }
 
         long days = diff / msPerDay;
