@@ -332,6 +332,13 @@ public class ExcavationRaidIntelV2 extends GenericExpeditionIntel {
     }
 
     @Override
+    public void configureFleet(CampaignFleetAPI fleet, float fp) {
+        super.configureFleet(fleet, fp);
+        fleet.getMemoryWithoutUpdate().set(FLEET_KEY, true);
+        fleet.getMemoryWithoutUpdate().set(EVENT_KEY, this);
+    }
+
+    @Override
     public void setFleetMemoryAtStage(CampaignFleetAPI fleet, RaidStage stage) {
         if (stage instanceof GenericReturnStage) {
             fleet.setNoAutoDespawn(true);
