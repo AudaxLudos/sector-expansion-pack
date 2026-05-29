@@ -143,6 +143,6 @@ public class ExcavationActionStage extends ActionStage implements ActionAssignme
 
     @Override
     public float getActionDuration() {
-        return this.intel.getActionStage().getMaxDays() / 5f;
+        return Math.max(0.5f, this.intel.getActionStage().getMaxDays() / 10f);
     }
 }
