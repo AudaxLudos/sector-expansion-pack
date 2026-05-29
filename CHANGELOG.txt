@@ -1,3 +1,8 @@
+### 0.2.98-alpha
+- Shorten action duration for excavation action stage
+- Fix excavation leaked intel not expiring
+- Fix fleet flags not set when spawned for excavation event
+
 ### 0.2.94-alpha
 - Fix leak chance being higher than normal for excavation raid intel v2
 - Update acquisition raid intel implementation
