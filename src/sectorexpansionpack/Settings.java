@@ -13,9 +13,13 @@ import java.util.List;
 
 public class Settings implements LunaSettingsListener {
     public static final String MOD_ID = "sectorexpansionpack";
+    @Deprecated(forRemoval = true)
     public static boolean EXPEDITIONS_ENABLED;
+    @Deprecated(forRemoval = true)
     public static int EXPEDITIONS_TIMER;
+    @Deprecated(forRemoval = true)
     public static boolean INCURSIONS_ENABLED;
+    @Deprecated(forRemoval = true)
     public static int INCURSIONS_TIMER;
     public static boolean EXCAVATIONS_ENABLED;
     public static int EXCAVATIONS_TIMER;

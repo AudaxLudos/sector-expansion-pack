@@ -15,6 +15,10 @@ import com.fs.starfarer.api.util.Misc;
 import java.awt.*;
 import java.util.Set;
 
+/**
+ * @deprecated
+ */
+@Deprecated(forRemoval = true)
 public class ExpeditionFleetDepartureIntel extends BaseIntelPlugin {
     protected final RouteManager.RouteData route;
     protected final FactionAPI faction;

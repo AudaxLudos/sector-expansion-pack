@@ -23,6 +23,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+/**
+ * @deprecated
+ */
+@Deprecated(forRemoval = true)
 public class HyperspaceAnomalyResearchMission extends HubMissionWithBarEvent {
     public static final String PROGRESS_STEP_UPDATE = "progress_step_update";
     public static final Logger log = Global.getLogger(HyperspaceAnomalyResearchMission.class);

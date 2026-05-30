@@ -113,6 +113,7 @@ public class ArtifactInstallationIntel extends BaseIntelPlugin {
     public Set<String> getIntelTags(SectorMapAPI map) {
         Set<String> tags = super.getIntelTags(map);
         tags.add(this.faction.getId());
+        tags.add("Leaks");
         return tags;
     }
 }

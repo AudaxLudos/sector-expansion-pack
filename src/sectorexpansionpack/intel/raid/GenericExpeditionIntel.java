@@ -9,7 +9,10 @@ import com.fs.starfarer.api.impl.campaign.fleets.FleetFactoryV3;
 import com.fs.starfarer.api.impl.campaign.fleets.FleetParamsV3;
 import com.fs.starfarer.api.impl.campaign.fleets.RouteLocationCalculator;
 import com.fs.starfarer.api.impl.campaign.fleets.RouteManager;
-import com.fs.starfarer.api.impl.campaign.ids.*;
+import com.fs.starfarer.api.impl.campaign.ids.Factions;
+import com.fs.starfarer.api.impl.campaign.ids.FleetTypes;
+import com.fs.starfarer.api.impl.campaign.ids.MemFlags;
+import com.fs.starfarer.api.impl.campaign.ids.Ranks;
 import com.fs.starfarer.api.impl.campaign.intel.raid.*;
 import com.fs.starfarer.api.impl.campaign.procgen.themes.RouteFleetAssignmentAI;
 import com.fs.starfarer.api.ui.Alignment;
@@ -343,7 +346,7 @@ public abstract class GenericExpeditionIntel extends RaidIntel implements Generi
         RaidStage stage = this.stages.get(this.currentStage);
         setFleetMemoryAtStage(fleet, stage);
 
-        String raid = getRaidNoun();
+        String raid = Misc.ucFirst(getRaidNoun());
 
         fleet.setName("Grand " + raid + " Fleet");
         fleet.getCommander().setRankId(Ranks.SPACE_ADMIRAL);
