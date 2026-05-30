@@ -31,7 +31,7 @@ public class ExcavationActionStage extends ActionStage implements ActionAssignme
             if (this.target.getStarSystem() != null) {
                 route.addSegment(new RouteManager.RouteSegment(0.5f, this.target.getStarSystem().getCenter()));
             }
-            route.addSegment(new RouteManager.RouteSegment(1000f, this.target));
+            route.addSegment(new RouteManager.RouteSegment(1000f, this.target, ActionAssignmentAI.GUARD_STAGE));
         }
     }
 

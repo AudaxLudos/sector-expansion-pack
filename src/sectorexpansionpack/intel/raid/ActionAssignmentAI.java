@@ -16,8 +16,10 @@ import com.fs.starfarer.api.util.Misc;
 import org.lwjgl.util.vector.Vector2f;
 
 public class ActionAssignmentAI extends RouteFleetAssignmentAI implements FleetActionTextProvider {
-    public static final String RECENTLY_ACTED_KEY = "$sep_eri_recentlyActedAnAction";
-    public static final String RECENTLY_AFFECTED_KEY = "$sep_eri_recentlyAffectedByAction";
+    public static final String GUARD_STAGE = "sep_action_guard";
+    public static final String GUARDED_KEY = "$sep_guarded";
+    public static final String RECENTLY_ACTED_KEY = "$sep_recentlyActedAnAction";
+    public static final String RECENTLY_AFFECTED_KEY = "$sep_recentlyAffectedByAction";
     protected final SEPFleetActionDelegate delegate;
     protected IntervalUtil assistTracker;
     protected IntervalUtil actionTracker;
@@ -38,6 +40,13 @@ public class ActionAssignmentAI extends RouteFleetAssignmentAI implements FleetA
         if (curr != null &&
                 (BaseRaidStage.STRAGGLER.equals(this.route.getCustom()) || AssembleStage.WAIT_STAGE.equals(curr.custom) || curr.isTravel())) {
             Misc.setFlagWithReason(this.fleet.getMemoryWithoutUpdate(), MemFlags.FLEET_BUSY, "action_wait", true, 1);
+        }
+        if (curr != null && !BaseRaidStage.STRAGGLER.equals(this.route.getCustom()) && GUARD_STAGE.equals(curr.custom)
+                && !curr.isTravel() && curr.getFrom() != null) {
+            float dist = Misc.getDistance(this.fleet, curr.from);
+            if (dist <= 2000f) {
+                Misc.setFlagWithReason(curr.from.getMemoryWithoutUpdate(), GUARDED_KEY, "action_guard", true, 1);
+            }
         }
 
         checkAssist(amount);

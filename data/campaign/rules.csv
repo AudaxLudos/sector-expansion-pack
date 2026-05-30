@@ -62,11 +62,18 @@ MakeOtherFleetNonHostile sep_ari true",Your sensors officer detects a unique ene
 ,,,,,,
 ,,,,,,
 # Excavation Raid Intel START,,,,,,
-sep_eri_targetGuarded,OpenInteractionDialog,"$sep_eri_target score:1000
-$sep_eri_targetGuarded score:1000
+sep_eri_targetGuardedPlanet,OpenInteractionDialog,"$sep_eri_target score:1000
+$sep_guarded score:1000
+$tag:planet
 ",ShowDefaultVisual,"Your $shipOrFleet approaches $entityName.
 
 A nearby fleet is preventing you from conducting survey operations.",defaultLeave:Leave,
+sep_eri_targetGuardedOther,OpenInteractionDialog,"$sep_eri_target score:1000
+$sep_guarded score:1000
+$customType == wreck
+",ShowDefaultVisual,"Your $shipOrFleet approaches $aOrAn $nameInText.
+
+A nearby fleet is preventing you from conducting salvage operations.",defaultLeave:Leave,
 sep_eri_fleetHasArtifact,OpenCommLink,"$entity.sep_eri_fleet score:1000
 $entity.sep_eri_hasArtifact score:1000","ShowDefaultVisual
 SetStoryOption sep_eri_persuadeToGive ui_char_spent_story_point ""Persuade the fleet to give the artifact""
