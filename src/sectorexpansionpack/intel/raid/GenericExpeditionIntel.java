@@ -9,13 +9,11 @@ import com.fs.starfarer.api.impl.campaign.fleets.FleetFactoryV3;
 import com.fs.starfarer.api.impl.campaign.fleets.FleetParamsV3;
 import com.fs.starfarer.api.impl.campaign.fleets.RouteLocationCalculator;
 import com.fs.starfarer.api.impl.campaign.fleets.RouteManager;
-import com.fs.starfarer.api.impl.campaign.ids.Factions;
-import com.fs.starfarer.api.impl.campaign.ids.FleetTypes;
-import com.fs.starfarer.api.impl.campaign.ids.MemFlags;
-import com.fs.starfarer.api.impl.campaign.ids.Ranks;
+import com.fs.starfarer.api.impl.campaign.ids.*;
 import com.fs.starfarer.api.impl.campaign.intel.raid.*;
 import com.fs.starfarer.api.impl.campaign.procgen.themes.RouteFleetAssignmentAI;
 import com.fs.starfarer.api.ui.Alignment;
+import com.fs.starfarer.api.ui.SectorMapAPI;
 import com.fs.starfarer.api.ui.TooltipMakerAPI;
 import com.fs.starfarer.api.util.Misc;
 import org.lwjgl.util.vector.Vector2f;
@@ -23,6 +21,7 @@ import org.lwjgl.util.vector.Vector2f;
 import java.awt.*;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 
 public abstract class GenericExpeditionIntel extends RaidIntel implements GenericOrganizeStage.ShowStageInfoDelegate, GenericAssembleStage.AssembleStageDelegate {
     protected Outcome outcome;
@@ -127,6 +126,13 @@ public abstract class GenericExpeditionIntel extends RaidIntel implements Generi
             return base + " - Successful";
         }
         return base;
+    }
+
+    @Override
+    public Set<String> getIntelTags(SectorMapAPI map) {
+        Set<String> tags = super.getIntelTags(map);
+        tags.add("Leaks");
+        return tags;
     }
 
     @Override
