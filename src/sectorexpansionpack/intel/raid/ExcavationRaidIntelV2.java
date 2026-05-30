@@ -94,6 +94,8 @@ public class ExcavationRaidIntelV2 extends GenericExpeditionIntel {
         Misc.makeImportant(this.target, HAS_ARTIFACT_REASON);
         Misc.setSalvageSpecial(this.target, new SEPHiddenItemSpecial.HiddenSpecialItemSpecialData(this.artifact.getId()));
 
+        // Global.getSector().getIntelManager().queueIntel(this);
+
         log.info(String.format("Starting %s excavation at %s in the %s, targeting %s in the %s",
                 getFaction().getDisplayName(),
                 this.source.getName(), this.source.getStarSystem().getNameWithLowercaseTypeShort(),
@@ -157,27 +159,6 @@ public class ExcavationRaidIntelV2 extends GenericExpeditionIntel {
 
             this.leakChance += 0.2f;
         }
-    }
-
-    @Override
-    protected void failedAtStage(RaidStage stage) {
-        if (this.outcome == null) {
-            if (stage instanceof OrganizeStage) {
-                setOutcome(Outcome.ABORTED_IN_PLANNING);
-            } else if (stage instanceof AssembleStage) {
-                setOutcome(Outcome.ASSEMBLING_DISRUPTED);
-            } else if (stage instanceof TravelStage && !(stage instanceof GenericReturnStage)) {
-                setOutcome(Outcome.NOT_ENOUGH_MADE_IT);
-            } else if (stage instanceof ActionStage) {
-                setOutcome(Outcome.FAILED);
-            } else if (stage instanceof GenericReturnStage) {
-                setOutcome(Outcome.NOT_ENOUGH_MADE_IT);
-            }
-        }
-        if (stage instanceof BaseRaidStage stage1) {
-            stage1.giveReturnOrdersToStragglers(stage1.getRoutes()); // Order fleets to return home and despawn
-        }
-        endAfterDelay();
     }
 
     @Override

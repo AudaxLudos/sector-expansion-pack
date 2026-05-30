@@ -115,6 +115,12 @@ public abstract class GenericExpeditionIntel extends RaidIntel implements Generi
     }
 
     @Override
+    protected void notifyEnding() {
+        super.notifyEnding();
+        setFleetsMemoryAtStage(this.stages.size() - 1, true); // Clears fleets memory
+    }
+
+    @Override
     public String getName() {
         String base = Misc.ucFirst(getFaction().getPersonNamePrefix()) + " " + Misc.ucFirst(getRaidNoun());
         if (isEnding()) {
@@ -375,13 +381,13 @@ public abstract class GenericExpeditionIntel extends RaidIntel implements Generi
             }
 
             if (useNextStage && !isNextStage) {
-                isNextStage = true;
-                index++;
-                if (index + 1 > this.stages.size()) {
+                if (index + 1 >= this.stages.size()) {
                     clearFleetMemory(fleet);
                     continue;
                 }
+                index++;
                 currStage = this.stages.get(index);
+                isNextStage = true;
             }
 
             setFleetMemoryAtStage(fleet, currStage);
