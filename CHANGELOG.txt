@@ -1,3 +1,9 @@
+### 0.2.103-alpha
+- Clear fleets memory when excavation or acquisition events end
+- Add artifact installation intel to leaks intel tab
+- Prevent entity interaction if entity is guarded by excavation forces
+- Add acquisitions and excavations to leaks intel tab
+
 ### 0.2.98-alpha
 - Shorten action duration for excavation action stage
 - Fix excavation leaked intel not expiring
