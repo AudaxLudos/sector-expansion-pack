@@ -1,5 +1,5 @@
 ### 0.2.105-alpha
--  Fix special items from excavations and acquisitions not stacking
+- Fix special items from excavations and acquisitions not stacking
 
 ### 0.2.103-alpha
 - Clear fleets memory when excavation or acquisition events end
