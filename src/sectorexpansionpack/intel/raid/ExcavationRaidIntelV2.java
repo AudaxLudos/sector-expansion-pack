@@ -94,7 +94,7 @@ public class ExcavationRaidIntelV2 extends GenericExpeditionIntel {
         Misc.makeImportant(this.target, HAS_ARTIFACT_REASON);
         Misc.setSalvageSpecial(this.target, new SEPHiddenItemSpecial.HiddenSpecialItemSpecialData(this.artifact.getId()));
 
-        // Global.getSector().getIntelManager().queueIntel(this);
+        Global.getSector().getIntelManager().queueIntel(this);
 
         log.info(String.format("Starting %s excavation at %s in the %s, targeting %s in the %s",
                 getFaction().getDisplayName(),
@@ -134,7 +134,7 @@ public class ExcavationRaidIntelV2 extends GenericExpeditionIntel {
             this.target.getMemoryWithoutUpdate().unset(EVENT_KEY);
             this.target.getMemoryWithoutUpdate().unset(MemFlags.SALVAGE_SPECIAL_DATA);
         } else if (stage instanceof GenericReturnStage stage1) {
-            SpecialItemData data = new SpecialItemData(this.artifact.getId(), this.artifact.getParams());
+            SpecialItemData data = new SpecialItemData(this.artifact.getId(), null);
             Utils.findMarketToInstallSpecialItem(new EntityFinderMission(), getFaction().getId(), this.source, data, log);
             setOutcome(Outcome.SUCCEEDED);
             stage1.giveReturnOrdersToStragglers(stage1.getRoutes()); // Order fleets to return home and despawn
@@ -303,7 +303,7 @@ public class ExcavationRaidIntelV2 extends GenericExpeditionIntel {
             sendUpdateIfPlayerHasIntel(UPDATE_FAILED, dialog.getTextPanel());
             return true;
         } else if ("giveArtifact".equals(action)) {
-            SpecialItemData specialItemData = new SpecialItemData(this.artifact.getId(), this.artifact.getParams());
+            SpecialItemData specialItemData = new SpecialItemData(this.artifact.getId(), null);
             Global.getSector().getPlayerFleet().getCargo().addSpecial(specialItemData, 1f);
             AddRemoveCommodity.addItemGainText(specialItemData, 1, dialog.getTextPanel());
             return true;
