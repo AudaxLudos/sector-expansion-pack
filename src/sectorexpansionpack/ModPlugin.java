@@ -82,14 +82,6 @@ public class ModPlugin extends BaseModPlugin {
 
         // Scripts
         SectorAPI sector = Global.getSector();
-        // expeditions deprecated
-        // if (!sector.hasScript(ExpeditionFleetManager.class)) {
-        //     sector.addScript(new ExpeditionFleetManager());
-        // }
-        // incursions deprecated
-        // if (!sector.hasScript(IncursionFleetManager.class)) {
-        //     sector.addScript(new IncursionFleetManager());
-        // }
         if (!sector.hasScript(ExcavationRaidManager.class)) {
             sector.addScript(new ExcavationRaidManager());
         }

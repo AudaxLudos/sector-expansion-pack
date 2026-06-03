@@ -69,7 +69,7 @@ public class AcquisitionRaidManager extends BaseEventManager {
         }
 
         if (event == null && this.counter < 5) {
-            // Try to force an incursion 5 times before stopping
+            // Try to force an event 5 times before stopping
             // Doing this to make it more consistent as the first few calls could be null
             this.counter++;
             return createEvent();

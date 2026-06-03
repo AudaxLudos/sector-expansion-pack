@@ -7,8 +7,6 @@ import com.fs.starfarer.api.campaign.SpecialItemSpecAPI;
 import com.fs.starfarer.api.impl.campaign.rulecmd.AddRemoveCommodity;
 import com.fs.starfarer.api.impl.campaign.rulecmd.salvage.SalvageSpecialInteraction;
 import com.fs.starfarer.api.util.Misc;
-import sectorexpansionpack.intel.ExpeditionFleetIntel;
-import sectorexpansionpack.intel.raid.ExcavationRaidIntel;
 import sectorexpansionpack.intel.raid.ExcavationRaidIntelV2;
 import sectorexpansionpack.intel.raid.GenericExpeditionIntel;
 
@@ -36,16 +34,7 @@ public class SEPHiddenItemSpecial extends BaseSalvageSpecial {
         addText("Your salvage crews find a well-hidden safe. After an EMP pulse and some delicate work " +
                 "with a plasma cutter, the safe yields its contents.");
 
-        if (this.entity.getMemoryWithoutUpdate().get(ExpeditionFleetIntel.EVENT_KEY) instanceof ExpeditionFleetIntel intel) {
-            intel.unsetEventMemoryFlags();
-            intel.finish(true);
-        } else if (this.entity.getMemoryWithoutUpdate().get(ExcavationRaidIntel.EVENT_KEY) instanceof ExcavationRaidIntel intel) {
-            intel.setOutcome(ExcavationRaidIntel.Outcome.FAILED);
-            intel.forceFail(true);
-            Misc.makeUnimportant(this.entity, ExcavationRaidIntel.HAS_ARTIFACT_REASON);
-            this.entity.getMemoryWithoutUpdate().unset(ExcavationRaidIntel.TARGET_KEY);
-            this.entity.getMemoryWithoutUpdate().unset(ExcavationRaidIntel.EVENT_KEY);
-        } else if (this.entity.getMemoryWithoutUpdate().get(ExcavationRaidIntelV2.EVENT_KEY) instanceof ExcavationRaidIntelV2 intel) {
+        if (this.entity.getMemoryWithoutUpdate().get(ExcavationRaidIntelV2.EVENT_KEY) instanceof ExcavationRaidIntelV2 intel) {
             intel.setOutcome(GenericExpeditionIntel.Outcome.FAILED);
             intel.forceFail(true);
             Misc.makeUnimportant(this.entity, ExcavationRaidIntelV2.HAS_ARTIFACT_REASON);

@@ -1,21 +1,4 @@
 fieldID,fieldName,fieldType,defaultValue,secondaryValue,fieldDescription,minValue,maxValue,tab
-#sep_expeditions_settings_header,Expeditions Settings,Header,Expeditions Settings,,,,,
-#sep_expeditions_enabled,Expeditions Enabled,Boolean,TRUE,,"Sets whether or not expeditions can happen in a campaign.
-
-Default Value: True",,,
-#sep_expeditions_timer,Expeditions Interval,Int,94,,"Sets the interval between each expedition in days as well as the grace period for the first expedition.
-
-Default Value: 94",31,731,
-#sep_incursion_settings_header,Incursions Settings,Header,Incursions Settings,,,,,
-#sep_incursions_enabled,Incursions Enabled,Boolean,FALSE,,"Sets whether or not incursions can happen in a campaign.
-
-Default Value: True",,,
-#sep_incursions_timer,Incursions Interval,Int,183,,"Sets the interval between each incursion in days as well as the grace period for the first incursion.
-
-Default Value: 183",31,731,
-,,,,,,,,
-,,,,,,,,
-,,,,,,,,
 sep_excavations_settings_header,Excavations Settings,Header,Excavations Settings,,,,,
 sep_excavations_enabled,Excavations Enabled,Boolean,TRUE,,"Sets whether or not excavations can happen in a campaign.
 
