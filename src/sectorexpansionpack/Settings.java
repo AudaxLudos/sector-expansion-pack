@@ -13,14 +13,6 @@ import java.util.List;
 
 public class Settings implements LunaSettingsListener {
     public static final String MOD_ID = "sectorexpansionpack";
-    @Deprecated(forRemoval = true)
-    public static boolean EXPEDITIONS_ENABLED;
-    @Deprecated(forRemoval = true)
-    public static int EXPEDITIONS_TIMER;
-    @Deprecated(forRemoval = true)
-    public static boolean INCURSIONS_ENABLED;
-    @Deprecated(forRemoval = true)
-    public static int INCURSIONS_TIMER;
     public static boolean EXCAVATIONS_ENABLED;
     public static int EXCAVATIONS_TIMER;
     public static boolean ACQUISITIONS_ENABLED;
@@ -59,12 +51,6 @@ public class Settings implements LunaSettingsListener {
     }
 
     public static void setSettings() {
-        EXPEDITIONS_ENABLED = false; // expeditions deprecated
-        EXPEDITIONS_TIMER = 731; // expeditions deprecated
-
-        INCURSIONS_ENABLED = false; // incursions deprecated
-        INCURSIONS_TIMER = 731; // incursions deprecated
-
         EXCAVATIONS_ENABLED = getBoolean("sep_excavations_enabled");
         EXCAVATIONS_TIMER = getInt("sep_excavations_timer");
 
