@@ -2,23 +2,20 @@ package sectorexpansionpack.colonies;
 
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.campaign.FactionAPI;
-import com.fs.starfarer.api.campaign.econ.Industry;
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
 import com.fs.starfarer.api.impl.campaign.intel.BaseIntelPlugin;
-import com.fs.starfarer.api.loading.IndustrySpecAPI;
 import com.fs.starfarer.api.ui.SectorMapAPI;
 import com.fs.starfarer.api.ui.TooltipMakerAPI;
 import com.fs.starfarer.api.util.IntervalUtil;
 import com.fs.starfarer.api.util.Misc;
 import com.fs.starfarer.api.util.WeightedRandomPicker;
 import org.apache.log4j.Logger;
-import sectorexpansionpack.colonies.actions.*;
+import sectorexpansionpack.colonies.actions.ColonyAction;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class FactionColonyAI extends BaseIntelPlugin {
+    public static final String PERSISTENT_DATA_KEY = "sep_factionColonyAI";
     public static List<ColonyAction> COLONY_ACTIONS = new ArrayList<>();
     public static Logger log = Global.getLogger(FactionColonyAI.class);
     protected FactionAPI faction;
@@ -26,25 +23,38 @@ public class FactionColonyAI extends BaseIntelPlugin {
     protected MarketAPI prevMarket;
     protected ColonyAction prevAction;
 
-    static {
-        COLONY_ACTIONS.add(new BuildFarmingAction());
-        COLONY_ACTIONS.add(new BuildMiningAction());
-        COLONY_ACTIONS.add(new BuildWaystationAction());
-        COLONY_ACTIONS.add(new BuildGroundDefensesAction());
-        COLONY_ACTIONS.add(new BuildPatrolHQAction());
-        COLONY_ACTIONS.add(new BuildOrbitalStationAction());
-        for (IndustrySpecAPI indSpec : Global.getSettings().getAllIndustrySpecs()) {
-            if (!indSpec.getUpgrade().isBlank()) {
-                COLONY_ACTIONS.add(new ColonyUpgradeAction(indSpec.getId()));
-            }
-        }
-    }
-
     public FactionColonyAI(FactionAPI faction) {
         this.faction = faction;
         this.actionTimer = new IntervalUtil(30f, 60f);
 
         Global.getSector().getIntelManager().addIntel(this, true);
+    }
+
+    @SuppressWarnings("unchecked")
+    public static Map<String, FactionColonyAI> getFactionColonyAIs() {
+        if (!Global.getSector().getPersistentData().containsKey(PERSISTENT_DATA_KEY)) {
+            Global.getSector().getPersistentData().put(PERSISTENT_DATA_KEY, new HashMap<String, FactionColonyAI>());
+        }
+
+        return (Map<String, FactionColonyAI>) Global.getSector().getPersistentData().get(PERSISTENT_DATA_KEY);
+    }
+
+    public static FactionColonyAI getFactionColonyAI(FactionAPI faction) {
+        return getFactionColonyAIs().get(faction.getId());
+    }
+
+    public static Set<FactionAPI> getFactionsWithMarkets() {
+        Set<FactionAPI> factionsWithMarkets = new HashSet<>();
+        for (MarketAPI market : Global.getSector().getEconomy().getMarketsCopy()) {
+            if (market.isPlayerOwned()) {
+                continue;
+            }
+            if (market.getFaction() == null) {
+                continue;
+            }
+            factionsWithMarkets.add(market.getFaction());
+        }
+        return factionsWithMarkets;
     }
 
     @Override
@@ -123,7 +133,7 @@ public class FactionColonyAI extends BaseIntelPlugin {
     public void createSmallDescription(TooltipMakerAPI info, float width, float height) {
         int daysLeft = (int) (this.actionTimer.getIntervalDuration() - this.actionTimer.getElapsed());
         String daysText = daysLeft <= 1 ? "day" : "days";
-        info.addPara( daysLeft+ " " + daysText + " until next colony action meeting", 10f);
+        info.addPara(daysLeft + " " + daysText + " until next colony action meeting", 10f);
         if (this.prevMarket != null && this.prevAction != null) {
             info.addPara("A " + this.prevAction.name() + " was performed " + this.prevMarket.getOnOrAt() +
                     " " + this.prevMarket.getName() + " in the " + this.prevMarket.getStarSystem(), 10f);
