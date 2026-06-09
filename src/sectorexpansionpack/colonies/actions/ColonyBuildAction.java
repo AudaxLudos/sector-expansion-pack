@@ -36,7 +36,7 @@ public class ColonyBuildAction extends ColonyAction {
     }
 
     protected boolean isIndustry() {
-        IndustrySpecAPI spec = Global.getSettings().getIndustrySpec(industryToBuild());
+        IndustrySpecAPI spec = getSpec();
         if (spec == null) {
             return false;
         }
@@ -50,10 +50,14 @@ public class ColonyBuildAction extends ColonyAction {
     @Override
     public void perform(MarketAPI market) {
         if (canPerform(market)) {
-            IndustrySpecAPI spec = Global.getSettings().getIndustrySpec(industryToBuild());
+            IndustrySpecAPI spec = getSpec();
             if (spec != null) {
                 market.getConstructionQueue().addToEnd(spec.getId(), (int) spec.getCost());
             }
         }
+    }
+
+    public IndustrySpecAPI getSpec() {
+        return Global.getSettings().getIndustrySpec(industryToBuild());
     }
 }
