@@ -2,7 +2,9 @@ package sectorexpansionpack.colonies.actions;
 
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
+import com.fs.starfarer.api.impl.campaign.ids.Industries;
 import com.fs.starfarer.api.loading.IndustrySpecAPI;
+import com.fs.starfarer.api.util.Misc;
 
 public class ColonyBuildAction extends ColonyAction {
     @Override
@@ -26,7 +28,23 @@ public class ColonyBuildAction extends ColonyAction {
 
     @Override
     public boolean canPerform(MarketAPI market) {
-        return market.hasIndustry(industryToBuild());
+        return (!market.hasIndustry(industryToBuild()) && !isStructureQueued(market)) && (!isIndustry() || (isIndustry() && hasAvailableIndustrySlots(market)));
+    }
+
+    protected boolean hasAvailableIndustrySlots(MarketAPI market) {
+        return Misc.getNumIndustries(market) < Misc.getMaxIndustries(market);
+    }
+
+    protected boolean isIndustry() {
+        IndustrySpecAPI spec = Global.getSettings().getIndustrySpec(industryToBuild());
+        if (spec == null) {
+            return false;
+        }
+        return spec.hasTag(Industries.TAG_INDUSTRY);
+    }
+
+    protected boolean isStructureQueued(MarketAPI market) {
+        return market.getConstructionQueue().hasItem(industryToBuild());
     }
 
     @Override
