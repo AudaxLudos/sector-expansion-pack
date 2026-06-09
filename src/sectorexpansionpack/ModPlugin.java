@@ -2,13 +2,17 @@ package sectorexpansionpack;
 
 import com.fs.starfarer.api.BaseModPlugin;
 import com.fs.starfarer.api.Global;
+import com.fs.starfarer.api.campaign.FactionAPI;
 import com.fs.starfarer.api.campaign.SectorAPI;
+import com.fs.starfarer.api.campaign.econ.MarketAPI;
 import com.fs.starfarer.api.campaign.listeners.ListenerManagerAPI;
 import com.fs.starfarer.api.impl.campaign.ghosts.SensorGhostManager;
 import com.fs.starfarer.api.impl.campaign.intel.GenericMissionManager;
+import com.fs.starfarer.api.util.Misc;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import sectorexpansionpack.colonies.FactionColonyAI;
 import sectorexpansionpack.ghosts.types.FleetEaterGhostCreator;
 import sectorexpansionpack.ghosts.types.StormInducerGhostCreator;
 import sectorexpansionpack.ghosts.types.StormPacifierGhostCreator;
@@ -20,6 +24,7 @@ import sectorexpansionpack.listeners.MatrixCatalystBlueprintAdder;
 import sectorexpansionpack.listeners.MatrixCatalystOptionProvider;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -87,6 +92,22 @@ public class ModPlugin extends BaseModPlugin {
         }
         if (!sector.hasScript(AcquisitionRaidManager.class)) {
             sector.addScript(new AcquisitionRaidManager());
+        }
+        List<FactionAPI> factionsWithMarkets = new ArrayList<>();
+        for (MarketAPI market : sector.getEconomy().getMarketsCopy()) {
+            if (market.isPlayerOwned()) {
+                continue;
+            }
+            if (market.getFaction() == null) {
+                continue;
+            }
+            if (factionsWithMarkets.contains(market.getFaction())) {
+                continue;
+            }
+            factionsWithMarkets.add(market.getFaction());
+        }
+        for (FactionAPI faction : factionsWithMarkets) {
+            sector.addTransientScript(new FactionColonyAI(faction));
         }
 
         GenericMissionManager genericMissionManager = GenericMissionManager.getInstance();
