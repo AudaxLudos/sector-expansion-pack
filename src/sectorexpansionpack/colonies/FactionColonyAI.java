@@ -2,18 +2,17 @@ package sectorexpansionpack.colonies;
 
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.campaign.FactionAPI;
+import com.fs.starfarer.api.campaign.econ.Industry;
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
 import com.fs.starfarer.api.impl.campaign.intel.BaseIntelPlugin;
+import com.fs.starfarer.api.loading.IndustrySpecAPI;
 import com.fs.starfarer.api.ui.SectorMapAPI;
 import com.fs.starfarer.api.ui.TooltipMakerAPI;
 import com.fs.starfarer.api.util.IntervalUtil;
 import com.fs.starfarer.api.util.Misc;
 import com.fs.starfarer.api.util.WeightedRandomPicker;
 import org.apache.log4j.Logger;
-import sectorexpansionpack.colonies.actions.BuildFarmingAction;
-import sectorexpansionpack.colonies.actions.BuildMiningAction;
-import sectorexpansionpack.colonies.actions.BuildWaystationAction;
-import sectorexpansionpack.colonies.actions.ColonyAction;
+import sectorexpansionpack.colonies.actions.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,6 +30,14 @@ public class FactionColonyAI extends BaseIntelPlugin {
         COLONY_ACTIONS.add(new BuildFarmingAction());
         COLONY_ACTIONS.add(new BuildMiningAction());
         COLONY_ACTIONS.add(new BuildWaystationAction());
+        COLONY_ACTIONS.add(new BuildGroundDefensesAction());
+        COLONY_ACTIONS.add(new BuildPatrolHQAction());
+        COLONY_ACTIONS.add(new BuildOrbitalStationAction());
+        for (IndustrySpecAPI indSpec : Global.getSettings().getAllIndustrySpecs()) {
+            if (!indSpec.getUpgrade().isBlank()) {
+                COLONY_ACTIONS.add(new ColonyUpgradeAction(indSpec.getId()));
+            }
+        }
     }
 
     public FactionColonyAI(FactionAPI faction) {
