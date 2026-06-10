@@ -130,6 +130,7 @@ public class ModPlugin extends BaseModPlugin {
         FactionColonyAI.COLONY_ACTIONS.add(new BuildGroundDefensesAction());
         FactionColonyAI.COLONY_ACTIONS.add(new BuildPatrolHQAction());
         FactionColonyAI.COLONY_ACTIONS.add(new BuildOrbitalStationAction());
+        FactionColonyAI.COLONY_ACTIONS.add(new BuildRefiningAction());
         for (IndustrySpecAPI indSpec : Global.getSettings().getAllIndustrySpecs()) {
             if (indSpec.getUpgrade() != null && !indSpec.getUpgrade().isBlank()) {
                 FactionColonyAI.COLONY_ACTIONS.add(new ColonyUpgradeAction(indSpec.getId()));

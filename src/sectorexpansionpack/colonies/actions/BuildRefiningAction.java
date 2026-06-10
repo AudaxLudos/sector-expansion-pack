@@ -1,0 +1,22 @@
+package sectorexpansionpack.colonies.actions;
+
+import com.fs.starfarer.api.campaign.econ.MarketAPI;
+import com.fs.starfarer.api.impl.campaign.ids.Industries;
+import sectorexpansionpack.colonies.ProductionData;
+
+public class BuildRefiningAction extends ColonyBuildAction {
+    @Override
+    protected String industryToBuild() {
+        return Industries.REFINING;
+    }
+
+    @Override
+    public float priority() {
+        return 10f;
+    }
+
+    @Override
+    public boolean canPerform(MarketAPI market) {
+        return super.canPerform(market) && ProductionData.canSupportIndustry(market, industryToBuild());
+    }
+}

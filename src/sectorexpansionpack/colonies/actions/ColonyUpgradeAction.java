@@ -12,8 +12,13 @@ public class ColonyUpgradeAction extends ColonyBuildAction {
     }
 
     @Override
+    public String id() {
+        return super.id().replace("build", "upgrade");
+    }
+
+    @Override
     public String name() {
-        return super.name().replace("build", "upgrade to ");
+        return super.name().replace("Build", "Upgrade");
     }
 
     @Override
