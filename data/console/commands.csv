@@ -1,6 +1,6 @@
 command,class,tags,syntax,help,
 StartAcquisitionEvent,sectorexpansionpack.commands.StartAcquisitionEvent,campaign,StartAcquisitionEvent (noArguments)|<optionalSourceMarketName>|<optionalSourceFactionId> <optionalTargetMarketName>|<optionalTargetFactionId> <optionalColonyItemId>,Starts an acquisition event,
 StartExcavationEvent,sectorexpansionpack.commands.StartExcavationEvent,campaign,StartExcavationEvent (noArguments)|<optionalSourceMarketName>|<optionalSourceFactionId> <optionalColonyItemId>,Starts an excavation event,
-,,,,,
+StartColonyAIAction,sectorexpansionpack.commands.StartColonyAIAction,campaign,StartColonyAIAction <marketName> <colonyAction>,Starts a colony action on a market,
 ,,,,,
 ,,,,,
