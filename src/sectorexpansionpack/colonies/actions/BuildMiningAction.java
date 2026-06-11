@@ -1,7 +1,6 @@
 package sectorexpansionpack.colonies.actions;
 
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
-import com.fs.starfarer.api.impl.campaign.ids.Conditions;
 import com.fs.starfarer.api.impl.campaign.ids.Industries;
 import sectorexpansionpack.colonies.ProductionData;
 

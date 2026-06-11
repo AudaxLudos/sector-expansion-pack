@@ -1,12 +1,22 @@
 package sectorexpansionpack.colonies.actions;
 
 import com.fs.starfarer.api.Global;
+import com.fs.starfarer.api.campaign.econ.Industry;
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
 import com.fs.starfarer.api.impl.campaign.ids.Industries;
 import com.fs.starfarer.api.loading.IndustrySpecAPI;
 import com.fs.starfarer.api.util.Misc;
 
 public class ColonyBuildAction extends ColonyAction {
+    public static Industry geIndustryWithTag(MarketAPI market, String tag) {
+        for (Industry ind : market.getIndustries()) {
+            if (ind.getSpec().hasTag(tag)) {
+                return ind;
+            }
+        }
+        return null;
+    }
+
     @Override
     public String getId() {
         IndustrySpecAPI spec = Global.getSettings().getIndustrySpec(industryToBuild());
