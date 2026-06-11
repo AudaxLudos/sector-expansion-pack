@@ -12,6 +12,11 @@ public class BuildMiningAction extends ColonyBuildAction {
     }
 
     @Override
+    public float getPriority() {
+        return 3f;
+    }
+
+    @Override
     public boolean canPerform(MarketAPI market) {
         return super.canPerform(market) && ProductionData.canSupportIndustry(market, industryToBuild());
     }

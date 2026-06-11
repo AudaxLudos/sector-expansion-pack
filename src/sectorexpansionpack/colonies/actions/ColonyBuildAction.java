@@ -24,7 +24,7 @@ public class ColonyBuildAction extends ColonyAction {
         if (spec != null) {
             industryName = spec.getName();
         }
-        return "Build " + industryName.toLowerCase().replaceAll("-.*", "") + " action";
+        return "Build " + industryName.toLowerCase().replaceAll(" -.*", "") + " action";
     }
 
     protected String industryToBuild() {

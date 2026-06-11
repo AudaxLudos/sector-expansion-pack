@@ -7,4 +7,9 @@ public class BuildGroundDefensesAction extends ColonyBuildAction {
     protected String industryToBuild() {
         return Industries.GROUNDDEFENSES;
     }
+
+    @Override
+    public float getPriority() {
+        return 1f;
+    }
 }

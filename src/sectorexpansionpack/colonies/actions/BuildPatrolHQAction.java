@@ -7,4 +7,9 @@ public class BuildPatrolHQAction extends ColonyBuildAction {
     protected String industryToBuild() {
         return Industries.PATROLHQ;
     }
+
+    @Override
+    public float getPriority() {
+        return 2f;
+    }
 }

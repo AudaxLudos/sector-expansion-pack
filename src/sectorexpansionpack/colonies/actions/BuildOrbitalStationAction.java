@@ -8,4 +8,9 @@ public class BuildOrbitalStationAction extends ColonyBuildAction {
         // TODO: Figure out a way for specific factions to use their preferred station type
         return Industries.ORBITALSTATION_MID;
     }
+
+    @Override
+    public float getPriority() {
+        return 2f;
+    }
 }

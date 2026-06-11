@@ -21,6 +21,11 @@ public class ColonyUpgradeAction extends ColonyBuildAction {
     }
 
     @Override
+    public float getPriority() {
+        return 5f;
+    }
+
+    @Override
     protected String industryToBuild() {
         return this.industryId;
     }
