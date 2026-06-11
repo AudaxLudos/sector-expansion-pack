@@ -3,6 +3,7 @@ package sectorexpansionpack.colonies.actions;
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
 import com.fs.starfarer.api.impl.campaign.ids.Conditions;
 import com.fs.starfarer.api.impl.campaign.ids.Industries;
+import sectorexpansionpack.colonies.ProductionData;
 
 public class BuildFarmingAction extends ColonyBuildAction {
     @Override
@@ -12,8 +13,6 @@ public class BuildFarmingAction extends ColonyBuildAction {
 
     @Override
     public boolean canPerform(MarketAPI market) {
-        return super.canPerform(market) &&
-                (market.hasCondition(Conditions.FARMLAND_POOR) || market.hasCondition(Conditions.FARMLAND_ADEQUATE) ||
-                        market.hasCondition(Conditions.FARMLAND_RICH) || market.hasCondition(Conditions.FARMLAND_BOUNTIFUL));
+        return super.canPerform(market) && ProductionData.canSupportIndustry(market, industryToBuild());
     }
 }

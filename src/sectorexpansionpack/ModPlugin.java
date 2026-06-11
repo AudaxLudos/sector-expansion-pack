@@ -4,7 +4,6 @@ import com.fs.starfarer.api.BaseModPlugin;
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.campaign.FactionAPI;
 import com.fs.starfarer.api.campaign.SectorAPI;
-import com.fs.starfarer.api.campaign.econ.MarketAPI;
 import com.fs.starfarer.api.campaign.listeners.ListenerManagerAPI;
 import com.fs.starfarer.api.impl.campaign.ghosts.SensorGhostManager;
 import com.fs.starfarer.api.impl.campaign.intel.GenericMissionManager;
@@ -25,9 +24,13 @@ import sectorexpansionpack.listeners.MatrixCatalystBlueprintAdder;
 import sectorexpansionpack.listeners.MatrixCatalystOptionProvider;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
 
 public class ModPlugin extends BaseModPlugin {
+    public static boolean STATIC_DATA_INITIALIZED = false;
+
     @Override
     public void onApplicationLoad() {
         addMissionScenarios();
@@ -119,22 +122,28 @@ public class ModPlugin extends BaseModPlugin {
             Global.getSector().addTransientListener(new MatrixCatalystBlueprintAdder());
         }
 
-        SensorGhostManager.CREATORS.add(new StormPacifierGhostCreator());
-        SensorGhostManager.CREATORS.add(new StormInducerGhostCreator());
-        SensorGhostManager.CREATORS.add(new FleetEaterGhostCreator());
+        if (!STATIC_DATA_INITIALIZED) {
+            SensorGhostManager.CREATORS.add(new StormPacifierGhostCreator());
+            SensorGhostManager.CREATORS.add(new StormInducerGhostCreator());
+            SensorGhostManager.CREATORS.add(new FleetEaterGhostCreator());
 
-        FactionColonyAI.COLONY_ACTIONS.clear();
-        FactionColonyAI.COLONY_ACTIONS.add(new BuildFarmingAction());
-        FactionColonyAI.COLONY_ACTIONS.add(new BuildMiningAction());
-        FactionColonyAI.COLONY_ACTIONS.add(new BuildWaystationAction());
-        FactionColonyAI.COLONY_ACTIONS.add(new BuildGroundDefensesAction());
-        FactionColonyAI.COLONY_ACTIONS.add(new BuildPatrolHQAction());
-        FactionColonyAI.COLONY_ACTIONS.add(new BuildOrbitalStationAction());
-        FactionColonyAI.COLONY_ACTIONS.add(new BuildRefiningAction());
-        for (IndustrySpecAPI indSpec : Global.getSettings().getAllIndustrySpecs()) {
-            if (indSpec.getUpgrade() != null && !indSpec.getUpgrade().isBlank()) {
-                FactionColonyAI.COLONY_ACTIONS.add(new ColonyUpgradeAction(indSpec.getId()));
+            FactionColonyAI.COLONY_ACTIONS.clear();
+            FactionColonyAI.COLONY_ACTIONS.add(new BuildFarmingAction());
+            FactionColonyAI.COLONY_ACTIONS.add(new BuildMiningAction());
+            FactionColonyAI.COLONY_ACTIONS.add(new BuildWaystationAction());
+            FactionColonyAI.COLONY_ACTIONS.add(new BuildGroundDefensesAction());
+            FactionColonyAI.COLONY_ACTIONS.add(new BuildPatrolHQAction());
+            FactionColonyAI.COLONY_ACTIONS.add(new BuildOrbitalStationAction());
+            FactionColonyAI.COLONY_ACTIONS.add(new BuildRefiningAction());
+            FactionColonyAI.COLONY_ACTIONS.add(new BuildHeavyIndustryAction());
+            FactionColonyAI.COLONY_ACTIONS.add(new BuildLightIndustryAction());
+            FactionColonyAI.COLONY_ACTIONS.add(new BuildFuelProductionAction());
+            for (IndustrySpecAPI indSpec : Global.getSettings().getAllIndustrySpecs()) {
+                if (indSpec.getUpgrade() != null && !indSpec.getUpgrade().isBlank()) {
+                    FactionColonyAI.COLONY_ACTIONS.add(new ColonyUpgradeAction(indSpec.getId()));
+                }
             }
+            STATIC_DATA_INITIALIZED = true;
         }
     }
 }

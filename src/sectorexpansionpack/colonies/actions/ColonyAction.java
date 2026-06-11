@@ -1,18 +1,27 @@
 package sectorexpansionpack.colonies.actions;
 
+import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
+import org.apache.log4j.Logger;
 
 public abstract class ColonyAction {
+    public static Logger log = Global.getLogger(ColonyAction.class);
+
     /**
      * Identifier for an action, will mostly be used for debugging
      *
      * @return returns a constructed string from id
      */
-    public abstract String id();
+    public abstract String getId();
 
-    public abstract String name();
+    public abstract String getName();
 
-    public abstract float priority();
+    /**
+     * @return a value between 0 - 9, lower is more important higher is less
+     */
+    public float getPriority() {
+        return 0f;
+    }
 
     public abstract boolean canPerform(MarketAPI market);
 

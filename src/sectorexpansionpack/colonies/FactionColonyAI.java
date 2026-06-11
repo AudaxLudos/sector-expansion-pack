@@ -95,7 +95,7 @@ public class FactionColonyAI extends BaseIntelPlugin {
         WeightedRandomPicker<ColonyAction> actionPicker = new WeightedRandomPicker<>();
         for (ColonyAction action : COLONY_ACTIONS) {
             if (action.canPerform(market)) {
-                actionPicker.add(action, action.priority());
+                actionPicker.add(action, action.getPriority());
             }
         }
         ColonyAction action = actionPicker.pick();
@@ -108,7 +108,7 @@ public class FactionColonyAI extends BaseIntelPlugin {
         action.perform(market);
         this.prevMarket = market;
         this.prevAction = action;
-        log.info("A " + this.prevAction.name() + " was performed " + this.prevMarket.getOnOrAt() +
+        log.info("A " + this.prevAction.getName() + " was performed " + this.prevMarket.getOnOrAt() +
                 " " + this.prevMarket.getName() + " in the " + this.prevMarket.getStarSystem());
     }
 
@@ -135,7 +135,7 @@ public class FactionColonyAI extends BaseIntelPlugin {
         String daysText = daysLeft <= 1 ? "day" : "days";
         info.addPara(daysLeft + " " + daysText + " until next colony action meeting", 10f);
         if (this.prevMarket != null && this.prevAction != null) {
-            info.addPara("A " + this.prevAction.name() + " was performed " + this.prevMarket.getOnOrAt() +
+            info.addPara(this.prevAction.getName() + " performed " + this.prevMarket.getOnOrAt() +
                     " " + this.prevMarket.getName() + " in the " + this.prevMarket.getStarSystem(), 10f);
         }
     }
