@@ -8,7 +8,7 @@ import com.fs.starfarer.api.util.Misc;
 
 public class ColonyBuildAction extends ColonyAction {
     @Override
-    public String id() {
+    public String getId() {
         IndustrySpecAPI spec = Global.getSettings().getIndustrySpec(industryToBuild());
         String industryId = " ";
         if (spec != null) {
@@ -18,7 +18,7 @@ public class ColonyBuildAction extends ColonyAction {
     }
 
     @Override
-    public String name() {
+    public String getName() {
         IndustrySpecAPI spec = Global.getSettings().getIndustrySpec(industryToBuild());
         String industryName = " ";
         if (spec != null) {
@@ -32,7 +32,7 @@ public class ColonyBuildAction extends ColonyAction {
     }
 
     @Override
-    public float priority() {
+    public float getPriority() {
         return 1;
     }
 
@@ -67,6 +67,7 @@ public class ColonyBuildAction extends ColonyAction {
             IndustrySpecAPI spec = getSpec();
             if (spec != null) {
                 market.getConstructionQueue().addToEnd(spec.getId(), (int) spec.getCost());
+                log.info(getName() + " performed " + market.getOnOrAt() + " " + market.getName() + " in the " + market.getStarSystem());
             }
         }
     }

@@ -2,6 +2,7 @@ package sectorexpansionpack.colonies;
 
 import com.fs.starfarer.api.campaign.econ.Industry;
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
+import com.fs.starfarer.api.impl.campaign.econ.impl.FuelProduction;
 import com.fs.starfarer.api.impl.campaign.ids.Commodities;
 import com.fs.starfarer.api.impl.campaign.ids.Conditions;
 import com.fs.starfarer.api.impl.campaign.ids.Industries;
@@ -13,6 +14,11 @@ public class ProductionData {
     public static Map<String, IndustryEntry> INDUSTRIES = new HashMap<>();
 
     static {
+        addIndustrySupplies(Industries.FARMING,
+                Commodities.FOOD);
+        addIndustryConditionDemands(Industries.FARMING,
+                Conditions.FARMLAND_POOR, Conditions.FARMLAND_ADEQUATE, Conditions.FARMLAND_RICH, Conditions.FARMLAND_BOUNTIFUL);
+
         addIndustrySupplies(Industries.MINING,
                 Commodities.ORGANICS, Commodities.ORE, Commodities.RARE_ORE, Commodities.VOLATILES);
         addIndustryConditionDemands(Industries.MINING,
@@ -25,6 +31,21 @@ public class ProductionData {
                 Commodities.METALS, Commodities.RARE_METALS);
         addIndustryCommodityDemands(Industries.REFINING,
                 Commodities.ORE, Commodities.RARE_ORE);
+
+        addIndustrySupplies(Industries.LIGHTINDUSTRY,
+                Commodities.DOMESTIC_GOODS, Commodities.LUXURY_GOODS);
+        addIndustryCommodityDemands(Industries.LIGHTINDUSTRY,
+                Commodities.ORGANICS);
+
+        addIndustrySupplies(Industries.HEAVYINDUSTRY,
+                Commodities.HEAVY_MACHINERY, Commodities.SUPPLIES, Commodities.HAND_WEAPONS, Commodities.SHIPS);
+        addIndustryCommodityDemands(Industries.HEAVYINDUSTRY,
+                Commodities.METALS, Commodities.RARE_METALS);
+
+        addIndustrySupplies(Industries.FUELPROD,
+                Commodities.FUEL);
+        addIndustryCommodityDemands(Industries.FUELPROD,
+                Commodities.VOLATILES);
     }
 
     public static IndustryEntry getIndustryEntry(String industryId) {
@@ -100,8 +121,8 @@ public class ProductionData {
     }
 
     public static class IndustryEntry {
-        Set<String> supplies = new HashSet<>();
-        Set<String> commodityDemands = new HashSet<>();
-        Set<String> conditionDemands = new HashSet<>();
+        public Set<String> supplies = new HashSet<>();
+        public Set<String> commodityDemands = new HashSet<>();
+        public Set<String> conditionDemands = new HashSet<>();
     }
 }

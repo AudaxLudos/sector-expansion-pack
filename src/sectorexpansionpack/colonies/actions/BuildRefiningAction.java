@@ -11,11 +11,6 @@ public class BuildRefiningAction extends ColonyBuildAction {
     }
 
     @Override
-    public float priority() {
-        return 10f;
-    }
-
-    @Override
     public boolean canPerform(MarketAPI market) {
         return super.canPerform(market) && ProductionData.canSupportIndustry(market, industryToBuild());
     }

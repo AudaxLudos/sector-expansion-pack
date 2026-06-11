@@ -22,7 +22,7 @@ public class StartColonyAIAction implements BaseCommandWithSuggestion {
             suggestions.addAll(Global.getSector().getEconomy().getMarketsCopy().stream().map(MarketAPI::getName).toList());
             suggestions.addAll(Global.getSector().getAllFactions().stream().map(FactionAPI::getId).toList());
         } else if (i == 1) {
-            suggestions.addAll(FactionColonyAI.COLONY_ACTIONS.stream().map(ColonyAction::id).toList());
+            suggestions.addAll(FactionColonyAI.COLONY_ACTIONS.stream().map(ColonyAction::getId).toList());
         }
 
         return suggestions;
@@ -47,14 +47,14 @@ public class StartColonyAIAction implements BaseCommandWithSuggestion {
         }
 
         if (tmp.length >= 2) {
-            boolean actionValid = FactionColonyAI.COLONY_ACTIONS.stream().anyMatch(ca -> Objects.equals(ca.id(), tmp[1]));
+            boolean actionValid = FactionColonyAI.COLONY_ACTIONS.stream().anyMatch(ca -> Objects.equals(ca.getId(), tmp[1]));
             if (!actionValid) {
                 Console.showMessage("No action found with id of '" + tmp[1] + "'");
                 return CommandResult.ERROR;
             }
         }
 
-        ColonyAction action = FactionColonyAI.COLONY_ACTIONS.stream().filter(ca -> Objects.equals(ca.id(), tmp[1])).findFirst().orElse(null);
+        ColonyAction action = FactionColonyAI.COLONY_ACTIONS.stream().filter(ca -> Objects.equals(ca.getId(), tmp[1])).findFirst().orElse(null);
         if (action == null) {
             Console.showMessage("No action found with id of '" + tmp[1] + "'");
             return CommandResult.ERROR;
