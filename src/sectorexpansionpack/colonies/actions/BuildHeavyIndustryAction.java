@@ -17,6 +17,6 @@ public class BuildHeavyIndustryAction extends ColonyBuildAction {
 
     @Override
     public boolean canPerform(MarketAPI market) {
-        return super.canPerform(market) && ProductionData.canSupportIndustry(market, industryToBuild()) && geIndustryWithTag(market, Industries.TAG_HEAVYINDUSTRY) == null;
+        return super.canPerform(market) && geIndustryWithTag(market, Industries.TAG_HEAVYINDUSTRY) == null && ProductionData.canSupportIndustry(market, industryToBuild());
     }
 }
