@@ -7,4 +7,9 @@ public class BuildWaystationAction extends ColonyBuildAction {
     protected String industryToBuild() {
         return Industries.WAYSTATION;
     }
+
+    @Override
+    public float getPriority() {
+        return 1f;
+    }
 }

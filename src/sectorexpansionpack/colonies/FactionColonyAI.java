@@ -95,7 +95,7 @@ public class FactionColonyAI extends BaseIntelPlugin {
         WeightedRandomPicker<ColonyAction> actionPicker = new WeightedRandomPicker<>();
         for (ColonyAction action : COLONY_ACTIONS) {
             if (action.canPerform(market)) {
-                actionPicker.add(action, action.getPriority());
+                actionPicker.add(action, 10f - action.getPriority());
             }
         }
         ColonyAction action = actionPicker.pick();
