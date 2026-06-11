@@ -1,6 +1,8 @@
 package sectorexpansionpack.colonies.actions;
 
+import com.fs.starfarer.api.campaign.econ.MarketAPI;
 import com.fs.starfarer.api.impl.campaign.ids.Industries;
+import com.fs.starfarer.api.util.Misc;
 
 public class BuildOrbitalStationAction extends ColonyBuildAction {
     @Override
@@ -12,5 +14,10 @@ public class BuildOrbitalStationAction extends ColonyBuildAction {
     @Override
     public float getPriority() {
         return 2f;
+    }
+
+    @Override
+    public boolean canPerform(MarketAPI market) {
+        return super.canPerform(market) && Misc.getStationIndustry(market) == null;
     }
 }

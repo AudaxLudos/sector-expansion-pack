@@ -41,8 +41,8 @@ public class ColonyUpgradeAction extends ColonyBuildAction {
             Industry industry = market.getIndustry(industryToBuild());
             if (industry != null) {
                 industry.startUpgrading();
+                log.info(getName() + " performed " + market.getOnOrAt() + " " + market.getName() + " in the " + market.getStarSystem());
             }
-            log.info(getName() + " performed " + market.getOnOrAt() + " " + market.getName() + " in the " + market.getStarSystem());
         }
     }
 }
