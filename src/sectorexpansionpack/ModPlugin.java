@@ -122,12 +122,12 @@ public class ModPlugin extends BaseModPlugin {
             Global.getSector().addTransientListener(new MatrixCatalystBlueprintAdder());
         }
 
+        // Static variables that need initializing
         if (!STATIC_DATA_INITIALIZED) {
             SensorGhostManager.CREATORS.add(new StormPacifierGhostCreator());
             SensorGhostManager.CREATORS.add(new StormInducerGhostCreator());
             SensorGhostManager.CREATORS.add(new FleetEaterGhostCreator());
 
-            FactionColonyAI.COLONY_ACTIONS.clear();
             FactionColonyAI.COLONY_ACTIONS.add(new BuildFarmingAction());
             FactionColonyAI.COLONY_ACTIONS.add(new BuildMiningAction());
             FactionColonyAI.COLONY_ACTIONS.add(new BuildWaystationAction());
@@ -138,9 +138,9 @@ public class ModPlugin extends BaseModPlugin {
             FactionColonyAI.COLONY_ACTIONS.add(new BuildHeavyIndustryAction());
             FactionColonyAI.COLONY_ACTIONS.add(new BuildLightIndustryAction());
             FactionColonyAI.COLONY_ACTIONS.add(new BuildFuelProductionAction());
-            for (IndustrySpecAPI indSpec : Global.getSettings().getAllIndustrySpecs()) {
-                if (indSpec.getUpgrade() != null && !indSpec.getUpgrade().isBlank()) {
-                    FactionColonyAI.COLONY_ACTIONS.add(new ColonyUpgradeAction(indSpec.getId()));
+            for (IndustrySpecAPI spec : Global.getSettings().getAllIndustrySpecs()) {
+                if (spec.getUpgrade() != null && !spec.getUpgrade().isBlank()) {
+                    FactionColonyAI.COLONY_ACTIONS.add(new ColonyUpgradeAction(spec.getId()));
                 }
             }
             STATIC_DATA_INITIALIZED = true;
