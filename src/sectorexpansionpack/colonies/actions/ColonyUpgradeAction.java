@@ -32,7 +32,8 @@ public class ColonyUpgradeAction extends ColonyBuildAction {
 
     @Override
     public boolean canPerform(MarketAPI market) {
-        return market.hasIndustry(industryToBuild()) && !getSpec().getUpgrade().isBlank();
+        return market.hasIndustry(industryToBuild()) && !getSpec().getUpgrade().isBlank() &&
+                (!isIndustry(getSpec().getUpgrade()) || isIndustry(getSpec().getUpgrade()) && hasAvailableIndustrySlots(market));
     }
 
     @Override

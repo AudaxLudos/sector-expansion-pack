@@ -17,6 +17,18 @@ public class ColonyBuildAction extends ColonyAction {
         return null;
     }
 
+    public static boolean hasAvailableIndustrySlots(MarketAPI market) {
+        return Misc.getNumIndustries(market) < Misc.getMaxIndustries(market);
+    }
+
+    public static boolean isIndustry(String structureId) {
+        IndustrySpecAPI spec = Global.getSettings().getIndustrySpec(structureId);
+        if (spec == null) {
+            return false;
+        }
+        return spec.hasTag(Industries.TAG_INDUSTRY);
+    }
+
     @Override
     public String getId() {
         IndustrySpecAPI spec = Global.getSettings().getIndustrySpec(industryToBuild());
@@ -51,16 +63,8 @@ public class ColonyBuildAction extends ColonyAction {
         return !isBuiltOrQueued(market) && (!isIndustry() || (isIndustry() && hasAvailableIndustrySlots(market)));
     }
 
-    protected boolean hasAvailableIndustrySlots(MarketAPI market) {
-        return Misc.getNumIndustries(market) < Misc.getMaxIndustries(market);
-    }
-
     protected boolean isIndustry() {
-        IndustrySpecAPI spec = getSpec();
-        if (spec == null) {
-            return false;
-        }
-        return spec.hasTag(Industries.TAG_INDUSTRY);
+        return isIndustry(industryToBuild());
     }
 
     protected boolean isBuiltOrQueued(MarketAPI market) {

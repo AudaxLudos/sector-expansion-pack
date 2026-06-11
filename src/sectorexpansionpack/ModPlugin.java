@@ -129,15 +129,16 @@ public class ModPlugin extends BaseModPlugin {
             SensorGhostManager.CREATORS.add(new FleetEaterGhostCreator());
 
             FactionColonyAI.COLONY_ACTIONS.add(new BuildFarmingAction());
-            FactionColonyAI.COLONY_ACTIONS.add(new BuildMiningAction());
-            FactionColonyAI.COLONY_ACTIONS.add(new BuildWaystationAction());
+            FactionColonyAI.COLONY_ACTIONS.add(new BuildFuelProductionAction());
             FactionColonyAI.COLONY_ACTIONS.add(new BuildGroundDefensesAction());
-            FactionColonyAI.COLONY_ACTIONS.add(new BuildPatrolHQAction());
-            FactionColonyAI.COLONY_ACTIONS.add(new BuildOrbitalStationAction());
-            FactionColonyAI.COLONY_ACTIONS.add(new BuildRefiningAction());
             FactionColonyAI.COLONY_ACTIONS.add(new BuildHeavyIndustryAction());
             FactionColonyAI.COLONY_ACTIONS.add(new BuildLightIndustryAction());
-            FactionColonyAI.COLONY_ACTIONS.add(new BuildFuelProductionAction());
+            FactionColonyAI.COLONY_ACTIONS.add(new BuildMiningAction());
+            FactionColonyAI.COLONY_ACTIONS.add(new BuildOrbitalStationAction());
+            FactionColonyAI.COLONY_ACTIONS.add(new BuildPatrolHQAction());
+            FactionColonyAI.COLONY_ACTIONS.add(new BuildRefiningAction());
+            FactionColonyAI.COLONY_ACTIONS.add(new BuildSpaceportAction());
+            FactionColonyAI.COLONY_ACTIONS.add(new BuildWaystationAction());
             for (IndustrySpecAPI spec : Global.getSettings().getAllIndustrySpecs()) {
                 if (spec.getUpgrade() != null && !spec.getUpgrade().isBlank()) {
                     FactionColonyAI.COLONY_ACTIONS.add(new ColonyUpgradeAction(spec.getId()));
