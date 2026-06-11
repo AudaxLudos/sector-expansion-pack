@@ -54,7 +54,7 @@ public class ColonyBuildAction extends ColonyAction {
     }
 
     protected boolean isBuiltOrQueued(MarketAPI market) {
-        return market.hasIndustry(industryToBuild()) && isStructureQueued(market);
+        return market.hasIndustry(industryToBuild()) || isStructureQueued(market);
     }
 
     protected boolean isStructureQueued(MarketAPI market) {
