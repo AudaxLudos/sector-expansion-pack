@@ -17,6 +17,9 @@ public class Settings implements LunaSettingsListener {
     public static int EXCAVATIONS_TIMER;
     public static boolean ACQUISITIONS_ENABLED;
     public static int ACQUISITIONS_TIMER;
+    public static boolean FACTION_COLONY_AIS_ENABLED;
+    public static boolean FACTION_COLONY_AIS_CAN_UPGRADE;
+    public static boolean FACTION_COLONY_AIS_CAN_IMPROVE;
     public static List<String> COLONY_ITEM_WHITELIST = new ArrayList<>();
 
     public static void load() {
@@ -56,6 +59,10 @@ public class Settings implements LunaSettingsListener {
 
         ACQUISITIONS_ENABLED = getBoolean("sep_acquisitions_enabled");
         ACQUISITIONS_TIMER = getInt("sep_acquisitions_timer");
+
+        FACTION_COLONY_AIS_ENABLED = getBoolean("sep_faction_colony_ais_enabled");
+        FACTION_COLONY_AIS_CAN_UPGRADE = getBoolean("sep_faction_colony_ais_can_upgrade");
+        FACTION_COLONY_AIS_CAN_IMPROVE = getBoolean("sep_faction_colony_ais_can_improve");
     }
 
     public static boolean getBoolean(String settingId) {

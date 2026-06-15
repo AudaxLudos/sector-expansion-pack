@@ -13,6 +13,16 @@ Default Value: True",,,
 sep_acquisitions_timer,Acquisitions Interval,Int,183,,"Sets the interval between acquisitions in days as well as the grace period for the first acquisition.
 
 Default Value: 183",31,731,
+sep_faction_colony_ais_settings_header,Faction Colony AIs Settings,Header,Faction Colony AIs Settings,,,,,
+sep_faction_colony_ais_enabled,Faction Colony AIs Enabled,Boolean,TRUE,,"Sets whether or not factions can auto develop their colonies. 
+
+Default true",,,
+sep_faction_colony_ais_can_upgrade,Faction Colony AIs Can Upgrade Structures,Boolean,TRUE,,"Sets whether or not a faction's colony ai can upgrade colony industries. Requires faction colony ais to be enabled. 
+
+Default true",,,
+sep_faction_colony_ais_can_improve,Faction Colony AIs Can Improve Structures,Boolean,TRUE,,"Sets whether or not a faction's colony ai can upgrade colony industries. Requires faction colony ais to be enabled. 
+
+Default true",,,
 ,,,,,,,,
 ,,,,,,,,
 ,,,,,,,,
