@@ -6,6 +6,7 @@ import com.fs.starfarer.api.campaign.econ.MarketAPI;
 import com.fs.starfarer.api.impl.campaign.ids.Industries;
 import com.fs.starfarer.api.loading.IndustrySpecAPI;
 import com.fs.starfarer.api.util.Misc;
+import sectorexpansionpack.colonies.ColonyDevelopmentIntel;
 
 public class ColonyBuildAction extends ColonyAction {
     public static Industry geIndustryWithTag(MarketAPI market, String tag) {
@@ -81,6 +82,7 @@ public class ColonyBuildAction extends ColonyAction {
             IndustrySpecAPI spec = getSpec();
             if (spec != null) {
                 market.getConstructionQueue().addToEnd(spec.getId(), (int) spec.getCost());
+                new ColonyDevelopmentIntel(market, this);
                 log.info(getName() + " performed " + market.getOnOrAt() + " " + market.getName() + " in the " + market.getStarSystem());
             }
         }

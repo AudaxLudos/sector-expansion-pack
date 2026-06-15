@@ -2,6 +2,7 @@ package sectorexpansionpack.colonies.actions;
 
 import com.fs.starfarer.api.campaign.econ.Industry;
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
+import sectorexpansionpack.colonies.ColonyDevelopmentIntel;
 
 public class ColonyUpgradeAction extends ColonyBuildAction {
     protected String industryId;
@@ -42,6 +43,7 @@ public class ColonyUpgradeAction extends ColonyBuildAction {
             Industry industry = market.getIndustry(industryToBuild());
             if (industry != null) {
                 industry.startUpgrading();
+                new ColonyDevelopmentIntel(market, this);
                 log.info(getName() + " performed " + market.getOnOrAt() + " " + market.getName() + " in the " + market.getStarSystem());
             }
         }
