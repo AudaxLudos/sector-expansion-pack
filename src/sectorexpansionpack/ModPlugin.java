@@ -4,10 +4,15 @@ import com.fs.starfarer.api.BaseModPlugin;
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.campaign.FactionAPI;
 import com.fs.starfarer.api.campaign.SectorAPI;
+import com.fs.starfarer.api.campaign.econ.Industry;
+import com.fs.starfarer.api.campaign.econ.MarketAPI;
 import com.fs.starfarer.api.campaign.listeners.ListenerManagerAPI;
+import com.fs.starfarer.api.impl.campaign.econ.impl.Mining;
 import com.fs.starfarer.api.impl.campaign.ghosts.SensorGhostManager;
+import com.fs.starfarer.api.impl.campaign.ids.Factions;
 import com.fs.starfarer.api.impl.campaign.intel.GenericMissionManager;
 import com.fs.starfarer.api.loading.IndustrySpecAPI;
+import com.fs.starfarer.api.util.Misc;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -142,6 +147,17 @@ public class ModPlugin extends BaseModPlugin {
             for (IndustrySpecAPI spec : Global.getSettings().getAllIndustrySpecs()) {
                 if (spec.getUpgrade() != null && !spec.getUpgrade().isBlank()) {
                     FactionColonyAI.COLONY_ACTIONS.add(new ColonyUpgradeAction(spec.getId()));
+                }
+            }
+            String id = "temp_market_" + Misc.genUID();
+            MarketAPI tempMarket = Global.getFactory().createMarket("sep_" + id, id, 6);
+            tempMarket.setFactionId(Factions.NEUTRAL);
+            for (IndustrySpecAPI spec : Global.getSettings().getAllIndustrySpecs()) {
+                tempMarket.addIndustry(spec.getId());
+            }
+            for (Industry industry : tempMarket.getIndustries()) {
+                if (industry.canImprove()) {
+                    FactionColonyAI.COLONY_ACTIONS.add(new ColonyImproveAction(industry.getId()));
                 }
             }
             STATIC_DATA_INITIALIZED = true;
