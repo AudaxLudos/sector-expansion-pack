@@ -4,6 +4,10 @@
   "sep_acquisitions_enabled": true, # Sets whether or not acquisitions can happen in a campaign. Default true
   "sep_acquisitions_timer": 183, # Sets the interval between acquisitions in days as well as the grace period for the first acquisition. Default 183
 
+  "sep_faction_colony_ais_enabled": true, # Sets whether or not factions can auto develop their colonies. Default true
+  "sep_faction_colony_ais_can_upgrade": true, # Sets whether or not factions can upgrade colony industries. Requires faction colony ais to be enabled. Default true
+  "sep_faction_colony_ais_can_improve": true, # Sets whether or not factions can upgrade colony industries. Requires faction colony ais to be enabled. Default true
+
   "graphics": {
     "intel": {
       "sep_expeditionFleet": "graphics/sectorexpansionpack/icons/expedition_fleet.png",

@@ -10,7 +10,10 @@ import com.fs.starfarer.api.util.IntervalUtil;
 import com.fs.starfarer.api.util.Misc;
 import com.fs.starfarer.api.util.WeightedRandomPicker;
 import org.apache.log4j.Logger;
+import sectorexpansionpack.Settings;
 import sectorexpansionpack.colonies.actions.ColonyAction;
+import sectorexpansionpack.colonies.actions.ColonyImproveAction;
+import sectorexpansionpack.colonies.actions.ColonyUpgradeAction;
 
 import java.util.*;
 
@@ -94,6 +97,12 @@ public class FactionColonyAI extends BaseIntelPlugin {
 
         WeightedRandomPicker<ColonyAction> actionPicker = new WeightedRandomPicker<>();
         for (ColonyAction action : COLONY_ACTIONS) {
+            if (action instanceof ColonyUpgradeAction && !Settings.FACTION_COLONY_AIS_CAN_UPGRADE) {
+                continue;
+            }
+            if (action instanceof ColonyImproveAction && !Settings.FACTION_COLONY_AIS_CAN_IMPROVE) {
+                continue;
+            }
             if (action.canPerform(market)) {
                 actionPicker.add(action, 10f - action.getPriority());
             }

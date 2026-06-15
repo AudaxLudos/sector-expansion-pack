@@ -7,7 +7,6 @@ import com.fs.starfarer.api.campaign.SectorAPI;
 import com.fs.starfarer.api.campaign.econ.Industry;
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
 import com.fs.starfarer.api.campaign.listeners.ListenerManagerAPI;
-import com.fs.starfarer.api.impl.campaign.econ.impl.Mining;
 import com.fs.starfarer.api.impl.campaign.ghosts.SensorGhostManager;
 import com.fs.starfarer.api.impl.campaign.ids.Factions;
 import com.fs.starfarer.api.impl.campaign.intel.GenericMissionManager;
@@ -99,13 +98,21 @@ public class ModPlugin extends BaseModPlugin {
         if (!sector.hasScript(AcquisitionRaidManager.class)) {
             sector.addScript(new AcquisitionRaidManager());
         }
-        for (FactionAPI faction : FactionColonyAI.getFactionsWithMarkets()) {
-            FactionColonyAI currAI = FactionColonyAI.getFactionColonyAI(faction);
-            if (currAI == null) {
-                FactionColonyAI newAI = new FactionColonyAI(faction);
-                sector.addScript(newAI);
-                FactionColonyAI.getFactionColonyAIs().put(faction.getId(), newAI);
+        if (Settings.FACTION_COLONY_AIS_ENABLED) {
+            for (FactionAPI faction : FactionColonyAI.getFactionsWithMarkets()) {
+                FactionColonyAI currAI = FactionColonyAI.getFactionColonyAI(faction);
+                if (currAI == null) {
+                    FactionColonyAI newAI = new FactionColonyAI(faction);
+                    sector.addScript(newAI);
+                    FactionColonyAI.getFactionColonyAIs().put(faction.getId(), newAI);
+                }
             }
+        } else {
+            for (FactionColonyAI ai : FactionColonyAI.getFactionColonyAIs().values()) {
+                sector.removeScript(ai);
+                ai.endImmediately();
+            }
+            FactionColonyAI.getFactionColonyAIs().clear();
         }
 
         GenericMissionManager genericMissionManager = GenericMissionManager.getInstance();
@@ -133,6 +140,7 @@ public class ModPlugin extends BaseModPlugin {
             SensorGhostManager.CREATORS.add(new StormInducerGhostCreator());
             SensorGhostManager.CREATORS.add(new FleetEaterGhostCreator());
 
+            // Colony AI build actions
             FactionColonyAI.COLONY_ACTIONS.add(new BuildFarmingAction());
             FactionColonyAI.COLONY_ACTIONS.add(new BuildFuelProductionAction());
             FactionColonyAI.COLONY_ACTIONS.add(new BuildGroundDefensesAction());
@@ -144,17 +152,17 @@ public class ModPlugin extends BaseModPlugin {
             FactionColonyAI.COLONY_ACTIONS.add(new BuildRefiningAction());
             FactionColonyAI.COLONY_ACTIONS.add(new BuildSpaceportAction());
             FactionColonyAI.COLONY_ACTIONS.add(new BuildWaystationAction());
+            String id = "temp_market_" + Misc.genUID();
+            MarketAPI tempMarket = Global.getFactory().createMarket("sep_" + id, id, 6);
+            tempMarket.setFactionId(Factions.NEUTRAL);
+            // Colony AI upgrade actions
             for (IndustrySpecAPI spec : Global.getSettings().getAllIndustrySpecs()) {
+                tempMarket.addIndustry(spec.getId());
                 if (spec.getUpgrade() != null && !spec.getUpgrade().isBlank()) {
                     FactionColonyAI.COLONY_ACTIONS.add(new ColonyUpgradeAction(spec.getId()));
                 }
             }
-            String id = "temp_market_" + Misc.genUID();
-            MarketAPI tempMarket = Global.getFactory().createMarket("sep_" + id, id, 6);
-            tempMarket.setFactionId(Factions.NEUTRAL);
-            for (IndustrySpecAPI spec : Global.getSettings().getAllIndustrySpecs()) {
-                tempMarket.addIndustry(spec.getId());
-            }
+            // Colony AI improve actions
             for (Industry industry : tempMarket.getIndustries()) {
                 if (industry.canImprove()) {
                     FactionColonyAI.COLONY_ACTIONS.add(new ColonyImproveAction(industry.getId()));
