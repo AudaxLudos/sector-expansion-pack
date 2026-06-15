@@ -13,6 +13,7 @@ import com.fs.starfarer.api.ui.TooltipMakerAPI;
 import com.fs.starfarer.api.util.Misc;
 import sectorexpansionpack.colonies.actions.ColonyAction;
 import sectorexpansionpack.colonies.actions.ColonyBuildAction;
+import sectorexpansionpack.colonies.actions.ColonyImproveAction;
 import sectorexpansionpack.colonies.actions.ColonyUpgradeAction;
 
 import java.awt.*;
@@ -73,7 +74,7 @@ public class ColonyDevelopmentIntel extends BaseIntelPlugin {
 
         info.addImage(getFaction().getLogo(), width, 128, opad);
         LabelAPI label = info.addPara(Misc.ucFirst(getFaction().getPersonNamePrefix()) + " officials has agreed " +
-                        "on developing a colony in the " + getSystem().getNameWithLowercaseType() + ".", tc, opad);
+                "on developing a colony in the " + getSystem().getNameWithLowercaseType() + ".", tc, opad);
         label.setHighlightColors(fc, b);
         label.setHighlight(Misc.ucFirst(getFaction().getPersonNamePrefix()), getSystem().getNameWithLowercaseType());
     }
@@ -122,7 +123,7 @@ public class ColonyDevelopmentIntel extends BaseIntelPlugin {
 
     protected String getActionText() {
         String result;
-        if (this.action instanceof ColonyBuildAction && !(this.action instanceof ColonyUpgradeAction)) {
+        if (this.action instanceof ColonyBuildAction && !(this.action instanceof ColonyUpgradeAction) && !(this.action instanceof ColonyImproveAction)) {
             result = "building";
         } else if (this.action instanceof ColonyUpgradeAction) {
             result = "upgrading";
