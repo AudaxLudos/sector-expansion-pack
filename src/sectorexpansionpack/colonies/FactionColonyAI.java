@@ -17,6 +17,31 @@ import sectorexpansionpack.colonies.actions.ColonyUpgradeAction;
 
 import java.util.*;
 
+/**
+ * A faction AI for performing actions on owned colonies.
+ *
+ * <p>This AI operates on a periodic cycle where it assesses its colonies
+ * and determines the most beneficial action to perform. The cycle follows
+ * these steps:</p>
+ *
+ * <ol>
+ *   <li><b>Evaluation:</b> Every X days (configurable), the AI selects a
+ *   colony from its assigned faction.</li>
+ *   <li><b>Assessment:</b> The AI scans the selected colony for
+ *   feasible actions it can perform (e.g., building industries,
+ *   upgrading structures, etc.).</li>
+ *   <li><b>Prioritization:</b> From the list of viable actions,
+ *   the AI selects an action with the highest priority value.
+ *   If multiple actions share the same highest priority value,
+ *   one is chosen at random.</li>
+ *   <li><b>Execution:</b> The AI performs the chosen action on the colony,
+ *   if all previous steps succeed.</li>
+ * </ol>
+ *
+ * <p>Currently, actions do not consider the economy or a colony's strategic importance
+ * and are mostly concerned with whether the colony can support a production industry
+ * or if a structure is able to be built.</p>
+ */
 public class FactionColonyAI extends BaseIntelPlugin {
     public static final String PERSISTENT_DATA_KEY = "sep_factionColonyAI";
     public static List<ColonyAction> COLONY_ACTIONS = new ArrayList<>();
@@ -26,11 +51,22 @@ public class FactionColonyAI extends BaseIntelPlugin {
     protected MarketAPI prevMarket;
     protected ColonyAction prevAction;
 
+    /**
+     * @param minInterval The min days on how often an AI performs a colony action
+     * @param maxInterval The max days on how often an AI performs a colony action
+     */
+    public FactionColonyAI(FactionAPI faction, float minInterval, float maxInterval) {
+        this.faction = faction;
+        this.actionTimer = new IntervalUtil(minInterval, maxInterval);
+
+        // Global.getSector().getIntelManager().addIntel(this, true);
+    }
+
     public FactionColonyAI(FactionAPI faction) {
         this.faction = faction;
         this.actionTimer = new IntervalUtil(30f, 60f);
 
-        Global.getSector().getIntelManager().addIntel(this, true);
+        // Global.getSector().getIntelManager().addIntel(this, true);
     }
 
     @SuppressWarnings("unchecked")
