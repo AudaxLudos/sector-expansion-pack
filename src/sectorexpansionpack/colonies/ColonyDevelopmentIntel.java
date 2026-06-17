@@ -138,6 +138,14 @@ public class ColonyDevelopmentIntel extends BaseIntelPlugin {
         return getSystem().getHyperspaceAnchor();
     }
 
+    @Override
+    public boolean shouldRemoveIntel() {
+        if (isImportant()) {
+            return false;
+        }
+        return super.shouldRemoveIntel() || getDaysSincePlayerVisible() >= 30;
+    }
+
     public FactionAPI getFaction() {
         return this.faction;
     }
