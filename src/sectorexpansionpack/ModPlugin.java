@@ -102,7 +102,13 @@ public class ModPlugin extends BaseModPlugin {
             for (FactionAPI faction : FactionColonyAI.getFactionsWithMarkets()) {
                 FactionColonyAI currAI = FactionColonyAI.getFactionColonyAI(faction);
                 if (currAI == null) {
-                    FactionColonyAI newAI = new FactionColonyAI(faction);
+                    float minInterval = 30f;
+                    float maxInterval = 90f;
+                    if (faction.getCustomBoolean(Factions.CUSTOM_PIRATE_BEHAVIOR)) {
+                        minInterval = 60f;
+                        maxInterval = 120f;
+                    }
+                    FactionColonyAI newAI = new FactionColonyAI(faction, minInterval, maxInterval);
                     sector.addScript(newAI);
                     FactionColonyAI.getFactionColonyAIs().put(faction.getId(), newAI);
                 }
