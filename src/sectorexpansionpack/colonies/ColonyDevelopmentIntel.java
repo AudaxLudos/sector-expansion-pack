@@ -34,7 +34,7 @@ public class ColonyDevelopmentIntel extends BaseIntelPlugin {
         setPostingLocation(this.market.getPrimaryEntity());
         setPostingRangeLY(3f);
 
-        Global.getSector().getIntelManager().queueIntel(this);
+        Global.getSector().getIntelManager().queueIntel(this, 30f);
     }
 
     @Override
