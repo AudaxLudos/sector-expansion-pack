@@ -103,10 +103,7 @@ public class ArtifactInstallationIntel extends BaseIntelPlugin {
         if (isImportant()) {
             return false;
         }
-        if (getDaysSincePlayerVisible() < 30) {
-            return false;
-        }
-        return super.shouldRemoveIntel();
+        return super.shouldRemoveIntel() || getDaysSincePlayerVisible() >= 30;
     }
 
     @Override
