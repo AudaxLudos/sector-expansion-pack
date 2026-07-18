@@ -97,7 +97,7 @@ public class ExcavationRaidIntelV2 extends GenericExpeditionIntel {
         Misc.makeImportant(this.target, HAS_ARTIFACT_REASON);
         Misc.setSalvageSpecial(this.target, new SEPHiddenItemSpecial.HiddenSpecialItemSpecialData(this.artifact.getId()));
 
-        Global.getSector().getIntelManager().queueIntel(this);
+        // Global.getSector().getIntelManager().queueIntel(this);
 
         log.info(String.format("Starting %s excavation at %s in the %s, targeting %s in the %s",
                 getFaction().getDisplayName(),
