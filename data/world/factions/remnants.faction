@@ -1,0 +1,9 @@
+{
+    "knownShips":{
+        "hulls":[
+            "sep_blaze",
+            "sep_sun_ray",
+            "sep_effulgence"
+        ]
+    }
+}
