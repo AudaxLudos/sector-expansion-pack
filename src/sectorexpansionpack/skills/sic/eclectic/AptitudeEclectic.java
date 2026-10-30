@@ -24,6 +24,9 @@ public class AptitudeEclectic extends SCBaseAptitudePlugin {
         Map<String, Integer> counts = new HashMap<>();
 
         for (FleetMemberAPI member : data.getFleet().getFleetData().getMembersListCopy()) {
+            if (member.getVariant() == null) {
+                continue;
+            }
             String type = member.getVariant().getHullSpec().getManufacturer();
             counts.merge(type, 1, Integer::sum);
         }

@@ -35,6 +35,9 @@ public class AptitudePurist extends SCBaseAptitudePlugin {
         }
 
         for (FleetMemberAPI member : data.getFleet().getFleetData().getMembersListCopy()) {
+            if (member.getVariant() == null) {
+                continue;
+            }
             String type = member.getVariant().getHullSpec().getManufacturer();
             if (pData.hasCivilianTolerance) {
                 if (!member.getVariant().isCivilian()) {
