@@ -1,3 +1,7 @@
+### 0.2.107-alpha
+- Fix array out of bounds error when an expedition fleet spawns at the end of its event
+- Fix save loading error during initialization of AI fleets with purist/eclectic XO's
+
 ### 0.2.105-alpha
 - Fix special items from excavations and acquisitions not stacking
 
