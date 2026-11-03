@@ -349,7 +349,11 @@ public abstract class GenericExpeditionIntel extends RaidIntel implements Generi
 
         fleet.getMemoryWithoutUpdate().set(MemFlags.FLEET_NO_MILITARY_RESPONSE, true);
 
-        RaidStage stage = this.stages.get(this.currentStage);
+        int stageIndex = this.currentStage;
+        if (this.stages.size() >= stageIndex) {
+            stageIndex = this.stages.size() - 1;
+        }
+        RaidStage stage = this.stages.get(stageIndex);
         setFleetMemoryAtStage(fleet, stage);
 
         String raid = Misc.ucFirst(getRaidNoun());
