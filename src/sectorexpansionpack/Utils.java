@@ -12,6 +12,7 @@ import com.fs.starfarer.api.util.Misc;
 import com.fs.starfarer.api.util.WeightedRandomPicker;
 import org.apache.log4j.Logger;
 import sectorexpansionpack.intel.misc.ArtifactInstallationIntel;
+import sectorexpansionpack.loading.specs.MissionScenarioSpec;
 import sectorexpansionpack.missions.EntityFinderMission;
 import sectorexpansionpack.missions.hub.SEPHubMissionWithBarEvent;
 
@@ -22,10 +23,6 @@ public class Utils {
 
     public static void setRandom() {
         Utils.random = new Random(Long.parseLong(Global.getSector().getSeedString().replaceAll("\\D", "")));
-    }
-
-    public static boolean rollProbability(float p) {
-        return random.nextFloat() >= p;
     }
 
     @Deprecated(forRemoval = true)

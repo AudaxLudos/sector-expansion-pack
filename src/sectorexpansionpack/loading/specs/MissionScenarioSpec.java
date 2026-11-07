@@ -1,26 +1,26 @@
-package sectorexpansionpack;
+package sectorexpansionpack.loading.specs;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
 public class MissionScenarioSpec {
-    protected String missionId;
-    protected String scenarioId;
+    private String missionId;
+    private String scenarioId;
 
-    protected float frequency;
-    protected float duration;
+    private float frequency;
+    private float duration;
 
-    protected String creditReward;
+    private String creditReward;
 
-    protected String type;
+    private String type;
 
-    protected HashSet<String> complications = new HashSet<>();
-    protected HashSet<String> tags = new HashSet<>();
+    private HashSet<String> complications = new HashSet<>();
+    private HashSet<String> tags = new HashSet<>();
 
-    protected String data1;
-    protected String data2;
-    protected String data3;
+    private String data1;
+    private String data2;
+    private String data3;
 
     public String getMissionId() {
         return this.missionId;
