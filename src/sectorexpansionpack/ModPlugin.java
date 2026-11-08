@@ -9,6 +9,7 @@ import com.fs.starfarer.api.campaign.econ.MarketAPI;
 import com.fs.starfarer.api.campaign.listeners.ListenerManagerAPI;
 import com.fs.starfarer.api.impl.campaign.ghosts.SensorGhostManager;
 import com.fs.starfarer.api.impl.campaign.ids.Factions;
+import com.fs.starfarer.api.impl.campaign.ids.Industries;
 import com.fs.starfarer.api.impl.campaign.intel.GenericMissionManager;
 import com.fs.starfarer.api.loading.IndustrySpecAPI;
 import com.fs.starfarer.api.util.Misc;
@@ -107,7 +108,9 @@ public class ModPlugin extends BaseModPlugin {
             FactionColonyAI.COLONY_ACTIONS.add(new BuildLightIndustryAction());
             FactionColonyAI.COLONY_ACTIONS.add(new BuildMiningAction());
             FactionColonyAI.COLONY_ACTIONS.add(new BuildOrbitalStationAction());
-            FactionColonyAI.COLONY_ACTIONS.add(new BuildPatrolHQAction());
+            if (Settings.FACTION_COLONY_AIS_CAN_BUILD_PATROL_HQ) {
+                FactionColonyAI.COLONY_ACTIONS.add(new BuildPatrolHQAction());
+            }
             FactionColonyAI.COLONY_ACTIONS.add(new BuildRefiningAction());
             FactionColonyAI.COLONY_ACTIONS.add(new BuildSpaceportAction());
             FactionColonyAI.COLONY_ACTIONS.add(new BuildWaystationAction());
@@ -117,6 +120,12 @@ public class ModPlugin extends BaseModPlugin {
             // Colony AI upgrade actions
             for (IndustrySpecAPI spec : Global.getSettings().getAllIndustrySpecs()) {
                 tempMarket.addIndustry(spec.getId());
+                if (spec.getId().equals(Industries.PATROLHQ) && !Settings.FACTION_COLONY_AIS_CAN_UPGRADE_PATROL_HQ) {
+                    continue;
+                }
+                if (spec.getId().equals(Industries.MILITARYBASE) && !Settings.FACTION_COLONY_AIS_CAN_UPGRADE_MILITARY_BASE) {
+                    continue;
+                }
                 if (spec.getUpgrade() != null && !spec.getUpgrade().isBlank()) {
                     FactionColonyAI.COLONY_ACTIONS.add(new ColonyUpgradeAction(spec.getId()));
                 }

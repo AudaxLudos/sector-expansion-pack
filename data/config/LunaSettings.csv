@@ -23,6 +23,14 @@ Default true",,,
 sep_faction_colony_ais_can_improve,Faction Colony AIs Can Improve Structures,Boolean,TRUE,,"Sets whether or not a faction's colony ai can upgrade colony industries. Requires faction colony ais to be enabled. 
 
 Default true",,,
-,,,,,,,,
+sep_faction_colony_ais_can_build_patrol_hq,Faction Colony AIs Can Build Patrol HQs,Boolean,TRUE,,"Sets if factions can build patrol hqs. Mostly for preventing lag due to, too many patrol ships spawning. Requires faction colony ais enabled.
+
+Default true",,,
+sep_faction_colony_ais_can_upgrade_patrol_hq,Faction Colony AIs Can Upgrade Patrol HQs,Boolean,FALSE,,"Sets if factions can upgrade patrol hqs. Mostly for preventing lag due to, too many patrol ships spawning. Requires faction colony ais and can upgrade options enabled.
+
+Default true",,,
+sep_faction_colony_ais_can_upgrade_military_base,Faction Colony AIs Can Upgrade Military Bases,Boolean,FALSE,,"Sets if factions can upgrade military bases. Mostly for preventing lag due to, too many patrol ships spawning. Requires faction colony ais and can upgrade options enabled.
+
+Default true",,,
 ,,,,,,,,
 ,,,,,,,,

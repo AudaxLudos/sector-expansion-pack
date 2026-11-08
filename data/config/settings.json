@@ -1,12 +1,15 @@
 {
-  "sep_excavations_enabled": true, # Sets whether or not excavations can happen in a campaign. Default true
+  "sep_excavations_enabled": true, # Sets if excavations can happen in a campaign. Default true
   "sep_excavations_timer": 94, # Sets the interval between excavations in days as well as the grace period for the first excavation. Default 94
-  "sep_acquisitions_enabled": true, # Sets whether or not acquisitions can happen in a campaign. Default true
+  "sep_acquisitions_enabled": true, # Sets if acquisitions can happen in a campaign. Default true
   "sep_acquisitions_timer": 183, # Sets the interval between acquisitions in days as well as the grace period for the first acquisition. Default 183
 
-  "sep_faction_colony_ais_enabled": true, # Sets whether or not factions can auto develop their colonies. Default true
-  "sep_faction_colony_ais_can_upgrade": true, # Sets whether or not factions can upgrade colony industries. Requires faction colony ais to be enabled. Default true
-  "sep_faction_colony_ais_can_improve": true, # Sets whether or not factions can upgrade colony industries. Requires faction colony ais to be enabled. Default true
+  "sep_faction_colony_ais_enabled": true, # Sets if factions can auto develop their colonies. Default true
+  "sep_faction_colony_ais_can_upgrade": true, # Sets if factions can upgrade colony industries. Requires faction colony ais to be enabled. Default true
+  "sep_faction_colony_ais_can_improve": true, # Sets if factions can upgrade colony industries. Requires faction colony ais to be enabled. Default true
+  "sep_faction_colony_ais_can_build_patrol_hq": true, # Sets if factions can build patrol hqs. Mostly for preventing lag due to, too many patrol ships spawning. Requires faction colony ais enabled. Default true
+  "sep_faction_colony_ais_can_upgrade_patrol_hq": false, # Sets if factions can upgrade patrol hqs. Mostly for preventing lag due to, too many patrol ships spawning. Requires faction colony ais and can upgrade options enabled. Default true
+  "sep_faction_colony_ais_can_upgrade_military_base": false, # Sets if factions can upgrade military bases. Mostly for preventing lag due to, too many patrol ships spawning. Requires faction colony ais and can upgrade options enabled. Default true
 
   "graphics": {
     "intel": {

@@ -58,15 +58,11 @@ public class FactionColonyAI extends BaseIntelPlugin {
     public FactionColonyAI(FactionAPI faction, float minInterval, float maxInterval) {
         this.faction = faction;
         this.actionTimer = new IntervalUtil(minInterval, maxInterval);
-
-        // Global.getSector().getIntelManager().addIntel(this, true);
     }
 
     public FactionColonyAI(FactionAPI faction) {
         this.faction = faction;
         this.actionTimer = new IntervalUtil(30f, 60f);
-
-        // Global.getSector().getIntelManager().addIntel(this, true);
     }
 
     @SuppressWarnings("unchecked")
@@ -98,7 +94,17 @@ public class FactionColonyAI extends BaseIntelPlugin {
 
     @Override
     protected void advanceImpl(float amount) {
-        this.actionTimer.advance(amount);
+        float days = Misc.getDays(amount);
+        if (Settings.isDevMode()) {
+            days *= 100f;
+        }
+        if (Settings.isDevMode() && !Global.getSector().getIntelManager().hasIntel(this)) {
+            Global.getSector().getIntelManager().addIntel(this, true);
+        } else if (!Settings.isDevMode() && Global.getSector().getIntelManager().hasIntel(this)) {
+            Global.getSector().getIntelManager().removeIntel(this);
+        }
+
+        this.actionTimer.advance(days);
         if (!this.actionTimer.intervalElapsed()) {
             return;
         }

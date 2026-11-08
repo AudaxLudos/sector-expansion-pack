@@ -20,6 +20,9 @@ public class Settings implements LunaSettingsListener {
     public static boolean FACTION_COLONY_AIS_ENABLED;
     public static boolean FACTION_COLONY_AIS_CAN_UPGRADE;
     public static boolean FACTION_COLONY_AIS_CAN_IMPROVE;
+    public static boolean FACTION_COLONY_AIS_CAN_BUILD_PATROL_HQ;
+    public static boolean FACTION_COLONY_AIS_CAN_UPGRADE_PATROL_HQ;
+    public static boolean FACTION_COLONY_AIS_CAN_UPGRADE_MILITARY_BASE;
     public static List<String> COLONY_ITEM_WHITELIST = new ArrayList<>();
 
     public static void load() {
@@ -63,6 +66,9 @@ public class Settings implements LunaSettingsListener {
         FACTION_COLONY_AIS_ENABLED = getBoolean("sep_faction_colony_ais_enabled");
         FACTION_COLONY_AIS_CAN_UPGRADE = getBoolean("sep_faction_colony_ais_can_upgrade");
         FACTION_COLONY_AIS_CAN_IMPROVE = getBoolean("sep_faction_colony_ais_can_improve");
+        FACTION_COLONY_AIS_CAN_BUILD_PATROL_HQ = getBoolean("sep_faction_colony_ais_can_build_patrol_hq");
+        FACTION_COLONY_AIS_CAN_UPGRADE_PATROL_HQ = getBoolean("sep_faction_colony_ais_can_upgrade_patrol_hq");
+        FACTION_COLONY_AIS_CAN_UPGRADE_MILITARY_BASE = getBoolean("sep_faction_colony_ais_can_upgrade_military_base");
     }
 
     public static boolean getBoolean(String settingId) {
@@ -87,6 +93,10 @@ public class Settings implements LunaSettingsListener {
 
     public static boolean isLunaLibEnabled() {
         return Global.getSettings().getModManager().isModEnabled("lunalib");
+    }
+
+    public static boolean isDevMode() {
+        return Global.getSettings().isDevMode();
     }
 
     @Override
