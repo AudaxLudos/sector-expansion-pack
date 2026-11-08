@@ -1,3 +1,6 @@
+### 0.3.1-alpha
+- Fix crash on new game when initializing colony AI improve actions
+
 ### 0.3.0-alpha
 #### Not Save Compatible with version below this
 - Fix artifact installation intel not expiring after some time
