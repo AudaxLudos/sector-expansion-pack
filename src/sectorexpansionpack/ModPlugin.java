@@ -114,12 +114,8 @@ public class ModPlugin extends BaseModPlugin {
             FactionColonyAI.COLONY_ACTIONS.add(new BuildRefiningAction());
             FactionColonyAI.COLONY_ACTIONS.add(new BuildSpaceportAction());
             FactionColonyAI.COLONY_ACTIONS.add(new BuildWaystationAction());
-            String id = "temp_market_" + Misc.genUID();
-            MarketAPI tempMarket = Global.getFactory().createMarket("sep_" + id, id, 6);
-            tempMarket.setFactionId(Factions.NEUTRAL);
             // Colony AI upgrade actions
             for (IndustrySpecAPI spec : Global.getSettings().getAllIndustrySpecs()) {
-                tempMarket.addIndustry(spec.getId());
                 if (spec.getId().equals(Industries.PATROLHQ) && !Settings.FACTION_COLONY_AIS_CAN_UPGRADE_PATROL_HQ) {
                     continue;
                 }
@@ -130,10 +126,13 @@ public class ModPlugin extends BaseModPlugin {
                     FactionColonyAI.COLONY_ACTIONS.add(new ColonyUpgradeAction(spec.getId()));
                 }
             }
-            // Colony AI improve actions
-            for (Industry industry : tempMarket.getIndustries()) {
-                if (industry.canImprove()) {
-                    FactionColonyAI.COLONY_ACTIONS.add(new ColonyImproveAction(industry.getId()));
+            String id = "temp_market_" + Misc.genUID();
+            MarketAPI tempMarket = Global.getFactory().createMarket("sep_" + id, id, 6);
+            tempMarket.setFactionId(Factions.NEUTRAL);
+            for (IndustrySpecAPI spec : Global.getSettings().getAllIndustrySpecs()) {
+                Industry ind = spec.getNewPluginInstance(tempMarket);
+                if (ind.canImprove()) {
+                    FactionColonyAI.COLONY_ACTIONS.add(new ColonyImproveAction(ind.getId()));
                 }
             }
             STATIC_DATA_INITIALIZED = true;
