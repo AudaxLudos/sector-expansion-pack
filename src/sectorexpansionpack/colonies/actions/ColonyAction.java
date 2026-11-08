@@ -5,7 +5,7 @@ import com.fs.starfarer.api.campaign.econ.MarketAPI;
 import org.apache.log4j.Logger;
 
 public abstract class ColonyAction {
-    public static Logger log = Global.getLogger(ColonyAction.class);
+    public static final Logger log = Global.getLogger(ColonyAction.class);
 
     /**
      * Identifier for an action, will mostly be used for debugging

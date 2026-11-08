@@ -5,7 +5,7 @@ import com.fs.starfarer.api.campaign.econ.MarketAPI;
 import sectorexpansionpack.colonies.ColonyDevelopmentIntel;
 
 public class ColonyUpgradeAction extends ColonyBuildAction {
-    protected String industryId;
+    protected final String industryId;
 
     public ColonyUpgradeAction(String industryId) {
         this.industryId = industryId;

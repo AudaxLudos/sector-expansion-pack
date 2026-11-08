@@ -1,4 +1,4 @@
-## 0.3.0-alpha
+## 0.3.0-alpha - Not Save Compatible with version below this
 - Fix artifact installation intel not expiring after some time
 - Increase persuade story point cost for excavation and acquisition events
 - Add faction colony development intel

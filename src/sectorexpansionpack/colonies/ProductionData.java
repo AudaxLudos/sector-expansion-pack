@@ -10,7 +10,7 @@ import com.fs.starfarer.api.util.Misc;
 import java.util.*;
 
 public class ProductionData {
-    public static Map<String, IndustryEntry> INDUSTRIES = new HashMap<>();
+    public static final Map<String, IndustryEntry> INDUSTRIES = new HashMap<>();
 
     static {
         addIndustrySupplies(Industries.FARMING,
@@ -120,8 +120,8 @@ public class ProductionData {
     }
 
     public static class IndustryEntry {
-        public Set<String> supplies = new HashSet<>();
-        public Set<String> commodityDemands = new HashSet<>();
-        public Set<String> conditionDemands = new HashSet<>();
+        public final Set<String> supplies = new HashSet<>();
+        public final Set<String> commodityDemands = new HashSet<>();
+        public final Set<String> conditionDemands = new HashSet<>();
     }
 }

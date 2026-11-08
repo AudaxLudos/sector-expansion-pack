@@ -20,10 +20,10 @@ import java.awt.*;
 import java.util.Set;
 
 public class ColonyDevelopmentIntel extends BaseIntelPlugin {
-    protected MarketAPI market;
-    protected FactionAPI faction;
-    protected StarSystemAPI system;
-    protected ColonyAction action;
+    protected final MarketAPI market;
+    protected final FactionAPI faction;
+    protected final StarSystemAPI system;
+    protected final ColonyAction action;
 
     public ColonyDevelopmentIntel(MarketAPI market, ColonyAction action) {
         this.market = market;

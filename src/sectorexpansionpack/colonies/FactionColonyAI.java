@@ -44,10 +44,10 @@ import java.util.*;
  */
 public class FactionColonyAI extends BaseIntelPlugin {
     public static final String PERSISTENT_DATA_KEY = "sep_factionColonyAI";
-    public static List<ColonyAction> COLONY_ACTIONS = new ArrayList<>();
-    public static Logger log = Global.getLogger(FactionColonyAI.class);
-    protected FactionAPI faction;
-    protected IntervalUtil actionTimer;
+    public static final List<ColonyAction> COLONY_ACTIONS = new ArrayList<>();
+    public static final Logger log = Global.getLogger(FactionColonyAI.class);
+    protected final FactionAPI faction;
+    protected final IntervalUtil actionTimer;
     protected MarketAPI prevMarket;
     protected ColonyAction prevAction;
 
