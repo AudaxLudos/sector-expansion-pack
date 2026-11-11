@@ -1,8 +1,9 @@
 ### 0.3.1-alpha
+#### Not Save Compatible with versions below 0.3.0-alpha
 - Fix crash on new game when initializing colony AI improve actions
 
 ### 0.3.0-alpha
-#### Not Save Compatible with version below this
+#### Not Save Compatible with versions below 0.3.0-alpha
 - Fix artifact installation intel not expiring after some time
 - Increase persuade story point cost for excavation and acquisition events
 - Add faction colony development intel
