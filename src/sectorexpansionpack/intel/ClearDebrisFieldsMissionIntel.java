@@ -27,6 +27,9 @@ import java.util.Set;
 
 public class ClearDebrisFieldsMissionIntel extends BaseMissionIntel {
     public static final Logger log = Global.getLogger(ClearDebrisFieldsMissionIntel.class);
+    public static int BASE_REWARD = 20000;
+    public static int MIN_REWARD = 10000;
+    public static int REWARD_PER_DEBRIS = 2000;
     protected final MarketAPI market;
     protected final List<SectorEntityToken> debrisFields = new ArrayList<>();
     protected StarSystemAPI system;
@@ -50,10 +53,15 @@ public class ClearDebrisFieldsMissionIntel extends BaseMissionIntel {
         setDuration(120f);
 
         this.numDebris = Utils.random.nextInt(2, 8);
-        this.reward = (int) Misc.getDistance(new Vector2f(), this.market.getLocationInHyperspace());
-        this.reward = 20000 + (this.reward / 10000) * 10000 + (this.numDebris * 2000);
-        if (this.reward < 10000) {
-            this.reward = 10000;
+        int debrisPerReward = this.numDebris * REWARD_PER_DEBRIS;
+
+        float distanceMult = Misc.getDistance(new Vector2f(), this.market.getLocationInHyperspace()) / MIN_REWARD;
+        int distanceReward = (int) (distanceMult * MIN_REWARD);
+
+        int totalReward = BASE_REWARD + debrisPerReward + distanceReward;
+        this.reward = Math.round((float) totalReward / MIN_REWARD) * MIN_REWARD;
+        if (this.reward < MIN_REWARD) {
+            this.reward = MIN_REWARD;
         }
 
         log.info("Created ClearDebrisFieldsMissionIntel: faction: " + this.faction.getDisplayName());

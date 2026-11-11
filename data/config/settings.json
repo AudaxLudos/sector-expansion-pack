@@ -6,7 +6,7 @@
 
   "sep_faction_colony_ais_enabled": true, # Sets if factions can auto develop their colonies. Default true
   "sep_faction_colony_ais_can_upgrade": true, # Sets if factions can upgrade colony industries. Requires faction colony ais to be enabled. Default true
-  "sep_faction_colony_ais_can_improve": true, # Sets if factions can upgrade colony industries. Requires faction colony ais to be enabled. Default true
+  "sep_faction_colony_ais_can_improve": true, # Sets if factions can improve colony industries. Requires faction colony ais to be enabled. Default true
   "sep_faction_colony_ais_can_build_patrol_hq": true, # Sets if factions can build patrol hqs. Mostly for preventing lag due to, too many patrol ships spawning. Requires faction colony ais enabled. Default true
   "sep_faction_colony_ais_can_upgrade_patrol_hq": false, # Sets if factions can upgrade patrol hqs. Mostly for preventing lag due to, too many patrol ships spawning. Requires faction colony ais and can upgrade options enabled. Default true
   "sep_faction_colony_ais_can_upgrade_military_base": false, # Sets if factions can upgrade military bases. Mostly for preventing lag due to, too many patrol ships spawning. Requires faction colony ais and can upgrade options enabled. Default true

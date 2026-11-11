@@ -17,13 +17,14 @@ import com.fs.starfarer.api.util.IntervalUtil;
 import com.fs.starfarer.api.util.Misc;
 import com.fs.starfarer.api.util.WeightedRandomPicker;
 import org.apache.log4j.Logger;
-import org.lwjgl.util.vector.Vector2f;
 
 import java.awt.*;
 import java.util.Set;
 
 public class ConstructObjectiveMissionIntel extends BaseMissionIntel {
     public static final Logger log = Global.getLogger(ClearDebrisFieldsMissionIntel.class);
+    public static int BASE_REWARD = 20000;
+    public static int MIN_REWARD = 10000;
     protected final StarSystemAPI system;
     protected final IntervalUtil timer = new IntervalUtil(0.1f, 0.3f);
     protected MarketAPI market;
@@ -85,10 +86,18 @@ public class ConstructObjectiveMissionIntel extends BaseMissionIntel {
 
         setDuration(120f);
 
-        this.reward = (int) Misc.getDistance(this.market.getLocationInHyperspace(), this.system.getLocation());
-        this.reward = 20000 + (this.reward / 10000) * 10000;
-        if (this.reward < 10000) {
-            this.reward = 10000;
+        float machineryCost = Global.getSettings().getCommoditySpec(Commodities.HEAVY_MACHINERY).getBasePrice() * 15f;
+        float metalCost = Global.getSettings().getCommoditySpec(Commodities.METALS).getBasePrice() * 30f;
+        float rareMetalCost = Global.getSettings().getCommoditySpec(Commodities.RARE_METALS).getBasePrice() * 5f;
+        int resourceCostOffset = (int) (machineryCost + metalCost + rareMetalCost);
+
+        float distanceMult = Misc.getDistance(this.market.getLocationInHyperspace(), this.system.getLocation()) / MIN_REWARD;
+        int distanceReward = (int) (distanceMult * MIN_REWARD);
+
+        int totalReward = BASE_REWARD + resourceCostOffset + distanceReward;
+        this.reward = Math.round((float) totalReward / MIN_REWARD) * MIN_REWARD;
+        if (this.reward < MIN_REWARD) {
+            this.reward = MIN_REWARD;
         }
 
         log.info("Created ConstructObjectiveMissionIntel: faction: " + this.faction.getDisplayName());

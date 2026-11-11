@@ -60,11 +60,6 @@ public class FactionColonyAI extends BaseIntelPlugin {
         this.actionTimer = new IntervalUtil(minInterval, maxInterval);
     }
 
-    public FactionColonyAI(FactionAPI faction) {
-        this.faction = faction;
-        this.actionTimer = new IntervalUtil(30f, 60f);
-    }
-
     @SuppressWarnings("unchecked")
     public static Map<String, FactionColonyAI> getFactionColonyAIs() {
         if (!Global.getSector().getPersistentData().containsKey(PERSISTENT_DATA_KEY)) {
@@ -98,6 +93,7 @@ public class FactionColonyAI extends BaseIntelPlugin {
         if (Settings.isDevMode()) {
             days *= 100f;
         }
+
         if (Settings.isDevMode() && !Global.getSector().getIntelManager().hasIntel(this)) {
             Global.getSector().getIntelManager().addIntel(this, true);
         } else if (!Settings.isDevMode() && Global.getSector().getIntelManager().hasIntel(this)) {
