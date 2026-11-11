@@ -85,7 +85,7 @@ public class ConstructObjectiveMissionIntel extends BaseMissionIntel {
 
         setDuration(120f);
 
-        this.reward = (int) Misc.getDistance(new Vector2f(), this.market.getLocationInHyperspace());
+        this.reward = (int) Misc.getDistance(this.market.getLocationInHyperspace(), this.system.getLocation());
         this.reward = 20000 + (this.reward / 10000) * 10000;
         if (this.reward < 10000) {
             this.reward = 10000;
