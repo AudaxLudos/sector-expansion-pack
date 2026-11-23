@@ -434,7 +434,6 @@ public class SearchAndRescueMission extends SEPHubMissionWithScenario {
                         Misc.getOfficerSalary(this.survivor, false) : Misc.getAdminSalary(this.survivor)) * 0.5f;
                 OfficerManagerEvent.AvailableOfficer officer = new OfficerManagerEvent.AvailableOfficer(
                         this.survivor, getPerson().getMarket().getId(), 0, Math.round(salary));
-
                 if (this.survivorPostType == PersonPostType.OFFICER) {
                     manager.addAvailable(officer);
                 } else if (this.survivorPostType == PersonPostType.ADMINISTRATOR) {
