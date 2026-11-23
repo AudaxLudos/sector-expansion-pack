@@ -242,4 +242,13 @@ public class Utils {
 
         return closest;
     }
+
+    public static SpecialItemSpecAPI getSpecialItemSpec(String specialItemId) {
+        return Global.getSettings().getSpecialItemSpec(specialItemId);
+    }
+
+    public static SpecialItemData getSpecialItemData(String specialItemId) {
+        SpecialItemSpecAPI specialItemSpec = getSpecialItemSpec(specialItemId);
+        return new SpecialItemData(specialItemSpec.getId(), null);
+    }
 }

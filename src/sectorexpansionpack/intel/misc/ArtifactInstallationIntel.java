@@ -10,6 +10,7 @@ import com.fs.starfarer.api.impl.campaign.intel.BaseIntelPlugin;
 import com.fs.starfarer.api.ui.SectorMapAPI;
 import com.fs.starfarer.api.ui.TooltipMakerAPI;
 import com.fs.starfarer.api.util.Misc;
+import sectorexpansionpack.Utils;
 
 import java.awt.*;
 import java.util.Set;
@@ -18,18 +19,28 @@ public class ArtifactInstallationIntel extends BaseIntelPlugin {
     protected final MarketAPI market;
     protected final FactionAPI faction;
     protected final Industry industry;
-    protected final SpecialItemSpecAPI specialItemSpec;
+    @Deprecated
+    protected SpecialItemSpecAPI artifact;
+    protected String artifactId;
 
     public ArtifactInstallationIntel(MarketAPI market, Industry industry, SpecialItemSpecAPI specialItemSpec) {
         this.market = market;
         this.faction = market.getFaction();
         this.industry = industry;
-        this.specialItemSpec = specialItemSpec;
+        this.artifactId = specialItemSpec.getId();
 
         setPostingRangeLY(3f, true);
         setPostingLocation(this.market.getPrimaryEntity());
 
         Global.getSector().getIntelManager().queueIntel(this);
+    }
+
+    protected Object readResolve() {
+        if (this.artifact != null) {
+            this.artifactId = this.artifact.getId();
+            this.artifact = null;
+        }
+        return this;
     }
 
     @Override
@@ -38,8 +49,9 @@ public class ArtifactInstallationIntel extends BaseIntelPlugin {
         Color h = Misc.getHighlightColor();
         Color fc = this.faction.getBaseUIColor();
         float oPad = 10f;
+        SpecialItemSpecAPI specialItemSpec = Utils.getSpecialItemSpec(this.artifactId);
 
-        info.addImages(width, 96f, oPad, 3f, this.faction.getCrest(), this.specialItemSpec.getIconName());
+        info.addImages(width, 96f, oPad, 3f, this.faction.getCrest(), specialItemSpec.getIconName());
 
         info.addPara("Your contacts %s %s in the %s let you know that the %s has secured an artifact.", oPad,
                 new Color[]{tc, fc, h, fc},
@@ -48,7 +60,7 @@ public class ArtifactInstallationIntel extends BaseIntelPlugin {
 
         info.addPara("The artifact is called %s and is now installed on %s %s facility.", oPad,
                 new Color[]{h, tc, h},
-                this.specialItemSpec.getName(), Misc.getAOrAnFor(this.industry.getCurrentName()),
+                specialItemSpec.getName(), Misc.getAOrAnFor(this.industry.getCurrentName()),
                 this.industry.getCurrentName());
 
         addBulletPoints(info, ListInfoMode.IN_DESC);
@@ -60,6 +72,7 @@ public class ArtifactInstallationIntel extends BaseIntelPlugin {
     protected void addBulletPoints(TooltipMakerAPI info, ListInfoMode mode) {
         float pad = 3f;
         float oPad = 10f;
+        SpecialItemSpecAPI specialItemSpec = Utils.getSpecialItemSpec(this.artifactId);
 
         float initPad = pad;
         if (mode == ListInfoMode.IN_DESC) {
@@ -77,7 +90,7 @@ public class ArtifactInstallationIntel extends BaseIntelPlugin {
             info.addPara("Faction: %s", initPad, tc, fc, this.faction.getPersonNamePrefix());
             initPad = 0f;
             info.addPara("%s installed " + this.market.getOnOrAt() + " %s", initPad, tc, h,
-                    this.specialItemSpec.getName(), this.market.getName());
+                    specialItemSpec.getName(), this.market.getName());
         }
 
         unindent(info);

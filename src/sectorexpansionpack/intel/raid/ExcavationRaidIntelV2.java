@@ -41,8 +41,10 @@ public class ExcavationRaidIntelV2 extends GenericExpeditionIntel {
 
     protected final MarketAPI source;
     protected final SectorEntityToken target;
-    protected final SpecialItemSpecAPI artifact;
     protected final Random random;
+    @Deprecated
+    protected SpecialItemSpecAPI artifact;
+    protected String artifactId;
     protected float leakChance = 0.3f;
     protected boolean leaked = false;
     protected boolean artifactGiven = false;
@@ -53,7 +55,7 @@ public class ExcavationRaidIntelV2 extends GenericExpeditionIntel {
         this.defenderStr = getLargeSize(false);
         this.source = source;
         this.target = target;
-        this.artifact = artifact;
+        this.artifactId = artifact.getId();
         this.random = new Random();
 
         float desireMult = Utils.getSpecialItemsDesireMult(getFaction().getId());
@@ -95,7 +97,7 @@ public class ExcavationRaidIntelV2 extends GenericExpeditionIntel {
 
         // Mark the target for player and give it the special item
         Misc.makeImportant(this.target, HAS_ARTIFACT_REASON);
-        Misc.setSalvageSpecial(this.target, new SEPHiddenItemSpecial.HiddenSpecialItemSpecialData(this.artifact.getId()));
+        Misc.setSalvageSpecial(this.target, new SEPHiddenItemSpecial.HiddenSpecialItemSpecialData(this.artifactId));
 
         // Global.getSector().getIntelManager().queueIntel(this);
 
@@ -103,6 +105,14 @@ public class ExcavationRaidIntelV2 extends GenericExpeditionIntel {
                 getFaction().getDisplayName(),
                 this.source.getName(), this.source.getStarSystem().getNameWithLowercaseTypeShort(),
                 this.target.getName(), getSystem().getNameWithLowercaseTypeShort()));
+    }
+
+    protected Object readResolve() {
+        if (this.artifact != null) {
+            this.artifactId = this.artifact.getId();
+            this.artifact = null;
+        }
+        return this;
     }
 
     @Override
@@ -137,7 +147,7 @@ public class ExcavationRaidIntelV2 extends GenericExpeditionIntel {
             this.target.getMemoryWithoutUpdate().unset(EVENT_KEY);
             this.target.getMemoryWithoutUpdate().unset(MemFlags.SALVAGE_SPECIAL_DATA);
         } else if (stage instanceof GenericReturnStage stage1) {
-            SpecialItemData data = new SpecialItemData(this.artifact.getId(), null);
+            SpecialItemData data = new SpecialItemData(this.artifactId, null);
             Utils.findMarketToInstallSpecialItem(new EntityFinderMission(), getFaction().getId(), this.source, data, log);
             setOutcome(Outcome.SUCCEEDED);
             stage1.giveReturnOrdersToStragglers(stage1.getRoutes()); // Order fleets to return home and despawn
@@ -152,7 +162,8 @@ public class ExcavationRaidIntelV2 extends GenericExpeditionIntel {
                 this.leaked = true;
 
                 if (this.source.getStarSystem() != null) {
-                    new ExcavationLeakedIntel(this.source, this.target, this.artifact, stage, this);
+                    SpecialItemSpecAPI specialItemSpec = Utils.getSpecialItemSpec(this.artifactId);
+                    new ExcavationLeakedIntel(this.source, this.target, specialItemSpec, stage, this);
                     log.info(String.format("Leaking artifact location at %s by unknown contact %s %s in the %s",
                             this.target.getStarSystem().getNameWithLowercaseType(), this.source.getOnOrAt(),
                             this.source.getName(), this.source.getStarSystem().getNameWithLowercaseType()));
@@ -306,7 +317,7 @@ public class ExcavationRaidIntelV2 extends GenericExpeditionIntel {
             sendUpdateIfPlayerHasIntel(UPDATE_FAILED, dialog.getTextPanel());
             return true;
         } else if ("giveArtifact".equals(action)) {
-            SpecialItemData specialItemData = new SpecialItemData(this.artifact.getId(), null);
+            SpecialItemData specialItemData = new SpecialItemData(this.artifactId, null);
             Global.getSector().getPlayerFleet().getCargo().addSpecial(specialItemData, 1f);
             AddRemoveCommodity.addItemGainText(specialItemData, 1, dialog.getTextPanel());
             return true;

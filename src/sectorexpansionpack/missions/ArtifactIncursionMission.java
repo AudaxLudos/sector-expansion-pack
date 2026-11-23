@@ -33,14 +33,31 @@ public class ArtifactIncursionMission extends SEPHubMissionWithBarEvent implemen
     public static final float MISSION_DURATION = 120f;
     protected MarketAPI market;
     protected Industry industry;
+    @Deprecated
     protected SpecialItemSpecAPI specialItemSpec;
+    @Deprecated
     protected SpecialItemData specialItemData;
+    protected String artifactId;
     protected MarketCMD.RaidDangerLevel danger;
     protected SpecialItemRaidObjectivePluginImpl objectivePlugin;
 
     public ArtifactIncursionMission() {
         super();
         setGenRandom(new Random(Utils.random.nextLong()));
+    }
+
+    protected Object readResolve() {
+        if (this.specialItemSpec != null) {
+            this.artifactId = this.specialItemSpec.getId();
+            this.specialItemSpec = null;
+            this.specialItemData = null;
+        }
+        if (this.specialItemData != null) {
+            this.artifactId = this.specialItemData.getId();
+            this.specialItemSpec = null;
+            this.specialItemData = null;
+        }
+        return this;
     }
 
     @Override
@@ -105,7 +122,7 @@ public class ArtifactIncursionMission extends SEPHubMissionWithBarEvent implemen
         }
 
         pickItemFromIndustry();
-        if (this.specialItemSpec == null || this.specialItemData == null) {
+        if (this.artifactId == null) {
             log.info("Failed to find item to raid");
             return false;
         }
@@ -132,9 +149,10 @@ public class ArtifactIncursionMission extends SEPHubMissionWithBarEvent implemen
 
         setTimeLimit(Stage.FAILED, MISSION_DURATION, null);
 
+        SpecialItemSpecAPI specialItemSpec = Utils.getSpecialItemSpec(this.artifactId);
         this.danger = getDangerLevel();
         int bonus = getRewardBonusForMarines(getMarinesRequiredForCustomObjective(this.market, this.danger));
-        bonus += Math.round(this.specialItemSpec.getBasePrice() * 0.5f);
+        bonus += Math.round(specialItemSpec.getBasePrice() * 0.5f);
         setCreditRewardWithBonus(CreditReward.VERY_HIGH, bonus);
         setRepChanges(0.1f, 0.2f, 0.1f, 0.2f);
 
@@ -149,8 +167,8 @@ public class ArtifactIncursionMission extends SEPHubMissionWithBarEvent implemen
 
         triggerComplicationBegin(Stage.DELIVER_ARTIFACT, ComplicationSpawn.EXITING_SYSTEM,
                 this.market.getStarSystem(), this.market.getFactionId(),
-                "the " + this.specialItemSpec.getName(), "it",
-                "the " + this.specialItemSpec.getName() + " you stole from " + this.market.getName(),
+                "the " + specialItemSpec.getName(), "it",
+                "the " + specialItemSpec.getName() + " you stole from " + this.market.getName(),
                 0,
                 true, ComplicationRepImpact.FULL, null);
         if (this.market.getSize() <= 4) {
@@ -194,17 +212,18 @@ public class ArtifactIncursionMission extends SEPHubMissionWithBarEvent implemen
     }
 
     public void pickItemFromIndustry() {
-        this.specialItemData = this.industry.getSpecialItem();
-        if (this.specialItemData == null) {
+        SpecialItemData specialItemData = this.industry.getSpecialItem();
+        if (specialItemData == null) {
             return;
         }
-        this.specialItemSpec = Global.getSettings().getSpecialItemSpec(this.specialItemData.getId());
+        this.artifactId = specialItemData.getId();
     }
 
     public MarketCMD.RaidDangerLevel getDangerLevel() {
-        MarketCMD.RaidDangerLevel level = this.specialItemSpec.getBaseDanger();
+        SpecialItemSpecAPI specialItemSpec = Utils.getSpecialItemSpec(this.artifactId);
+        MarketCMD.RaidDangerLevel level = specialItemSpec.getBaseDanger();
         if (this.industry != null) {
-            level = this.industry.adjustItemDangerLevel(this.specialItemData.getId(), this.specialItemData.getData(), level);
+            level = this.industry.adjustItemDangerLevel(specialItemSpec.getId(), null, level);
         }
         return level;
     }
@@ -216,8 +235,9 @@ public class ArtifactIncursionMission extends SEPHubMissionWithBarEvent implemen
 
     @Override
     public String getIcon() {
-        if (this.specialItemSpec != null) {
-            return this.specialItemSpec.getIconName();
+        SpecialItemSpecAPI specialItemSpec = Utils.getSpecialItemSpec(this.artifactId);
+        if (specialItemSpec != null) {
+            return specialItemSpec.getIconName();
         }
         return super.getIcon();
     }
@@ -239,13 +259,14 @@ public class ArtifactIncursionMission extends SEPHubMissionWithBarEvent implemen
             return;
         }
 
-        Utils.findMarketToInstallSpecialItem(this, getPerson().getFaction().getId(), null, this.specialItemData, log);
+        Utils.findMarketToInstallSpecialItem(this, getPerson().getFaction().getId(), null, Utils.getSpecialItemData(this.artifactId), log);
     }
 
     @Override
     protected void updateInteractionDataImpl() {
-        set("$sep_aim_artifactId", this.specialItemSpec.getId());
-        set("$sep_aim_artifactName", this.specialItemSpec.getName());
+        SpecialItemSpecAPI specialItemSpec = Utils.getSpecialItemSpec(this.artifactId);
+        set("$sep_aim_artifactId", specialItemSpec.getId());
+        set("$sep_aim_artifactName", specialItemSpec.getName());
         set("$sep_aim_industryName", this.industry.getCurrentName());
         set("$sep_aim_industryAOrAn", Misc.ucFirst(Misc.getAOrAnFor(this.industry.getCurrentName())));
         set("$sep_aim_marketFactionColor", this.market.getFaction().getBaseUIColor());
@@ -342,7 +363,7 @@ public class ArtifactIncursionMission extends SEPHubMissionWithBarEvent implemen
         if (market == this.market && entity == this.market.getPrimaryEntity()) {
             for (GroundRaidObjectivePlugin obj : objectives) {
                 if (obj instanceof SpecialItemRaidObjectivePluginImpl plugin) {
-                    if (Objects.equals(plugin.getItemSpec().getId(), this.specialItemSpec.getId()) && plugin.getSource() == this.industry) {
+                    if (Objects.equals(plugin.getItemSpec().getId(), this.artifactId) && plugin.getSource() == this.industry) {
                         this.objectivePlugin = plugin;
                         plugin.setNameOverride("Take " + plugin.getItemSpec().getName() + " for " + getPerson().getNameString());
                         return;

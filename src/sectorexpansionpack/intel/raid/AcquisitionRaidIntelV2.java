@@ -35,8 +35,10 @@ public class AcquisitionRaidIntelV2 extends GenericExpeditionIntel {
 
     protected final MarketAPI target;
     protected final FactionAPI targetFaction;
-    protected final SpecialItemSpecAPI artifact;
     protected final Random random;
+    @Deprecated
+    protected SpecialItemSpecAPI artifact;
+    protected String artifactId;
     protected boolean artifactGiven = false;
 
     public AcquisitionRaidIntelV2(MarketAPI source, MarketAPI target, SpecialItemSpecAPI artifact) {
@@ -45,7 +47,7 @@ public class AcquisitionRaidIntelV2 extends GenericExpeditionIntel {
         this.source = source;
         this.target = target;
         this.targetFaction = target.getFaction();
-        this.artifact = artifact;
+        this.artifactId = artifact.getId();
         this.random = new Random();
 
         float desireMult = Utils.getSpecialItemsDesireMult(getFaction().getId());
@@ -92,6 +94,14 @@ public class AcquisitionRaidIntelV2 extends GenericExpeditionIntel {
                 this.target.getName(), getSystem().getNameWithLowercaseTypeShort()));
     }
 
+    protected Object readResolve() {
+        if (this.artifact != null) {
+            this.artifactId = this.artifact.getId();
+            this.artifact = null;
+        }
+        return this;
+    }
+
     @Override
     protected boolean checkFailureConditions(RaidStage stage) {
         if (!this.source.isInEconomy()) {
@@ -125,11 +135,12 @@ public class AcquisitionRaidIntelV2 extends GenericExpeditionIntel {
                 sendUpdateIfPlayerHasIntel(RaidIntel.ENTERED_SYSTEM_UPDATE, false);
             }
         } else if (stage instanceof AcquisitionActionStageV2) {
-            SpecialItemData data = new SpecialItemData(this.artifact.getId(), null);
+            SpecialItemSpecAPI specialItemSpec = Utils.getSpecialItemSpec(this.artifactId);
+            SpecialItemData data = new SpecialItemData(this.artifactId, null);
             for (Industry ind : this.target.getIndustries()) {
                 if (ind.getSpecialItem() != null && Objects.equals(ind.getSpecialItem().getId(), data.getId())) {
                     log.info(String.format("Removing %s from %s at %s in the %s due to an acquisition",
-                            this.artifact.getName(), ind.getCurrentName(), this.target.getName(),
+                            specialItemSpec.getName(), ind.getCurrentName(), this.target.getName(),
                             getSystem().getNameWithLowercaseTypeShort()));
                     ind.setSpecialItem(null);
                     break;
@@ -139,7 +150,7 @@ public class AcquisitionRaidIntelV2 extends GenericExpeditionIntel {
                 sendUpdateIfPlayerHasIntel(RaidIntel.UPDATE_RETURNING, false);
             }
         } else if (stage instanceof GenericReturnStage stage1) {
-            SpecialItemData data = new SpecialItemData(this.artifact.getId(), null);
+            SpecialItemData data = new SpecialItemData(this.artifactId, null);
             Utils.findMarketToInstallSpecialItem(new EntityFinderMission(), getFaction().getId(), this.source, data, log);
             setOutcome(Outcome.SUCCEEDED);
             stage1.giveReturnOrdersToStragglers(stage1.getRoutes());
@@ -357,7 +368,7 @@ public class AcquisitionRaidIntelV2 extends GenericExpeditionIntel {
             sendUpdateIfPlayerHasIntel(UPDATE_FAILED, dialog.getTextPanel());
             return true;
         } else if ("giveArtifact".equals(action)) {
-            SpecialItemData specialItemData = new SpecialItemData(this.artifact.getId(), null);
+            SpecialItemData specialItemData = new SpecialItemData(this.artifactId, null);
             Global.getSector().getPlayerFleet().getCargo().addSpecial(specialItemData, 1f);
             AddRemoveCommodity.addItemGainText(specialItemData, 1, dialog.getTextPanel());
             return true;
