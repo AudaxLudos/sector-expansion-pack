@@ -1,3 +1,12 @@
+### 0.3.8-alpha
+#### Not Save Compatible with versions below 0.3.0-alpha
+- Increase colony development interval between 60 and 120 from 30 and 90 days
+- Fix incorrect distance reward calculation for construct objective intel mission (more credits)
+- Add resource cost offset to construct object mission intel reward (more credits)
+- Fix save loading error after updating the game
+- Fix crash caused by an updated method call in 0.98.5a
+- Update game version to 0.98.5a from 0.98a
+
 ### 0.3.1-alpha
 #### Not Save Compatible with versions below 0.3.0-alpha
 - Fix crash on new game when initializing colony AI improve actions
