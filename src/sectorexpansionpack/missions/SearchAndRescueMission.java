@@ -431,7 +431,7 @@ public class SearchAndRescueMission extends SEPHubMissionWithScenario {
         for (EveryFrameScript script : Global.getSector().getScripts()) {
             if (script instanceof OfficerManagerEvent manager) {
                 float salary = (this.survivorPostType == PersonPostType.OFFICER ?
-                        Misc.getOfficerSalary(this.survivor) : Misc.getAdminSalary(this.survivor)) * 0.5f;
+                        Misc.getOfficerSalary(this.survivor, false) : Misc.getAdminSalary(this.survivor)) * 0.5f;
                 OfficerManagerEvent.AvailableOfficer officer = new OfficerManagerEvent.AvailableOfficer(
                         this.survivor, getPerson().getMarket().getId(), 0, Math.round(salary));
 
